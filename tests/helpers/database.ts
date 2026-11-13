@@ -36,3 +36,8 @@ export async function sessionActing(db:PGlite,user:string,session:string,sql:str
   await db.exec('set role authenticated');
   try { return await db.query(sql,params); } finally { await db.exec('reset role'); }
 }
+export async function clinicalDatabase() {
+  const db=await registryDatabase();
+  await db.exec(readFileSync('supabase/migrations/20261113045412_clinical_records.sql','utf8'));
+  return db;
+}
