@@ -4,13 +4,24 @@ Supabase remains the authentication/session authority. Signup confirmation and p
 
 ## Current connection and activation
 
-The official hosted MCP endpoint `https://mcp.resend.com/mcp` is registered in the owner's local Codex configuration. It needs OAuth authorization and a tool-connection refresh before its account tools can be used. No local Resend server/dependency install is needed. No Resend API key or verified sending domain was available when this work began. The existing hosted SMTP settings have therefore not been changed.
+The official hosted MCP endpoint `https://mcp.resend.com/mcp` is registered in the owner's local Codex configuration. The owner subsequently reported connecting the official Resend plugin successfully, but its tools have not yet appeared in this conversation; the separate local CLI entry still reports not logged in. These are distinct connection states. No local Resend server/dependency install is needed. The owner confirmed that no sending domain is owned yet and that the Resend account uses the same authorized test mailbox. No Resend API key is currently available to the operator scripts. The existing hosted SMTP settings have therefore not been changed.
+
+## Own-inbox testing before buying a domain
+
+Resend's shared `onboarding@resend.dev` sender can send testing mail only to the email address associated with the Resend account. This is sufficient for an owner-only delivery check; it does not enable delivery to arbitrary doctors or parents. See [Resend's testing restriction](https://resend.com/docs/knowledge-base/403-error-resend-dev-domain).
+
+The setup script has two additional modes that never read or change Supabase settings:
+
+- `--check-owner-test` verifies TLS SMTP authentication using only `RESEND_API_KEY`, without sending mail.
+- `--send-owner-test` sends one fixed plain-text, non-clinical message to `RESEND_TEST_RECIPIENT` using the shared test sender. It also requires `RESEND_SMOKE_OPERATION_ID`, a UUID retained for retry. The SMTP idempotency header and Message-ID remain stable for that operation. Never automatically retry an uncertain outcome with a new ID; inspect Resend first. Provider idempotency retention is finite, so this is not an unlimited-time deduplication guarantee.
+
+Keep the recipient, operation UUID and sending key in ignored environment configuration. No address, key, message content or raw SMTP/provider failure is printed. SMTP acceptance still needs a separate mailbox receipt confirmation; it does not prove inbox delivery, Auth recovery or general sender-domain readiness. These test modes deliberately do not switch the canonical app's global Auth sender to Resend's restricted test domain.
 
 The sender must use a domain the owner controls, with Resend's required DNS records verified. The application's `mon-enfant.vercel.app` hosting address is not an owned sending domain. Disable click/open tracking on the sending domain so Auth links are not rewritten and email opens are not tracked. Retain existing Auth confirmation/recovery templates and allowed callback URLs during the SMTP switch.
 
 Use separate credentials: a domain-restricted sending key as `RESEND_API_KEY`, and an operator-only full-access `RESEND_ADMIN_API_KEY` for reading domain verification/tracking settings. Keep both in a secret manager or ignored mode-600 `.env.local`. Neither belongs in client variables, Git, chat, command arguments, logs or test fixtures. `SUPABASE_ACCESS_TOKEN` is an operator Management API token, not an app service-role key. The setup script reads credentials from its environment and does not load or print files containing them.
 
-`scripts/configure-resend.py` supports:
+For a verified domain, `scripts/configure-resend.py` supports:
 
 - `--plan`: offline list of required environment names and intended settings.
 - `--check`: verifies the exact sending domain, tracking disabled, TLS SMTP authentication and the current hosted Auth mail configuration; no changes or email sent.
