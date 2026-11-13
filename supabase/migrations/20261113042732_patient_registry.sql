@@ -289,10 +289,13 @@ $$;
 create function public.my_access_requests() returns jsonb language sql security invoker set search_path='' as $$select private.my_access_requests();$$;
 create function private.pending_access_requests() returns jsonb
 language plpgsql security definer set search_path='' as $$
+declare result jsonb;
 begin
   perform private.assert_doctor();
-  return coalesce((select jsonb_agg(jsonb_build_object('id',r.id,'child_id',r.child_id,'universal_id',c.universal_id,'child_name',concat_ws(' ',c.given_name,c.family_name),'requester_professional_id',p.professional_id,'facility_name',f.name,'reason',r.request_reason,'number',r.local_number,'book',r.register_book,'year',r.register_year,'created_at',r.created_at) order by r.created_at)
-    from (select * from public.child_access_requests q where q.status='pending' and private.can_access_child(q.child_id,true) order by q.created_at limit 100) r join public.children c on c.id=r.child_id join public.professional_profiles p on p.user_id=r.requester_id join public.facilities f on f.id=r.facility_id),'[]'::jsonb);
+  select coalesce((select jsonb_agg(jsonb_build_object('id',r.id,'child_id',r.child_id,'universal_id',c.universal_id,'child_name',concat_ws(' ',c.given_name,c.family_name),'requester_professional_id',p.professional_id,'facility_name',f.name,'reason',r.request_reason,'number',r.local_number,'book',r.register_book,'year',r.register_year,'created_at',r.created_at) order by r.created_at)
+    from (select * from public.child_access_requests q where q.status='pending' and private.can_access_child(q.child_id,true) order by q.created_at limit 100) r join public.children c on c.id=r.child_id join public.professional_profiles p on p.user_id=r.requester_id join public.facilities f on f.id=r.facility_id),'[]'::jsonb) into result;
+  insert into public.audit_events(actor_id,entity_id,entity_type,action) select distinct auth.uid(),(item->>'child_id')::uuid,'child_access_worklist_read','accessed' from jsonb_array_elements(result) item;
+  return result;
 end;
 $$;
 create function public.pending_access_requests() returns jsonb language sql security invoker set search_path='' as $$select private.pending_access_requests();$$;
@@ -364,13 +367,14 @@ revoke all on public.child_access_changes from public,anon,authenticated;
 create trigger child_access_changes_immutable before update or delete on public.child_access_changes for each row execute function private.prevent_mutation();
 create trigger child_access_changes_audit after insert on public.child_access_changes for each row execute function private.audit_change();
 create function private.child_access_grants(p_child_id uuid) returns jsonb
-language plpgsql stable security definer set search_path='' as $$
+language plpgsql security definer set search_path='' as $$
 begin
   if not private.can_access_child(p_child_id,true) then raise exception 'Access manager required' using errcode='42501'; end if;
+  insert into public.audit_events(actor_id,entity_id,entity_type,action) values(auth.uid(),p_child_id,'child_access_grants_read','accessed');
   return coalesce((select jsonb_agg(jsonb_build_object('professional_id',g.professional_id,'platform_id',p.professional_id,'can_manage_access',g.can_manage_access,'granted_at',g.granted_at,'expires_at',g.expires_at,'revoked_at',g.revoked_at,'is_self',g.professional_id=auth.uid())) from public.access_grants g join public.professional_profiles p on p.user_id=g.professional_id where g.child_id=p_child_id),'[]'::jsonb);
 end;
 $$;
-create function public.child_access_grants(p_child_id uuid) returns jsonb language sql stable security invoker set search_path='' as $$select private.child_access_grants(p_child_id);$$;
+create function public.child_access_grants(p_child_id uuid) returns jsonb language sql security invoker set search_path='' as $$select private.child_access_grants(p_child_id);$$;
 create function private.revoke_child_access(p_child_id uuid,p_professional_id uuid,p_reason text) returns void
 language plpgsql security definer set search_path='' as $$
 begin

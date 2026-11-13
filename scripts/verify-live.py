@@ -84,13 +84,15 @@ try:
     status,_=rpc('review_verification',decision,a);check(status>=400,'A second decision cannot overwrite the first')
     child_id=str(uuid.uuid4())
     sql(f"begin; insert into public.children(id,given_name,family_name,birth_date,sex,created_by) values ('{child_id}','QA Fictif','{run}','2026-01-01','unknown','{doctor}'); insert into public.access_grants(child_id,professional_id,granted_by) values ('{child_id}','{doctor}','{reviewer}'); commit;")
-    status,rows=api('/rest/v1/children?select=id&id=eq.'+child_id,token=d['access_token']);check(status==200 and rows==[{'id':child_id}],'Approved doctor can read only the explicitly granted child')
-    status,rows=api('/rest/v1/children?select=id&id=eq.'+child_id,token=a['access_token']);check(status==200 and rows==[],'Reviewer admin has no blanket clinical access')
+    status,rows=api('/rest/v1/children?select=id&id=eq.'+child_id,token=d['access_token']);check(status in (401,403),'Direct clinical table reads denied even for an approved doctor')
+    status,record=rpc('get_child_profile',{'p_child_id':child_id},d);check(status==200 and record['id']==child_id,'Approved doctor reads the granted child through an audited RPC')
+    status,_=rpc('get_child_profile',{'p_child_id':child_id},a);check(status in (401,403),'Reviewer admin has no blanket clinical access')
     status,_=rpc('set_professional_suspension',{'p_user_id':doctor,'p_suspend':True,'p_reason':'Suspension de la fixture de test.'},a);check(status in (200,204),'Audited suspension succeeds')
-    status,rows=api('/rest/v1/children?select=id&id=eq.'+child_id,token=d['access_token']);check(status==200 and rows==[],'Suspension cuts clinical reads with the existing access token')
+    status,_=rpc('get_child_profile',{'p_child_id':child_id},d);check(status in (401,403),'Suspension cuts clinical reads with the existing access token')
     status,_=rpc('set_professional_suspension',{'p_user_id':doctor,'p_suspend':False,'p_reason':'Réactivation de la fixture de test.'},a);check(status in (200,204),'Audited reactivation succeeds')
     status,refreshed=api('/auth/v1/token?grant_type=refresh_token','POST',{'refresh_token':d['refresh_token']});check(status==200 and refreshed.get('access_token'),'Refresh-token lifecycle works');sessions.append(refreshed)
     status,_=api('/auth/v1/logout?scope=global','POST',token=refreshed['access_token']);check(status in (200,204),'Global sign-out succeeds')
+    status,_=rpc('get_child_profile',{'p_child_id':child_id},refreshed);check(status in (401,403),'Global sign-out cuts clinical access with an already issued JWT')
     status,_=api('/auth/v1/token?grant_type=refresh_token','POST',{'refresh_token':refreshed['refresh_token']});check(status>=400,'Sign-out invalidates refresh credentials')
 finally:
     if evidence_path:
