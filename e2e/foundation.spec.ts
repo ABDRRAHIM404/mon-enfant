@@ -89,7 +89,10 @@ test("recovery setup state and invalid recovery tokens", async ({ page }) => {
     page.getByRole("button", { name: "Demander un lien de récupération" }),
   ).toBeDisabled();
   await page.goto("/auth/confirm?type=recovery&token_hash=invalid");
-  await expect(page).toHaveURL(/confirmation=invalid/);
+  await expect(page).toHaveURL(/recovery=invalid/);
+  await expect(page.getByRole("alert")).toContainText("déjà utilisé ou expiré");
+  await page.goto("/auth/callback?next=reset-password");
+  await expect(page).toHaveURL(/recovery=invalid/);
   await page.goto("/auth/callback?next=https://attacker.invalid");
   await expect(page).toHaveURL(/confirmation=invalid/);
 });

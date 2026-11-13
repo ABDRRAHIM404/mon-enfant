@@ -44,7 +44,7 @@ try:
  status,new_session=api('/auth/v1/token?grant_type=password',{'email':email,'password':new});check(status==200 and new_session.get('access_token'),'New password authenticates successfully')
  status,_=api('/auth/v1/token?grant_type=refresh_token',{'refresh_token':old_session['refresh_token']});check(status>=400,'Password reset invalidates earlier refresh sessions')
  url,_,_=browser.get('/auth/reset-password');check('/login' in url,'Reset session is cleared after the successful change')
- fresh=Browser();url,_,_=fresh.get(path);check('confirmation=invalid' in url,'Recovery token cannot be reused')
+ fresh=Browser();url,_,_=fresh.get(path);check('recovery=invalid' in url,'Recovery token cannot be reused and returns to self-service recovery')
 finally:
  if user and user.get('id'):
   uid=str(uuid.UUID(user['id']))
