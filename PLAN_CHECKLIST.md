@@ -1,5 +1,9 @@
 # Full plan execution and completion audit
 
+Current implementation phase: **Phase 6 — Doctor/admin hardening and pilot readiness**.
+
+See [PROGRESS.md](PROGRESS.md) for verification evidence and remaining approval gates.
+
 This checklist preserves PROJECT_PLAN.md's complete Phase 0–8 scope. It is not a narrower definition of success. A phase can have implemented technical work while external approval gates remain unresolved. Later enhancements explicitly deferred in the baseline remain deferred, including OCR/AI, offline capture, WhatsApp/SMS, HBn/HB1 special-case automation and automatic catch-up.
 
 ## Phase 0 — baseline and validation
