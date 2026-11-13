@@ -31,16 +31,26 @@ export async function requireApprovedDoctor() {
 
 export async function requireReviewer() {
   const result = await getProfessional();
-  if (result.profile?.role !== "admin" || result.profile.verification_status !== "approved") redirect("/account");
+  if (
+    result.profile?.role !== "admin" ||
+    result.profile.verification_status !== "approved"
+  )
+    redirect("/account");
   const { data, error } = await result.supabase.rpc("can_review_professionals");
   if (error || data !== true) redirect("/account");
   return result;
 }
 
 export async function requireClinicalPermissionManager() {
-  const result=await getProfessional();
-  if(result.profile?.role!=='admin'||result.profile.verification_status!=='approved') redirect('/account');
-  const {data,error}=await result.supabase.rpc('can_manage_clinical_permissions');
-  if(error||data!==true) redirect('/account');
+  const result = await getProfessional();
+  if (
+    result.profile?.role !== "admin" ||
+    result.profile.verification_status !== "approved"
+  )
+    redirect("/account");
+  const { data, error } = await result.supabase.rpc(
+    "can_manage_clinical_permissions",
+  );
+  if (error || data !== true) redirect("/account");
   return result;
 }

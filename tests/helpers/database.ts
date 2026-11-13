@@ -1,7 +1,7 @@
 import { PGlite } from "@electric-sql/pglite";
 import { readFileSync } from "node:fs";
 export async function verificationDatabase() {
-  const db=new PGlite();
+  const db = new PGlite();
   await db.exec(`create role anon nologin; create role authenticated nologin;
     create schema auth; create table auth.users(id uuid primary key);
     create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
@@ -14,13 +14,21 @@ export async function verificationDatabase() {
     alter table storage.objects enable row level security;
     grant usage on schema storage to authenticated;
     grant select,insert,update,delete on storage.objects to authenticated;`);
-  for (const file of ['20261113021114_foundation.sql','20261113030711_professional_verification.sql']) await db.exec(readFileSync(`supabase/migrations/${file}`,'utf8'));
+  for (const file of [
+    "20261113021114_foundation.sql",
+    "20261113030711_professional_verification.sql",
+  ])
+    await db.exec(readFileSync(`supabase/migrations/${file}`, "utf8"));
   return db;
 }
-export async function acting(db:PGlite,user:string,sql:string) {
-  await db.query("select set_config('request.jwt.claim.sub',$1,false)",[user]);
+export async function acting(db: PGlite, user: string, sql: string) {
+  await db.query("select set_config('request.jwt.claim.sub',$1,false)", [user]);
   await db.exec("set role authenticated");
-  try { return await db.query(sql); } finally { await db.exec("reset role"); }
+  try {
+    return await db.query(sql);
+  } finally {
+    await db.exec("reset role");
+  }
 }
 
 export async function registryDatabase() {
@@ -28,16 +36,39 @@ export async function registryDatabase() {
   await db.exec(`create table auth.sessions(id uuid primary key,user_id uuid not null references auth.users(id),not_after timestamptz);
     create or replace function auth.jwt() returns jsonb language sql stable as $$
       select jsonb_build_object('is_anonymous',false,'session_id',nullif(current_setting('request.jwt.claim.session_id',true),'')) $$;`);
-  await db.exec(readFileSync('supabase/migrations/20261113042732_patient_registry.sql','utf8'));
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/20261113042732_patient_registry.sql",
+      "utf8",
+    ),
+  );
   return db;
 }
-export async function sessionActing(db:PGlite,user:string,session:string,sql:string,params:unknown[] = []) {
-  await db.query("select set_config('request.jwt.claim.sub',$1,false),set_config('request.jwt.claim.session_id',$2,false)",[user,session]);
-  await db.exec('set role authenticated');
-  try { return await db.query(sql,params); } finally { await db.exec('reset role'); }
+export async function sessionActing(
+  db: PGlite,
+  user: string,
+  session: string,
+  sql: string,
+  params: unknown[] = [],
+) {
+  await db.query(
+    "select set_config('request.jwt.claim.sub',$1,false),set_config('request.jwt.claim.session_id',$2,false)",
+    [user, session],
+  );
+  await db.exec("set role authenticated");
+  try {
+    return await db.query(sql, params);
+  } finally {
+    await db.exec("reset role");
+  }
 }
 export async function clinicalDatabase() {
-  const db=await registryDatabase();
-  await db.exec(readFileSync('supabase/migrations/20261113045412_clinical_records.sql','utf8'));
+  const db = await registryDatabase();
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/20261113045412_clinical_records.sql",
+      "utf8",
+    ),
+  );
   return db;
 }

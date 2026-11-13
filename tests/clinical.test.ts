@@ -1,30 +1,446 @@
-import { beforeAll,afterAll,describe,it,expect } from 'vitest';
-import { randomUUID } from 'node:crypto';
-import type { PGlite } from '@electric-sql/pglite';
-import { clinicalDatabase,sessionActing } from './helpers/database';
-let db:PGlite;
-type Actor={id:string;session:string};
-async function actor(role='doctor',status='approved',manager=false):Promise<Actor> {
- const id=randomUUID(),session=randomUUID();await db.query('insert into auth.users(id) values($1)',[id]);await db.query('insert into auth.sessions(id,user_id) values($1,$2)',[session,id]);
- await db.query('insert into public.professional_profiles(user_id,role,verification_status,professional_id) values($1,$2,$3,$4)',[id,role,status,status==='approved'?`CLINICAL-${id}`:null]);
- if(manager)await db.query('insert into private.staff_permissions(user_id,can_manage_clinical_permissions) values($1,true)',[id]);return{id,session};
+import { beforeAll, afterAll, describe, it, expect } from "vitest";
+import { randomUUID } from "node:crypto";
+import type { PGlite } from "@electric-sql/pglite";
+import { clinicalDatabase, sessionActing } from "./helpers/database";
+let db: PGlite;
+type Actor = { id: string; session: string };
+async function actor(
+  role = "doctor",
+  status = "approved",
+  manager = false,
+): Promise<Actor> {
+  const id = randomUUID(),
+    session = randomUUID();
+  await db.query("insert into auth.users(id) values($1)", [id]);
+  await db.query("insert into auth.sessions(id,user_id) values($1,$2)", [
+    session,
+    id,
+  ]);
+  await db.query(
+    "insert into public.professional_profiles(user_id,role,verification_status,professional_id) values($1,$2,$3,$4)",
+    [id, role, status, status === "approved" ? `CLINICAL-${id}` : null],
+  );
+  if (manager)
+    await db.query(
+      "insert into private.staff_permissions(user_id,can_manage_clinical_permissions) values($1,true)",
+      [id],
+    );
+  return { id, session };
 }
-async function rpc(a:Actor,name:string,args:unknown[]=[]):Promise<unknown>{const r=await sessionActing(db,a.id,a.session,`select public.${name}(${args.map((_,i)=>`$${i+1}`).join(',')}) as value`,args);return(r.rows[0] as {value:unknown}).value;}
-async function permission(manager:Actor,a:Actor,kind='consultation',enabled=true,op=randomUUID(),verified=true){return rpc(manager,'set_clinical_capability',[op,a.id,kind,enabled,null,'Source fictive de qualification vérifiée.','Attribution fictive documentée pour le test.',verified]);}
-async function setup(){const a=await actor(),manager=await actor('admin','approved',true),facility=await rpc(a,'create_facility',[randomUUID(),'Centre Fictif','Rabat']) as string;const child=await rpc(a,'register_child',[randomUUID(),{facility_id:facility,register_year:2026,register_book:'A',local_number:'125',given_name:'Enfant',family_name:'Fictif',birth_date:'2025-01-01',sex:'unknown'}]) as string;return{a,manager,facility,child};}
-function entry(child:string,facility:string,kind='consultation',payload:unknown={reason:'Contrôle fictif',findings:'Observation fictive'}){return[randomUUID(),child,kind,facility,'2026-01-02','exact','observed',null,true,payload];}
-beforeAll(async()=>{db=await clinicalDatabase();});afterAll(async()=>{await db?.close();});
-describe('current clinical schema',()=>{
- it('enables RLS and denies direct ledger/permission reads or writes',async()=>{const a=await actor();for(const table of ['clinical_entries','professional_capabilities','capability_changes'])await expect(sessionActing(db,a.id,a.session,`select * from public.${table}`)).rejects.toThrow(/permission denied/);const r=await db.query<{relrowsecurity:boolean}>("select relrowsecurity from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and relkind='r'");expect(r.rows.every(t=>t.relrowsecurity)).toBe(true);});
- it('does not infer clinical writes or permission management from account approval/reviewer status',async()=>{const{a,manager,child,facility}=await setup();await expect(rpc(a,'write_clinical_entry',entry(child,facility))).rejects.toThrow(/capability/);await expect(permission(a,a)).rejects.toThrow(/manager/);const reviewer=await actor('admin');await db.query('insert into private.staff_permissions(user_id,can_review_professionals) values($1,true)',[reviewer.id]);await expect(permission(reviewer,a)).rejects.toThrow(/manager/);await expect(permission(manager,a,'consultation',true,randomUUID(),false)).rejects.toThrow(/Verified basis/);expect(await rpc(a,'my_clinical_capabilities')).toEqual([]);});
- it('records verified capability attribution, idempotency and immutable history',async()=>{const{a,manager}=await setup(),op=randomUUID();await permission(manager,a,'consultation',true,op);await permission(manager,a,'consultation',true,op);expect(await rpc(a,'my_clinical_capabilities')).toEqual(['consultation']);const history=await rpc(a,'clinical_capability_history',[a.id]) as unknown[];expect(history).toHaveLength(1);await expect(permission(manager,a,'growth',true,op)).rejects.toThrow(/reused/);await expect(db.query('delete from public.capability_changes where professional_id=$1',[a.id])).rejects.toThrow(/Append-only/);});
- it('retains actor, platform ID, facility, occurrence, entry time and provenance',async()=>{const{a,manager,child,facility}=await setup();await permission(manager,a);const args=entry(child,facility),id=await rpc(a,'write_clinical_entry',args);expect(await rpc(a,'write_clinical_entry',args)).toBe(id);const ledger=await rpc(a,'clinical_entry_history',[child,id]);expect(ledger).toMatchObject([{id,root_id:id,revision:1,previous_id:null,author_id:a.id,professional_id:`CLINICAL-${a.id}`,facility_id:facility,occurrence_precision:'exact',source_type:'observed',source_verified:true,recorded_at:expect.any(String)}]);await expect(db.query('update public.clinical_entries set payload=$1 where id=$2',[{},id])).rejects.toThrow(/Append-only/);await expect(db.query('delete from public.clinical_entries where id=$1',[id])).rejects.toThrow(/Append-only/);});
- it('rejects malformed payloads, forged attribution, invalid dates and unauthorized facility membership',async()=>{const{a,manager,child,facility}=await setup();await permission(manager,a);for(const payload of [{reason:''},{reason:'Test',author_id:randomUUID()},{reason:5},{reason:'x'.repeat(1001)}])await expect(rpc(a,'write_clinical_entry',entry(child,facility,'consultation',payload))).rejects.toThrow();const args=entry(child,facility);args[4]='2024-01-01';await expect(rpc(a,'write_clinical_entry',args)).rejects.toThrow(/date/);args[4]='2200-01-01';await expect(rpc(a,'write_clinical_entry',args)).rejects.toThrow(/date/);const other=await actor(),f=await rpc(other,'create_facility',[randomUUID(),'Autre centre','']) as string;await expect(rpc(a,'write_clinical_entry',entry(child,f))).rejects.toThrow(/membership/);});
- it('keeps uncertain historical provenance explicit and does not invent a date',async()=>{const{a,manager,child,facility}=await setup();await permission(manager,a);const args=entry(child,facility);args[4]=null;args[5]='unknown';args[6]='paper_transcription';args[8]=false;await expect(rpc(a,'write_clinical_entry',args)).rejects.toThrow(/provenance/);args[7]='Registre papier fictif page 18';const id=await rpc(a,'write_clinical_entry',args);expect(await rpc(a,'clinical_entry_history',[child,id])).toMatchObject([{occurred_on:null,occurrence_precision:'unknown',source_verified:false,source_reference:'Registre papier fictif page 18'}]);});
- it('permits another authorized capable doctor to amend while preserving all revisions',async()=>{const{a,manager,child,facility}=await setup();await permission(manager,a);const id=await rpc(a,'write_clinical_entry',entry(child,facility));const b=await actor(),fb=await rpc(b,'create_facility',[randomUUID(),'Centre B','Rabat']);await db.query('insert into public.access_grants(child_id,professional_id,granted_by) values($1,$2,$3)',[child,b.id,a.id]);await permission(manager,b);const correction=[...entry(child,fb as string,'consultation',{reason:'Motif corrigé',findings:'Correction fictive'}),id,1,'Correction fictive justifiée par la source.','active'];const revised=await rpc(b,'write_clinical_entry',correction);expect(await rpc(b,'clinical_entry_history',[child,id])).toMatchObject([{id,author_id:a.id,revision:1,payload:{reason:'Contrôle fictif'}},{id:revised,author_id:b.id,revision:2,previous_id:id,payload:{reason:'Motif corrigé'}}]);expect(await rpc(a,'clinical_timeline',[child,1,'all'])).toMatchObject({total:1,items:[{id:revised,revision:2}]});await expect(rpc(b,'write_clinical_entry',[randomUUID(),...correction.slice(1)])).rejects.toThrow(/Stale clinical revision/);});
- it('records withdrawals as revisions and retains them in exports',async()=>{const{a,manager,child,facility}=await setup();await permission(manager,a);const original=entry(child,facility),id=await rpc(a,'write_clinical_entry',original);const amended=await rpc(a,'write_clinical_entry',[randomUUID(),...original.slice(1),id,1,'Retrait fictif pour erreur de saisie.','withdrawn']);expect(await rpc(a,'clinical_timeline',[child])).toMatchObject({items:[{id:amended,entry_state:'withdrawn'}]});expect(await rpc(a,'clinical_export',[child])).toMatchObject([{id,entry_state:'active'},{id:amended,entry_state:'withdrawn'}]);});
- it('validates measurements with explicit units and no invented percentile',async()=>{const{a,manager,child,facility}=await setup();await permission(manager,a,'growth');for(const p of [{},{weight_kg:'8'},{weight_kg:-1},{height_cm:999},{percentile:50}])await expect(rpc(a,'write_clinical_entry',entry(child,facility,'growth',p))).rejects.toThrow();const id=await rpc(a,'write_clinical_entry',entry(child,facility,'growth',{weight_kg:8.25,height_cm:72,head_cm:44}));expect(await rpc(a,'clinical_entry_history',[child,id])).toMatchObject([{payload:{weight_kg:8.25,height_cm:72,head_cm:44}}]);});
- it('keeps prescription and risk permissions distinct with required bounded fields',async()=>{const{a,manager,child,facility}=await setup();await permission(manager,a,'prescription');await expect(rpc(a,'write_clinical_entry',entry(child,facility,'prescription',{medication:'Traitement fictif'}))).rejects.toThrow(/instructions/);await rpc(a,'write_clinical_entry',entry(child,facility,'prescription',{medication:'Traitement fictif',instructions:'Instructions fictives du prescripteur',duration:'7 jours fictifs'}));await expect(rpc(a,'write_clinical_entry',entry(child,facility,'risk',{category:'allergy',description:'Allergie fictive',severity:'unknown'}))).rejects.toThrow(/capability/);await permission(manager,a,'risk');await rpc(a,'write_clinical_entry',entry(child,facility,'risk',{category:'allergy',description:'Allergie fictive',severity:'unknown'}));expect(await rpc(a,'clinical_timeline',[child,1,'risk'])).toMatchObject({total:1});});
- it('rechecks capability expiry/revocation, child grants, account suspension and Auth logout',async()=>{const{a,manager,child,facility}=await setup();await permission(manager,a);await rpc(a,'write_clinical_entry',entry(child,facility));await permission(manager,a,'consultation',false);await expect(rpc(a,'write_clinical_entry',entry(child,facility))).rejects.toThrow(/capability/);await permission(manager,a);await db.query("update public.professional_capabilities set expires_at=now()-interval '1 second' where professional_id=$1",[a.id]);await expect(rpc(a,'write_clinical_entry',entry(child,facility))).rejects.toThrow(/capability/);await db.query('update public.professional_capabilities set expires_at=null where professional_id=$1',[a.id]);await db.query("update public.professional_profiles set verification_status='suspended' where user_id=$1",[a.id]);await expect(rpc(a,'write_clinical_entry',entry(child,facility))).rejects.toThrow(/Approved doctor/);await expect(rpc(a,'clinical_timeline',[child])).rejects.toThrow(/denied/);await db.query("update public.professional_profiles set verification_status='approved' where user_id=$1",[a.id]);await db.query('update public.access_grants set revoked_at=now() where child_id=$1',[child]);await expect(rpc(a,'clinical_timeline',[child])).rejects.toThrow(/denied/);await db.query('delete from auth.sessions where id=$1',[manager.session]);await expect(permission(manager,a)).rejects.toThrow(/manager/);});
- it('denies unrelated and general-admin clinical reads/exports even if they know child and root IDs',async()=>{const{a,manager,child,facility}=await setup();await permission(manager,a);const root=await rpc(a,'write_clinical_entry',entry(child,facility));for(const caller of [await actor(),await actor('admin'),manager])for(const [name,args] of [['clinical_timeline',[child]],['clinical_entry_history',[child,root]],['clinical_export',[child]]] as [string,unknown[]][])await expect(rpc(caller,name,args)).rejects.toThrow(/denied/);});
+async function rpc(
+  a: Actor,
+  name: string,
+  args: unknown[] = [],
+): Promise<unknown> {
+  const r = await sessionActing(
+    db,
+    a.id,
+    a.session,
+    `select public.${name}(${args.map((_, i) => `$${i + 1}`).join(",")}) as value`,
+    args,
+  );
+  return (r.rows[0] as { value: unknown }).value;
+}
+async function permission(
+  manager: Actor,
+  a: Actor,
+  kind = "consultation",
+  enabled = true,
+  op = randomUUID(),
+  verified = true,
+) {
+  return rpc(manager, "set_clinical_capability", [
+    op,
+    a.id,
+    kind,
+    enabled,
+    null,
+    "Source fictive de qualification vérifiée.",
+    "Attribution fictive documentée pour le test.",
+    verified,
+  ]);
+}
+async function setup() {
+  const a = await actor(),
+    manager = await actor("admin", "approved", true),
+    facility = (await rpc(a, "create_facility", [
+      randomUUID(),
+      "Centre Fictif",
+      "Rabat",
+    ])) as string;
+  const child = (await rpc(a, "register_child", [
+    randomUUID(),
+    {
+      facility_id: facility,
+      register_year: 2026,
+      register_book: "A",
+      local_number: "125",
+      given_name: "Enfant",
+      family_name: "Fictif",
+      birth_date: "2025-01-01",
+      sex: "unknown",
+    },
+  ])) as string;
+  return { a, manager, facility, child };
+}
+function entry(
+  child: string,
+  facility: string,
+  kind = "consultation",
+  payload: unknown = {
+    reason: "Contrôle fictif",
+    findings: "Observation fictive",
+  },
+) {
+  return [
+    randomUUID(),
+    child,
+    kind,
+    facility,
+    "2026-01-02",
+    "exact",
+    "observed",
+    null,
+    true,
+    payload,
+  ];
+}
+beforeAll(async () => {
+  db = await clinicalDatabase();
+});
+afterAll(async () => {
+  await db?.close();
+});
+describe("current clinical schema", () => {
+  it("enables RLS and denies direct ledger/permission reads or writes", async () => {
+    const a = await actor();
+    for (const table of [
+      "clinical_entries",
+      "professional_capabilities",
+      "capability_changes",
+    ])
+      await expect(
+        sessionActing(db, a.id, a.session, `select * from public.${table}`),
+      ).rejects.toThrow(/permission denied/);
+    const r = await db.query<{ relrowsecurity: boolean }>(
+      "select relrowsecurity from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and relkind='r'",
+    );
+    expect(r.rows.every((t) => t.relrowsecurity)).toBe(true);
+  });
+  it("does not infer clinical writes or permission management from account approval/reviewer status", async () => {
+    const { a, manager, child, facility } = await setup();
+    await expect(
+      rpc(a, "write_clinical_entry", entry(child, facility)),
+    ).rejects.toThrow(/capability/);
+    await expect(permission(a, a)).rejects.toThrow(/manager/);
+    const reviewer = await actor("admin");
+    await db.query(
+      "insert into private.staff_permissions(user_id,can_review_professionals) values($1,true)",
+      [reviewer.id],
+    );
+    await expect(permission(reviewer, a)).rejects.toThrow(/manager/);
+    await expect(
+      permission(manager, a, "consultation", true, randomUUID(), false),
+    ).rejects.toThrow(/Verified basis/);
+    expect(await rpc(a, "my_clinical_capabilities")).toEqual([]);
+  });
+  it("records verified capability attribution, idempotency and immutable history", async () => {
+    const { a, manager } = await setup(),
+      op = randomUUID();
+    await permission(manager, a, "consultation", true, op);
+    await permission(manager, a, "consultation", true, op);
+    expect(await rpc(a, "my_clinical_capabilities")).toEqual(["consultation"]);
+    const history = (await rpc(a, "clinical_capability_history", [
+      a.id,
+    ])) as unknown[];
+    expect(history).toHaveLength(1);
+    await expect(permission(manager, a, "growth", true, op)).rejects.toThrow(
+      /reused/,
+    );
+    await expect(
+      db.query(
+        "delete from public.capability_changes where professional_id=$1",
+        [a.id],
+      ),
+    ).rejects.toThrow(/Append-only/);
+  });
+  it("retains actor, platform ID, facility, occurrence, entry time and provenance", async () => {
+    const { a, manager, child, facility } = await setup();
+    await permission(manager, a);
+    const args = entry(child, facility),
+      id = await rpc(a, "write_clinical_entry", args);
+    expect(await rpc(a, "write_clinical_entry", args)).toBe(id);
+    const ledger = await rpc(a, "clinical_entry_history", [child, id]);
+    expect(ledger).toMatchObject([
+      {
+        id,
+        root_id: id,
+        revision: 1,
+        previous_id: null,
+        author_id: a.id,
+        professional_id: `CLINICAL-${a.id}`,
+        facility_id: facility,
+        occurrence_precision: "exact",
+        source_type: "observed",
+        source_verified: true,
+        recorded_at: expect.any(String),
+      },
+    ]);
+    await expect(
+      db.query("update public.clinical_entries set payload=$1 where id=$2", [
+        {},
+        id,
+      ]),
+    ).rejects.toThrow(/Append-only/);
+    await expect(
+      db.query("delete from public.clinical_entries where id=$1", [id]),
+    ).rejects.toThrow(/Append-only/);
+  });
+  it("rejects malformed payloads, forged attribution, invalid dates and unauthorized facility membership", async () => {
+    const { a, manager, child, facility } = await setup();
+    await permission(manager, a);
+    for (const payload of [
+      { reason: "" },
+      { reason: "Test", author_id: randomUUID() },
+      { reason: 5 },
+      { reason: "x".repeat(1001) },
+    ])
+      await expect(
+        rpc(
+          a,
+          "write_clinical_entry",
+          entry(child, facility, "consultation", payload),
+        ),
+      ).rejects.toThrow();
+    const args = entry(child, facility);
+    args[4] = "2024-01-01";
+    await expect(rpc(a, "write_clinical_entry", args)).rejects.toThrow(/date/);
+    args[4] = "2200-01-01";
+    await expect(rpc(a, "write_clinical_entry", args)).rejects.toThrow(/date/);
+    const other = await actor(),
+      f = (await rpc(other, "create_facility", [
+        randomUUID(),
+        "Autre centre",
+        "",
+      ])) as string;
+    await expect(
+      rpc(a, "write_clinical_entry", entry(child, f)),
+    ).rejects.toThrow(/membership/);
+  });
+  it("keeps uncertain historical provenance explicit and does not invent a date", async () => {
+    const { a, manager, child, facility } = await setup();
+    await permission(manager, a);
+    const args = entry(child, facility);
+    args[4] = null;
+    args[5] = "unknown";
+    args[6] = "paper_transcription";
+    args[8] = false;
+    await expect(rpc(a, "write_clinical_entry", args)).rejects.toThrow(
+      /provenance/,
+    );
+    args[7] = "Registre papier fictif page 18";
+    const id = await rpc(a, "write_clinical_entry", args);
+    expect(await rpc(a, "clinical_entry_history", [child, id])).toMatchObject([
+      {
+        occurred_on: null,
+        occurrence_precision: "unknown",
+        source_verified: false,
+        source_reference: "Registre papier fictif page 18",
+      },
+    ]);
+  });
+  it("permits another authorized capable doctor to amend while preserving all revisions", async () => {
+    const { a, manager, child, facility } = await setup();
+    await permission(manager, a);
+    const id = await rpc(a, "write_clinical_entry", entry(child, facility));
+    const b = await actor(),
+      fb = await rpc(b, "create_facility", [randomUUID(), "Centre B", "Rabat"]);
+    await db.query(
+      "insert into public.access_grants(child_id,professional_id,granted_by) values($1,$2,$3)",
+      [child, b.id, a.id],
+    );
+    await permission(manager, b);
+    const correction = [
+      ...entry(child, fb as string, "consultation", {
+        reason: "Motif corrigé",
+        findings: "Correction fictive",
+      }),
+      id,
+      1,
+      "Correction fictive justifiée par la source.",
+      "active",
+    ];
+    const revised = await rpc(b, "write_clinical_entry", correction);
+    expect(await rpc(b, "clinical_entry_history", [child, id])).toMatchObject([
+      {
+        id,
+        author_id: a.id,
+        revision: 1,
+        payload: { reason: "Contrôle fictif" },
+      },
+      {
+        id: revised,
+        author_id: b.id,
+        revision: 2,
+        previous_id: id,
+        payload: { reason: "Motif corrigé" },
+      },
+    ]);
+    expect(await rpc(a, "clinical_timeline", [child, 1, "all"])).toMatchObject({
+      total: 1,
+      items: [{ id: revised, revision: 2 }],
+    });
+    await expect(
+      rpc(b, "write_clinical_entry", [randomUUID(), ...correction.slice(1)]),
+    ).rejects.toThrow(/Stale clinical revision/);
+  });
+  it("records withdrawals as revisions and retains them in exports", async () => {
+    const { a, manager, child, facility } = await setup();
+    await permission(manager, a);
+    const original = entry(child, facility),
+      id = await rpc(a, "write_clinical_entry", original);
+    const amended = await rpc(a, "write_clinical_entry", [
+      randomUUID(),
+      ...original.slice(1),
+      id,
+      1,
+      "Retrait fictif pour erreur de saisie.",
+      "withdrawn",
+    ]);
+    expect(await rpc(a, "clinical_timeline", [child])).toMatchObject({
+      items: [{ id: amended, entry_state: "withdrawn" }],
+    });
+    expect(await rpc(a, "clinical_export", [child])).toMatchObject([
+      { id, entry_state: "active" },
+      { id: amended, entry_state: "withdrawn" },
+    ]);
+  });
+  it("validates measurements with explicit units and no invented percentile", async () => {
+    const { a, manager, child, facility } = await setup();
+    await permission(manager, a, "growth");
+    for (const p of [
+      {},
+      { weight_kg: "8" },
+      { weight_kg: -1 },
+      { height_cm: 999 },
+      { percentile: 50 },
+    ])
+      await expect(
+        rpc(a, "write_clinical_entry", entry(child, facility, "growth", p)),
+      ).rejects.toThrow();
+    const id = await rpc(
+      a,
+      "write_clinical_entry",
+      entry(child, facility, "growth", {
+        weight_kg: 8.25,
+        height_cm: 72,
+        head_cm: 44,
+      }),
+    );
+    expect(await rpc(a, "clinical_entry_history", [child, id])).toMatchObject([
+      { payload: { weight_kg: 8.25, height_cm: 72, head_cm: 44 } },
+    ]);
+  });
+  it("keeps prescription and risk permissions distinct with required bounded fields", async () => {
+    const { a, manager, child, facility } = await setup();
+    await permission(manager, a, "prescription");
+    await expect(
+      rpc(
+        a,
+        "write_clinical_entry",
+        entry(child, facility, "prescription", {
+          medication: "Traitement fictif",
+        }),
+      ),
+    ).rejects.toThrow(/instructions/);
+    await rpc(
+      a,
+      "write_clinical_entry",
+      entry(child, facility, "prescription", {
+        medication: "Traitement fictif",
+        instructions: "Instructions fictives du prescripteur",
+        duration: "7 jours fictifs",
+      }),
+    );
+    await expect(
+      rpc(
+        a,
+        "write_clinical_entry",
+        entry(child, facility, "risk", {
+          category: "allergy",
+          description: "Allergie fictive",
+          severity: "unknown",
+        }),
+      ),
+    ).rejects.toThrow(/capability/);
+    await permission(manager, a, "risk");
+    await rpc(
+      a,
+      "write_clinical_entry",
+      entry(child, facility, "risk", {
+        category: "allergy",
+        description: "Allergie fictive",
+        severity: "unknown",
+      }),
+    );
+    expect(await rpc(a, "clinical_timeline", [child, 1, "risk"])).toMatchObject(
+      { total: 1 },
+    );
+  });
+  it("rechecks capability expiry/revocation, child grants, account suspension and Auth logout", async () => {
+    const { a, manager, child, facility } = await setup();
+    await permission(manager, a);
+    await rpc(a, "write_clinical_entry", entry(child, facility));
+    await permission(manager, a, "consultation", false);
+    await expect(
+      rpc(a, "write_clinical_entry", entry(child, facility)),
+    ).rejects.toThrow(/capability/);
+    await permission(manager, a);
+    await db.query(
+      "update public.professional_capabilities set expires_at=now()-interval '1 second' where professional_id=$1",
+      [a.id],
+    );
+    await expect(
+      rpc(a, "write_clinical_entry", entry(child, facility)),
+    ).rejects.toThrow(/capability/);
+    await db.query(
+      "update public.professional_capabilities set expires_at=null where professional_id=$1",
+      [a.id],
+    );
+    await db.query(
+      "update public.professional_profiles set verification_status='suspended' where user_id=$1",
+      [a.id],
+    );
+    await expect(
+      rpc(a, "write_clinical_entry", entry(child, facility)),
+    ).rejects.toThrow(/Approved doctor/);
+    await expect(rpc(a, "clinical_timeline", [child])).rejects.toThrow(
+      /denied/,
+    );
+    await db.query(
+      "update public.professional_profiles set verification_status='approved' where user_id=$1",
+      [a.id],
+    );
+    await db.query(
+      "update public.access_grants set revoked_at=now() where child_id=$1",
+      [child],
+    );
+    await expect(rpc(a, "clinical_timeline", [child])).rejects.toThrow(
+      /denied/,
+    );
+    await db.query("delete from auth.sessions where id=$1", [manager.session]);
+    await expect(permission(manager, a)).rejects.toThrow(/manager/);
+  });
+  it("denies unrelated and general-admin clinical reads/exports even if they know child and root IDs", async () => {
+    const { a, manager, child, facility } = await setup();
+    await permission(manager, a);
+    const root = await rpc(a, "write_clinical_entry", entry(child, facility));
+    for (const caller of [await actor(), await actor("admin"), manager])
+      for (const [name, args] of [
+        ["clinical_timeline", [child]],
+        ["clinical_entry_history", [child, root]],
+        ["clinical_export", [child]],
+      ] as [string, unknown[]][])
+        await expect(rpc(caller, name, args)).rejects.toThrow(/denied/);
+  });
 });
