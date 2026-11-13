@@ -778,7 +778,7 @@ describe("appointments, independent clinical permissions and cross-doctor contin
       [a.id],
     );
     await expect(rpc(a, "change_appointment", decision(id, 1))).rejects.toThrow(
-      /practice/,
+      /facility/,
     );
     await db.query(
       "update public.access_grants set expires_at=now()-interval '1 second' where child_id=$1",

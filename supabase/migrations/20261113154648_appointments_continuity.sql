@@ -308,10 +308,22 @@ create function public.appointments_export(p_child_id uuid) returns jsonb langua
 create function public.vaccine_followup_worklist(p_bucket text default 'all',p_page integer default 1) returns jsonb language sql security invoker set search_path='' as $$select private.vaccine_followup_worklist(p_bucket,p_page);$$;
 create function public.patient_visit_overview(p_child_id uuid) returns jsonb language sql security invoker set search_path='' as $$select private.patient_visit_overview(p_child_id);$$;
 
+
+create function private.appointment_item_options(p_child_id uuid) returns jsonb
+language plpgsql security definer set search_path='' as $$
+declare result jsonb;
+begin
+ if not private.can_access_child(p_child_id,false) then raise exception 'Child access denied' using errcode='42501';end if;
+ if (select count(*) from public.child_vaccine_items where child_id=p_child_id)>5000 then raise exception 'Appointment options exceed interactive limit' using errcode='54000';end if;
+ select coalesce(jsonb_agg(jsonb_build_object('id',i.id,'dose_code',i.dose_code,'vaccine_code',r.vaccine_code,'version_id',i.version_id,'version_label',v.label,'version_status',v.status,'active',private.vaccine_item_active(i.id),'reference',private.item_reference(i.id),'documentation',private.item_documentation(i.id)) order by i.created_at,i.id),'[]'::jsonb) into result from public.child_vaccine_items i join public.vaccine_versions v on v.id=i.version_id join public.vaccine_rules r on r.version_id=i.version_id and r.dose_code=i.dose_code where i.child_id=p_child_id;
+ insert into public.audit_events(actor_id,entity_id,entity_type,action) values(auth.uid(),p_child_id,'appointment_item_options_read','accessed');return result;
+end;$$;
+create function public.appointment_item_options(p_child_id uuid) returns jsonb language sql security invoker set search_path='' as $$select private.appointment_item_options(p_child_id);$$;
+
 do $$declare fn record;begin
- for fn in select p.oid::regprocedure signature,p.proname from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname in ('public','private') and p.proname=any(array['appointment_instant','item_documentation','assert_appointment_item','assert_open_appointment','create_appointment','change_appointment','guard_appointment_identity','guard_appointment_event','appointment_rows','appointment_calendar','appointment_worklist','patient_appointments','appointment_history','appointments_export','item_reference','vaccine_followup_rows','vaccine_followup_worklist','patient_visit_overview','list_patients','list_patients_base']) loop
+ for fn in select p.oid::regprocedure signature,p.proname from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname in ('public','private') and p.proname=any(array['appointment_instant','item_documentation','assert_appointment_item','assert_open_appointment','create_appointment','change_appointment','guard_appointment_identity','guard_appointment_event','appointment_rows','appointment_calendar','appointment_worklist','patient_appointments','appointment_history','appointments_export','item_reference','vaccine_followup_rows','vaccine_followup_worklist','patient_visit_overview','list_patients','list_patients_base','appointment_item_options']) loop
   execute format('revoke all on function %s from public,anon,authenticated',fn.signature);
-  if fn.proname=any(array['create_appointment','change_appointment','appointment_calendar','appointment_worklist','patient_appointments','appointment_history','appointments_export','vaccine_followup_worklist','patient_visit_overview','list_patients']) then execute format('grant execute on function %s to authenticated',fn.signature);end if;
+  if fn.proname=any(array['create_appointment','change_appointment','appointment_calendar','appointment_worklist','patient_appointments','appointment_history','appointments_export','vaccine_followup_worklist','patient_visit_overview','list_patients','appointment_item_options']) then execute format('grant execute on function %s to authenticated',fn.signature);end if;
  end loop;
 end$$;
 commit;
