@@ -265,7 +265,7 @@ describe("appointments, independent clinical permissions and cross-doctor contin
     const other = await setup();
     await expect(
       rpc(a, "create_appointment", createArgs(child, other.facility)),
-    ).rejects.toThrow(/practice/);
+    ).rejects.toThrow(/facility/);
   });
   it("uses the checked permission manager workflow without implying vaccination privileges", async () => {
     const { a } = await setup();
