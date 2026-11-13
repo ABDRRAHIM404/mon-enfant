@@ -39,6 +39,6 @@ Test the complete A/B scenario: A registers child/local 125; authorized B links 
 
 ## Outstanding hardening inputs to preserve
 
-- Actual email delivery remains unproven; recovery/confirmation tokens and hosted password reset are technically tested without sending email.
+- Actual owner signup confirmation is verified, and Resend owner-only delivery/recovery/new-password sign-in succeeded. A verified sending domain, broader delivery and application notifications remain open (EMAIL_DELIVERY.md).
 - The current evidence bucket/UI declares 5 MiB. Before readiness, test the hosted upload boundary against Vercel's actual inbound body limit (verify current primary docs); adjust the allowed size or use a properly validated direct-upload flow if needed. Small-file smoke tests do not prove the largest accepted file works.
 - Formal clinical/source, legal/hosting, real reviewer/guardian verification, production retention and native/device gates remain open. These do not authorize identifiable-data use while the synthetic implementation progresses.

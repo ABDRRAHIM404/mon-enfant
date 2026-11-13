@@ -58,3 +58,10 @@ Clinical originals and amendments retain child/root/previous IDs, revision, entr
 Audited reads expose latest-revision timeline pages, complete event amendment history and permitted all-revision exports. Capability changes are separately attributed and retry-safe. The migration reserves the vaccination capability but does not yet implement vaccine entries/catalog/routine schedule logic. Full current-schema tests are in `tests/clinical.test.ts`; deployed/applied status and live evidence are recorded in PROGRESS.md.
 
 Follow-up migration `20261113051659_clinical_revision_conflict.sql` uses PT409 for stale expected revisions. Explicitly raising 40001 is unsuitable for a deterministic business conflict on the actual PostgREST 14.18 provider because it retries that transaction indefinitely. Current full-schema tests apply both migrations, and hosted acceptance asserts exact HTTP 409 and the actual stale-form feedback.
+
+
+## Versioned vaccine catalog (Phase 4)
+
+Migration `20261113091129_vaccine_catalog.sql` is applied and verified in the hosted migration ledger. `private.vaccine_sources` preserves the original JSON and exact file hash. Public `vaccine_versions`, `vaccine_rules` and append-only `vaccine_catalog_changes` all have RLS enabled and no direct client table privileges. Narrow invoker RPC wrappers use checked private implementations; reader/caller session, account state, separate editor/reviewer appointments and current vaccination capability are rechecked. Editor authority confers no child access.
+
+Rule guards protect immutable original source mappings and agreed birth-window/rotavirus/HPV/HB1 constraints. Review records source/clinical/window attestations and is independent of any actor who created/edited that version. Row locks, actor/operation receipts and expected revisions make edits/reviews retry-safe and serialize races; business conflicts use PT409. Publication freezes content; retirement retains every snapshot and original review mapping. Initial source status remains draft. Child dose-item/administration foreign-key mappings are not implemented yet.
