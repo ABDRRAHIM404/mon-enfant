@@ -1,0 +1,39 @@
+name: Operational readiness
+run-name: Operational readiness · ${{ inputs.mode || 'scheduled-check' }}
+on:
+  schedule:
+    # Synthetic development sampling, four short credential-free probes a day.
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Read-only live check or controlled report failure (no application outage)
+        type: choice
+        options: [check, failure-drill]
+        default: check
+permissions:
+  contents: read
+concurrency:
+  group: operational-readiness-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  readiness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    env:
+      READINESS_DRILL: ${{ inputs.mode == 'failure-drill' && '1' || '0' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check deployed readiness and anonymous export denial
+        run: |
+          if [ "$READINESS_DRILL" = "1" ]; then
+            python3 scripts/check-readiness.py --exercise-failure
+          else
+            python3 scripts/check-readiness.py
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: operational-readiness-result
+          path: test-results/readiness/result.json
+          retention-days: 3

@@ -108,3 +108,13 @@ test("recovery setup state and invalid recovery tokens", async ({ page }) => {
   await page.goto("/auth/callback?next=https://attacker.invalid");
   await expect(page).toHaveURL(/confirmation=invalid/);
 });
+
+test("public readiness fails closed without configuration and exposes no details", async ({
+  request,
+}) => {
+  const response = await request.get("/api/health");
+  expect(response.status()).toBe(503);
+  expect(await response.json()).toEqual({ status: "unavailable" });
+  expect(response.headers()["cache-control"]).toContain("no-store");
+  expect(response.headers()["set-cookie"]).toBeUndefined();
+});
