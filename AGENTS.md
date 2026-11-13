@@ -5,3 +5,5 @@
 - Use synthetic data only. Do not provision paid dependencies or use identifiable patient records.
 - Never grant clinical access based on user-editable metadata, registry membership alone, or an admin role alone.
 - Keep vaccine source data unchanged. Vaccination implementation belongs to Phase 4; no automatic catch-up logic or HB1 scheduling.
+
+- Before implementing Phase 3, read REGISTRY_SPEC.md for the authorization, provenance, audit and current-session contract. Keep the full Phase 0–8 scope in PLAN_CHECKLIST.md; external approval gates are not silently waived.

@@ -22,7 +22,7 @@ This checklist preserves PROJECT_PLAN.md's complete Phase 0–8 scope. It is not
 - [x] Immutable audit infrastructure and explicit clinical-correction design (CLINICAL_MODEL.md); future clinical writes remain unexposed.
 - [x] Private evidence bucket, upload restrictions and atomic submission.
 - [x] Synthetic fixtures, source control and privacy-preserving operational logging.
-- [ ] Password recovery implementation and live token/update/session tests (in progress).
+- [x] Password recovery implemented; live one-use token, mismatch rejection, password update, old-password denial, refresh revocation and cookie/session cleanup tested without sending email.
 - [ ] Actual email delivery and confirmation walkthrough with an authorized mailbox; no outgoing mail was sent by automated tests.
 - [ ] Operational monitoring/alert escalation acceptance before an external pilot.
 

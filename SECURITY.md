@@ -30,3 +30,5 @@ This is a Phase 1 development foundation. Use fictional data only. A dedicated s
 Report discovered vulnerabilities privately to the repository owner. An operational disclosure address and escalation rota will be defined before external testing.
 
 Verification evidence includes 37 hosted API checks and 15 actual hosted HTML form checks using only synthetic accounts without outbound mail. Test identities are suspended and reviewer permissions removed at cleanup. Default email delivery and formal external review are not proven by those tests.
+
+Password recovery now has 12 live hosted/provider checks, including token replay denial and invalidation of previous refresh credentials. Do not infer immediate revocation of every already-issued access JWT from refresh-token logout alone. The next clinical access layer must validate current Auth session identity and include explicit stale-session tests; this is recorded in REGISTRY_SPEC.md. Largest-file acceptance also still needs a hosted boundary test rather than relying only on bucket limits.

@@ -71,3 +71,5 @@ CI runs these checks on push and pull request. Versions are pinned and `package-
 - [SECURITY.md](SECURITY.md): current boundaries and rollout requirements.
 
 Operator-only live smoke tests are documented in OPERATIONS.md. They exercise hosted Auth/Storage/RPC and actual Next.js HTML forms without running a local browser or sending email. No test admin keys are installed in the web application. Clinical event/correction design is in CLINICAL_MODEL.md.
+
+Password recovery is available from the sign-in page. Recovery links must be opened in the same browser for the default PKCE flow. Successful reset requires a new sign-in. Operator-only recovery-token checks are in `scripts/verify-recovery.py`; they generate test tokens without delivering email.
