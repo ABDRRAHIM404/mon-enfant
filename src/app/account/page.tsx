@@ -7,9 +7,10 @@ import { initializeProfile, signOut } from "@/app/auth/actions";
 export const dynamic = "force-dynamic";
 export default async function Account() {
   const { profile, supabase } = await getProfessional();
-  const reviewPermission = profile?.role === "admin" && profile.verification_status === "approved"
-    ? await supabase.rpc("can_review_professionals") : null;
+  const [reviewPermission,clinicalPermission] = profile?.role === "admin" && profile.verification_status === "approved"
+    ? await Promise.all([supabase.rpc("can_review_professionals"),supabase.rpc("can_manage_clinical_permissions")]) : [null,null];
   const canReview = reviewPermission?.data === true && !reviewPermission?.error;
+  const canManageClinical=clinicalPermission?.data===true&&!clinicalPermission?.error;
   return (
     <main className="account-page">
       <header>
@@ -42,6 +43,8 @@ export default async function Account() {
           </form>
         ) : canReview ? (
           <Link className="button primary" href="/admin/verifications">Ouvrir l’administration</Link>
+        ) : canManageClinical ? (
+          <Link className="button primary" href="/admin/clinical-permissions">Gérer les habilitations cliniques</Link>
         ) : canAccessClinicalWorkspace(profile) ? (
           <Link className="button primary" href="/dashboard">Ouvrir mon espace</Link>
         ) : profile.role === "doctor" && profile.verification_status !== "suspended" ? (
@@ -49,6 +52,7 @@ export default async function Account() {
         ) : (
           <div className="notice">Votre compte ne dispose actuellement d’aucun accès clinique. Contactez un administrateur habilité pour toute question sur votre statut.</div>
         )}
+        {canReview&&canManageClinical&&<p><Link className="text-link" href="/admin/clinical-permissions">Gérer les habilitations cliniques</Link></p>}
         <p className="fine">Environnement de développement · Données et documents fictifs uniquement</p>
       </section>
     </main>
