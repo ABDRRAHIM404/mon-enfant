@@ -32,3 +32,9 @@ Record who performed provisioning in the operator log. Do not grant access just 
 Server failures emit only fixed event names, random correlation references, severity and UTC timestamps. Raw provider errors, names, identity files, clinical notes, passwords and request bodies are excluded. Vercel runtime logs are the development monitoring surface. Configure alerting/on-call ownership and test escalation before pilot readiness.
 
 For suspected account compromise: suspend the doctor's account using the audited reviewer workflow, revoke sessions through Supabase Auth, inspect authorized audit/decision records, and record the operator's remediation. Clinical RLS reads current profile state, so suspension is enforced even if a JWT has not refreshed. An issued evidence URL may remain valid for its remaining 60 seconds.
+
+## Live integration checks
+
+After cloud CI passes and the intended migration is applied, an authenticated project operator may run `python3 scripts/verify-live.py` using their existing CLI credentials and ignored `.env.local`. It performs remote Auth/PostgREST/Storage checks using synthetic confirmed accounts without sending mail. A privileged CLI key stays in memory, is never written into the app, and is never printed. The script suspends all fixture accounts, revokes grants and removes fixture documents on completion; immutable audit metadata remains.
+
+`python3 scripts/verify-web.py` checks the deployed HTML forms/session cookies through small HTTPS requests, without launching a browser on this PC. It must target the deployed version at the canonical development origin. It also creates fictional accounts without email and retires them afterward. Configure your normal HTTPS proxy environment if required. Do not run these operator scripts against a production-patient database.

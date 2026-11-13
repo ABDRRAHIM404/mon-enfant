@@ -52,3 +52,10 @@ Finish Phase 1 storage/submission and integration verification, then Phase 2: cr
 ## Overnight continuation — professional verification
 
 Implemented on `feature/professional-verification` (not yet verified/applied): private evidence bucket and policies, atomic credential submission, explicit reviewer permission, admin queue/detail, bounded private downloads with access audit, approval/rejection/more-evidence decisions and audited suspension/reactivation. Added file-signature validation, operational logging and reviewer/retention procedures in OPERATIONS.md. Authorization/migration tests and cloud CI are the next verification gate. Phase 1/2 completion is not yet claimed.
+
+### Verification feature evidence
+
+- Feature commit `f6fd6a7` passed cloud lint/typecheck, database/unit tests, build and desktop/mobile anonymous route guards: https://github.com/ABDRRAHIM404/mon-enfant/actions/runs/43351090460 . The Vercel preview is ready.
+- Migration `20261113030711_professional_verification.sql` applied to the synthetic development database. An initial TCP connection attempt failed before any migration ran; a subsequent CLI push succeeded. Security advisors returned no issues.
+- Operator live smoke run `ba41ddc8bb14` passed 37 checks covering actual Auth, profile initialization, private Storage, credential RPCs, reviewer permissions, approval, repeated-decision denial, clinical grants, suspension with an existing JWT, refresh and logout. Four fictional accounts were suspended, grants revoked and evidence removed afterward. No email was sent.
+- Added HTTP-only production session cookies and an HTTPS-only hosted HTML form smoke test. These latest additions still need their exact-head cloud CI and deployed-form verification before promotion.

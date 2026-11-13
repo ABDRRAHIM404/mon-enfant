@@ -1,11 +1,12 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { supabaseConfig } from "@/lib/supabase/config";
+import { supabaseConfig, sessionCookieOptions } from "@/lib/supabase/config";
 export async function proxy(request: NextRequest) {
   const config = supabaseConfig();
   if (!config) return NextResponse.next();
   let response = NextResponse.next({ request });
   const supabase = createServerClient(config.url, config.key, {
+    cookieOptions: sessionCookieOptions(),
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll(values) {

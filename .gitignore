@@ -9,3 +9,6 @@ test-results/
 supabase/.temp/
 
 .vercel/
+
+__pycache__/
+*.pyc
