@@ -25,6 +25,7 @@ This checklist preserves PROJECT_PLAN.md's complete Phase 0–8 scope. It is not
 - [x] Password recovery implemented; live one-use token, mismatch rejection, password update, old-password denial, refresh revocation and cookie/session cleanup tested without sending email.
 - [x] Actual signup email delivery and confirmation walkthrough with the owner’s authorized mailbox; the owner reported success and hosted Auth shows email confirmed. Automated smoke tests send no mail.
 - [ ] Complete the owner’s real recovery-email reset/new-password sign-in walkthrough. The first message arrived, but the link was opened across Brave/Chrome; a fresh same-browser retry is pending the built-in sender quota.
+- [ ] Resend MCP account authorization, verified sending domain, secret-backed hosted SMTP activation/rate limits and fresh signup/recovery delivery evidence (EMAIL_DELIVERY.md).
 - [ ] Operational monitoring/alert escalation acceptance before an external pilot.
 
 ## Phase 2 — professional verification/admin
@@ -32,6 +33,7 @@ This checklist preserves PROJECT_PLAN.md's complete Phase 0–8 scope. It is not
 - [x] Signup/status, matricule/evidence submission, admin queue/detail and decision history.
 - [x] Explicit reviewer permission, separate from admin role and clinical access.
 - [x] Approval/rejection/more-evidence, duplicate checks, assigned professional ID, audited suspension/reactivation.
+- [ ] Resend delivery of transactional doctor-approval notices from committed decisions, with duplicate/retry controls and no clinical/evidence details.
 - [x] Private bounded downloads, recorded app download access and immutable decisions/status events.
 - [x] Operator bootstrap and development document-retention procedure (OPERATIONS.md).
 - [x] Actual hosted forms and private-download/role/history/logout checks; live API and PostgreSQL policy suites.
@@ -76,6 +78,7 @@ This checklist preserves PROJECT_PLAN.md's complete Phase 0–8 scope. It is not
 
 - [ ] Parent account and recorded guardianship verification.
 - [ ] One-use hashed expiring invitations and safe claim/linking of an existing child.
+- [ ] Resend parent invitation delivery, separately from Auth identity confirmation and recorded guardianship approval.
 - [ ] Child/health/vaccine/growth/booklet views, appointments, notifications and permitted export.
 - [ ] Multiple guardians, revocation, correction requests, privacy/access history and look-up QR boundaries.
 - [ ] Full parent claim and unrelated-scanner rejection acceptance/security checks.
