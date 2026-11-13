@@ -49,10 +49,12 @@ Patient reads use audited `list_patients` and `get_child_profile` RPCs. Direct a
 
 Older migration tests remain historical snapshots. `tests/registry.test.ts` applies all current migrations with actual session fixtures. `scripts/verify-registry.py` exercises hosted forms and real provider authorization/concurrent decisions with synthetic accounts only. Applied/deployed status and evidence belong in PROGRESS.md.
 
-## Clinical ledger and capability layer (Phase 4 source)
+## Clinical ledger and capability layer (Phase 4)
 
 Migration `20261113045412_clinical_records.sql` adds private clinical-permission-management delegation, `professional_capabilities`, immutable `capability_changes` and immutable `clinical_entries`. All exposed tables have RLS and no direct API table privileges. Checked private implementations expose narrow invoker RPC wrappers. Approval alone cannot write a clinical entry, and capability management alone cannot read a child.
 
 Clinical originals and amendments retain child/root/previous IDs, revision, entry state, author Auth ID and platform-ID snapshot, facility, occurred-on date/certainty, source/reference/verification, payload and entry timestamp. Payloads are whitelisted and bounded by kind (consultation, prescription, risk, growth); source and unknown dates remain explicit. Amendment checks require current grant/capability/facility membership, a reason and the latest expected revision. The shared child lock coordinates writes with access revocation; root locks and unique revision/previous-ID constraints reject stale concurrent amendments. Original rows cannot be updated/deleted. Idempotency receipts bind full input to actor/operation.
 
 Audited reads expose latest-revision timeline pages, complete event amendment history and permitted all-revision exports. Capability changes are separately attributed and retry-safe. The migration reserves the vaccination capability but does not yet implement vaccine entries/catalog/routine schedule logic. Full current-schema tests are in `tests/clinical.test.ts`; deployed/applied status and live evidence are recorded in PROGRESS.md.
+
+Follow-up migration `20261113051659_clinical_revision_conflict.sql` uses PT409 for stale expected revisions. Explicitly raising 40001 is unsuitable for a deterministic business conflict on the actual PostgREST 14.18 provider because it retries that transaction indefinitely. Current full-schema tests apply both migrations, and hosted acceptance asserts exact HTTP 409 and the actual stale-form feedback.

@@ -9,3 +9,5 @@
 - Before changing registry code, read REGISTRY_SPEC.md for the authorization, provenance, audit and current-session contract. Keep the full Phase 0–8 scope in PLAN_CHECKLIST.md; external approval gates are not silently waived.
 
 - Before implementing clinical records, read CLINICAL_MODEL.md, USER_STORIES.md and VACCINE_DATA.md. Account approval does not imply clinical write capabilities. Preserve source data and keep imported schedule versions draft until qualified review.
+
+- For deterministic RPC revision/validation conflicts, use an explicit business error such as PT409. Never manually raise 40001 or 40P01 for business conditions: the hosted PostgREST 14 provider retries them. Keep applied migrations immutable and fix through a new migration; prove HTTP conflict behavior in live checks.

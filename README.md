@@ -1,6 +1,6 @@
 # Mon Enfant
 
-Digital Moroccan child health booklet. The implementation follows [PROJECT_PLAN.md](PROJECT_PLAN.md) in phase order. Foundation, professional verification/review and patient registry are implemented. Work is moving into **Phase 4 — Clinical records and vaccine tracking**; clinical and parent/mobile phases remain outstanding. See [PLAN_CHECKLIST.md](PLAN_CHECKLIST.md) for the complete scope and unresolved external gates.
+Digital Moroccan child health booklet. The implementation follows [PROJECT_PLAN.md](PROJECT_PLAN.md) in phase order. Foundation, professional verification/review, patient registry and the Phase 4 clinical-record core are implemented. **Phase 4 vaccine catalog/tracking** and the appointment/parent/mobile phases remain outstanding. See [PLAN_CHECKLIST.md](PLAN_CHECKLIST.md) for the complete scope and unresolved external gates.
 
 ## Development services
 
@@ -8,7 +8,7 @@ Digital Moroccan child health booklet. The implementation follows [PROJECT_PLAN.
 - Private source and CI: https://github.com/ABDRRAHIM404/mon-enfant
 - Supabase development: https://supabase.com/dashboard/project/zkkasbxvdvecnafgjpxd (Paris / `eu-west-3`).
 
-Three migrations are applied and all 12 public tables have RLS. Patient reads use audited RPCs and require a current Auth session plus an approved doctor and active child grant. The latest security advisor reports disabled leaked-password screening (a paid-plan feature); no additional SQL/RLS/function warnings. See SECURITY.md. App credentials are configured on Vercel. Use fictional data only. The owner prefers remote verification to keep their PC responsive.
+Five migrations are applied and all 15 public tables have RLS. Patient reads use audited RPCs and require a current Auth session plus an approved doctor and active child grant. The latest security advisor reports disabled leaked-password screening (a paid-plan feature); no additional SQL/RLS/function warnings. See SECURITY.md. App credentials are configured on Vercel. Use fictional data only. The owner prefers remote verification to keep their PC responsive.
 
 ## Run locally (only when requested)
 
@@ -73,3 +73,5 @@ CI runs these checks on push and pull request. Versions are pinned and `package-
 Operator-only live smoke tests are documented in OPERATIONS.md. They exercise hosted Auth/Storage/RPC and actual Next.js HTML forms without running a local browser or sending email. No test admin keys are installed in the web application. Clinical event/correction design is in CLINICAL_MODEL.md.
 
 Password recovery is available from the sign-in page. Recovery links must be opened in the same browser for the default PKCE flow. Successful reset requires a new sign-in. Operator-only recovery-token checks are in `scripts/verify-recovery.py`; they generate test tokens without delivering email.
+
+Clinical records require a separate capability for consultations, prescriptions, risks or growth measurements, plus current child/facility authorization. Originals, corrections and withdrawals remain in the ledger with all authors, sources and dates. Authorized users can inspect history, view raw growth measurements, print a summary or download an audited JSON ledger. The vaccine catalog/administration module remains the next Phase 4 milestone.

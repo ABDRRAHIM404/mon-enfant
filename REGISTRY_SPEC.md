@@ -1,6 +1,6 @@
 # Phase 3 implementation contract
 
-This is the next coding milestone. It implements the registry scope in PROJECT_PLAN.md; it does not close the clinical/legal/hosting gates or add a catch-up protocol. See USER_STORIES.md D03–D05 and CLINICAL_MODEL.md.
+This is the implemented registry contract. It implements the registry scope in PROJECT_PLAN.md; it does not close the clinical/legal/hosting gates or add a catch-up protocol. See USER_STORIES.md D03–D05 and CLINICAL_MODEL.md.
 
 ## Data and unknowns
 

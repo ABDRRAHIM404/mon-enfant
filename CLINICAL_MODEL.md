@@ -1,6 +1,6 @@
 # Clinical record design — implementation contract for Phases 3–5
 
-This is a software model derived from the agreed requirements, not a medical protocol. Clinical schema/workflows below are not yet implemented. Use fictional data until the clinical/legal/hosting gates are approved.
+This is a software model derived from the agreed requirements, not a medical protocol. The capability/consultation/prescription/risk/growth ledger, amendments, timeline and permitted exports are implemented. Vaccine catalog/administration, appointments and parent workflows below remain planned. Use fictional data until the clinical/legal/hosting gates are approved.
 
 ## Identity and authorization
 

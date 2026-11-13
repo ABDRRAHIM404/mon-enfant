@@ -47,12 +47,12 @@ This checklist preserves PROJECT_PLAN.md's complete Phase 0–8 scope. It is not
 
 ## Phase 4 — clinical/vaccines
 
-- [ ] Clinical events, explicit clinical privileges, append-only correction chain and provenance.
+- [x] Consultation/prescription/risk/growth events, explicit clinical privileges, append-only correction chain and provenance; vaccine entries remain below.
 - [ ] Draft/versioned 25-row catalog with original/configured ages, decisions and source references.
 - [ ] Clinically authorized schedule management and immutable version mapping.
 - [ ] Correct routine date/window arithmetic; HPV/rotavirus/PCV/HB1 constraints and unknown-history handling.
 - [ ] Vaccine recording, duplicate/override/idempotency controls and cautious item matching.
-- [ ] Consultations, measurements/charts, timeline, audit and permitted exports/print summaries.
+- [x] Consultations/treatments/risks, measurements/raw charts, timeline, revision history and permitted all-revision exports/print summaries; future vaccine inclusion remains tracked below.
 - [ ] All specified calendar/age/version/correction/access tests and qualified clinical review.
 
 ## Phase 5 — appointments/continuity
