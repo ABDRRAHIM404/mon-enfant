@@ -145,6 +145,7 @@ test("two doctors preserve identity, amendments, appointments and private access
     ).toBeVisible();
     timings.push({ screen: label, navigation_ms: Date.now() - start });
     await fit(target);
+    expect(pageErrors).toBe(0);
   }
   async function actor(role: Role) {
     const use = info.project.use;
