@@ -58,7 +58,7 @@ export async function recordClinical(
     p_entry_state: root ? text("entry_state") : "active",
   });
   if (error) {
-    if (error.code === "40001")
+    if (["40001", "PT409"].includes(error.code ?? ""))
       return {
         error:
           "Une autre correction a été enregistrée. Ouvrez de nouveau l’historique avant de modifier la dernière version.",

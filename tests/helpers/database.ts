@@ -70,5 +70,11 @@ export async function clinicalDatabase() {
       "utf8",
     ),
   );
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/20261113051659_clinical_revision_conflict.sql",
+      "utf8",
+    ),
+  );
   return db;
 }

@@ -292,7 +292,10 @@ describe("current clinical schema", () => {
     });
     await expect(
       rpc(b, "write_clinical_entry", [randomUUID(), ...correction.slice(1)]),
-    ).rejects.toThrow(/Stale clinical revision/);
+    ).rejects.toMatchObject({
+      code: "PT409",
+      message: "Stale clinical revision",
+    });
   });
   it("records withdrawals as revisions and retains them in exports", async () => {
     const { a, manager, child, facility } = await setup();
