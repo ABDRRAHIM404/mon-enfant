@@ -109,6 +109,7 @@ def intended(actor,child):
     assert status==200
     return result['items']
 
+print('START synthetic vaccination run '+run,flush=True)
 try:
     editor=create('editor','admin',manage=True)
     reviewer=create('reviewer',review=True,capable=True)
@@ -175,8 +176,9 @@ try:
     status,review=rpc(a,'clinical_entry_history',{'p_child_id':child,'p_root_id':duplicate_root})
     check(status==200 and review[0]['duplicate_review']=={'reason':override,'conflicting_entry_ids':[root]},'Reasoned form override stores the exact conflicting revision and keeps both events')
     path=f'/patients/{child}/records/{root}';_,stale_page,_=b['web'].get(path)
+    _,correction_page,_=b['web'].get(path)
     correction={**matched,**payload(),'duplicate_override_reason':basis['reason'],'amendment_reason':'Rapprochement fictif annulé après contrôle de la source.','entry_state':'active'}
-    _,page,_=b['web'].submit(path,stale_page,correction,lambda f:f['fields'].get('kind')=='vaccination')
+    _,page,_=b['web'].submit(path,correction_page,correction,lambda f:f['fields'].get('kind')=='vaccination')
     status,history=rpc(a,'clinical_entry_history',{'p_child_id':child,'p_root_id':root})
     check(status==200 and len(history)==2 and history[0]['vaccine_mapping']['version_id']==version and history[1]['vaccine_mapping'] is None and not intended(a,child)[0]['documented_entries'],'Correction reopens only its intended item and preserves original version mapping')
     _,stale_result,_=b['web'].submit(path,stale_page,correction,lambda f:f['fields'].get('kind')=='vaccination')
