@@ -1,5 +1,7 @@
 "use server";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
+import { authOrigin } from "@/lib/auth-origin";
 import { createClient } from "@/lib/supabase/server";
 import { supabaseConfig } from "@/lib/supabase/config";
 import { requireUser } from "@/lib/auth";
@@ -42,7 +44,10 @@ export async function signUp(_: AuthState, form: FormData): Promise<AuthState> {
         "Indiquez un e-mail valide et un mot de passe de 12 à 128 caractères.",
     };
   const client = await createClient();
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  let siteUrl: string;
+  try {
+    siteUrl = authOrigin((await headers()).get("origin"), process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000", [process.env.VERCEL_URL, process.env.VERCEL_BRANCH_URL], process.env.NODE_ENV === "development");
+  } catch { return { error: "L’origine de la demande ne correspond pas à cet espace. Rechargez la page." }; }
   const { error } = await client.auth.signUp({
     ...input,
     options: { emailRedirectTo: new URL("/auth/callback", siteUrl).toString() },

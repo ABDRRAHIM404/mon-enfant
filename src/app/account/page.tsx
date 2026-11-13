@@ -6,7 +6,10 @@ import { canAccessClinicalWorkspace, statusLabels } from "@/lib/authorization";
 import { initializeProfile, signOut } from "@/app/auth/actions";
 export const dynamic = "force-dynamic";
 export default async function Account() {
-  const { profile } = await getProfessional();
+  const { profile, supabase } = await getProfessional();
+  const reviewPermission = profile?.role === "admin" && profile.verification_status === "approved"
+    ? await supabase.rpc("can_review_professionals") : null;
+  const canReview = reviewPermission?.data === true && !reviewPermission?.error;
   return (
     <main className="account-page">
       <header>
@@ -37,18 +40,16 @@ export default async function Account() {
               Activer mon espace professionnel
             </button>
           </form>
+        ) : canReview ? (
+          <Link className="button primary" href="/admin/verifications">Ouvrir l’administration</Link>
         ) : canAccessClinicalWorkspace(profile) ? (
-          <Link className="button primary" href="/dashboard">
-            Ouvrir mon espace
-          </Link>
+          <Link className="button primary" href="/dashboard">Ouvrir mon espace</Link>
+        ) : profile.role === "doctor" && profile.verification_status !== "suspended" ? (
+          <Link className="button primary" href="/verification">{profile.verification_status === "under_review" ? "Suivre ma demande" : "Soumettre mes justificatifs"}</Link>
         ) : (
-          <div className="notice">
-            La soumission des justificatifs et la revue administrative seront
-            disponibles lors de la prochaine étape. Votre compte ne donne
-            actuellement aucun accès aux dossiers patients.
-          </div>
+          <div className="notice">Votre compte ne dispose actuellement d’aucun accès clinique. Contactez un administrateur habilité pour toute question sur votre statut.</div>
         )}
-        <p className="fine">Développement · Phase 1 du projet</p>
+        <p className="fine">Environnement de développement · Données et documents fictifs uniquement</p>
       </section>
     </main>
   );

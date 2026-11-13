@@ -48,3 +48,7 @@ Docker is unavailable locally; no Docker installation or local stack was started
 ## Next ordered milestone
 
 Finish Phase 1 storage/submission and integration verification, then Phase 2: credential/evidence submission, restricted admin review queue, audited approve/reject/suspend operations. Phase 3 patient-registry screens and Phase 4 vaccination logic have not been implemented.
+
+## Overnight continuation — professional verification
+
+Implemented on `feature/professional-verification` (not yet verified/applied): private evidence bucket and policies, atomic credential submission, explicit reviewer permission, admin queue/detail, bounded private downloads with access audit, approval/rejection/more-evidence decisions and audited suspension/reactivation. Added file-signature validation, operational logging and reviewer/retention procedures in OPERATIONS.md. Authorization/migration tests and cloud CI are the next verification gate. Phase 1/2 completion is not yet claimed.

@@ -21,10 +21,18 @@ export async function getProfessional() {
     .eq("user_id", user.id)
     .maybeSingle();
   if (error) throw new Error("Impossible de charger le statut professionnel.");
-  return { user, profile: data as Professional | null };
+  return { user, profile: data as Professional | null, supabase };
 }
 export async function requireApprovedDoctor() {
   const result = await getProfessional();
   if (!canAccessClinicalWorkspace(result.profile)) redirect("/account");
+  return result;
+}
+
+export async function requireReviewer() {
+  const result = await getProfessional();
+  if (result.profile?.role !== "admin" || result.profile.verification_status !== "approved") redirect("/account");
+  const { data, error } = await result.supabase.rpc("can_review_professionals");
+  if (error || data !== true) redirect("/account");
   return result;
 }
