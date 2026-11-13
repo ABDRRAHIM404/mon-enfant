@@ -31,3 +31,11 @@ The user asked to keep their PC responsive and use GitHub/Vercel for heavy work.
 Created the private GitHub repository, linked Vercel project `mon-enfant` (Node.js 24, default deployment protection retained), and created a dedicated Supabase development project `zkkasbxvdvecnafgjpxd` in the existing organization, Paris (`eu-west-3`). Applied the foundation migration and checked live RLS/anonymous denial and database advisors. This region is for fictional-data development; regulated hosting approval is still open.
 
 Only Supabase public client configuration is provided to the web app. The generated database password stays in ignored, owner-readable `.env.local`. No service-role key is provided to Next.js. The free plan does not allow custom templates with the default email provider, so sign-up uses the built-in confirmation email and same-browser PKCE `/auth/callback` route. No paid plan or SMTP dependency was enabled.
+
+## 13 November 2026 — Verification and session security
+
+Professional evidence is a private 5 MiB MIME-restricted bucket with owner-scoped upload and immutable submitted objects. Requests, decisions, explicit reviewer permissions and account status events are database-enforced. The admin role alone does not confer identity-review or clinical access. Privileged RPC implementations stay in the private schema, check current authorization and lock affected rows; public RPCs are invoker wrappers. The Next.js app continues to use only the public client key.
+
+Because the app uses server actions rather than browser Supabase sessions, session cookies are HTTP-only, Secure in production, SameSite=Lax and host-bound. Confirmation redirects select the exact trusted current deployment origin to retain the PKCE verifier. Staging previews share the dedicated synthetic backend, not a production-patient database. Formal clinical/identity/legal/hosting decisions remain gates before real-data use.
+
+37 live API checks and 15 actual hosted HTML form checks use fictional confirmed test accounts without sending email. Test accounts are retired, grants revoked and private files purged; immutable audit metadata is retained. Operator scripts are not exposed through the web app.

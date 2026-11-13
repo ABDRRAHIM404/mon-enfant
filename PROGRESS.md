@@ -1,6 +1,6 @@
 # Mon Enfant — Implementation progress
 
-Updated: 13 November 2026. Execution follows `PROJECT_PLAN.md` in order. Current milestone: **Phase 1 — Technical foundation (in progress)**.
+Updated: 13 November 2026. Execution follows `PROJECT_PLAN.md` in order. Current milestone: **Phase 3 — Doctor patient registry**. Foundation/verification technical workflows are implemented and verified; external readiness gates remain open. Full-scope audit: [PLAN_CHECKLIST.md](PLAN_CHECKLIST.md).
 
 ## Phase 0 — Requirements and source validation
 
@@ -22,9 +22,9 @@ The supplied requirements, roadmap and 25-dose source files are the development 
 
 ## Phase 1 — Still required before exit criteria are met
 
-- Complete the real email-confirmation/session lifecycle smoke test against the connected development project.
-- Verify real Auth email/sign-in/refresh/logout, profile initialization through PostgREST, live API denial and suspension behavior. Isolated PostgreSQL tests do not prove the hosted integration.
-- Create private verification-evidence storage and the minimal submission workflow required by Phase 1, before any documents are accepted. Admin review screens remain Phase 2.
+- Finish the real email-delivery/confirmation walkthrough with an authorized mailbox. Password login, refresh, logout and hosted form sessions are proven by synthetic live tests.
+- Hosted Auth, profile initialization through PostgREST, API denial and existing-token suspension now pass live tests. Outbound email delivery remains untested.
+- Private evidence storage/submission and admin review are now implemented and tested; the remaining live-email delivery walkthrough and external operations gates stay open.
 - Establish staging and privacy-preserving operational error monitoring before external use.
 
 Connected services:
@@ -47,15 +47,22 @@ Docker is unavailable locally; no Docker installation or local stack was started
 
 ## Next ordered milestone
 
-Finish Phase 1 storage/submission and integration verification, then Phase 2: credential/evidence submission, restricted admin review queue, audited approve/reject/suspend operations. Phase 3 patient-registry screens and Phase 4 vaccination logic have not been implemented.
+Next: Phase 3 doctor dashboard, registry, manual registration/transcription and authorized existing-child linking. Phase 4 clinical/vaccination functionality remains unimplemented. The complete Phase 0–8 goal is tracked in PLAN_CHECKLIST.md; no full-goal completion is claimed.
 
 ## Overnight continuation — professional verification
 
-Implemented on `feature/professional-verification` (not yet verified/applied): private evidence bucket and policies, atomic credential submission, explicit reviewer permission, admin queue/detail, bounded private downloads with access audit, approval/rejection/more-evidence decisions and audited suspension/reactivation. Added file-signature validation, operational logging and reviewer/retention procedures in OPERATIONS.md. Authorization/migration tests and cloud CI are the next verification gate. Phase 1/2 completion is not yet claimed.
+Implemented, migrated, cloud-verified and deployed from `feature/professional-verification`: private evidence bucket and policies, atomic credential submission, explicit reviewer permission, admin queue/detail, bounded private downloads with access audit, approval/rejection/more-evidence decisions and audited suspension/reactivation. Added file-signature validation, operational logging and reviewer/retention procedures in OPERATIONS.md. Authorization/migration tests, cloud CI and hosted API/form checks pass. External pilot-readiness approvals are not claimed.
 
 ### Verification feature evidence
 
 - Feature commit `f6fd6a7` passed cloud lint/typecheck, database/unit tests, build and desktop/mobile anonymous route guards: https://github.com/ABDRRAHIM404/mon-enfant/actions/runs/43351090460 . The Vercel preview is ready.
 - Migration `20261113030711_professional_verification.sql` applied to the synthetic development database. An initial TCP connection attempt failed before any migration ran; a subsequent CLI push succeeded. Security advisors returned no issues.
 - Operator live smoke run `ba41ddc8bb14` passed 37 checks covering actual Auth, profile initialization, private Storage, credential RPCs, reviewer permissions, approval, repeated-decision denial, clinical grants, suspension with an existing JWT, refresh and logout. Four fictional accounts were suspended, grants revoked and evidence removed afterward. No email was sent.
-- Added HTTP-only production session cookies and an HTTPS-only hosted HTML form smoke test. These latest additions still need their exact-head cloud CI and deployed-form verification before promotion.
+- HTTP-only production session cookies passed cloud CI and were verified on the actual hosted login response. Hosted form smoke tests passed after promotion.
+
+### Deployed verification checkpoint
+
+- Main app now runs feature commit `7dc72da`. Preview cloud CI passed: https://github.com/ABDRRAHIM404/mon-enfant/actions/runs/43352996711 . The main-target CI run is https://github.com/ABDRRAHIM404/mon-enfant/actions/runs/43353346088 . Vercel deployment `dpl_HYjPnLz8JEMoXPorEEN2xSWaSpxf` is ready.
+- Hosted HTML form smoke run `d7fcb2c2df` passed all 15 checks against the deployed Next.js application: login, Secure/HTTP-only cookies, profile activation, private multipart submission, pending/doctor route denial, reviewer detail/download/approval, applicant decision history and logout. This used small HTTPS requests, not a local browser. No outgoing email was sent.
+- The first hosted test expected a transient success message; the page had correctly refreshed to pending state, confirmed in the database. The assertion now accepts the submitted/pending view and separately verifies the persisted request. Cleanup also closes abandoned fictional pending requests through the authorized review workflow. All test accounts are suspended, reviewer privileges removed and documents purged; audit metadata is retained.
+- CLINICAL_MODEL.md records the correction/provenance/privilege/version/continuity contract for the next phases. Production clinical/legal/hosting, real reviewer appointment and email delivery validation remain unapproved.

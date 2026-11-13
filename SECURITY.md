@@ -4,7 +4,7 @@ This is a Phase 1 development foundation. Use fictional data only. A dedicated s
 
 ## Implemented
 
-- Cookie-based Supabase SSR sessions, refreshed by the route proxy.
+- Cookie-based Supabase SSR sessions, refreshed by the route proxy; production cookies are Secure, HTTP-only and SameSite=Lax.
 - Server-side validated identity (`getUser`) on protected pages and actions.
 - Database-backed professional approval; no authorization from user-editable metadata.
 - Fail-closed protected routes when Supabase is absent; no demo privilege bypass.
@@ -19,7 +19,7 @@ This is a Phase 1 development foundation. Use fictional data only. A dedicated s
 ## Required before phase completion / later rollout
 
 - Finish actual sign-up, confirmation, login, refresh, logout and role-change integration checks. The hosted Auth health and anonymous REST denial checks already pass.
-- Before Phase 1 completion: private verification-evidence storage and submission. Phase 2 adds controlled review, reviewer permissions and decision audit; document retention remains an explicit decision.
+- Private evidence storage/submission and controlled review are implemented and live-tested. Development retention procedures exist in OPERATIONS.md; production retention and reviewer identity/source approval remain explicit external decisions.
 - Configure production Auth rate limits, bot controls and MFA/session policies after selecting hosting and the deployment threat model.
 - Expand transactional audit/corrections alongside clinical writes; restrict privileged service keys and operator access.
 - Verify future storage policies and full authenticated live RLS boundaries. The initial hosted security advisor returned no issues; rerun it after schema changes.
@@ -28,3 +28,5 @@ This is a Phase 1 development foundation. Use fictional data only. A dedicated s
 - Obtain qualified Moroccan privacy/health-data advice and clinical/hosting sign-off before storing identifiable data, per the project baseline.
 
 Report discovered vulnerabilities privately to the repository owner. An operational disclosure address and escalation rota will be defined before external testing.
+
+Verification evidence includes 37 hosted API checks and 15 actual hosted HTML form checks using only synthetic accounts without outbound mail. Test identities are suspended and reviewer permissions removed at cleanup. Default email delivery and formal external review are not proven by those tests.

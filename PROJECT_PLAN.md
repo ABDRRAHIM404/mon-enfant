@@ -1,6 +1,6 @@
 # Mon Enfant — Development Plan
 
-**Status:** Implementation started — Phase 1 technical foundation in progress; see [PROGRESS.md](PROGRESS.md)  
+**Status:** Implementation in progress — foundation/verification workflows verified; Phase 3 registry next; see [PROGRESS.md](PROGRESS.md) and [PLAN_CHECKLIST.md](PLAN_CHECKLIST.md)  
 **Working name:** Mon Enfant (temporary)  
 **Primary objective:** Launch a secure, responsive doctor/admin web application, then introduce the parent experience.  
 **Last updated:** 13 November 2026
