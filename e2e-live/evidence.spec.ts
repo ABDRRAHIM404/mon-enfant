@@ -285,6 +285,9 @@ test("private evidence browser-to-storage boundary and review", async ({
     .filter({ hasText: registration })
     .getByRole("link", { name: "Examiner le dossier", exact: true })
     .click();
+  await expect(
+    reviewer.getByRole("heading", { name: displayName, exact: true }),
+  ).toBeVisible();
   expect(
     await reviewer.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
