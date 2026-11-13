@@ -49,8 +49,7 @@ export function GrowthChart({
         className="growth-chart"
       >
         <title id={`chart-${field}`}>
-          {label}, valeurs enregistrées à date exacte sur cette page. Le tableau
-          donne chaque valeur et sa provenance.
+          {`${label}, valeurs enregistrées à date exacte sur cette page. Le tableau donne chaque valeur et sa provenance.`}
         </title>
         <line x1="44" y1="20" x2="44" y2="165" stroke="currentColor" />
         <line x1="44" y1="165" x2="500" y2="165" stroke="currentColor" />
@@ -69,8 +68,7 @@ export function GrowthChart({
             fill={p.confirmed ? "#126b5c" : "#b47b2f"}
           >
             <title>
-              {p.date} : {p.value} {unit},{" "}
-              {p.confirmed ? "source contrôlée" : "source non confirmée"}
+              {`${p.date} : ${p.value} ${unit}, ${p.confirmed ? "source contrôlée" : "source non confirmée"}`}
             </title>
           </circle>
         ))}
