@@ -5,6 +5,7 @@ Only temporary synthetic login credentials enter GitHub. Operator keys remain
 in memory on this PC. No email, local browser, build or dependency install.
 """
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -99,15 +100,23 @@ def validate(state):
     return ids
 
 
-def prepare(session_only=False):
+def prepare(session_only=False, vaccine_browser=False):
     if any(name.startswith(PREFIX) for name in secret_names()):
         raise RuntimeError('Finish the recorded clinical fixture run first')
-    state = {'run': uuid.uuid4().hex[:16], 'actors': [], 'secrets': [], 'purpose': 'session' if session_only else 'clinical'}
-    if not session_only:
+    state = {'run': uuid.uuid4().hex[:16], 'actors': [], 'secrets': [], 'purpose': 'session' if session_only else 'vaccination' if vaccine_browser else 'clinical'}
+    if not session_only and not vaccine_browser:
         state['clinical_story_version'] = 2
     credentials = {}
     save(state, credentials)
     try:
+        if vaccine_browser:
+            seeds = sql("select v.id,v.status,v.revision,s.sha256,(select count(*) from public.vaccine_rules r where r.version_id=v.id)::integer rules from public.vaccine_versions v join private.vaccine_sources s on s.id=v.source_id where v.parent_id is null")
+            source_hash = hashlib.sha256((ROOT / 'data-for-supa/MON_ENFANT_PNI_DATA.json').read_bytes()).hexdigest()
+            if len(seeds) != 1 or seeds[0]['status'] != 'draft' or seeds[0]['revision'] != 1 or seeds[0]['rules'] != 25 or seeds[0]['sha256'] != source_hash:
+                raise RuntimeError('Original draft source baseline was not proven')
+            state['vaccine_seed_id'] = str(uuid.UUID(seeds[0]['id']))
+            state['vaccine_source_sha256'] = source_hash
+            save(state, credentials)
         for role in (('A',) if session_only else ROLES):
             email = f"qa-cbrowser-{state['run']}-{role.lower()}@example.invalid"
             password = secrets.token_urlsafe(32)
@@ -121,7 +130,9 @@ def prepare(session_only=False):
             platform = f"QAB-{state['run']}-{role}"
             sql(f"insert into public.professional_profiles(user_id,role,verification_status,professional_id) values('{uid}','{profile_role}','approved','{platform}')")
             if role == 'MANAGER':
-                sql(f"insert into private.staff_permissions(user_id,can_manage_clinical_permissions) values('{uid}',true)")
+                sql(f"insert into private.staff_permissions(user_id,can_manage_clinical_permissions,can_manage_vaccine_catalog) values('{uid}',true,{str(vaccine_browser).lower()})")
+            if vaccine_browser and role == 'A':
+                sql(f"insert into private.staff_permissions(user_id,can_review_vaccine_catalog) values('{uid}',true)")
             for field in ('EMAIL', 'PASSWORD'):
                 key = PREFIX + role + '_' + field
                 # Record the intended secret before publishing, so interrupted
@@ -143,6 +154,9 @@ def inspect(run):
         if len(state['actors']) != 1 or rows != [{'children': 0, 'clinical_entries': 0, 'grants': 0, 'capabilities': 0, 'staff_permissions': 0}]:
             raise RuntimeError('Session-only fixture scope was not proven')
         print(json.dumps({'run': run, 'session_only_scope_verified': True, **rows[0]}), flush=True)
+        return
+    if state.get('purpose') == 'vaccination':
+        inspect_vaccination(state)
         return
     if len(state['actors']) != 4:
         raise RuntimeError('Fixture setup incomplete')
@@ -180,6 +194,51 @@ def inspect(run):
     print(json.dumps({'run': run, 'database_persistence_verified': True, **expected}), flush=True)
 
 
+def vaccination_versions(state):
+    seed = str(uuid.UUID(state['vaccine_seed_id']))
+    manager = next((actor['id'] for actor in state['actors'] if actor['role'] == 'MANAGER'), None)
+    if not manager:
+        return []
+    versions = sql(f"select id,parent_id,label,status,revision from public.vaccine_versions where created_by='{manager}'")
+    if any(row['parent_id'] != seed or not row['label'].startswith('QA navigateur vaccinal ' + state['run'] + ' ') for row in versions):
+        raise RuntimeError('Unexpected fictional catalog scope; cleanup refused')
+    return versions
+
+
+def inspect_vaccination(state):
+    if len(state['actors']) != 4:
+        raise RuntimeError('Vaccination fixture setup incomplete')
+    a = next(actor['id'] for actor in state['actors'] if actor['role'] == 'A')
+    b = next(actor['id'] for actor in state['actors'] if actor['role'] == 'B')
+    versions = vaccination_versions(state)
+    if len(versions) != 3 or any(row['status'] != 'retired' or row['revision'] != 5 for row in versions):
+        raise RuntimeError('Three retired versioned browser QA clones were not proven')
+    seed = str(uuid.UUID(state['vaccine_seed_id']))
+    rows = sql(f"""with children as(select id from public.children where created_by='{a}'),
+        entries as(select * from public.clinical_entries where child_id in(select id from children)),
+        versions as(select id from public.vaccine_versions where parent_id='{seed}' and label like 'QA navigateur vaccinal {state['run']} %')
+        select (select count(*) from children)::integer children,
+        (select count(*) from entries)::integer clinical_revisions,
+        (select count(distinct root_id) from entries)::integer clinical_roots,
+        (select count(*) from entries where kind='vaccination' and author_id='{a}' and source_type='paper_transcription' and occurred_on is null and not source_verified)::integer uncertain_paper_entries,
+        (select count(*) from entries where author_id='{b}' and entry_state='withdrawn' and revision=3)::integer withdrawn_administrations,
+        (select count(*) from public.child_vaccine_items where child_id in(select id from children))::integer intended_items,
+        (select count(*) from public.vaccine_item_changes c join public.child_vaccine_items i on i.id=c.item_id where i.child_id in(select id from children))::integer item_decisions,
+        (select count(*) from public.vaccination_entry_links l join entries e on e.id=l.entry_id where e.author_id='{b}' and e.revision=1)::integer preserved_original_mappings,
+        (select count(*) from public.vaccine_catalog_changes where version_id in(select id from versions))::integer catalog_decisions,
+        (select count(*) from public.vaccine_rules where version_id in(select id from versions))::integer catalog_rules,
+        (select count(*) from public.appointments where child_id in(select id from children))::integer appointments,
+        (select count(*) from public.appointment_events e join public.appointments p on p.id=e.appointment_id where p.child_id in(select id from children))::integer appointment_events,
+        (select count(*) from public.appointments p join lateral(select state from public.appointment_events e where e.appointment_id=p.id order by revision desc limit 1) latest on true where p.child_id in(select id from children) and latest.state='scheduled')::integer still_planned_appointments,
+        (select count(*) from public.access_grants where child_id in(select id from children) and professional_id='{b}' and revoked_at is not null)::integer revoked_second_doctor_grants,
+        (select count(*) from public.vaccine_rules r join public.vaccine_rules original on original.version_id='{seed}' and original.dose_code=r.dose_code where r.version_id in(select id from versions) and r.source_row=original.source_row and r.source_age=original.source_age and r.age=original.age and r.automatic_scheduling=original.automatic_scheduling and r.eligibility=original.eligibility)::integer unchanged_source_rules,
+        (select count(*) from public.vaccine_versions where id='{seed}' and status='draft' and revision=1)::integer unchanged_original_draft""")
+    expected = {'children': 3, 'clinical_revisions': 15, 'clinical_roots': 9, 'uncertain_paper_entries': 3, 'withdrawn_administrations': 3, 'intended_items': 3, 'item_decisions': 9, 'preserved_original_mappings': 3, 'catalog_decisions': 15, 'catalog_rules': 75, 'appointments': 6, 'appointment_events': 12, 'still_planned_appointments': 6, 'revoked_second_doctor_grants': 3, 'unchanged_source_rules': 75, 'unchanged_original_draft': 1}
+    if rows != [expected]:
+        raise RuntimeError('Full vaccination browser persistence and original-source preservation were not proven')
+    print(json.dumps({'run': state['run'], 'vaccination_persistence_verified': True, **expected}), flush=True)
+
+
 def cleanup(run):
     state = load(run)
     allowed = {PREFIX + role + '_' + field for role in ROLES for field in ('EMAIL', 'PASSWORD')}
@@ -187,6 +246,22 @@ def cleanup(run):
         raise RuntimeError('Unexpected cleanup secret scope')
     ids = validate(state)
     if ids:
+        if state.get('purpose') == 'vaccination':
+            versions = vaccination_versions(state)
+            active = [row for row in versions if row['status'] != 'retired']
+            if active:
+                credentials = dict(line.split('=', 1) for line in state_path(run).with_suffix('.env').read_text().splitlines())
+                web = Browser()
+                web.login(credentials[PREFIX + 'MANAGER_EMAIL'], credentials[PREFIX + 'MANAGER_PASSWORD'])
+                for row in active:
+                    path = '/vaccines/' + str(uuid.UUID(row['id']))
+                    _, page, _ = web.get(path)
+                    web.submit(path, page, {'reason': 'Retrait de copie QA fictive après vérification navigateur.', 'evidence_reference': 'Nettoyage de test technique, sans approbation clinique réelle.'}, lambda form: form['fields'].get('action') == 'retire')
+            if any(row['status'] != 'retired' for row in vaccination_versions(state)):
+                raise RuntimeError('Fictional catalog copies remain active; state retained')
+            seed = str(uuid.UUID(state['vaccine_seed_id']))
+            if sql(f"select count(*)::integer n from public.vaccine_versions where id='{seed}' and status='draft' and revision=1")[0]['n'] != 1:
+                raise RuntimeError('Original source changed; operator review required')
         pending = sql(f"select id,requester_id from public.child_access_requests where requester_id in({ids}) and status='pending'")
         if pending:
             credentials = dict(line.split('=', 1) for line in state_path(run).with_suffix('.env').read_text().splitlines())
@@ -205,7 +280,7 @@ def cleanup(run):
                 raise RuntimeError('Pending fictional requests were not withdrawn; state retained')
         sql(f"""begin;
             update public.professional_capabilities set enabled=false where professional_id in({ids});
-            update private.staff_permissions set can_manage_clinical_permissions=false where user_id in({ids});
+            update private.staff_permissions set can_manage_clinical_permissions=false,can_manage_vaccine_catalog=false,can_review_vaccine_catalog=false where user_id in({ids});
             update public.access_grants set revoked_at=coalesce(revoked_at,now()) where professional_id in({ids});
             update public.professional_facilities set revoked_at=coalesce(revoked_at,now()) where professional_id in({ids});
             update public.professional_profiles set verification_status='suspended' where user_id in({ids});
@@ -232,12 +307,15 @@ if __name__ == '__main__':
     modes.add_argument('--cleanup', action='store_true')
     parser.add_argument('--run')
     parser.add_argument('--session-only', action='store_true', help='Prepare only one fictional doctor, without capabilities, grants or staff permissions')
+    parser.add_argument('--vaccine-browser', action='store_true', help='Prepare isolated catalog editor/reviewer appointments for the fictional vaccine browser story')
     args = parser.parse_args()
+    if args.vaccine_browser and (not args.prepare or args.session_only):
+        parser.error('--vaccine-browser requires --prepare and cannot combine with --session-only')
     if args.session_only and not args.prepare:
         parser.error('--session-only requires --prepare')
     try:
         if args.prepare:
-            prepare(args.session_only)
+            prepare(args.session_only, args.vaccine_browser)
         elif args.check:
             inspect(args.run)
         else:

@@ -18,6 +18,7 @@ on:
             evidence-reproduce,
             evidence-accept,
             clinical-accept,
+            vaccination-accept,
             clinical-inspect,
             session-reproduce,
             session-accept,
@@ -84,7 +85,7 @@ jobs:
   live-browser:
     if: github.event_name == 'workflow_dispatch' && inputs.live_probe != 'none' && inputs.live_probe != ''
     runs-on: ubuntu-latest
-    timeout-minutes: 18
+    timeout-minutes: ${{ inputs.live_probe == 'vaccination-accept' && 22 || 18 }}
     env:
       NEXT_TELEMETRY_DISABLED: 1
       MON_ENFANT_LIVE_PROBE: ${{ inputs.live_probe }}
@@ -118,7 +119,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: ${{ startsWith(inputs.live_probe, 'session-') && 'synthetic-live-session-results' || inputs.live_probe == 'clinical-accept' && 'synthetic-live-clinical-results' || 'synthetic-live-evidence-results' }}
+          name: ${{ inputs.live_probe == 'vaccination-accept' && 'synthetic-live-vaccination-results' || startsWith(inputs.live_probe, 'session-') && 'synthetic-live-session-results' || inputs.live_probe == 'clinical-accept' && 'synthetic-live-clinical-results' || 'synthetic-live-evidence-results' }}
           path: |
             test-results/live/**/verification-form.png
             test-results/live/**/verification-history.png
@@ -130,4 +131,5 @@ jobs:
             test-results/live/**/clinical-summary.png
             test-results/live/**/clinical-proof.json
             test-results/live/**/session-proof.json
+            test-results/live/**/vaccination-proof.json
           retention-days: 3

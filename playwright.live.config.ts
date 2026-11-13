@@ -5,6 +5,7 @@ if (
     "evidence-reproduce",
     "evidence-accept",
     "clinical-accept",
+    "vaccination-accept",
     "clinical-inspect",
     "session-reproduce",
     "session-accept",
@@ -17,16 +18,23 @@ export default defineConfig({
   testDir: "./e2e-live",
   testMatch: probe?.startsWith("session-")
     ? "session.spec.ts"
-    : probe === "clinical-inspect"
-      ? "clinical-inspect.spec.ts"
-      : probe === "clinical-accept"
-        ? "clinical.spec.ts"
-        : "evidence.spec.ts",
+    : probe === "vaccination-accept"
+      ? "vaccination.spec.ts"
+      : probe === "clinical-inspect"
+        ? "clinical-inspect.spec.ts"
+        : probe === "clinical-accept"
+          ? "clinical.spec.ts"
+          : "evidence.spec.ts",
   fullyParallel: false,
   workers: 1,
   retries: 0,
   maxFailures: 1,
-  timeout: probe === "clinical-accept" ? 240000 : 120000,
+  timeout:
+    probe === "vaccination-accept"
+      ? 360000
+      : probe === "clinical-accept"
+        ? 240000
+        : 120000,
   expect: { timeout: 20000 },
   outputDir: "test-results/live",
   use: {
