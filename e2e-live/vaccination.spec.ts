@@ -831,9 +831,7 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
     await grant
       .getByRole("button", { name: "Révoquer cet accès", exact: true })
       .click();
-    await expect(
-      grant.getByText("Accès révoqué", { exact: true }),
-    ).toBeVisible();
+    await expect(grant.getByText(/^Accès révoqué/)).toBeVisible();
     expect((await get(b.context(), `/patients/${child}/export`)).status()).toBe(
       404,
     );
