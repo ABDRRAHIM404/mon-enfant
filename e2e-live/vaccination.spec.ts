@@ -396,7 +396,7 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
       rules
         .locator("article")
         .filter({
-          has: rules.getByRole("heading", {
+          has: manager.getByRole("heading", {
             name: "Rota1 · ROTA",
             exact: true,
           }),
@@ -407,7 +407,7 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
       rules
         .locator("article")
         .filter({
-          has: rules.getByRole("heading", {
+          has: manager.getByRole("heading", {
             name: "Rota1 · ROTA",
             exact: true,
           }),
@@ -418,7 +418,7 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
       rules
         .locator("article")
         .filter({
-          has: rules.getByRole("heading", { name: "HPV · HPV", exact: true }),
+          has: manager.getByRole("heading", { name: "HPV · HPV", exact: true }),
         })
         .getByText(/Filles uniquement/),
     ).toBeVisible();
