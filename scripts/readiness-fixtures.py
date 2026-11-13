@@ -117,6 +117,8 @@ def inspect(run,expected_bytes):
 
 def cleanup(run):
     state,credentials=load(run)
+    allowed={f'MON_ENFANT_READINESS_{role.upper()}_{field}' for role in ROLES for field in ('EMAIL','PASSWORD')}
+    if not set(state['secrets']).issubset(allowed):raise RuntimeError('Unexpected secret scope in fixture state; cleanup refused')
     if state['actors']:
         ids=validate(state)
         pending=sql(f"select id from public.verification_requests where professional_id in({ids}) and status='under_review'")
