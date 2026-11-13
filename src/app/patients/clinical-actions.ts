@@ -145,6 +145,14 @@ export async function recordClinical(
     return { error: `La saisie n’a pas abouti. Référence : ${ref}` };
   }
   revalidatePath(`/patients/${child}`);
+  for (const path of [
+    "/appointments",
+    "/follow-up",
+    "/dashboard",
+    "/patients",
+    `/patients/${child}/appointments`,
+  ])
+    revalidatePath(path);
   revalidatePath(`/patients/${child}/records`);
   revalidatePath(`/patients/${child}/growth`);
   revalidatePath(`/patients/${child}/vaccinations`);

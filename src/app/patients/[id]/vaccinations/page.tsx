@@ -121,6 +121,7 @@ export default async function Vaccinations({
       </div>
       <div className="tabs">
         <Link href={`/patients/${id}`}>Vue d’ensemble</Link>
+        <Link href={`/patients/${id}/appointments`}>Rendez-vous</Link>
         <Link href={`/patients/${id}/records?kind=vaccination`}>
           Administrations et corrections
         </Link>

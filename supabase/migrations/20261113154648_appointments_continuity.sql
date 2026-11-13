@@ -184,9 +184,9 @@ begin
  perform private.assert_doctor();
  if p_from is null or p_to is null or p_to<p_from or p_to>p_from+41 or p_page is null or p_page not between 1 and 10000 or p_state is null or p_state not in ('all','scheduled','missed','dose_documented','reference_review','cancelled','completed') then raise exception 'Invalid calendar range or filters' using errcode='22023';end if;
  with rows as materialized(select data from private.appointment_rows(null,true) r(data) where (data->>'starts_on')::date between p_from and p_to and (p_state='all' or data->>'effective_state'=p_state)),
- days as(select data->>'starts_on' day,count(*) n from rows group by data->>'starts_on'),
+ days as(select data->>'starts_on' calendar_day,count(*) n from rows group by data->>'starts_on'),
  page as(select data from rows order by (data->>'starts_at')::timestamptz,data->>'id' limit 50 offset (p_page-1)*50)
- select jsonb_build_object('items',coalesce((select jsonb_agg(data order by (data->>'starts_at')::timestamptz,data->>'id') from page),'[]'::jsonb),'total',(select count(*) from rows),'days',coalesce((select jsonb_agg(jsonb_build_object('day',day,'count',n) order by day) from days),'[]'::jsonb),'from',p_from,'to',p_to,'page',p_page,'generated_at',now(),'timezone','Africa/Casablanca') into result;
+ select jsonb_build_object('items',coalesce((select jsonb_agg(data order by (data->>'starts_at')::timestamptz,data->>'id') from page),'[]'::jsonb),'total',(select count(*) from rows),'days',coalesce((select jsonb_agg(jsonb_build_object('day',calendar_day,'count',n) order by calendar_day) from days),'[]'::jsonb),'from',p_from,'to',p_to,'page',p_page,'generated_at',now(),'timezone','Africa/Casablanca') into result;
  insert into public.audit_events(actor_id,entity_id,entity_type,action) select auth.uid(),(value->>'child_id')::uuid,'appointment_calendar_read','accessed' from jsonb_array_elements(result->'items') group by value->>'child_id';
  return result;
 end;$$;

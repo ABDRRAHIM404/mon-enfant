@@ -8,6 +8,8 @@ export function DoctorNav() {
         <Link href="/dashboard">Tableau de bord</Link>
         <Link href="/patients">Patients</Link>
         <Link href="/vaccines">Vaccinations</Link>
+        <Link href="/appointments">Calendrier</Link>
+        <Link href="/follow-up">Suivis</Link>
         <Link href="/access-requests">Demandes d’accès</Link>
         <Link href="/practices">Lieux d’exercice</Link>
         <Link href="/account">Mon compte</Link>

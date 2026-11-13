@@ -71,6 +71,14 @@ export async function changePatientVaccineItem(
     };
   }
   revalidatePath(`/patients/${child}/vaccinations`);
+  for (const path of [
+    "/appointments",
+    "/follow-up",
+    "/dashboard",
+    "/patients",
+    `/patients/${child}/appointments`,
+  ])
+    revalidatePath(path);
   revalidatePath(`/patients/${child}/summary`);
   if (item) revalidatePath(`/patients/${child}/vaccinations/${item}`);
   redirect(`/patients/${child}/vaccinations${item ? `/${item}` : ""}`);

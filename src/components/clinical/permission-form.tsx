@@ -22,6 +22,7 @@ export function PermissionForm({
             <option value="risk">Risque / allergie</option>
             <option value="growth">Mesures de croissance</option>
             <option value="vaccination">Vaccination</option>
+            <option value="appointment">Gestion des rendez-vous</option>
           </select>
         </label>
         <label>

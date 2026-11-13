@@ -57,6 +57,7 @@ export default async function Records({
       </div>
       <div className="tabs">
         <Link href={`/patients/${id}`}>Identité et registre</Link>
+        <Link href={`/patients/${id}/appointments`}>Rendez-vous</Link>
         <Link href={`/patients/${id}/vaccinations`}>Vaccinations</Link>
         <Link href={`/patients/${id}/growth`}>Croissance</Link>
         <Link href={`/patients/${id}/summary`}>Résumé / impression</Link>

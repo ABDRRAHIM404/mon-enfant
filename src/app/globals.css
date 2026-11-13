@@ -978,4 +978,42 @@ th {
   }
 }
 
-.source-json { white-space: pre-wrap; overflow-wrap: anywhere; max-width: 100%; font-size: .8rem; }
+.source-json {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+  font-size: 0.8rem;
+}
+
+/* Explicitly counted day/week/month appointment views. */
+.appointment-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.35rem;
+  margin-block: 1rem;
+}
+.appointment-calendar.day {
+  grid-template-columns: 1fr;
+}
+.appointment-calendar > strong {
+  font-size: 0.8rem;
+  text-align: center;
+}
+.appointment-calendar > a {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.65rem 0.25rem;
+  border: 1px solid var(--border, #d6e4e3);
+  border-radius: 0.5rem;
+  text-align: center;
+  min-width: 0;
+}
+.appointment-calendar > a:hover,
+.appointment-calendar > a:focus-visible {
+  background: var(--surface, #eef7f6);
+}
+.appointment-calendar small {
+  font-size: 0.7rem;
+  overflow-wrap: anywhere;
+}
