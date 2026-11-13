@@ -82,6 +82,8 @@ describe('fully migrated patient registry',()=>{
     const request=await call(b,'request_child_access',[randomUUID(),profile.universal_id,f,2026,'B','78','Autorisation de soins fictive.']);
     const missing=await call(b,'request_child_access',[randomUUID(),randomUUID(),f,2026,'B','79','Autorisation de soins fictive.']);
     const receipts=await call(b,'my_access_requests') as {id:string;child_id:null}[];
+    expect(await call(a,'pending_access_requests')).toMatchObject([{id:request,child_id:child}]);
+    expect(await call(b,'pending_access_requests')).toEqual([]);
     expect(receipts).toHaveLength(2);expect(receipts.every(r=>r.child_id===null)).toBe(true);expect(missing).toBeTruthy();
     await expect(call(b,'decide_child_access',[request,true,'Autorisation vérifiée fictivement.',true,false])).rejects.toThrow(/manager/);
     await expect(call(a,'decide_child_access',[request,true,'Autorisation vérifiée fictivement.',false,false])).rejects.toThrow(/must be checked/);

@@ -191,6 +191,7 @@ begin
   if (precision='unknown')<>(dob is null) or (names='unknown' and (nullif(trim(p_payload->>'given_name'),'') is not null or nullif(trim(p_payload->>'family_name'),'') is not null)) then raise exception 'Unknown fields must stay unknown' using errcode='22023'; end if;
   override_reason:=nullif(trim(p_payload->>'duplicate_override_reason'),'');
   if names<>'unknown' and dob is not null then
+    perform pg_advisory_xact_lock(hashtextextended(actor::text||lower(trim(p_payload->>'given_name'))||'|'||lower(trim(p_payload->>'family_name'))||'|'||dob::text,0));
     select count(*) into matches from public.children c where lower(c.given_name)=lower(trim(p_payload->>'given_name')) and lower(c.family_name)=lower(trim(p_payload->>'family_name')) and c.birth_date=dob and private.can_access_child(c.id,false);
     if matches>0 and (override_reason is null or length(override_reason) not between 10 and 1000) then raise exception 'Possible duplicate: review authorized matches or provide a reason' using errcode='P0002'; end if;
   end if;
