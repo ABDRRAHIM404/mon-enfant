@@ -5,7 +5,8 @@ import { authOrigin } from "@/lib/auth-origin";
 import { createClient } from "@/lib/supabase/server";
 import { supabaseConfig } from "@/lib/supabase/config";
 import { requireUser } from "@/lib/auth";
-export type AuthState = { error?: string; message?: string };
+import { reportOperationalEvent } from "@/lib/operational-events";
+export type AuthState = { error?: string; message?: string; passwordChanged?: boolean };
 function credentials(form: FormData) {
   const email = String(form.get("email") ?? "").trim();
   const password = String(form.get("password") ?? "");
@@ -78,4 +79,27 @@ export async function signOut() {
   const { error } = await supabase.auth.signOut();
   if (error) throw new Error("Déconnexion impossible. Réessayez.");
   redirect("/login");
+}
+
+export async function requestPasswordRecovery(_:AuthState,form:FormData):Promise<AuthState> {
+  if (!supabaseConfig()) return { error:"Le service de récupération est en cours de configuration." };
+  const email=String(form.get("email") ?? "").trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length>254) return { error:"Indiquez une adresse e-mail valide." };
+  let origin:string;
+  try { origin=authOrigin((await headers()).get("origin"),process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",[process.env.VERCEL_URL,process.env.VERCEL_BRANCH_URL],process.env.NODE_ENV==="development"); }
+  catch { return { error:"Rechargez la page depuis votre espace habituel." }; }
+  const client=await createClient();
+  const { error }=await client.auth.resetPasswordForEmail(email,{ redirectTo:`${origin}/auth/callback?next=reset-password` });
+  if (error) reportOperationalEvent("password_recovery_failed");
+  return { message:"Si cette adresse correspond à un compte éligible, un lien de récupération sera envoyé. Ouvrez-le dans ce même navigateur." };
+}
+export async function changePassword(_:AuthState,form:FormData):Promise<AuthState> {
+  const { supabase }=await requireUser();
+  const password=String(form.get("password") ?? "");
+  if (password.length<12 || password.length>128 || password!==String(form.get("confirmation") ?? "")) return { error:"Les deux mots de passe doivent être identiques et comporter 12 à 128 caractères." };
+  const { error }=await supabase.auth.updateUser({ password });
+  if (error) { reportOperationalEvent("password_reset_failed");return { error:"Le mot de passe n’a pas pu être modifié. Choisissez un nouveau mot de passe ou demandez un nouveau lien." }; }
+  const { error:logoutError }=await supabase.auth.signOut({ scope:"global" });
+  if (logoutError) { reportOperationalEvent("password_reset_failed");return { passwordChanged:true }; }
+  redirect("/login?password=updated");
 }

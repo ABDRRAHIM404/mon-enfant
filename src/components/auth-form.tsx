@@ -1,5 +1,6 @@
 "use client";
 import { useActionState } from "react";
+import Link from "next/link";
 import { ArrowRight, LoaderCircle } from "lucide-react";
 import { signIn, signUp } from "@/app/auth/actions";
 export function AuthForm({
@@ -62,6 +63,7 @@ export function AuthForm({
           </>
         )}
       </button>
+      {mode === "login" && <Link className="text-link" href="/forgot-password">Mot de passe oublié ?</Link>}
       <p className="fine">
         {mode === "signup"
           ? "Votre compte sera non vérifié. L’accès clinique nécessite une validation professionnelle."
