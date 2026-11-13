@@ -79,6 +79,17 @@ test("workspace refresh persists real provider sessions without a public health 
     throw new Error("Dedicated synthetic session credentials missing.");
   let errors = 0;
   observeBrowserErrors(page, "session-fixture", () => errors++);
+  // Isolate explicit document navigation from Next's background link prefetch.
+  // A prefetched route can refresh cookies before the route under test runs.
+  await page.route("**/*", async (route) => {
+    const headers = route.request().headers();
+    if (
+      headers["next-router-prefetch"] === "1" ||
+      headers.purpose === "prefetch"
+    )
+      await route.abort();
+    else await route.continue();
+  });
   await page.goto("/login");
   await page.locator('[name="email"]').fill(email);
   await page.keyboard.press("Tab");
@@ -98,6 +109,8 @@ test("workspace refresh persists real provider sessions without a public health 
     secure_cookie: boolean;
   }[] = [];
   for (const [path, heading] of routes) {
+    // Stop the preceding page before changing its stored session expiry.
+    await page.goto("about:blank");
     const stale = await expireStoredSession(page.context());
     let health;
     try {
