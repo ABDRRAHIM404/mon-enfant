@@ -78,7 +78,8 @@ This checklist preserves PROJECT_PLAN.md's complete Phase 0–8 scope. It is not
 - [x] Core clinical continuity browser story on desktop/tablet/phone: A/125–B/078 identity, capability decisions, consultation/correction, growth, appointment reschedule, private export and revocation/logout; growth hydration regression fixed. See PROGRESS.md.
 - [ ] Remaining story-level browser/API/database verification (including vaccination/catalog and other entry kinds), full keyboard/accessibility/performance acceptance.
 - [ ] Account/session, QR, export, RLS/Storage, secret and rate-limit review.
-- [ ] Backup/recovery drill, monitoring, incident response and retention execution evidence.
+- [x] Credential-free development readiness monitor, active scheduled configuration and live healthy/failure/recovery reporting drill; owner reports GitHub notifications arriving. See PROGRESS.md.
+- [ ] Backup/recovery and incident/retention drills; pilot monitoring ownership, response targets and scheduled alert-delivery acceptance.
 - [ ] Formal clinical, legal/privacy and regulated hosting approvals before any identifiable-data pilot.
 
 ## Phase 7 — parent web
