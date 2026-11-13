@@ -12,7 +12,14 @@ on:
       live_probe:
         description: Explicit synthetic authenticated cloud-browser check (never sends email)
         type: choice
-        options: [none, evidence-reproduce, evidence-accept, clinical-accept]
+        options:
+          [
+            none,
+            evidence-reproduce,
+            evidence-accept,
+            clinical-accept,
+            clinical-inspect,
+          ]
         default: none
       fixture_run:
         description: Prepared synthetic browser fixture run (16 hex characters)

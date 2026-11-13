@@ -1,5 +1,6 @@
 import { test, expect, type Page, type BrowserContext } from "@playwright/test";
 import { writeFileSync } from "node:fs";
+import { observeBrowserErrors } from "./browser-errors";
 import type { ClinicalEntry } from "../src/lib/clinical/types";
 
 const SITE = "https://mon-enfant.vercel.app";
@@ -129,7 +130,7 @@ test("two doctors preserve identity, amendments, appointments and private access
     "Correction fictive par le second médecin, original conservé.";
   const contexts: BrowserContext[] = [];
   let pageErrors = 0;
-  page.on("pageerror", () => pageErrors++);
+  observeBrowserErrors(page, "A", () => pageErrors++);
   const timings: { screen: string; navigation_ms: number }[] = [];
   async function screen(
     target: Page,
@@ -159,7 +160,7 @@ test("two doctors preserve identity, amendments, appointments and private access
     context.setDefaultNavigationTimeout(30000);
     contexts.push(context);
     const target = await context.newPage();
-    target.on("pageerror", () => pageErrors++);
+    observeBrowserErrors(target, role, () => pageErrors++);
     await login(target, role);
     return target;
   }
