@@ -23,7 +23,8 @@ This checklist preserves PROJECT_PLAN.md's complete Phase 0–8 scope. It is not
 - [x] Private evidence bucket, upload restrictions and atomic submission.
 - [x] Synthetic fixtures, source control and privacy-preserving operational logging.
 - [x] Password recovery implemented; live one-use token, mismatch rejection, password update, old-password denial, refresh revocation and cookie/session cleanup tested without sending email.
-- [ ] Actual email delivery and confirmation walkthrough with an authorized mailbox; no outgoing mail was sent by automated tests.
+- [x] Actual signup email delivery and confirmation walkthrough with the owner’s authorized mailbox; the owner reported success and hosted Auth shows email confirmed. Automated smoke tests send no mail.
+- [ ] Complete the owner’s real recovery-email reset/new-password sign-in walkthrough. The first message arrived, but the link was opened across Brave/Chrome; a fresh same-browser retry is pending the built-in sender quota.
 - [ ] Operational monitoring/alert escalation acceptance before an external pilot.
 
 ## Phase 2 — professional verification/admin
