@@ -4,11 +4,13 @@ Uses only synthetic Auth fixtures, never prints tokens, and suspends fixtures at
 Run after the feature is deployed to the canonical development origin.
 """
 import os,json,pathlib,subprocess,secrets,urllib.request,urllib.error,http.cookiejar,html.parser,uuid,tempfile
+from operator_http import Browser,Forms
 ROOT=pathlib.Path(__file__).resolve().parent.parent
 PROJECT='zkkasbxvdvecnafgjpxd';SITE='https://mon-enfant.vercel.app'
 assert (ROOT/'supabase/.temp/project-ref').read_text().strip()==PROJECT
 cfg=dict(line.split('=',1) for line in (ROOT/'.env.local').read_text().splitlines() if line and not line.startswith('#'))
 env={**os.environ,**cfg};BASE=cfg['NEXT_PUBLIC_SUPABASE_URL'];PUBLIC=cfg['NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY']
+assert BASE==f'https://{PROJECT}.supabase.co'
 r=subprocess.run(['supabase','projects','api-keys','--project-ref',PROJECT,'--reveal','--output-format','json'],env=env,capture_output=True,text=True,check=True,cwd=ROOT)
 d=json.loads(r.stdout);keys=d if isinstance(d,list) else d.get('api_keys',d.get('keys',[]));SERVICE=next(k['api_key'] for k in keys if k['name']=='service_role')
 fixtures=[];evidence_path=None;checks=[];run=uuid.uuid4().hex[:10];staff=None;reviewReady=False
@@ -23,34 +25,6 @@ def sql(text):
   f.write(text);f.flush();r=subprocess.run(['supabase','db','query','--linked','--file',f.name,'--output-format','json'],env=env,capture_output=True,text=True,cwd=ROOT)
  if r.returncode:raise AssertionError('Trusted fixture operation failed')
  return json.loads(r.stdout).get('rows',[])
-class Forms(html.parser.HTMLParser):
- def __init__(self,source):
-  super().__init__(convert_charrefs=True);self.forms=[];self.current=None;self.feed(source)
- def handle_starttag(self,tag,attrs):
-  attrs=dict(attrs)
-  if tag=='form':self.current={'fields':{},'names':set(),'text':''}
-  elif self.current is not None and tag in ('input','select','textarea') and attrs.get('name'):
-   self.current['names'].add(attrs['name'])
-   if tag=='input' and attrs.get('type')=='hidden':self.current['fields'][attrs['name']]=attrs.get('value','')
- def handle_data(self,data):
-  if self.current is not None:self.current['text']+=data
- def handle_endtag(self,tag):
-  if tag=='form' and self.current is not None:self.forms.append(self.current);self.current=None
-class Browser:
- def __init__(self):
-  self.jar=http.cookiejar.CookieJar();self.opener=urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.jar))
- def get(self,path):
-  with self.opener.open(SITE+path,timeout=40) as r:return r.geturl(),r.read().decode('utf8'),r.headers
- def submit(self,path,page,fields,match,file=None):
-  forms=Forms(page).forms;form=next(f for f in forms if match(f));values={**form['fields'],**fields}
-  boundary='QA'+uuid.uuid4().hex;parts=[]
-  for key,value in values.items():parts.append(f'--{boundary}\r\nContent-Disposition: form-data; name="{key}"\r\n\r\n{value}\r\n'.encode())
-  if file:
-   name,content=file;parts.append(f'--{boundary}\r\nContent-Disposition: form-data; name="{name}"; filename="synthetic.pdf"\r\nContent-Type: application/pdf\r\n\r\n'.encode()+content+b'\r\n')
-  parts.append(f'--{boundary}--\r\n'.encode());req=urllib.request.Request(SITE+path,data=b''.join(parts),headers={'Content-Type':f'multipart/form-data; boundary={boundary}','Origin':SITE},method='POST')
-  with self.opener.open(req,timeout=50) as r:return r.geturl(),r.read().decode('utf8'),r.headers
- def login(self,email,password):
-  _,page,_=self.get('/login');return self.submit('/login',page,{'email':email,'password':password},lambda f:'email' in f['names'])
 def create(kind):
  email=f'qa-web-{run}-{kind}@example.invalid';password=secrets.token_urlsafe(30)
  user=admin('/auth/v1/admin/users',{'email':email,'password':password,'email_confirm':True,'app_metadata':{'synthetic_fixture':True,'fixture_run':run}})
