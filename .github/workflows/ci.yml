@@ -12,10 +12,10 @@ on:
       live_probe:
         description: Explicit synthetic authenticated cloud-browser check (never sends email)
         type: choice
-        options: [none, evidence-reproduce, evidence-accept]
+        options: [none, evidence-reproduce, evidence-accept, clinical-accept]
         default: none
       fixture_run:
-        description: Prepared synthetic readiness fixture run (16 hex characters)
+        description: Prepared synthetic browser fixture run (16 hex characters)
         type: string
         default: ""
       operation_id:
@@ -75,7 +75,7 @@ jobs:
   live-browser:
     if: github.event_name == 'workflow_dispatch' && inputs.live_probe != 'none' && inputs.live_probe != ''
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 18
     env:
       NEXT_TELEMETRY_DISABLED: 1
       MON_ENFANT_LIVE_PROBE: ${{ inputs.live_probe }}
@@ -88,6 +88,14 @@ jobs:
       MON_ENFANT_READINESS_MOBILE_PASSWORD: ${{ secrets.MON_ENFANT_READINESS_MOBILE_PASSWORD }}
       MON_ENFANT_READINESS_REVIEWER_EMAIL: ${{ secrets.MON_ENFANT_READINESS_REVIEWER_EMAIL }}
       MON_ENFANT_READINESS_REVIEWER_PASSWORD: ${{ secrets.MON_ENFANT_READINESS_REVIEWER_PASSWORD }}
+      MON_ENFANT_CLINICAL_BROWSER_A_EMAIL: ${{ secrets.MON_ENFANT_CLINICAL_BROWSER_A_EMAIL }}
+      MON_ENFANT_CLINICAL_BROWSER_A_PASSWORD: ${{ secrets.MON_ENFANT_CLINICAL_BROWSER_A_PASSWORD }}
+      MON_ENFANT_CLINICAL_BROWSER_B_EMAIL: ${{ secrets.MON_ENFANT_CLINICAL_BROWSER_B_EMAIL }}
+      MON_ENFANT_CLINICAL_BROWSER_B_PASSWORD: ${{ secrets.MON_ENFANT_CLINICAL_BROWSER_B_PASSWORD }}
+      MON_ENFANT_CLINICAL_BROWSER_MANAGER_EMAIL: ${{ secrets.MON_ENFANT_CLINICAL_BROWSER_MANAGER_EMAIL }}
+      MON_ENFANT_CLINICAL_BROWSER_MANAGER_PASSWORD: ${{ secrets.MON_ENFANT_CLINICAL_BROWSER_MANAGER_PASSWORD }}
+      MON_ENFANT_CLINICAL_BROWSER_OUTSIDE_EMAIL: ${{ secrets.MON_ENFANT_CLINICAL_BROWSER_OUTSIDE_EMAIL }}
+      MON_ENFANT_CLINICAL_BROWSER_OUTSIDE_PASSWORD: ${{ secrets.MON_ENFANT_CLINICAL_BROWSER_OUTSIDE_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -96,15 +104,20 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium --only-shell
-      - name: Verify the deployed private evidence flow in cloud browsers
+      - name: Verify the selected deployed workflow in cloud browsers
         run: npx playwright test --config=playwright.live.config.ts
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: synthetic-live-evidence-results
+          name: ${{ inputs.live_probe == 'clinical-accept' && 'synthetic-live-clinical-results' || 'synthetic-live-evidence-results' }}
           path: |
             test-results/live/**/verification-form.png
             test-results/live/**/verification-history.png
             test-results/live/**/verification-review.png
             test-results/live/**/evidence-proof.json
+            test-results/live/**/clinical-profile.png
+            test-results/live/**/clinical-history.png
+            test-results/live/**/clinical-growth.png
+            test-results/live/**/clinical-summary.png
+            test-results/live/**/clinical-proof.json
           retention-days: 3
