@@ -327,7 +327,7 @@ test("two doctors preserve identity, amendments, appointments and private access
       b.getByRole("heading", { name: "Historique de la saisie", exact: true }),
     ).toBeVisible();
     await clinicalFields(b, placeB);
-    await b.getByLabel("Observations", { exact: true }).fill(corrected);
+    await b.locator('[name="findings"]').fill(corrected);
     await b.locator('[name="amendment_reason"]').fill(correctionReason);
     await b.getByRole("button", { name: "Ajouter la révision" }).click();
     await expect(b.locator(".clinical-entry")).toHaveCount(2);
