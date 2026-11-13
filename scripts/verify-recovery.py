@@ -45,6 +45,7 @@ try:
  status,_=api('/auth/v1/token?grant_type=refresh_token',{'refresh_token':old_session['refresh_token']});check(status>=400,'Password reset invalidates earlier refresh sessions')
  url,_,_=browser.get('/auth/reset-password');check('/login' in url,'Reset session is cleared after the successful change')
  fresh=Browser();url,_,_=fresh.get(path);check('recovery=invalid' in url,'Recovery token cannot be reused and returns to self-service recovery')
+ missing_browser=Browser();url,page,_=missing_browser.get('/auth/callback?next=reset-password&code=invalid-synthetic-code');check('recovery=browser' in url and 'Ce navigateur ne peut pas confirmer la demande' in page,'Hosted PKCE callback explains missing browser proof without claiming the link expired')
 finally:
  if user and user.get('id'):
   uid=str(uuid.UUID(user['id']))
