@@ -4,7 +4,11 @@
 --plan is offline and needs no credentials. --check verifies the actual Resend
 domain, SMTP authentication and hosted settings without modifying them. --apply
 does the same preflight, PATCHes only mail configuration, and verifies the result.
-No email is sent by any mode. Do not run with HTTP debug logging enabled.
+Only --send-owner-test sends email: one fixed non-clinical SMTP test to the
+Resend account owner's address. It never changes Supabase. --apply-owner-auth
+explicitly configures the synthetic app's Auth sender for owner-only testing;
+other recipients still need a verified domain. All setup modes send no email.
+Do not run with HTTP debug logging enabled.
 """
 import argparse
 import http.client
@@ -17,6 +21,8 @@ import sys
 import urllib.error
 import urllib.parse
 import urllib.request
+import uuid
+from email.message import EmailMessage
 
 PROJECT = "zkkasbxvdvecnafgjpxd"
 SITE = "https://mon-enfant.vercel.app"
@@ -26,6 +32,8 @@ MAIL_KEYS = frozenset({"smtp_host", "smtp_port", "smtp_user", "smtp_pass",
 PRESERVED_KEYS = ("site_url", "uri_allow_list", "mailer_autoconfirm",
     "jwt_exp", "refresh_token_rotation_enabled", "security_refresh_token_reuse_interval",
     "mailer_templates_confirmation_content", "mailer_templates_recovery_content")
+TEST_SENDER = "onboarding@resend.dev"
+ADDRESS = re.compile(r"[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 
 
 class SetupError(Exception):
@@ -41,7 +49,7 @@ def required(env, key):
 
 def settings(env):
     sender = required(env, "MAIL_FROM_EMAIL")
-    if not re.fullmatch(r"[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", sender):
+    if not ADDRESS.fullmatch(sender):
         raise SetupError("MAIL_FROM_EMAIL must be a single address on your verified sending domain.")
     name = env.get("MAIL_FROM_NAME", "Mon Enfant").strip()
     if not name or len(name) > 100 or any(ord(c) < 32 for c in name):
@@ -112,17 +120,68 @@ def verify_smtp(key):
         raise SetupError("SMTP TLS/authentication check failed; no email sent and no credential logged.") from None
 
 
-def configure(env, apply=False):
-    mail = settings(env)
+def owner_test(env, send=False):
+    """Exercise real Resend SMTP without reconfiguring global Auth delivery."""
+    key = required(env, "RESEND_API_KEY")
+    if not send:
+        verify_smtp(key)
+        print("PASS: SMTP TLS/authentication accepted. No email sent; Supabase unchanged.")
+        return
+    recipient = required(env, "RESEND_TEST_RECIPIENT")
+    if not ADDRESS.fullmatch(recipient):
+        raise SetupError("RESEND_TEST_RECIPIENT must be one address belonging to the Resend account owner.")
+    try:
+        operation = str(uuid.UUID(required(env, "RESEND_SMOKE_OPERATION_ID")))
+    except ValueError:
+        raise SetupError("RESEND_SMOKE_OPERATION_ID must be a UUID retained for retries.") from None
+    message = EmailMessage()
+    message["From"] = "Mon Enfant <" + TEST_SENDER + ">"
+    message["To"] = recipient
+    message["Subject"] = "Mon Enfant — test SMTP Resend"
+    message["Message-ID"] = "<" + operation + "@mon-enfant.test>"
+    message["Resend-Idempotency-Key"] = "mon-enfant/owner-smoke/" + operation
+    message.set_content("Test technique de livraison SMTP pour Mon Enfant.\n"
+        "Ce message ne contient aucune donnée clinique ni lien de connexion.\n")
+    send_started = False
+    accepted = False
+    try:
+        with ProxySMTP("smtp.resend.com", 465, timeout=25, context=ssl.create_default_context()) as smtp:
+            smtp.login("resend", key)
+            send_started = True
+            refused = smtp.send_message(message, from_addr=TEST_SENDER, to_addrs=[recipient])
+            if refused:
+                raise SetupError("SMTP recipient refused; no recipient or provider message logged.")
+            accepted = True
+    except SetupError:
+        raise
+    except Exception:
+        if not accepted:
+            if send_started:
+                raise SetupError("SMTP test outcome is unknown. Inspect Resend before retrying with the same operation ID.") from None
+            raise SetupError("SMTP test connection/authentication failed; no recipient or credential logged.") from None
+        # A QUIT/connection-close failure does not undo an accepted message.
+    print("PASS: one owner-only test message accepted by Resend SMTP. Supabase unchanged.")
+    print("Provider acceptance is not mailbox-delivery proof; confirm receipt privately.")
+
+
+def configure(env, apply=False, owner_only=False):
+    if owner_only:
+        recipient = required(env, "RESEND_TEST_RECIPIENT")
+        if not ADDRESS.fullmatch(recipient):
+            raise SetupError("Owner-only Auth testing needs the Resend account owner's single email address.")
+        mail = settings({**env, "MAIL_FROM_EMAIL": TEST_SENDER})
+    else:
+        mail = settings(env)
     token = required(env, "SUPABASE_ACCESS_TOKEN")
-    domain_id = required(env, "RESEND_DOMAIN_ID")
-    if not re.fullmatch(r"[0-9a-fA-F-]{36}", domain_id):
-        raise SetupError("RESEND_DOMAIN_ID must be the verified domain's UUID.")
-    # Keep the domain-management credential operator-only. A domain-restricted
-    # sending key is used as the SMTP password and never shipped to the browser.
-    admin = required(env, "RESEND_ADMIN_API_KEY")
-    domain = request_json("https://api.resend.com/domains/" + domain_id, admin)
-    validate_domain(domain, mail["smtp_admin_email"])
+    if not owner_only:
+        domain_id = required(env, "RESEND_DOMAIN_ID")
+        if not re.fullmatch(r"[0-9a-fA-F-]{36}", domain_id):
+            raise SetupError("RESEND_DOMAIN_ID must be the verified domain's UUID.")
+        # Keep the domain-management credential operator-only. A domain-restricted
+        # sending key is used as the SMTP password and never shipped to the browser.
+        admin = required(env, "RESEND_ADMIN_API_KEY")
+        domain = request_json("https://api.resend.com/domains/" + domain_id, admin)
+        validate_domain(domain, mail["smtp_admin_email"])
     verify_smtp(mail["smtp_pass"])
     before = request_json(AUTH_URL, token)
     if before.get("site_url") != SITE or before.get("mailer_autoconfirm") is not False:
@@ -145,8 +204,11 @@ def configure(env, apply=False):
         # Print only connection/limit state; do not print even the sender address.
         actual.pop("smtp_admin_email", None)
         actual.pop("smtp_sender_name", None)
-        print("PASS: verified sender domain, tracking disabled and SMTP TLS/authentication accepted.")
+        print("PASS: owner-only test sender and SMTP TLS/authentication checked." if owner_only else
+            "PASS: verified sender domain, tracking disabled and SMTP TLS/authentication accepted.")
         print("Current hosted mail settings:", json.dumps(actual, sort_keys=True))
+    if owner_only:
+        print("OWNER-ONLY TEST MODE: Resend restricts the shared sender to its account owner's inbox. Other recipients require a verified domain.")
     print("No email sent. Real signup/recovery delivery still requires a mailbox walkthrough.")
 
 
@@ -156,15 +218,25 @@ def main():
     modes.add_argument("--plan", action="store_true")
     modes.add_argument("--check", action="store_true")
     modes.add_argument("--apply", action="store_true")
+    modes.add_argument("--check-owner-test", action="store_true")
+    modes.add_argument("--send-owner-test", action="store_true")
+    modes.add_argument("--check-owner-auth", action="store_true")
+    modes.add_argument("--apply-owner-auth", action="store_true")
     args = parser.parse_args()
     if args.plan:
         print("Target: Mon Enfant hosted Supabase Auth; Resend SMTP over TLS on port 465.")
         print("Default limits: 30 Auth emails/hour; 60-second recipient cooldown. Provider quotas also apply.")
         print("Required environment names: RESEND_API_KEY, RESEND_ADMIN_API_KEY, RESEND_DOMAIN_ID, MAIL_FROM_EMAIL, SUPABASE_ACCESS_TOKEN.")
+        print("Without a domain: --check-owner-test needs RESEND_API_KEY; --send-owner-test additionally needs RESEND_TEST_RECIPIENT and a retained RESEND_SMOKE_OPERATION_ID UUID.")
+        print("Owner-only Auth setup: --check-owner-auth / --apply-owner-auth also need RESEND_TEST_RECIPIENT and SUPABASE_ACCESS_TOKEN; shared sender is forced to onboarding@resend.dev.")
         print("No network calls, changes or email sent.")
         return 0
     try:
-        configure(os.environ, args.apply)
+        if args.check_owner_test or args.send_owner_test:
+            owner_test(os.environ, send=args.send_owner_test)
+        else:
+            configure(os.environ, apply=args.apply or args.apply_owner_auth,
+                owner_only=args.check_owner_auth or args.apply_owner_auth)
         return 0
     except SetupError as error:
         print("SETUP PENDING:", str(error), file=sys.stderr)

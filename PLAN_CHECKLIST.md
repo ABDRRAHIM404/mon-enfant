@@ -24,8 +24,9 @@ This checklist preserves PROJECT_PLAN.md's complete Phase 0–8 scope. It is not
 - [x] Synthetic fixtures, source control and privacy-preserving operational logging.
 - [x] Password recovery implemented; live one-use token, mismatch rejection, password update, old-password denial, refresh revocation and cookie/session cleanup tested without sending email.
 - [x] Actual signup email delivery and confirmation walkthrough with the owner’s authorized mailbox; the owner reported success and hosted Auth shows email confirmed. Automated smoke tests send no mail.
-- [ ] Complete the owner’s real recovery-email reset/new-password sign-in walkthrough. The first message arrived, but the link was opened across Brave/Chrome; a fresh same-browser retry is pending the built-in sender quota.
-- [ ] Resend MCP account authorization, verified sending domain, secret-backed hosted SMTP activation/rate limits and fresh signup/recovery delivery evidence (EMAIL_DELIVERY.md).
+- [x] Owner’s real recovery-email reset/new-password sign-in walkthrough succeeded after switching hosted Auth SMTP to Resend; owner confirmed receipt, reset and new-password login.
+- [x] Resend local MCP credential helper, successful initialization/catalog check, private sending key, hosted owner-only SMTP activation/readback and actual owner delivery/recovery evidence (EMAIL_DELIVERY.md).
+- [ ] Verified sending domain, broader doctor/parent delivery, fresh signup confirmation through Resend and production deliverability/abuse monitoring.
 - [ ] Operational monitoring/alert escalation acceptance before an external pilot.
 
 ## Phase 2 — professional verification/admin

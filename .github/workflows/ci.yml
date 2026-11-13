@@ -1,12 +1,26 @@
 name: CI
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      mail_probe:
+        description: Owner-only Resend SMTP check (manual; never used on push/PR)
+        type: choice
+        options: [none, check, send]
+        default: none
+      operation_id:
+        description: Retained UUID for the single owner test message (send only)
+        type: string
+        default: ""
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.ref }}-${{ github.event_name == 'workflow_dispatch' && inputs.mail_probe != 'none' && 'mail' || 'app' }}
   cancel-in-progress: true
 permissions:
   contents: read
 jobs:
   checks:
+    if: github.event_name != 'workflow_dispatch' || inputs.mail_probe == 'none'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -32,3 +46,19 @@ jobs:
           name: browser-results
           path: test-results/
           retention-days: 3
+  resend-smtp:
+    if: github.event_name == 'workflow_dispatch' && inputs.mail_probe != 'none'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    env:
+      RESEND_API_KEY: ${{ secrets.MON_ENFANT_RESEND_SMTP_KEY }}
+      RESEND_TEST_RECIPIENT: ${{ secrets.MON_ENFANT_RESEND_TEST_RECIPIENT }}
+      RESEND_SMOKE_OPERATION_ID: ${{ inputs.operation_id }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify SMTP authentication without sending email
+        if: inputs.mail_probe == 'check'
+        run: python3 scripts/configure-resend.py --check-owner-test
+      - name: Send one owner-only SMTP test with a retained idempotency key
+        if: inputs.mail_probe == 'send'
+        run: python3 scripts/configure-resend.py --send-owner-test
