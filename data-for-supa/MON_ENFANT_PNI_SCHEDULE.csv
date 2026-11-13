@@ -1,0 +1,26 @@
+﻿vaccine_code,vaccine_name_fr,dose_code,age_unit,age_value,condition,source_slide,status,source_age_unit,source_age_value,eligibility_sex,date_calculation,special_case_handling,scheduling_policy,age_is_window_not_exact_date,decision_id,detail_source_slide,notes
+HB,Hépatite B,HB1,first_4_weeks,,Only when HBn was not administered at birth,67,conditional_reference_only_deferred,first_4_weeks,,,,deferred,disabled_deferred_hepatitis_b_special_case,true,PNI-HB-DEFERRED,,HB1 only when HBn not administered at birth. HBn/HB1 logic deferred; no auto-scheduling.
+BCG,Tuberculose (BCG),BCG,first_4_weeks,,,67,reference_transcribed,first_4_weeks,,,,,doctor_select_date_in_first_four_weeks,true,,,
+VPO,Poliomyélite (Oral),VPO0,first_4_weeks,,,67,reference_transcribed,first_4_weeks,,,,,doctor_select_date_in_first_four_weeks,true,PNI-VPO0,79,
+VPO,Poliomyélite (Oral),VPO1,weeks,8,,67,reference_transcribed,weeks,8,,,,routine_after_clinical_review,false,,79,
+VPO,Poliomyélite (Oral),VPO2,weeks,12,,67,reference_transcribed,weeks,12,,,,routine_after_clinical_review,false,,79,
+VPO,Poliomyélite (Oral),VPO3,weeks,16,,67,reference_transcribed,weeks,16,,,,routine_after_clinical_review,false,,79,
+VPO,Poliomyélite (Oral),VPO4,months,18,,67,reference_transcribed,months,18,,,,routine_after_clinical_review,false,,79,
+VPO,Poliomyélite (Oral),VPO5,years,5,,67,reference_transcribed,years,5,,,,routine_after_clinical_review,false,,79,
+PENTA,DTC-Hib-HB (Vaccin Pentavalent),Penta1,weeks,8,,67,reference_transcribed,weeks,8,,,,routine_after_clinical_review,false,,,
+PENTA,DTC-Hib-HB (Vaccin Pentavalent),Penta2,weeks,12,,67,reference_transcribed,weeks,12,,,,routine_after_clinical_review,false,,,
+PENTA,DTC-Hib-HB (Vaccin Pentavalent),Penta3,weeks,16,,67,reference_transcribed,weeks,16,,,,routine_after_clinical_review,false,,,
+PCV,Pneumococcique,PCV1,weeks,10,,67,reference_transcribed,weeks,10,,,,routine_after_clinical_review,false,PNI-PCV-LABELS,89,Slide 89 repeats VPC2 in error; labels corrected according to slide 67 and project owner confirmation.
+PCV,Pneumococcique,PCV2,weeks,18,,67,reference_transcribed,weeks,18,,,,routine_after_clinical_review,false,PNI-PCV-LABELS,89,Slide 89 repeats VPC2 in error; labels corrected according to slide 67 and project owner confirmation.
+PCV,Pneumococcique,PCV3,months,6,,67,reference_transcribed,months,6,,,,routine_after_clinical_review,false,PNI-PCV-LABELS,89,Slide 89 repeats VPC2 in error; labels corrected according to slide 67 and project owner confirmation.
+PCV,Pneumococcique,PCV4,months,12,,67,reference_transcribed,months,12,,,,routine_after_clinical_review,false,PNI-PCV-LABELS,89,Slide 89 repeats VPC2 in error; labels corrected according to slide 67 and project owner confirmation.
+ROTA,Rotavirus,Rota1,months,2,,67,reference_transcribed,weeks,8,,calendar_months,,routine_after_clinical_review,false,PNI-ROTA-MONTHS,94,
+ROTA,Rotavirus,Rota2,months,3,,67,reference_transcribed,weeks,12,,calendar_months,,routine_after_clinical_review,false,PNI-ROTA-MONTHS,94,
+ROTA,Rotavirus,Rota3,months,4,,67,reference_transcribed,weeks,16,,calendar_months,,routine_after_clinical_review,false,PNI-ROTA-MONTHS,94,
+VPI,Poliomyélite (Inactivé),VPI1,weeks,16,,67,reference_transcribed,weeks,16,,,,routine_after_clinical_review,false,,,
+VPI,Poliomyélite (Inactivé),VPI2,months,9,,67,reference_transcribed,months,9,,,,routine_after_clinical_review,false,,,
+RR,"Rougeole, Rubéole (RR)",RR1,months,9,,67,reference_transcribed,months,9,,,,routine_after_clinical_review,false,,,
+RR,"Rougeole, Rubéole (RR)",RR2,months,18,,67,reference_transcribed,months,18,,,,routine_after_clinical_review,false,,,
+DTC,"Diphtérie, Tétanos, Coqueluche (DTC)",DTC1,months,18,,67,reference_transcribed,months,18,,,,routine_after_clinical_review,false,,,
+DTC,"Diphtérie, Tétanos, Coqueluche (DTC)",DTC2,years,5,,67,reference_transcribed,years,5,,,,routine_after_clinical_review,false,,,
+HPV,Papillomavirus (HPV),HPV,years,11,"Girls only, age 11",67,reference_transcribed,years,11,female,,,routine_after_clinical_review,false,PNI-HPV-GIRLS,102,

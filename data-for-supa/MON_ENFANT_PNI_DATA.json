@@ -1,0 +1,1434 @@
+{
+  "project": "Mon Enfant",
+  "source": {
+    "filename": "PNI cours.pptx",
+    "slides_total": 227,
+    "schedule_slide": 67,
+    "schedule_title": "Calendrier National de Vaccination 2025",
+    "source_type": "hospital-provided PNI training presentation",
+    "official_status": "Reported by project owner as the PNI reference used by doctors at their hospital; not independently authenticated."
+  },
+  "usage": {
+    "status": "source_transcription_with_project_decisions_not_a_complete_clinical_protocol",
+    "routine_schedule": "Routine due dates only after clinician review. The first-four-weeks column is a window, not one exact due date.",
+    "missed_vaccinations": "Detect and flag; doctor manually chooses new appointment date. Do not automatically prescribe a catch-up schedule.",
+    "hepatitis_b_exception": "Deferred. The 25 dose rows do NOT include a separate HBn birth-dose row. HB1 remains a conditional reference-only row and must not be auto-scheduled.",
+    "safety": "The reference is hospital-used. Patient-specific decisions, exceptions and rescheduling remain clinician-controlled.",
+    "missing_record_vs_missed_dose": "Missing documentation is not proof of a missed vaccination. Distinguish missed appointment, overdue/unconfirmed dose, and unknown history.",
+    "age_alignment": "Rotavirus uses 2/3/4 calendar months per user decision, while VPO and Penta retain source ages of 8/12/16 weeks. Do not assume these dates are identical or auto-combine visits without clinician review."
+  },
+  "vaccines": {
+    "HB": {
+      "label_fr": "Hépatite B"
+    },
+    "BCG": {
+      "label_fr": "Tuberculose (BCG)"
+    },
+    "VPO": {
+      "label_fr": "Poliomyélite (Oral)"
+    },
+    "PENTA": {
+      "label_fr": "DTC-Hib-HB (Vaccin Pentavalent)"
+    },
+    "PCV": {
+      "label_fr": "Pneumococcique"
+    },
+    "ROTA": {
+      "label_fr": "Rotavirus"
+    },
+    "VPI": {
+      "label_fr": "Poliomyélite (Inactivé)"
+    },
+    "RR": {
+      "label_fr": "Rougeole, Rubéole (RR)"
+    },
+    "DTC": {
+      "label_fr": "Diphtérie, Tétanos, Coqueluche (DTC)"
+    },
+    "HPV": {
+      "label_fr": "Papillomavirus (HPV)"
+    }
+  },
+  "schedule_2025": [
+    {
+      "vaccine_code": "HB",
+      "dose_code": "HB1",
+      "age": {
+        "unit": "first_4_weeks"
+      },
+      "condition": "Only when HBn was not administered at birth",
+      "source_slide": 67,
+      "status": "conditional_reference_only_deferred",
+      "source_age": {
+        "unit": "first_4_weeks"
+      },
+      "detail_source_slide": null,
+      "requires_clinician_review_for_patient_specific_decisions": true,
+      "special_case_handling": "deferred",
+      "automatic_scheduling_enabled": false,
+      "decision_id": "PNI-HB-DEFERRED",
+      "scheduling_policy": "disabled_deferred_hepatitis_b_special_case",
+      "age_is_window_not_exact_date": true,
+      "note": "HB1 only when HBn not administered at birth. HBn/HB1 logic deferred; no auto-scheduling."
+    },
+    {
+      "vaccine_code": "BCG",
+      "dose_code": "BCG",
+      "age": {
+        "unit": "first_4_weeks"
+      },
+      "condition": null,
+      "source_slide": 67,
+      "status": "reference_transcribed",
+      "source_age": {
+        "unit": "first_4_weeks"
+      },
+      "detail_source_slide": null,
+      "requires_clinician_review_for_patient_specific_decisions": true,
+      "scheduling_policy": "doctor_select_date_in_first_four_weeks",
+      "age_is_window_not_exact_date": true
+    },
+    {
+      "vaccine_code": "VPO",
+      "dose_code": "VPO0",
+      "age": {
+        "unit": "first_4_weeks"
+      },
+      "condition": null,
+      "source_slide": 67,
+      "status": "reference_transcribed",
+      "source_age": {
+        "unit": "first_4_weeks"
+      },
+      "detail_source_slide": 79,
+      "requires_clinician_review_for_patient_specific_decisions": true,
+      "decision_id": "PNI-VPO0",
+      "scheduling_policy": "doctor_select_date_in_first_four_weeks",
+      "age_is_window_not_exact_date": true
+    },
+    {
+      "vaccine_code": "VPO",
+      "dose_code": "VPO1",
+      "age": {
+        "unit": "weeks",
+        "value": 8
+      },
+      "condition": null,
+      "source_slide": 67,
+      "status": "reference_transcribed",
+      "source_age": {
+        "unit": "weeks",
+        "value": 8
+      },
+      "detail_source_slide": 79,
+      "requires_clinician_review_for_patient_specific_decisions": true,
+      "scheduling_policy": "routine_after_clinical_review"
+    },
+    {
+      "vaccine_code": "VPO",
+      "dose_code": "VPO2",
+      "age": {
+        "unit": "weeks",
+        "value": 12
+      },
+      "condition": null,
+      "source_slide": 67,
+      "status": "reference_transcribed",
+      "source_age": {
+        "unit": "weeks",
+        "value": 12
+      },
+      "detail_source_slide": 79,
+      "requires_clinician_review_for_patient_specific_decisions": true,
+      "scheduling_policy": "routine_after_clinical_review"
+    },
+    {
+      "vaccine_code": "VPO",
+      "dose_code": "VPO3",
+      "age": {
+        "unit": "weeks",
+        "value": 16
+      },
+      "condition": null,
+      "source_slide": 67,
+      "status": "reference_transcribed",
+      "source_age": {
+        "unit": "weeks",
+        "value": 16
+      },
+      "detail_source_slide": 79,
+      "requires_clinician_review_for_patient_specific_decisions": true,
+      "scheduling_policy": "routine_after_clinical_review"
+    },
+    {
+      "vaccine_code": "VPO",
+      "dose_code": "VPO4",
+      "age": {
+        "unit": "months",
+        "value": 18
+      },
+      "condition": null,
+      "source_slide": 67,
+      "status": "reference_transcribed",
+      "source_age": {
+        "unit": "months",
+        "value": 18
+      },
+      "detail_source_slide": 79,
+      "requires_clinician_review_for_patient_specific_decisions": true,
+      "scheduling_policy": "routine_after_clinical_review"
+    },
+    {
+      "vaccine_code": "VPO",
+      "dose_code": "VPO5",
+      "age": {
+        "unit": "years",
+        "value": 5
+      },
+      "condition": null,
+      "source_slide": 67,
+      "status": "reference_transcribed",
+      "source_age": {
+        "unit": "years",
+        "value": 5
+      },
+      "detail_source_slide": 79,
+      "requires_clinician_review_for_patient_specific_decisions": true,
+      "scheduling_policy": "routine_after_clinical_review"
+    },
+    {
+      "vaccine_code": "PENTA",
+      "dose_code": "Penta1",
+      "age": {
+        "unit": "weeks",
+        "value": 8
+      },
+      "condition": null,
+      "source_slide": 67,
+      "status": "reference_transcribed",
+      "source_age": {
+        "unit": "weeks",
+        "value": 8
+      },
+      "detail_source_slide": null,
+      "requires_clinician_review_for_patient_specific_decisions": true,
+      "scheduling_policy": "routine_after_clinical_review"
+    },
+    {
+      "vaccine_code": "PENTA",
+      "dose_code": "Penta2",
+      "age": {
+        "unit": "weeks",
+        "value": 12
+      },
+      "condition": null,
+      "source_slide": 67,
+      "status": "reference_transcribed",
+      "source_age": {
+        "unit": "weeks",
+        "value": 12
+      },
+      "detail_source_slide": null,
+      "requires_clinician_review_for_patient_specific_decisions": true,
+      "scheduling_policy": "routine_after_clinical_review"
+    },
+    {
+      "vaccine_code": "PENTA",
+      "dose_code": "Penta3",
+      "age": {
+        "unit": "weeks",
+        "value": 16
+      },
+      "condition": null,
+      "source_slide": 67,
+      "status": "reference_transcribed",
+      "source_age": {
+        "unit": "weeks",
+        "value": 16
+      },
+      "detail_source_slide": null,
+      "requires_clinician_review_for_patient_specific_decisions": true,
+      "scheduling_policy": "routine_after_clinical_review"
+    },
+    {
+      "vaccine_code": "PCV",
+      "dose_code": "PCV1",
+      "age": {
+        "unit": "weeks",
+        "value": 10
+      },
+      "condition": null,
+      "source_slide": 67,
+      "status": "reference_transcribed",
+      "source_age": {
+        "unit": "weeks",
+        "value": 10
+      },
+      "detail_source_slide": 89,
+      "requires_clinician_review_for_patient_specific_decisions": true,
+      "decision_id": "PNI-PCV-LABELS",
+      "note": "Slide 89 repeats VPC2 in error; labels corrected according to slide 67 and project owner confirmation.",
+      "scheduling_policy": "routine_after_clinical_review"
+    },
+    {
+      "vaccine_code": "PCV",
+      "dose_code": "PCV2",
+      "age": {
+        "unit": "weeks",
+        "value": 18
+      },
+      "condition": null,
+      "source_slide": 67,
+      "status": "reference_transcribed",
+      "source_age": {
+        "unit": "weeks",
+        "value": 18
+      },
+      "detail_source_slide": 89,
+      "requires_clinician_review_for_patient_specific_decisions": true,
+      "decision_id": "PNI-PCV-LABELS",
+      "note": "Slide 89 repeats VPC2 in error; labels corrected according to slide 67 and project owner confirmation.",
+      "scheduling_policy": "routine_after_clinical_review"
+    },
+    {
+      "vaccine_code": "PCV",
+      "dose_code": "PCV3",
+      "age": {
+        "unit": "months",
+        "value": 6
+      },
+      "condition": null,
+      "source_slide": 67,
+      "status": "reference_transcribed",
+      "source_age": {
+        "unit": "months",
+        "value": 6
+      },
+      "detail_source_slide": 89,
+      "requires_clinician_review_for_patient_specific_decisions": true,
+      "decision_id": "PNI-PCV-LABELS",
+      "note": "Slide 89 repeats VPC2 in error; labels corrected according to slide 67 and project owner confirmation.",
+      "scheduling_policy": "routine_after_clinical_review"
+    },
+    {
+      "vaccine_code": "PCV",
+      "dose_code": "PCV4",
+      "age": {
+        "unit": "months",
+        "value": 12
+      },
+      "condition": null,
+      "source_slide": 67,
+      "status": "reference_transcribed",
+      "source_age": {
+        "unit": "months",
+        "value": 12
+      },
+      "detail_source_slide": 89,
+      "requires_clinician_review_for_patient_specific_decisions": true,
+      "decision_id": "PNI-PCV-LABELS",
+      "note": "Slide 89 repeats VPC2 in error; labels corrected according to slide 67 and project owner confirmation.",
+      "scheduling_policy": "routine_after_clinical_review"
+    },
+    {
+      "vaccine_code": "ROTA",
+      "dose_code": "Rota1",
+      "age": {
+        "unit": "months",
+        "value": 2
+      },
+      "condition": null,
+      "source_slide": 67,
+      "status": "reference_transcribed",
+      "source_age": {
+        "unit": "weeks",
+        "value": 8
+      },
+      "detail_source_slide": 94,
+      "requires_clinician_review_for_patient_specific_decisions": true,
+      "date_calculation": "calendar_months",
+      "decision_id": "PNI-ROTA-MONTHS",
+      "scheduling_policy": "routine_after_clinical_review"
+    },
+    {
+      "vaccine_code": "ROTA",
+      "dose_code": "Rota2",
+      "age": {
+        "unit": "months",
+        "value": 3
+      },
+      "condition": null,
+      "source_slide": 67,
+      "status": "reference_transcribed",
+      "source_age": {
+        "unit": "weeks",
+        "value": 12
+      },
+      "detail_source_slide": 94,
+      "requires_clinician_review_for_patient_specific_decisions": true,
+      "date_calculation": "calendar_months",
+      "decision_id": "PNI-ROTA-MONTHS",
+      "scheduling_policy": "routine_after_clinical_review"
+    },
+    {
+      "vaccine_code": "ROTA",
+      "dose_code": "Rota3",
+      "age": {
+        "unit": "months",
+        "value": 4
+      },
+      "condition": null,
+      "source_slide": 67,
+      "status": "reference_transcribed",
+      "source_age": {
+        "unit": "weeks",
+        "value": 16
+      },
+      "detail_source_slide": 94,
+      "requires_clinician_review_for_patient_specific_decisions": true,
+      "date_calculation": "calendar_months",
+      "decision_id": "PNI-ROTA-MONTHS",
+      "scheduling_policy": "routine_after_clinical_review"
+    },
+    {
+      "vaccine_code": "VPI",
+      "dose_code": "VPI1",
+      "age": {
+        "unit": "weeks",
+        "value": 16
+      },
+      "condition": null,
+      "source_slide": 67,
+      "status": "reference_transcribed",
+      "source_age": {
+        "unit": "weeks",
+        "value": 16
+      },
+      "detail_source_slide": null,
+      "requires_clinician_review_for_patient_specific_decisions": true,
+      "scheduling_policy": "routine_after_clinical_review"
+    },
+    {
+      "vaccine_code": "VPI",
+      "dose_code": "VPI2",
+      "age": {
+        "unit": "months",
+        "value": 9
+      },
+      "condition": null,
+      "source_slide": 67,
+      "status": "reference_transcribed",
+      "source_age": {
+        "unit": "months",
+        "value": 9
+      },
+      "detail_source_slide": null,
+      "requires_clinician_review_for_patient_specific_decisions": true,
+      "scheduling_policy": "routine_after_clinical_review"
+    },
+    {
+      "vaccine_code": "RR",
+      "dose_code": "RR1",
+      "age": {
+        "unit": "months",
+        "value": 9
+      },
+      "condition": null,
+      "source_slide": 67,
+      "status": "reference_transcribed",
+      "source_age": {
+        "unit": "months",
+        "value": 9
+      },
+      "detail_source_slide": null,
+      "requires_clinician_review_for_patient_specific_decisions": true,
+      "scheduling_policy": "routine_after_clinical_review"
+    },
+    {
+      "vaccine_code": "RR",
+      "dose_code": "RR2",
+      "age": {
+        "unit": "months",
+        "value": 18
+      },
+      "condition": null,
+      "source_slide": 67,
+      "status": "reference_transcribed",
+      "source_age": {
+        "unit": "months",
+        "value": 18
+      },
+      "detail_source_slide": null,
+      "requires_clinician_review_for_patient_specific_decisions": true,
+      "scheduling_policy": "routine_after_clinical_review"
+    },
+    {
+      "vaccine_code": "DTC",
+      "dose_code": "DTC1",
+      "age": {
+        "unit": "months",
+        "value": 18
+      },
+      "condition": null,
+      "source_slide": 67,
+      "status": "reference_transcribed",
+      "source_age": {
+        "unit": "months",
+        "value": 18
+      },
+      "detail_source_slide": null,
+      "requires_clinician_review_for_patient_specific_decisions": true,
+      "scheduling_policy": "routine_after_clinical_review"
+    },
+    {
+      "vaccine_code": "DTC",
+      "dose_code": "DTC2",
+      "age": {
+        "unit": "years",
+        "value": 5
+      },
+      "condition": null,
+      "source_slide": 67,
+      "status": "reference_transcribed",
+      "source_age": {
+        "unit": "years",
+        "value": 5
+      },
+      "detail_source_slide": null,
+      "requires_clinician_review_for_patient_specific_decisions": true,
+      "scheduling_policy": "routine_after_clinical_review"
+    },
+    {
+      "vaccine_code": "HPV",
+      "dose_code": "HPV",
+      "age": {
+        "unit": "years",
+        "value": 11
+      },
+      "condition": "Girls only, age 11",
+      "source_slide": 67,
+      "status": "reference_transcribed",
+      "source_age": {
+        "unit": "years",
+        "value": 11
+      },
+      "detail_source_slide": 102,
+      "requires_clinician_review_for_patient_specific_decisions": true,
+      "eligibility": {
+        "sex": "female",
+        "age_years": 11
+      },
+      "decision_id": "PNI-HPV-GIRLS",
+      "scheduling_policy": "routine_after_clinical_review"
+    }
+  ],
+  "birth_hepatitis_b": {
+    "chart_note": "The chart distinguishes HBn administered at birth versus not administered. HB1 appears during the first four weeks only for the latter case.",
+    "source_slide": 67,
+    "status": "deferred_for_later_database_update",
+    "automatic_special_case_scheduling": false,
+    "birth_dose_HBn_reference": {
+      "age": "at_birth",
+      "source_slides": [
+        67,
+        73
+      ],
+      "present_as_schedule_2025_row": false,
+      "reason": "The user deferred HBn/HB1 special-case database modeling until later.",
+      "next_action": "Add birth-dose event/recording and conditional rules after clarification; do not infer a protocol."
+    },
+    "routine_schedule_complete_for_hepatitis_b": false,
+    "conditional_HB1_automatic_scheduling_enabled": false
+  },
+  "additional_reference_slides": [
+    {
+      "slide": 65,
+      "text": [
+        "Types de vaccin",
+        "Anti bactérien\n-Antituberculeux",
+        "Anti-viraux :\n-Poliomyélite (oral)\n-Rougeole/rubéole\n-Rotavirus",
+        "Vaccin  Vivant  atténué",
+        "Anti bactérien\n-Coqueluche (à\ngermes entiers)",
+        "Anti viraux\n-Poliomyélite(  inactivé, injectable)",
+        "Vaccins  inactivés"
+      ],
+      "tables": []
+    },
+    {
+      "slide": 66,
+      "text": [
+        "Calendrier de vaccination",
+        "Calendrier de vaccination  de l’enfant de 0 à 5 ans",
+        "Vaccination de la femme  en\tâge de procréer"
+      ],
+      "tables": []
+    },
+    {
+      "slide": 67,
+      "text": [
+        "67",
+        "Calendrier National de Vaccination 2025"
+      ],
+      "tables": []
+    },
+    {
+      "slide": 68,
+      "text": [
+        "Calendrier national de vaccination antitétanique chez  la femme âgée de 15- 45 ans :",
+        "L’OMS recommande que les femmes doivent recevoir au total 5 doses de\nVAT au cours de l’enfance suivies d’une sixième dose à l’âge adulte afin  d’assurer une protection à vie.",
+        "- Pour les adolescentes et les femmes en âge de procréer ayant déjà reçu une\nprimo vaccination et des rappels selon le PNI (5 prises) une 6ème dose est  recommandée pour assurer une protection à vie."
+      ],
+      "tables": []
+    },
+    {
+      "slide": 69,
+      "text": [
+        "Pour les adolescentes et les femmes en âge de procréer jamais vaccinées ou dont  les renseignements sont incertains il faut les vacciner selon le calendrier ci-  dessous\n\n\nPour les femmes enceintes jamais vaccinées ou dont les renseignements sont\nincertains elles doivent recevoir au moins 2 doses espacées de 4 semaines."
+      ],
+      "tables": []
+    },
+    {
+      "slide": 70,
+      "text": [
+        "Calendrier national de vaccination antitétanique chez  la femme agée de 15- 45 ans :"
+      ],
+      "tables": []
+    },
+    {
+      "slide": 71,
+      "text": [
+        "Calendrier De Supplémentation En Vitamines:",
+        "vit D2 ( Ergogyl) :",
+        "à la naissance (200.000 UI)\n6 mois (200.000 UI)",
+        "vit A :",
+        "6 mois(100.000UI) Capsule bleu  12mois (200.000UI) Capsule rouge  18 mois(200.000UI)"
+      ],
+      "tables": []
+    },
+    {
+      "slide": 72,
+      "text": [
+        "Les vaccins contre les maladies ciblées par le programme  national d’immunisation:",
+        "1.Vaccination contre l’hépatite virale type B (VHB)"
+      ],
+      "tables": [
+        [
+          [
+            "Type de\nvaccin",
+            "Objectif",
+            "Composition",
+            "Présentation",
+            "Mode de\nconservation"
+          ],
+          [
+            "Vaccin viral  sous unité  acellulaire",
+            "Prévenir  l’Hépatite  virale type\nB",
+            "Existe sous deux\nformes :\nVaccin obtenu  par purification  de l'enveloppe  virale ;\n\nVaccin obtenu  par technique de  recombinaison  génétique",
+            "Forme : liquide\n\n-Nombre de doses  par flacon : multi  dose (10 doses)",
+            "Doit être  conservé  dans un  réfrigérateur  entre +2C° et\n+8C°\n\nNe jamais\ncongeler"
+          ]
+        ]
+      ]
+    },
+    {
+      "slide": 73,
+      "text": [
+        "1.Vaccination contre l’hépatite virale type B (VHB)"
+      ],
+      "tables": [
+        [
+          [
+            "Mode\nd’administration",
+            "Dose  par  prise",
+            "Calendrier",
+            "Effets  secondaires",
+            "Contre-  indication"
+          ],
+          [
+            "-Agiter le flacon  avant\nl’administration\n\n-Intra musculaire\n(IM) profonde.\n\n- Le monovalent au\nniveau de :\n\nLa face antéro-  externe de la cuisse  GAUCHE chez le  nourrisson.",
+            "0,5 ml",
+            "Le calendrier national recommande 4  prises du vaccin contre l’hépatite virale  de type B\n\n1ère prise (HB1n): Administrée dans une  structure d’accouchement dans les 24  heures après la naissance (vaccin  monovalent). sinon, l’administrer en  même temps que le BCG.\n\nPuis les trois autres prises avec le vaccin\npentavalent DTC-Hib-HB (voir plus loin):\n2ème prise : à l’âge de 2 mois.\n3ème prise : à l’âge de 3 mois.\n4ème prise : à l’âge de 4 mois",
+            "-\tNourrisson et  enfant : Rares  et bénins ;  réaction locale  (douleur,  tuméfaction,  rougeur),  fièvre.",
+            "Aucune  contre –  indication  à ce vaccin  n’a été  signalée"
+          ]
+        ]
+      ]
+    },
+    {
+      "slide": 74,
+      "text": [
+        "La face antéro-externe  de la cuisse"
+      ],
+      "tables": []
+    },
+    {
+      "slide": 75,
+      "text": [
+        "2. Vaccination contre la tuberculose (BCG) :\nBacille Calmette-Guérin",
+        "Type  de  vaccin",
+        "Objectif",
+        "Compositio\nn",
+        "Présentation",
+        "Mode de conservation",
+        "Vivant\natténué",
+        "Prévenir  les formes  graves de  la  tuberculose",
+        "Vaccin  bactérien  vivant  atténué,  dérivé de la  souche du  Bacille de  Calmette et  Guérin",
+        "Sensible à la lumière et à\nla chaleur",
+        "- Doit être conservé dans  un réfrigérateur entre\n+2°C et +8°C",
+        "- Une fois reconstitué, le  vaccin doit être utilisé  dans les 6 heures qui  suivent.",
+        "Forme : lyophilisée  (poudre à reconstituer  avec un diluant)",
+        "Association : toujours  seul (jamais sous  forme combinée)",
+        "Nombre de doses par  flacon : flacons multi  doses (ampoules\nde 10 et 20 doses)"
+      ],
+      "tables": []
+    },
+    {
+      "slide": 76,
+      "text": [
+        "2. Vaccination contre la tuberculose (BCG) :"
+      ],
+      "tables": [
+        [
+          [
+            "Mode\nd’administration",
+            "Dose par\nprise",
+            "Calendrier",
+            "Effets secondaires",
+            "Contre-indication"
+          ],
+          [
+            "Toujours utiliser le  diluant spécifique  au vaccin ;\n- Injection en  intradermique (ID)  stricte\n- Site : face externe  du bras gauche, à la  jonction du 1/3  moyen et supérieur  du bras gauche",
+            "0,05 ml  chez  l’enfant  de moins  d’un an\n\n0,1 ml  chez  l’enfant  de plus  d’un an",
+            "Dose unique\n\n: le plus tôt  possible  après la  naissance",
+            "Complications locales et  locorégionales possibles :\n\nulcération ou abcès au site  d’injection avec ou sans  écoulement\n\nganglion satellite évoluant  parfois vers la caséification et  la fistulisation.\n\n- Complications systémiques:  Bécégites exceptionnellement  rapportées, généralement  observées chez un sujet porteur  d’un déficit immunitaire",
+            "-Dermatose en  évolution.\n\nAllergie à l’un des\ncomposants.\n\nImmunodépression  congénitale ou  acquise.\n\nEnfants nés de mère  séropositive pour le  VIH tant que l’on\nn’a pas la certitude  qu’ils ne sont pas  infectés"
+          ]
+        ]
+      ]
+    },
+    {
+      "slide": 77,
+      "text": [
+        "BCGite",
+        "L’OMS recommande pour les pays où l’incidence de la tuberculose est élevée,  de vacciner le plus rapidement possible après la naissance et de se limiter à  une seule vaccination par sujet, sans aucun contrôle tuberculinique ultérieur",
+        "Administration  de vaccin BCG"
+      ],
+      "tables": []
+    },
+    {
+      "slide": 78,
+      "text": [
+        "3. Vaccination contre la Poliomyélite (VPO)"
+      ],
+      "tables": [
+        [
+          [
+            "Type de\nvaccin",
+            "Objectif",
+            "Composition",
+            "Présentation",
+            "Mode de\nconservation"
+          ],
+          [
+            "vaccin viral  vivants  atténués qui  induit une  immunité  individuelle  et collective",
+            "Prévenir la  Poliomyélite  en induisant  une  immunité  individuelle  et collective\n\nParalysie  flasque  aigues (PFA)",
+            "Suspension  contenant des  poliovirus  vivants atténués",
+            "Forme : liquide  Association : toujours seul  (jamais sous forme  combinée)\nNombre de doses par  flacon : Ampoule multidose  (10 doses avec 1 dose égale\n2 gouttes)",
+            "Fragile et sensible à\nla chaleur\n\n- Ne doit être  conservé au  congélateur qu’au  niveau central\nà -20°C\n-au niveau  périphérique au  réfrigérateur entre\n+2°C et +8°C"
+          ]
+        ]
+      ]
+    },
+    {
+      "slide": 79,
+      "text": [
+        "3. Vaccination contre la Poliomyélite (VPO"
+      ],
+      "tables": [
+        [
+          [
+            "Mode\nd’administration",
+            "Dose par prise",
+            "Calendrier",
+            "Effets secondaires",
+            "Contre-\nindication"
+          ],
+          [
+            "Orale",
+            "2 gouttes  déposées  directement  sur la langue  sans contact  entre\nle flacon et la\nlangue",
+            "A la naissance : Première\nprise dite VPO zéro ;\n- Puis : en même temps que\nla prise des Penta 1, 2 et 3 :\n2ème prise VPO 1 : à l’âge  de 2 mois ;\n3ème prise VPO 2 : à l’âge\nde 3 mois ;\n4ème prise VPO 3: à l’âge\nde 4 mois.\n- Le rappel à :\nVPO 4 à l’âge de 18 mois ;\nVPO5 à l’âge de 5 ans",
+            "Exceptionnellement  paralysie chez le\nsujet vacciné ou  dans son entourage  (dans 30 jours  suivant la  vaccination)",
+            "Déficits  immunitaires  congénitaux  ou acquis à  l’exception de  l’infection au  VIH"
+          ]
+        ]
+      ]
+    },
+    {
+      "slide": 80,
+      "text": [
+        "Initiative mondiale pour l’éradication du POLIO, Aide-mémoire – février 2015",
+        "Poliovirus dérivé d’une\nsouche vaccinale (PVDV)",
+        "Poliovirus circulant dérivé d’une  souche vaccinale (PVDVc)",
+        "poliomyélite paralytique  associée au vaccin (PPAV)"
+      ],
+      "tables": []
+    },
+    {
+      "slide": 81,
+      "text": [
+        "1955\nJonas Salk",
+        "1957\nSabin Albert"
+      ],
+      "tables": []
+    },
+    {
+      "slide": 82,
+      "text": [
+        "Raisons du remplacement du VPO trivalent par le VPO bivalent",
+        "La composante de type 2 du VPOt :\nest à l’origine de plus de 90 % des cas dus aux poliovirus circulants dérivés\nd’une souche vaccinale (PVDVc)\nest à l’origine de 40 % environ des cas de poliomyélite paralytique associée à la  vaccination\n\ninterfère avec la réponse immunitaire au poliovirus de type 1 et de type 3 dans le\nVPOt",
+        "23",
+        "Actuellement, les risques associés à la composante de type 2 du VPOt l’emportent sur les bienfaits"
+      ],
+      "tables": []
+    },
+    {
+      "slide": 83,
+      "text": [
+        "L’introduction du VPI permettra :\nde réduire les risques associés au retrait du VPO de type 2\nde parvenir plus vite à l’éradication en renforçant l’immunité vis-à-vis des poliovirus\nde type 1 et de type 3",
+        "Raisons du remplacement du VPO trivalent par le VPO bivalent"
+      ],
+      "tables": []
+    },
+    {
+      "slide": 84,
+      "text": [
+        "Le VPOb et le VPI protègent contre\nles poliovirus de\ttypes 1, 2 et 3.",
+        "Le VPOb présente un risque\ninférieur de PVDVc.",
+        "En avril 2016,\nretrait du type 2",
+        "VPOt\tVPI\n\nLe VPOt et le VPI protègent  contre les poliovirus de  types 1, 2 et 3.",
+        "Passage du VPOt au VPOb",
+        "VPOb",
+        "VPI"
+      ],
+      "tables": []
+    },
+    {
+      "slide": 85,
+      "text": [
+        "4. Le Vaccin antipoliomyélitique inactivé (VPI) :"
+      ],
+      "tables": [
+        [
+          [
+            "Type de  vaccin",
+            "Objectif",
+            "Composit  ion",
+            "Présentat  ion",
+            "Mode de conservation"
+          ],
+          [
+            "Vaccin  inactivé",
+            "Prévenir  les  affections  graves  provoquée  s par le  virus de la  poliomyéli  te",
+            "Virus  inactivé  de la  poliomyél  ite",
+            "Forme :  Liquide  de 5 ou\nde 10  doses",
+            "Au réfrigérateur entre +2°C et +8°C et à l'abri de la\nlumière.\n- Une fois le flacon ouvert :\nL’utiliser dans les 28 jours qui suivent avec la  conservation dans une température entre 2°C et 8°C \nNe jamais congeler le VPI.\nLe «test d’agitation» n’est pas efficace pour détecter si le  VPI a été congelé.\nEn cas d’un doute quelconque sur le fait que le VPI\na pu être congelé, le flacon doit être jeté.\nTous les flacons de VPI comportent une pastille de  contrôle du vaccin qui indique si le vaccin a été soumis à  des températures excessives"
+          ]
+        ]
+      ]
+    },
+    {
+      "slide": 86,
+      "text": [
+        "4. Le Vaccin antipoliomyélitique inactivé (VPI) :"
+      ],
+      "tables": [
+        [
+          [
+            "Mode\nd’administratio  n",
+            "Dose  par  prise",
+            "Calendrier",
+            "Effets secondaires",
+            "Contre-indication"
+          ],
+          [
+            "Voie  intramusculaire  Site :La partie  haute de la face  antérolatérale  de la cuisse  GAUCHE\nRespecter la  distance de 2.5  cm lors de\nl’administration\nd’autre vaccin",
+            "0,5 ml",
+            "le VPI est  administré  à l’âge de 4  mois et une deuxième dose à l'âge de 9 mois,",
+            "Le VPI est un vaccin très sûr, qu’il  soit administré seul ou associé à  d’autres vaccins.\n\n-Aucune manifestation post  vaccinale indésirable grave n’a été  signalée.\n-quelques effets secondaires bénins.\n- Réactions locales mineures  comme une rougeur et une  sensibilité de la peau",
+            "-Nourrissons ayant  une allergie connue ou  documentée à l’une ou  plusieurs de ses  composants inactifs  (streptomycine,  néomycine\nou polymyxine B)\n\n-Ou ayant un  antécédent de réaction  allergique à la suite\nd’une précédente\ninjection de VPI."
+          ]
+        ]
+      ]
+    },
+    {
+      "slide": 87,
+      "text": [
+        "Mode d’administration du VPI"
+      ],
+      "tables": []
+    },
+    {
+      "slide": 88,
+      "text": [
+        "5.Vaccination Vaccin pneumococcique polyosidique conjugué 13-valent PCV 13",
+        "du 02 Mars  2023"
+      ],
+      "tables": [
+        [
+          [
+            "Type de\nvaccin",
+            "Objectif",
+            "Composi\ntion",
+            "Présentation",
+            "Mode de\nconservation"
+          ],
+          [
+            "Vaccin pneumococcique polyosidique conjugué 13-valent ® (PCV 13 – TT) : WEUPHORIA",
+            "Prévenir les infections  invasives à  pneumocoques  responsables de  pneumonies, de  méningites, d’otites  moyennes etc",
+            "Vaccin  polysacc  haridique",
+            "Forme : Suspension injectable\nNombre de doses par\nflacon :\nSeringue préremplie unidose (0,5 ml) Boite unitaire",
+            "- Doit être conservé  au réfrigérateur  entre +2°C et\n+8°C\n-NE PAS CONGELER\n- A l’abri de la lumière"
+          ]
+        ]
+      ]
+    },
+    {
+      "slide": 89,
+      "text": [
+        "5.Vaccination contre le Pneumocoque VPC :"
+      ],
+      "tables": [
+        [
+          [
+            "Mode\nd’administration",
+            "Dose  par  prise",
+            "Calendrier",
+            "Effets secondaires",
+            "Contre-\nindication"
+          ],
+          [
+            "Intramusculaire\nSite uniquement :\n\n(face antérolatérale de la cuisse chez les nourrissons et le muscle deltoïde du bras chez les tout-petits et les enfants). \nAgiter vigoureusement le vaccin immédiatement avant utilisation afin d’obtenir une suspension blanche et homogène",
+            "0,5 ml",
+            "-1ère prise\n(VPC1) à 10 Semaines\n\n2ème prise  (VPC2) à 18 Semaines\n\n3ème prise\n(VPC2) à 6\nMois\n\n-4ème prise\n(VPC2) à 12\nMois",
+            "-EIPV systémiques : \nTrès fréquents : fièvre, diarrhée. \nFréquents : pleurs, toux, nausées/vomissements, fatigue/somnolence, réaction allergique. \nPeu fréquents : myalgie. \n\nEIPV locaux :  \nTrès fréquents : rougeur. \nFréquents : gonflement, douleur, induration Peu fréquent : démangeaisons.\nRare : éruption cutanée (au site d’injection).",
+            "Hypersensibilité à tout composant du produit, y compris les substances actives, les excipients, ou la toxine tétanique."
+          ]
+        ]
+      ]
+    },
+    {
+      "slide": 90,
+      "text": [
+        "6. Vaccination contre la Rougeole et la Rubéole (RR) :"
+      ],
+      "tables": [
+        [
+          [
+            "Type de\nvaccin",
+            "Objectif",
+            "Compos\nition",
+            "Présentation",
+            "Mode de conservation"
+          ],
+          [
+            "Vaccin  vivant  atténué",
+            "Prévenir la  rougeole et la  rubéole  (Syndrome de  Rubéole  Congénitale)",
+            "Vaccins  viral  vivant  atténué",
+            "-Vaccin combiné contre la\nrougeole et la rubéole :\n\nFlacon de 10 doses\n\nForme lyophilisée avec  une ampoule de solvant  pour la reconstitution.",
+            "Doit être conservé au  réfrigérateur entre +2°C  et +8°C\n\nNe doit pas être congelé\n\nSolvant doit être conservé  au réfrigérateur"
+          ]
+        ]
+      ]
+    },
+    {
+      "slide": 91,
+      "text": [
+        "6. Vaccination contre la Rougeole et la Rubéole (RR) :"
+      ],
+      "tables": [
+        [
+          [
+            "Mode\nd’administrati\non",
+            "Dose  par  prise",
+            "Calendrier",
+            "Effets secondaires",
+            "Contre-indication"
+          ],
+          [
+            "Sous cutanée\n- Site : au  niveau du  deltoïde  GAUCHE.",
+            "0,5\nml",
+            "- Calendrier : deux  doses de RR à l’âge  de 09 et 18 mois.",
+            "Fièvre modérée ;\nEruption modérée plus ou  moins fébrile qui peut  apparaître de 8 à 12 jours  après la vaccination.",
+            "Déficit immunitaire\nacquis ou congénital ;\nGrossesse (cas du\nvaccin anti-rubéole) ;\nAllergie confirmée au\nblanc d'œuf"
+          ]
+        ]
+      ]
+    },
+    {
+      "slide": 92,
+      "text": [
+        "Présentation du vaccin antirotavirus"
+      ],
+      "tables": []
+    },
+    {
+      "slide": 93,
+      "text": [
+        "7. Vaccination contre le Rotavirus (Rotasiil® )",
+        ":"
+      ],
+      "tables": [
+        [
+          [
+            "Type de\nvaccin",
+            "Objectif",
+            "Composition",
+            "Présentation",
+            "Mode de conservation"
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "Doit être conservé au"
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "réfrigérateur entre +2°C et"
+          ],
+          [
+            "Vaccins  vivants  atténués",
+            "la  prévention  de la  gastro-  entérite  due à une  infection à  rotavirus",
+            "Composant  actif  lyophilisé à  reconstituer  avec un  excipient  diluant avant  utilisation",
+            "-Forme : lyophilisé\n-un flacon de vaccin lyophilisé à  reconstituer avec un diluant  liquide dans un flacon contenant  un antiacide.\n-Présentation en flacon de 1 dose  de lyophilisat+ flacon de diluant  solvant (2,5ml), 1 adaptateur et 1  seringue jetable stérile de 3ml.",
+            "+8°C\n- Ne doit pas être congelé\n-Une fois reconstituée : la  Température de stockage  recommandée est entre  02°C et 08oC pendant 6  heures\nLe diluant ne doit pas\nêtre congelé\nLes seringues orales et  adaptateurs doivent être  conservés dans un endroit  frais et sec"
+          ]
+        ]
+      ]
+    },
+    {
+      "slide": 94,
+      "text": [],
+      "tables": [
+        [
+          [
+            "administra\ntion",
+            "Dos\ne",
+            "Calendrier",
+            "Effets secondaires",
+            "Contre-indication"
+          ],
+          [
+            "Orale  Site : à  l'intérieur  de la joue  de  l'enfant",
+            "2,5\nml",
+            "Calendrier : En trois doses\nrespectivement à l’âge de :\n\nDeux mois : ROTA 1\nTrois mois : ROTA 2\nQuatre mois : ROTA 3\n\nles enfants ont raté leurs vaccins  antirotavirus, ils peuvent  bénéficier de l’administration du  vaccin jusqu’à l’âge de 24 mois.\n-En raison de la répartition par âge  typique de la gastro-entérite à  Rotavirus, la vaccination  antirotavirus des enfants de plus  de 24 mois n'est pas  recommandée",
+            "Le risque d’invagination après  la vaccination contre le  rotavirus est beaucoup plus  faible que le risque de  maladies graves à rotavirus  chez les nourrissons et les  jeunes enfants non vaccinés.\n\nLe vaccin Rotasiil® est sans  danger et ne provoque pas  d’effets indésirables graves.\n\nLa fièvre et la diarrhée sont  des effets secondaires très  fréquents du vaccin.",
+            "Hypersensibilité\naprès\nl’administration  antérieure des  vaccins  antirotavirus ou  à l’un des  composants.\n\nAntécédent\nd'invagination.\nLes personnes  avec Déficit  Immunitaire  Combiné sévère  (DICS) ."
+          ]
+        ]
+      ]
+    },
+    {
+      "slide": 95,
+      "text": [
+        "8.Vaccination contre la diphtérie le tétanos, la coqueluche, les infections  invasives dues à l’Hémophilus influenza de type b et l’hépatite virale  de type B : Penta(DTC+HB+Hib) :"
+      ],
+      "tables": [
+        [
+          [
+            "Type de vaccin",
+            "Objectif",
+            "Composition",
+            "Présentation",
+            "Mode de\nconservation"
+          ],
+          [
+            "Penta (DTC+HB+Hib):  Association vaccinale  de Diphtérie, Tétanos,  Coqueluche (à germe  complet), Hémophilus  influenza de type b et  les Hépatites virales de  type B",
+            "Prévenir la  Diphtérie, le  Tétanos, la  Coqueluche,\nl’Hémophilus  influenza de type  b et les Hépatites  virales de type B",
+            "Penta :association  vaccinale de  diphtérie, tétanos,  coqueluche,\nl’Hémophilus  influenza de type b  et les hépatites  virales de type B",
+            "Forme : liquide  injectable  Nombre de  doses par flacon :  10 doses",
+            "Doit être  conservé au  réfrigérateur  entre +2°C  et +8°C\n\n- Ne doivent  pas être  congelé"
+          ]
+        ]
+      ]
+    },
+    {
+      "slide": 96,
+      "text": [
+        "8.Vaccination contre la diphtérie le tétanos, la coqueluche, les infections invasives  dues à l’Hémophilus influenza de type b et l’hépatite virale de type B :  Penta(DTC+HB+Hib) :"
+      ],
+      "tables": [
+        [
+          [
+            "Mode\nd’administratio\nn",
+            "Dose  par  prise",
+            "Calendrier",
+            "Effets secondaires",
+            "Contre-indication"
+          ],
+          [
+            "Voies :\nVoie  intramusculaire  profonde\n\nFace  antérolatérale  de la cuisse  DROITE",
+            "0,5 ml",
+            "Penta : Trois prises\n\nPenta 1: à l’âge de 2 mois ;\nPenta 2 : à l’âge de 3 mois ;\nPenta 3 : à l’âge de 4 mois ;",
+            "Rougeur, douleur et  induration au point de  l’injection pouvant  persister 48 heures",
+            "Penta :\n\nHypersensibilité aux  substances actives ou à  l’un des excipients\n\nEnfant ayant une  thrombopénie ou tout  autre trouble de la  coagulation."
+          ]
+        ]
+      ]
+    },
+    {
+      "slide": 97,
+      "text": [
+        "9.Vaccination contre la diphtérie le tétanos, la coqueluche (DTC) :"
+      ],
+      "tables": [
+        [
+          [
+            "Type de vaccin",
+            "Objectif",
+            "Composition",
+            "Présentation",
+            "Mode de\nconservation"
+          ],
+          [
+            "DTC : Association  vaccinale de  diphtérie, tétanos et  coqueluche à  germe complet",
+            "Prévenir la  Diphtérie, le  Tétanos, la  Coqueluche,",
+            "DTC : association  vaccinale de deux  anatoxines  (tétanique et  diphtérique) et de  germes entiers  (coqueluche)",
+            "Forme : liquide  injectable  Nombre de doses  par flacon : 10  doses",
+            "Doit être  conservé au  réfrigérateur  entre +2°C  et +8°C\n\n- Ne doivent  pas être  congelé"
+          ]
+        ]
+      ]
+    },
+    {
+      "slide": 98,
+      "text": [
+        "9.Vaccination contre la diphtérie le tétanos, la coqueluche (DTC) :"
+      ],
+      "tables": [
+        [
+          [
+            "Mode\nd’administratio\nn",
+            "Dose  par  prise",
+            "Calendrier",
+            "Effets secondaires",
+            "Contre-indication"
+          ],
+          [
+            "Voie :\n-intramusculaire\n\nSite :\n- muscle\ndeltoïde",
+            "0,5 ml",
+            "DTC :\n\nRappel à l’âge de 18\nmois (DTC Rappel 1)\nRappel à l’âge de 5ans\n(DTC Rappel 2)",
+            "DTC\nHyperthermie ne dépassant\npas 24 à 48 heures;\n\nConvulsion ou réaction locale  à type de nodule douloureux  due à la composante  anticoquelucheuse;\n\nRarement anaphylaxie ou\ncollapsus",
+            "DTC :\n\nEncéphalopathie  évolutive, convulsivante  ou non\n\nForte réaction  allergique lors de la  prise précédente de  DTC"
+          ]
+        ]
+      ]
+    },
+    {
+      "slide": 99,
+      "text": [
+        "9. Vaccination antitétanique -antidiphtérique (td) chez la femme :"
+      ],
+      "tables": [
+        [
+          [
+            "Type de\nvaccin",
+            "Objectif",
+            "Composition",
+            "Présentation",
+            "Mode de\nconservation"
+          ],
+          [
+            "Vaccin sous-  unités  (acellulaires)",
+            "Prévenir le tétanos\nNéonatal et la diphtérie",
+            "(anatoxine tétanique et anatoxine diphtérique dose réduite)",
+            "Forme : liquide  Nombre de dose  par flacon : 10  doses",
+            "-Doit être conservé  au réfrigérateur  entre +2°C et\n+8°C\n\n- Ne doit pas être  congelé"
+          ]
+        ]
+      ]
+    },
+    {
+      "slide": 100,
+      "text": [],
+      "tables": [
+        [
+          [
+            "Mode\nd’administratio\nn",
+            "Dose  par  prise",
+            "Calendrier",
+            "Effets secondaires",
+            "Contre-\nindication"
+          ],
+          [
+            "-Voie :  intramusculaire  stricte\n\n- Site : au niveau  de la face  externe, haut  bras",
+            "0,5 ml",
+            "Chez la femme 5 doses :\n\nVAT1 : Premier contact\n\nVAT2 : Un mois après VAT 1\n\nVAT3 : Six mois après VAT2 ou\nen cas de grossesse ultérieure\n\nVAT4 : Un an après le VAT3 ou\nen cas de grossesse ultérieure\n\nVAT5 : Un an après le VAT4 ou  en cas de grossesse ultérieure",
+            "-Douleur, rougeur  et tuméfaction au  point d’injection.\n\n- Fièvre modérée  est possible  pendant 24 à 48  heures.",
+            "Aucune contre\n– indication à  ce vaccin n’est  signalée"
+          ]
+        ]
+      ]
+    },
+    {
+      "slide": 101,
+      "text": [
+        "10.Vaccination contre PapillomaVirus Humains –HPV-:"
+      ],
+      "tables": [
+        [
+          [
+            "Type de vaccin",
+            "Objectif",
+            "Composition",
+            "Présentation",
+            "Mode de\nconservation"
+          ],
+          [
+            "HPV: vaccin contre le Cancer du col utérin",
+            "-Prévenir le CCU\n-N’est pas inscrite comme  un moyen de protection contre une maladie sexuellement transmissible\n-Ne se substitue en aucun cas au dépistage du CCU avec lequel elle doit être combinée.",
+            "HPV: Vaccin recombinant quadrivalent contre le virus du papillome humain HPV (types 6, 11, 16, 18)",
+            "Forme : en flacon unidose à suspension 0,5 ml",
+            "Doit être  conservé au  réfrigérateur  entre +2°C  et +8°C\n\n-Sensible au gel\n- Sensible à la lumière"
+          ]
+        ]
+      ]
+    },
+    {
+      "slide": 102,
+      "text": [],
+      "tables": [
+        [
+          [
+            "Mode\nd’administratio\nn",
+            "Dose  par  prise",
+            "Calendrier",
+            "Effets secondaires",
+            "Contre-\nindication"
+          ],
+          [
+            "-Voie :  intramusculaire  stricte\n\n- Site : la partie supérieure du bras\n- Angle : 90°",
+            "0,5 ml",
+            "Chez les filles agées de 11 ans\n\n1 doses à l’àge de 11ans",
+            "Le  GARDASIL® est bien toléré\n\nrougeur, douleur et gonflement\nfièvre,étourdissements et nausées.\n\nPossibilité de syncope après toute intervention médicale et n'est pas rare chez les jeunes filles après l’administration d'un vaccin.",
+            "Hypersensibilité aux substances actives ou à l'un des excipients du vaccin."
+          ]
+        ]
+      ]
+    },
+    {
+      "slide": 215,
+      "text": [
+        "Rattrapage",
+        "De très nombreuses raisons peuvent conduire un enfant à être en  retard par rapport au calendrier des vaccinations et recommandations  vaccinales de l’année en cours.\nParmi ces raisons, la négligence (des parents et des médecins) est  certainement la plus importante.\nLe but d’un rattrapage est d’induire et de réactiver l’immunité pour  que le patient soit protégé de façon prolongée."
+      ],
+      "tables": []
+    },
+    {
+      "slide": 216,
+      "text": [
+        "Sur le plan immunologique, la vaccination est constituée par une  primo-vaccination (induction de réponses anticorps de courte durée  et de cellules mémoires), suivie de rappel(s) réactivant les cellules  mémoires et les incitant à fabriquer à nouveau des anticorps  protecteurs."
+      ],
+      "tables": []
+    },
+    {
+      "slide": 217,
+      "text": [
+        "Le nombre total de doses en principe nécessaires à une protection  prolongée permet de déterminer le\nnombre de doses manquantes, en soustrayant les doses déjà reçues."
+      ],
+      "tables": []
+    },
+    {
+      "slide": 218,
+      "text": [],
+      "tables": []
+    },
+    {
+      "slide": 219,
+      "text": [
+        "Règles générales :",
+        "Quatre règles de base pour le rattrapage peuvent être proposées:\n\n- Règle 1 : Il vaut mieux considérer qu’un enfant n’est pas vacciné que de le  croire erronément protégé.\nEn cas d’absence de document vaccinal, s’assurer en posant des questions  précises concernant les types, les sites et le nombre de prises vaccinales."
+      ],
+      "tables": []
+    },
+    {
+      "slide": 220,
+      "text": [
+        "Règle2 : Une interruption du schéma de vaccination ne nécessite ni de\nrecommencer toute la série de vaccins ni d’y ajouter des doses  supplémentaires.\nEn principe, en cas d’interruption d’un schéma vaccinal de base, on  poursuivra la vaccination là où elle a été interrompue, indépendamment  du temps écoulé depuis la dernière dose reçue."
+      ],
+      "tables": []
+    },
+    {
+      "slide": 221,
+      "text": [
+        "Règle 3. La qualité de la réponse immunitaire obtenue dépend du :\nrespect de l’âge chronologique minimum lors de l’administration de  la dose du vaccin,\nl’intervalle minimal (4 semaines pour la primo vaccination, 6 mois à  2 ans pour les rappels) entre deux doses et nombre de doses reçues y  compris le ou les rappels pour certains vaccins."
+      ],
+      "tables": []
+    },
+    {
+      "slide": 222,
+      "text": [
+        "Règle 4. L’utilisation de vaccins combinés favorise généralement  une meilleure compliance en réduisant le nombre total d’injections  nécessaires."
+      ],
+      "tables": []
+    },
+    {
+      "slide": 223,
+      "text": [
+        "Pour la vaccination  DTC",
+        "les enfants déjà vaccinés peuvent  présenter des réactions  importantes, locales ou générales à  une injection supplémentaire non  nécessaire.",
+        "En cas de doute, il peut être  intéressant d’administrer une  première dose de vaccin et de titrer  si possible les anticorps tétaniques.",
+        "Un dosage des anticorps anti-tétanos  après quatre semaines permet de  déterminer si des cellules mémoires  persistent en nombre suffisant et de  décider de la suite de la vaccination."
+      ],
+      "tables": []
+    },
+    {
+      "slide": 224,
+      "text": [
+        "Il est à noter que devant des situations spécifiques et particulaires il  faut demander l’avis du pédiatre au niveau de la province\n\nLe vaccin anti-Hib n’est pas nécessaire chez les enfants de 3 ans en\nbonne santé ."
+      ],
+      "tables": []
+    }
+  ],
+  "review_flags": [
+    {
+      "topic": "Hepatitis B birth-dose and conditional logic",
+      "status": "deferred_incomplete",
+      "details": "No separate HBn row in 25-entry schedule. HB1 is conditional and auto-scheduling is disabled. Add to database later after clinical clarification.",
+      "slides": [
+        67,
+        73
+      ]
+    },
+    {
+      "topic": "Catch-up clinical procedures",
+      "status": "manual_doctor_decision",
+      "details": "Each vaccine has distinct procedures. Flag missed appointments and possible overdue doses, but do not generate automatic catch-up dates; incomplete records require doctor review.",
+      "slides": [
+        219,
+        220,
+        221,
+        222,
+        223,
+        224
+      ]
+    },
+    {
+      "topic": "Rotavirus versus same-visit vaccine dates",
+      "status": "implementation_review",
+      "details": "Rotavirus uses 2/3/4 calendar months by user decision; Penta and VPO still use 8/12/16 weeks from the chart. They can yield different dates. Confirm how appointments are grouped before automatic booking.",
+      "slides": [
+        67,
+        79,
+        94,
+        96
+      ]
+    },
+    {
+      "topic": "First-four-weeks timing",
+      "status": "implementation_review",
+      "details": "BCG and VPO0 use a source window, not an exact due date. Doctor chooses exact appointment within the clinically appropriate window.",
+      "slides": [
+        67,
+        79
+      ]
+    }
+  ],
+  "clinical_decisions": [
+    {
+      "id": "PNI-VPO0",
+      "topic": "VPO0 timing",
+      "decision": "Birth wording and first-four-weeks window are treated as compatible in the project.",
+      "status": "resolved",
+      "source_slides": [
+        67,
+        79
+      ]
+    },
+    {
+      "id": "PNI-PCV-LABELS",
+      "topic": "Pneumococcal dose labels",
+      "decision": "Slide 89 repeats VPC2 for later doses; project owner confirms this is a typo. Use PCV1 (10 weeks), PCV2 (18 weeks), PCV3 (6 months), PCV4 (12 months), matching slide 67.",
+      "status": "confirmed_by_project_owner",
+      "source_slides": [
+        67,
+        89
+      ]
+    },
+    {
+      "id": "PNI-ROTA-MONTHS",
+      "topic": "Rotavirus date calculation",
+      "decision": "Use calendar months 2, 3 and 4 for appointment scheduling; preserve slide 67's original 8, 12 and 16 week labels separately.",
+      "status": "confirmed",
+      "source_slides": [
+        67,
+        94
+      ]
+    },
+    {
+      "id": "PNI-HPV-GIRLS",
+      "topic": "HPV eligibility",
+      "decision": "HPV at 11 years applies to girls only.",
+      "status": "confirmed",
+      "source_slides": [
+        67,
+        102
+      ]
+    },
+    {
+      "id": "PNI-MISSED-MANUAL",
+      "topic": "Missed vaccine follow-up",
+      "decision": "Automatically flag missed vaccinations; doctor manually adjusts appointment based on vaccine-specific procedures. Retain previous appointment and author audit.",
+      "status": "confirmed",
+      "source_slides": [
+        219,
+        220,
+        221,
+        222,
+        223,
+        224
+      ]
+    },
+    {
+      "id": "PNI-HB-DEFERRED",
+      "topic": "Hepatitis B birth-dose exception",
+      "decision": "HBn birth-dose entry and HB1 conditional logic will be added later. Current schedule rows are incomplete for Hepatitis B; HB1 must not be auto-scheduled.",
+      "status": "deferred",
+      "source_slides": [
+        67
+      ]
+    }
+  ],
+  "appointment_workflow": {
+    "missed_vaccine_detection": "A scheduled appointment may be flagged missed if its date has passed without administration or a documented disposition. An unrecorded dose can be due/overdue or unknown; absent documentation alone is not proof the child missed vaccination.",
+    "doctor_action": "Doctor reviews vaccination evidence and the original appointment -> manually chooses replacement date according to vaccine-specific procedure -> optionally records reason -> saves.",
+    "after_save": "Update the appointment and follow-up queue; keep the vaccine dose pending until actual administration is recorded.",
+    "audit": [
+      "acting_doctor_id",
+      "old_appointment_date",
+      "new_appointment_date",
+      "changed_at",
+      "reason"
+    ],
+    "history": "Preserve the missed appointment and all previous changes.",
+    "cross_doctor": "When an authorized doctor records a qualifying dose, update vaccine completion and suppress only duplicate vaccine reminders; do not cancel unrelated appointments.",
+    "auto_catch_up_prescription": false,
+    "status_distinctions": {
+      "missed_appointment": "Scheduled appointment passed without a recorded completed/rescheduled/cancelled disposition",
+      "overdue_or_unconfirmed_dose": "Expected vaccine dose lacks confirmed administration; review records before concluding missed",
+      "unknown_history": "Insufficient documentation; clinician must review, not auto-classify as missed",
+      "administered": "Qualifying dose actually recorded and validated against the intended dose"
+    }
+  },
+  "schedule_coverage": {
+    "transcribed_dose_rows": 25,
+    "separate_HBn_birth_dose_row": "not_included_deferred",
+    "supplementation": "Vitamin A and D in the source chart are outside the vaccination-only CSV; not imported.",
+    "source_calendar_slide": 67,
+    "complete_clinical_ruleset": false
+  }
+}
