@@ -119,7 +119,7 @@ begin
   end loop;
  else
   for key,value in select * from jsonb_each(p_payload) loop
-   if jsonb_typeof(value)<>'string' or length(value#>>'{}')>case key when 'findings' then 8000 when 'assessment' then 4000 when 'plan' then 4000 when 'reason' then 1000 when 'medication' then 200 when 'duration' then 200 else 2000 end then raise exception 'Invalid clinical text' using errcode='22023'; end if;
+   if jsonb_typeof(value)<>'string' or length(value#>>'{}')>(case key when 'findings' then 8000 when 'assessment' then 4000 when 'plan' then 4000 when 'reason' then 1000 when 'medication' then 200 when 'duration' then 200 else 2000 end) then raise exception 'Invalid clinical text' using errcode='22023'; end if;
   end loop;
   if p_kind='consultation' and coalesce(length(trim(p_payload->>'reason')),0)<1 then raise exception 'Consultation reason required' using errcode='22023'; end if;
   if p_kind='prescription' and (coalesce(length(trim(p_payload->>'medication')),0)<1 or coalesce(length(trim(p_payload->>'instructions')),0)<1) then raise exception 'Medication and instructions required' using errcode='22023'; end if;
