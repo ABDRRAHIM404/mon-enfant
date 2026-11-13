@@ -22,7 +22,9 @@ export default async function MyClinicalPermissions() {
     created_at: string;
   }[];
   function label(kind: string) {
-    return clinicalLabels[kind as ClinicalKind] || "Vaccination";
+    return kind === "appointment"
+      ? "Gestion des rendez-vous"
+      : clinicalLabels[kind as ClinicalKind] || "Habilitation inconnue";
   }
   return (
     <main className="account-page wide">
