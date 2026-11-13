@@ -29,7 +29,7 @@ The supplied requirements, roadmap and 25-dose source files are the development 
 
 Connected services:
 - Private GitHub: https://github.com/ABDRRAHIM404/mon-enfant
-- Vercel project: `mon-enfant`, Node.js 24, Git-linked remote builds, deployment protection enabled. Initial deployment passed.
+- Vercel project: `mon-enfant`, Node.js 24, Git-linked remote builds, deployment protection enabled. Connected app deployment passed: https://mon-enfant.vercel.app .
 - Supabase: `mon-enfant` / `zkkasbxvdvecnafgjpxd`, healthy in Paris (`eu-west-3`). The initial migration was applied and the CLI is linked. Public app configuration is installed in Vercel and in ignored `.env.local`; the database password is stored only in the owner-readable local file.
 - Auth configuration uses email confirmation, minimum 12-character passwords, the hosted origin and exact callback allowlist. The default confirmation template is retained on the free plan; PKCE callback support was added.
 
@@ -41,7 +41,7 @@ Docker is unavailable locally; no Docker installation or local stack was started
 - `npm run typecheck`: passed.
 - `npm test`: 29 tests passed across authorization and actual PostgreSQL/RLS suites. The first cold run hit a database-startup timeout; the successful rerun used a longer setup timeout and one worker.
 - `npm run build`: passed with Next.js 16.4.6.
-- Local browser checks were stopped at the user’s request. The first remote CI run passed five browser cases and found an ambiguous alert selector in one mobile case; the selector is fixed and the updated suite adds default-email PKCE callback denial coverage. Remote rerun pending.
+- GitHub Actions passed lint, TypeScript, 29 unit/database tests, the production build and all 8 desktop/mobile browser checks: https://github.com/ABDRRAHIM404/mon-enfant/actions/runs/43348722754 . The first run exposed an ambiguous alert selector, which was fixed before the passing rerun. Local browser checks remain stopped at the user’s request.
 - Live Supabase checks: Auth health HTTP 200; anonymous children/profile REST reads HTTP 401 (`42501`); RLS enabled on all six tables; security advisor returned no issues.
 - All owned local development/browser processes were stopped. Future heavy checks/builds run remotely; local work stays lightweight.
 
