@@ -186,6 +186,7 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
     "Administration fictive distincte confirmée après relecture des doublons.";
   const correction = "Rapprochement fictif annulé après contrôle de la source.";
   const contexts: BrowserContext[] = [];
+  const observedPages: { role: string; page: Page }[] = [{ role: "A", page }];
   let pageErrors = 0;
   const timings: { screen: string; navigation_ms: number }[] = [];
   observeBrowserErrors(page, "vaccine-A", () => pageErrors++);
@@ -218,6 +219,7 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
     context.setDefaultTimeout(20000);
     context.setDefaultNavigationTimeout(30000);
     const target = await context.newPage();
+    observedPages.push({ role, page: target });
     observeBrowserErrors(target, `vaccine-${role}`, () => pageErrors++);
     await login(target, role);
     return target;
@@ -871,6 +873,48 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
       JSON.stringify(proof),
     );
     console.log(JSON.stringify(proof));
+  } catch (error) {
+    // Classify known UI failures in memory; never emit message bodies or DOM.
+    const classes: Record<string, string> = {
+      offset_mismatch: "Le décalage choisi ne correspond pas",
+      duplicate_review: "potentiellement en doublon",
+      revision_conflict: "Une autre correction a été enregistrée",
+      appointment_conflict: "Une autre décision a été enregistrée",
+      catalog_conflict: "Cette version a changé",
+      catalog_permission: "Cette action exige une permission actuelle",
+      catalog_validation: "HB1 reste désactivé",
+      clinical_validation: "Vérifiez les champs requis",
+      appointment_validation: "Vérifiez le motif, l’attestation",
+    };
+    for (const target of observedPages) {
+      try {
+        if (target.page.isClosed()) continue;
+        const messages = await target.page
+          .getByRole("main")
+          .locator('[role="alert"]')
+          .allTextContents();
+        if (messages.length) {
+          const matched = Object.entries(classes)
+            .filter(([, text]) =>
+              messages.some((message) => message.includes(text)),
+            )
+            .map(([code]) => code);
+          console.log(
+            JSON.stringify({
+              event: "vaccination_form_diagnostic",
+              viewport,
+              role: target.role,
+              error_classes: matched.length
+                ? matched
+                : ["unclassified_form_error"],
+            }),
+          );
+        }
+      } catch {
+        /* Preserve the original test failure. */
+      }
+    }
+    throw error;
   } finally {
     await Promise.allSettled(contexts.map((context) => context.close()));
   }
