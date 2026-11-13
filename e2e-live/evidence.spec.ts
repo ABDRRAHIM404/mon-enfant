@@ -1,5 +1,6 @@
 import { test, expect, type Page, type BrowserContext } from "@playwright/test";
 import { createHash } from "node:crypto";
+import { writeFileSync } from "node:fs";
 const SITE = "https://mon-enfant.vercel.app",
   MIB = 1024 * 1024;
 function credentials(role: string) {
@@ -74,7 +75,14 @@ async function rawSubmission(
   bytes: Buffer,
   fields: Record<string, string>,
 ) {
-  const markup = await (await page.request.get("/verification")).text();
+  let markup: string;
+  try {
+    markup = await (await page.request.get("/verification")).text();
+  } catch {
+    throw new Error(
+      "Authenticated form preparation failed; request details omitted.",
+    );
+  }
   const hidden = await page.evaluate((html) => {
     const doc = new DOMParser().parseFromString(html, "text/html");
     const form = Array.from(doc.forms).find((element) =>
@@ -88,25 +96,38 @@ async function rawSubmission(
       ).map((input) => [input.name, input.value]),
     );
   }, markup);
-  return page.request.post("/verification", {
-    headers: { Origin: SITE },
-    multipart: {
-      ...hidden,
-      ...fields,
-      evidence: {
-        name: "synthetic-identity.pdf",
-        mimeType: "application/pdf",
-        buffer: bytes,
+  try {
+    return await page.request.post("/verification", {
+      headers: { Origin: SITE },
+      multipart: {
+        ...hidden,
+        ...fields,
+        evidence: {
+          name: "synthetic-identity.pdf",
+          mimeType: "application/pdf",
+          buffer: bytes,
+        },
       },
-    },
-  });
+    });
+  } catch {
+    throw new Error(
+      "Authenticated form submission failed; request details omitted.",
+    );
+  }
 }
 async function privateDenied(
   context: BrowserContext,
   path: string,
   destination: string,
 ) {
-  const response = await context.request.get(path);
+  let response;
+  try {
+    response = await context.request.get(path);
+  } catch {
+    throw new Error(
+      "Protected-download denial check failed; request details omitted.",
+    );
+  }
   expect(response.url().endsWith(destination)).toBe(true);
   expect((await response.body()).subarray(0, 5).toString() === "%PDF-").toBe(
     false,
@@ -181,14 +202,17 @@ test("private evidence browser-to-storage boundary and review", async ({
       page.getByRole("button", { name: "Soumettre pour vérification" }).click(),
     ]);
     expect(response.status()).toBe(413);
-    console.log(
-      JSON.stringify({
-        mode: "known_upload_mismatch_observed",
-        file_bytes: bytes.length,
-        http_status: response.status(),
-        flow_accepted: false,
-      }),
+    const proof = {
+      mode: "known_upload_mismatch_observed",
+      file_bytes: bytes.length,
+      http_status: response.status(),
+      flow_accepted: false,
+    };
+    writeFileSync(
+      info.outputPath("evidence-proof.json"),
+      JSON.stringify(proof),
     );
+    console.log(JSON.stringify(proof));
     return;
   }
   await expect(page.locator("#evidence-help")).toContainText("4 Mio");
@@ -251,9 +275,16 @@ test("private evidence browser-to-storage boundary and review", async ({
     .getByRole("link", { name: "Télécharger le justificatif privé" })
     .getAttribute("href");
   expect(evidencePath?.startsWith("/admin/evidence/")).toBe(true);
-  const redirect = await reviewerContext.request.get(evidencePath!, {
-    maxRedirects: 0,
-  });
+  let redirect;
+  try {
+    redirect = await reviewerContext.request.get(evidencePath!, {
+      maxRedirects: 0,
+    });
+  } catch {
+    throw new Error(
+      "Private-download authorization failed; request details omitted.",
+    );
+  }
   expect(redirect.status()).toBe(307);
   expect(redirect.headers()["cache-control"]).toContain("no-store");
   const signed = redirect.headers().location;
@@ -261,9 +292,14 @@ test("private evidence browser-to-storage boundary and review", async ({
   expect(signedUrl.origin === "https://zkkasbxvdvecnafgjpxd.supabase.co").toBe(
     true,
   );
-  const downloaded = await reviewerContext.request.get(signed);
-  const content = await downloaded.body();
-  expect(downloaded.status()).toBe(200);
+  let downloaded: Response, content: Buffer;
+  try {
+    downloaded = await fetch(signed, { redirect: "error" });
+    content = Buffer.from(await downloaded.arrayBuffer());
+  } catch {
+    throw new Error("Private evidence download failed; signed URL omitted.");
+  }
+  expect(downloaded.status).toBe(200);
   expect(content.length).toBe(4 * MIB);
   expect(createHash("sha256").update(content).digest("hex")).toBe(
     createHash("sha256").update(bytes).digest("hex"),
@@ -309,15 +345,15 @@ test("private evidence browser-to-storage boundary and review", async ({
   });
   expect(pageErrors).toBe(0);
   await reviewerContext.close();
-  console.log(
-    JSON.stringify({
-      mode: "evidence_acceptance",
-      viewport: role,
-      file_bytes: content.length,
-      server_oversize_rejected: true,
-      public_read_denied: true,
-      unrelated_download_denied: true,
-      page_errors: pageErrors,
-    }),
-  );
+  const proof = {
+    mode: "evidence_acceptance",
+    viewport: role,
+    file_bytes: content.length,
+    server_oversize_rejected: true,
+    public_read_denied: true,
+    unrelated_download_denied: true,
+    page_errors: pageErrors,
+  };
+  writeFileSync(info.outputPath("evidence-proof.json"), JSON.stringify(proof));
+  console.log(JSON.stringify(proof));
 });

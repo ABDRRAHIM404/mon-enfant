@@ -102,5 +102,8 @@ jobs:
         if: always()
         with:
           name: synthetic-live-evidence-results
-          path: test-results/
+          path: |
+            test-results/live/**/verification-form.png
+            test-results/live/**/verification-history.png
+            test-results/live/**/evidence-proof.json
           retention-days: 3

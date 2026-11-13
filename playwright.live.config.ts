@@ -18,10 +18,7 @@ export default defineConfig({
     video: "off",
     screenshot: "off",
   },
-  reporter: [
-    ["list"],
-    ["json", { outputFile: "test-results/live-results.json" }],
-  ],
+  reporter: [["list"]],
   projects:
     probe === "evidence-reproduce"
       ? [{ name: "desktop", use: { ...devices["Desktop Chrome"] } }]
