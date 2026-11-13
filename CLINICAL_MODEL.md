@@ -1,6 +1,6 @@
 # Clinical record design — implementation contract for Phases 3–5
 
-This is a software model derived from the agreed requirements, not a medical protocol. The capability/consultation/prescription/risk/growth ledger, amendments, timeline and permitted exports are implemented. The versioned vaccine catalog/editor/review workflow is implemented and verified; child vaccine references/administrations, appointments and parent workflows below remain unfinished. Use fictional data until the clinical/legal/hosting gates are approved.
+This is a software model derived from the agreed requirements, not a medical protocol. The capability/consultation/prescription/risk/growth ledger, amendments, timeline and permitted exports are implemented. The versioned vaccine catalog/editor/review workflow, child references and vaccination administrations/matching are implemented and technically verified. Appointments and parent workflows below remain unfinished; genuine clinical source review remains an external gate. Use fictional data until the clinical/legal/hosting gates are approved.
 
 ## Identity and authorization
 

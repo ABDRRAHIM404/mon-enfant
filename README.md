@@ -1,6 +1,6 @@
 # Mon Enfant
 
-Digital Moroccan child health booklet. The implementation follows [PROJECT_PLAN.md](PROJECT_PLAN.md) in phase order. Foundation, professional verification/review, patient registry and the Phase 4 clinical-record core are implemented. **Phase 4 vaccine catalog/tracking** and the appointment/parent/mobile phases remain outstanding. See [PLAN_CHECKLIST.md](PLAN_CHECKLIST.md) for the complete scope and unresolved external gates.
+Digital Moroccan child health booklet. The implementation follows [PROJECT_PLAN.md](PROJECT_PLAN.md) in phase order. Foundation, professional verification/review, patient registry, clinical records and Phase 4 vaccine catalog/tracking technical workflows are implemented and verified. Appointments, readiness, parent/mobile work and qualified clinical source approval remain outstanding. See [PLAN_CHECKLIST.md](PLAN_CHECKLIST.md) for the complete scope and unresolved external gates.
 
 ## Development services
 
@@ -74,4 +74,4 @@ Operator-only live smoke tests are documented in OPERATIONS.md. They exercise ho
 
 Password recovery is available from the sign-in page. Recovery links must be opened in the same browser for the default PKCE flow. Successful reset requires a new sign-in. Operator-only recovery-token checks are in `scripts/verify-recovery.py`; they generate test tokens without delivering email.
 
-Clinical records require a separate capability for consultations, prescriptions, risks or growth measurements, plus current child/facility authorization. Originals, corrections and withdrawals remain in the ledger with all authors, sources and dates. Authorized users can inspect history, view raw growth measurements, print a summary or download an audited JSON ledger. The vaccine catalog/administration module remains the next Phase 4 milestone.
+Clinical records require a separate capability for consultations, prescriptions, risks, growth measurements or vaccination, plus current child/facility authorization. Originals, corrections and withdrawals remain in the ledger with all authors, sources and dates. Authorized users can inspect history, view raw growth measurements, print a summary or download an audited JSON ledger. Vaccination records include versioned intended references, uncertain paper history, clinician-validated matching, duplicate review and preserved amendments. The initial catalog stays draft until genuine qualified review; appointments are the next technical milestone.

@@ -54,11 +54,11 @@ This checklist preserves PROJECT_PLAN.md's complete Phase 0–8 scope. It is not
 - [x] Consultation/prescription/risk/growth events, explicit clinical privileges, append-only correction chain and provenance; vaccine entries remain below.
 - [x] Draft/versioned 25-row catalog with original/configured ages, decisions and source references; deployed and verified with 23 hosted acceptance checks.
 - [x] Explicit catalog editor and independently qualified reviewer permissions, draft editing, checked-source approval attestations, retirement and immutable revision snapshots (technical workflow; actual source approval remains open).
-- [ ] Immutable version/dose mapping for child schedule items and administered vaccinations.
+- [x] Immutable version/dose mapping for child references and each administration revision; hosted matching/correction/retirement/export evidence in PROGRESS.md.
 - [x] Date-only routine calculation kernel with month-end/leap-year tests and HPV/rotavirus/PCV/HB1 constraints; unreviewed/retired/uncertain-birth/unknown-sex gates.
-- [ ] Authorized child routine-reference views and unknown-history handling without automatic missed/catch-up classification.
-- [ ] Vaccine recording, duplicate/override/idempotency controls and cautious item matching.
-- [x] Consultations/treatments/risks, measurements/raw charts, timeline, revision history and permitted all-revision exports/print summaries; future vaccine inclusion remains tracked below.
+- [x] Authorized child routine-reference views, version/date/sex gates and uncertain paper history without automatic missed/catch-up classification.
+- [x] Vaccine recording, audited duplicate override/idempotency, verified exact-item matching, cross-doctor continuity and append-only reference/administration revisions; 31 hosted acceptance checks.
+- [x] Consultations/treatments/risks, measurements/raw charts, timeline, revision history and permitted all-revision exports/print summaries, including vaccine mappings and complete intended-reference decisions.
 - [ ] All specified calendar/age/version/correction/access tests and qualified clinical review.
 
 ## Phase 5 — appointments/continuity

@@ -1,6 +1,6 @@
 # Mon Enfant — Implementation progress
 
-Updated: 13 November 2026. Execution follows `PROJECT_PLAN.md` in order. Current milestone: **Phase 4 — Clinical records and vaccine tracking**. Foundation/verification/registry technical workflows are implemented and verified; external readiness gates remain open. Full-scope audit: [PLAN_CHECKLIST.md](PLAN_CHECKLIST.md).
+Updated: 13 November 2026. Execution follows `PROJECT_PLAN.md` in order. Current milestone: **Phase 4 — Clinical records and vaccine tracking technically accepted; Phase 5 appointments next**. Foundation/verification/registry technical workflows are implemented and verified; external readiness gates remain open. Full-scope audit: [PLAN_CHECKLIST.md](PLAN_CHECKLIST.md).
 
 ## Phase 0 — Requirements and source validation
 
@@ -20,11 +20,11 @@ The supplied requirements, roadmap and 25-dose source files are the development 
 - Synthetic fixture data, actual PostgreSQL RLS/privilege tests, desktop/mobile browser checks and GitHub Actions CI.
 - Setup, architecture, schema, security and vaccine-source documentation.
 
-## Phase 1 — Still required before exit criteria are met
+## Phase 1 — Current acceptance and remaining external readiness
 
-- Finish the real email-delivery/confirmation walkthrough with an authorized mailbox. Password login, refresh, logout and hosted form sessions are proven by synthetic live tests.
-- Hosted Auth, profile initialization through PostgREST, API denial and existing-token suspension now pass live tests. Outbound email delivery remains untested.
-- Private evidence storage/submission and admin review are now implemented and tested; the remaining live-email delivery walkthrough and external operations gates stay open.
+- Signup/confirmation and owner recovery-mail/reset/new-password sign-in walkthroughs are verified. Password login, refresh, logout and hosted form sessions are also proven by synthetic live tests. Resend is owner-only until an owned sender domain is verified; broader application notification workflows remain open.
+- Hosted Auth, profile initialization through PostgREST, API denial and existing-token suspension pass live tests.
+- Private evidence storage/submission and admin review are implemented and verified; external operations gates remain open.
 - Establish staging and privacy-preserving operational error monitoring before external use.
 
 Connected services:
@@ -147,3 +147,13 @@ Implemented, migrated, cloud-verified and deployed from `feature/professional-ve
 - Added an unapplied follow-up migration for immutable intended dose references, reference decision history, vaccination administrations in the clinical amendment ledger, verified exact-item matching and reasoned duplicate review. Current vaccination capability, child authorization, declared facility and live session are checked at the database boundary. A draft source cannot be assigned; HB1 remains disabled and HPV eligibility is checked.
 - Added patient vaccination/reference forms and history, explicit unknown lot/site/provider/source fields, second-doctor shared matching and complete bounded JSON/print inclusion of reference decisions and administration revisions. No appointment/catch-up logic or clinical source approval is implied.
 - Initial database source `d26dc2e` passed cloud lint/typecheck, 118 unit/database tests, build and 10 browser checks: https://github.com/ABDRRAHIM404/mon-enfant/actions/runs/43440332815 . Expanded UI source initially failed a missing operational-event name at typecheck; the allow-list is now corrected for a fresh cloud run. The migration is not yet applied, this feature is not deployed, and hosted acceptance remains pending.
+
+
+### Vaccination records — deployed and technically accepted
+
+- Cloud source `ba5b390` passed 18 Python safety tests, lint/typecheck, 119 unit/database tests, build and 10 desktop/mobile browser checks: https://github.com/ABDRRAHIM404/mon-enfant/actions/runs/43441650373 . Main CI `43442442438` passed. Operator-only assertion fixes at `0c41885`/`c776d46` also passed main CI `43442963493`/`43443519964`; application/migration code was unchanged by those fixes.
+- Applied `20261113145142_vaccination_records.sql` after a successful hosted rollback preflight. Direct CLI TCP migration connections timed out; the existing authenticated HTTPS SQL route applied the exact tested DDL and its named/versioned migration-history entry together in one transaction, guarded by the expected prior ledger. Readback confirms all seven migration versions. All 22 public tables have RLS; security advisors still report only the existing Auth leaked-password-screening warning.
+- Deployment `dpl_9FPUx6sYT9cb6cxxg56A3b9TfCpV` was READY with canonical alias and the tested application source. Hosted run `201cf03544` passed all 31 checks: actual assignment/paper-entry/second-doctor forms, retry safety, duplicate warnings/reasoned overrides, immutable version matching, corrections/reopening, actual HTTP 409 conflicts, withdrawal content retention, reference withdrawal/reactivation, one-winner concurrent assignment, version retirement, complete private JSON/print exports, and immediate capability/grant/session revocation. Five fictional accounts and the QA version were retired; no email was sent and the initial source remains draft.
+- Two earlier hosted attempts exposed acceptance-script issues, corrected without changing application or applied SQL: a successful operation was mistakenly reused as a stale decision, and a heading assertion ignored React's split HTML text. Independent history inspection confirmed the expected active/withdrawn/active reference revisions before rerunning the full suite.
+- Follow-up clinical regression `eea9349b3d` passed all 28 existing hosted capability/form/consultation/correction/concurrency/growth/prescription/risk/print/JSON/revocation/session checks against the expanded schema and ledger-v2 export. Five fixtures were retired and no email was sent. Final application/operator source `c776d46` is READY at canonical alias in deployment `dpl_5FaJ6Zg1DtrZKoDgYqLEroYoehVf`.
+- This closes the Phase 4 technical vaccination milestone, not qualified clinical source approval or full product completion. Authenticated responsive/accessibility browser coverage, appointments/worklist reconciliation, operational readiness, parent/mobile delivery and all external approval gates remain explicitly open. The primary dashboard edit was preserved; dependency installation, full lint/typecheck/unit/build and browser execution stayed in GitHub Actions/Vercel; local verification used small HTTPS requests.
