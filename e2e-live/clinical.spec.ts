@@ -427,14 +427,14 @@ test("two doctors preserve identity, amendments, appointments and private access
     await a.locator('[name="category"]').selectOption("other");
     await a.locator('[name="severity"]').selectOption("unknown");
     await a.getByRole("button", { name: "Enregistrer le soin" }).click();
-    await expect(a.locator('[name="description"]')).toBeFocused();
-    await a.locator('[name="description"]').fill(riskOriginal);
+    await expect(a.locator('textarea[name="description"]')).toBeFocused();
+    await a.locator('textarea[name="description"]').fill(riskOriginal);
     await a.getByRole("button", { name: "Enregistrer le soin" }).click();
     await expect(a).toHaveURL(/\/records\/[a-f0-9-]{36}$/i);
     const riskPath = new URL(a.url()).pathname;
     await b.goto(riskPath);
     await clinicalFields(b, placeB);
-    await b.locator('[name="description"]').fill(riskCorrected);
+    await b.locator('textarea[name="description"]').fill(riskCorrected);
     await b.locator('[name="amendment_reason"]').fill(correctionReason);
     await b.getByRole("button", { name: "Ajouter la révision" }).click();
     await expect(b.locator(".clinical-entry")).toHaveCount(2);
