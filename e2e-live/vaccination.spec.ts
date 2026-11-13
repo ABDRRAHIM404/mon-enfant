@@ -429,7 +429,7 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
     await invalid
       .getByRole("button", { name: "Enregistrer la règle", exact: true })
       .click();
-    await expect(manager.getByRole("alert")).toContainText(
+    await expect(manager.getByRole("main").getByRole("alert")).toContainText(
       "HB1 reste désactivé",
     );
     for (const [value, revision] of [
@@ -625,7 +625,7 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
     await a
       .getByRole("button", { name: "Enregistrer le soin", exact: true })
       .click();
-    await expect(a.getByRole("alert")).toContainText(
+    await expect(a.getByRole("main").getByRole("alert")).toContainText(
       "potentiellement en doublon",
     );
     await expect(
@@ -656,7 +656,7 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
     await stale
       .getByRole("button", { name: "Ajouter la révision", exact: true })
       .click();
-    await expect(stale.getByRole("alert")).toContainText(
+    await expect(stale.getByRole("main").getByRole("alert")).toContainText(
       "Une autre correction a été enregistrée",
     );
     await stale.close();
