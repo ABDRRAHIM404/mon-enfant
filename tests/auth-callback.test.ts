@@ -23,3 +23,16 @@ it("retains signup feedback and only fixed internal redirect destinations", () =
     "/forgot-password?recovery=invalid",
   );
 });
+
+import { emailSendingLimited } from "../src/lib/auth-email";
+it("shows non-enumerating sending-limit feedback only for explicit throttle signals", () => {
+  expect(emailSendingLimited(null)).toBe(false);
+  expect(emailSendingLimited({ status: 429 })).toBe(true);
+  expect(emailSendingLimited({ code: "over_email_send_rate_limit" })).toBe(
+    true,
+  );
+  expect(emailSendingLimited({ code: "over_request_rate_limit" })).toBe(true);
+  expect(
+    emailSendingLimited({ status: 400, code: "invalid_credentials" }),
+  ).toBe(false);
+});

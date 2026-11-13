@@ -1,12 +1,17 @@
 "use server";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
+import { emailSendingLimited, emailLimitMessage } from "@/lib/auth-email";
 import { authOrigin } from "@/lib/auth-origin";
 import { createClient } from "@/lib/supabase/server";
 import { supabaseConfig } from "@/lib/supabase/config";
 import { requireUser } from "@/lib/auth";
 import { reportOperationalEvent } from "@/lib/operational-events";
-export type AuthState = { error?: string; message?: string; passwordChanged?: boolean };
+export type AuthState = {
+  error?: string;
+  message?: string;
+  passwordChanged?: boolean;
+};
 function credentials(form: FormData) {
   const email = String(form.get("email") ?? "").trim();
   const password = String(form.get("password") ?? "");
@@ -47,15 +52,27 @@ export async function signUp(_: AuthState, form: FormData): Promise<AuthState> {
   const client = await createClient();
   let siteUrl: string;
   try {
-    siteUrl = authOrigin((await headers()).get("origin"), process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000", [process.env.VERCEL_URL, process.env.VERCEL_BRANCH_URL], process.env.NODE_ENV === "development");
-  } catch { return { error: "L’origine de la demande ne correspond pas à cet espace. Rechargez la page." }; }
+    siteUrl = authOrigin(
+      (await headers()).get("origin"),
+      process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+      [process.env.VERCEL_URL, process.env.VERCEL_BRANCH_URL],
+      process.env.NODE_ENV === "development",
+    );
+  } catch {
+    return {
+      error:
+        "L’origine de la demande ne correspond pas à cet espace. Rechargez la page.",
+    };
+  }
   const { error } = await client.auth.signUp({
     ...input,
     options: { emailRedirectTo: new URL("/auth/callback", siteUrl).toString() },
   });
   if (error)
     return {
-      error: "Inscription indisponible. Réessayez dans quelques instants.",
+      error: emailSendingLimited(error)
+        ? emailLimitMessage
+        : "Inscription indisponible. Réessayez dans quelques instants.",
     };
   return {
     message:
@@ -81,25 +98,71 @@ export async function signOut() {
   redirect("/login");
 }
 
-export async function requestPasswordRecovery(_:AuthState,form:FormData):Promise<AuthState> {
-  if (!supabaseConfig()) return { error:"Le service de récupération est en cours de configuration." };
-  const email=String(form.get("email") ?? "").trim();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length>254) return { error:"Indiquez une adresse e-mail valide." };
-  let origin:string;
-  try { origin=authOrigin((await headers()).get("origin"),process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",[process.env.VERCEL_URL,process.env.VERCEL_BRANCH_URL],process.env.NODE_ENV==="development"); }
-  catch { return { error:"Rechargez la page depuis votre espace habituel." }; }
-  const client=await createClient();
-  const { error }=await client.auth.resetPasswordForEmail(email,{ redirectTo:`${origin}/auth/callback?next=reset-password` });
+export async function requestPasswordRecovery(
+  _: AuthState,
+  form: FormData,
+): Promise<AuthState> {
+  if (!supabaseConfig())
+    return {
+      error: "Le service de récupération est en cours de configuration.",
+    };
+  const email = String(form.get("email") ?? "").trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254)
+    return { error: "Indiquez une adresse e-mail valide." };
+  let origin: string;
+  try {
+    origin = authOrigin(
+      (await headers()).get("origin"),
+      process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+      [process.env.VERCEL_URL, process.env.VERCEL_BRANCH_URL],
+      process.env.NODE_ENV === "development",
+    );
+  } catch {
+    return { error: "Rechargez la page depuis votre espace habituel." };
+  }
+  const client = await createClient();
+  const { error } = await client.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/auth/callback?next=reset-password`,
+  });
+  if (emailSendingLimited(error)) {
+    reportOperationalEvent("auth_email_rate_limited");
+    return { error: emailLimitMessage };
+  }
   if (error) reportOperationalEvent("password_recovery_failed");
-  return { message:"Si cette adresse correspond à un compte éligible, un lien de récupération sera envoyé. Ouvrez-le dans ce même navigateur." };
+  return {
+    message:
+      "Si cette adresse correspond à un compte éligible, un lien de récupération sera envoyé. Ouvrez-le dans ce même navigateur.",
+  };
 }
-export async function changePassword(_:AuthState,form:FormData):Promise<AuthState> {
-  const { supabase }=await requireUser();
-  const password=String(form.get("password") ?? "");
-  if (password.length<12 || password.length>128 || password!==String(form.get("confirmation") ?? "")) return { error:"Les deux mots de passe doivent être identiques et comporter 12 à 128 caractères." };
-  const { error }=await supabase.auth.updateUser({ password });
-  if (error) { reportOperationalEvent("password_reset_failed");return { error:"Le mot de passe n’a pas pu être modifié. Choisissez un nouveau mot de passe ou demandez un nouveau lien." }; }
-  const { error:logoutError }=await supabase.auth.signOut({ scope:"global" });
-  if (logoutError) { reportOperationalEvent("password_reset_failed");return { passwordChanged:true }; }
+export async function changePassword(
+  _: AuthState,
+  form: FormData,
+): Promise<AuthState> {
+  const { supabase } = await requireUser();
+  const password = String(form.get("password") ?? "");
+  if (
+    password.length < 12 ||
+    password.length > 128 ||
+    password !== String(form.get("confirmation") ?? "")
+  )
+    return {
+      error:
+        "Les deux mots de passe doivent être identiques et comporter 12 à 128 caractères.",
+    };
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) {
+    reportOperationalEvent("password_reset_failed");
+    return {
+      error:
+        "Le mot de passe n’a pas pu être modifié. Choisissez un nouveau mot de passe ou demandez un nouveau lien.",
+    };
+  }
+  const { error: logoutError } = await supabase.auth.signOut({
+    scope: "global",
+  });
+  if (logoutError) {
+    reportOperationalEvent("password_reset_failed");
+    return { passwordChanged: true };
+  }
   redirect("/login?password=updated");
 }
