@@ -126,6 +126,18 @@ test("two doctors preserve identity, amendments, appointments and private access
   const childName = `Enfant fictif ${run}-${viewport}`;
   const original = `Observation originale fictive ${viewport}`;
   const corrected = `Observation corrigée fictive ${viewport}`;
+  const medication = `Traitement fictif sans substance ${viewport}`;
+  const instructions = "Instructions fictives sans posologie clinique.";
+  const correctedInstructions =
+    "Instructions fictives corrigées, sans posologie clinique.";
+  const paperReference =
+    "Papier fictif sans date lisible, aucune ordonnance réelle.";
+  const riskOriginal = `Risque entièrement fictif ${viewport}`;
+  const riskCorrected = `Signalement fictif corrigé ${viewport}`;
+  const riskReference =
+    "Signalement fictif rapporté, sans document clinique réel.";
+  const withdrawalReason =
+    "Retrait fictif pour erreur, toutes les versions conservées.";
   const correctionReason =
     "Correction fictive par le second médecin, original conservé.";
   const contexts: BrowserContext[] = [];
@@ -174,7 +186,8 @@ test("two doctors preserve identity, amendments, appointments and private access
     console.log(
       JSON.stringify({ viewport, phase: "synthetic_actors_authenticated" }),
     );
-    await permission(manager, platformA, "consultation", false);
+    for (const kind of ["consultation", "prescription", "risk", "growth"])
+      await permission(manager, platformA, kind, false);
     console.log(
       JSON.stringify({ viewport, phase: "explicit_capability_denial_set" }),
     );
@@ -222,21 +235,28 @@ test("two doctors preserve identity, amendments, appointments and private access
       fullPage: true,
     });
 
-    // Account approval plus child grant still do not confer clinical writing.
-    await screen(
-      a,
-      `/patients/${child}/records/new?kind=consultation`,
-      "Consultation",
-      "capability-denial",
-    );
-    await expect(
-      a.getByRole("button", { name: "Enregistrer le soin" }),
-    ).toHaveCount(0);
-    await expect(
-      a.getByText(
-        "L’habilitation consultation n’est pas active pour votre compte.",
-      ),
-    ).toBeVisible();
+    // Approval plus a child grant does not confer any clinical entry capability.
+    for (const [kind, label] of [
+      ["consultation", "Consultation"],
+      ["prescription", "Prescription / traitement"],
+      ["risk", "Risque / allergie"],
+      ["growth", "Mesures de croissance"],
+    ]) {
+      await screen(
+        a,
+        `/patients/${child}/records/new?kind=${kind}`,
+        label,
+        `capability-denial-${kind}`,
+      );
+      await expect(
+        a.getByRole("button", { name: "Enregistrer le soin" }),
+      ).toHaveCount(0);
+      await expect(
+        a.getByText(
+          `L’habilitation ${label.toLowerCase()} n’est pas active pour votre compte.`,
+        ),
+      ).toBeVisible();
+    }
     expect((await get(b.context(), `/patients/${child}/export`)).status()).toBe(
       404,
     );
@@ -294,8 +314,11 @@ test("two doctors preserve identity, amendments, appointments and private access
     await expect(b.getByText(/^078 ·/)).toBeVisible();
 
     for (const [platform, capabilities] of [
-      [platformA, ["consultation", "growth", "appointment"]],
-      [platformB, ["consultation"]],
+      [
+        platformA,
+        ["consultation", "prescription", "risk", "growth", "appointment"],
+      ],
+      [platformB, ["consultation", "prescription", "risk", "growth"]],
     ] as const) {
       for (const capability of capabilities)
         await permission(manager, platform, capability);
@@ -347,6 +370,95 @@ test("two doctors preserve identity, amendments, appointments and private access
 
     await screen(
       a,
+      `/patients/${child}/records/new?kind=prescription`,
+      "Prescription / traitement",
+      "prescription-form",
+    );
+    await clinicalFields(a, placeA);
+    await a.locator('[name="occurrence_precision"]').selectOption("unknown");
+    await a.locator('[name="occurred_on"]').fill("");
+    await a.locator('[name="source_type"]').selectOption("paper_transcription");
+    await a.locator('[name="source_reference"]').fill(paperReference);
+    await a.locator('[name="source_verified"]').uncheck();
+    await a.getByRole("button", { name: "Enregistrer le soin" }).click();
+    await expect(a.locator('[name="medication"]')).toBeFocused();
+    await a.locator('[name="medication"]').fill(medication);
+    await a.getByRole("button", { name: "Enregistrer le soin" }).click();
+    await expect(a.locator('[name="instructions"]')).toBeFocused();
+    await a.locator('[name="instructions"]').fill(instructions);
+    await a.getByRole("button", { name: "Enregistrer le soin" }).click();
+    await expect(a).toHaveURL(/\/records\/[a-f0-9-]{36}$/i);
+    const prescriptionPath = new URL(a.url()).pathname;
+    await expect(
+      a
+        .locator(".clinical-entry")
+        .getByText("Source non confirmée", { exact: false }),
+    ).toBeVisible();
+    await b.goto(prescriptionPath);
+    await clinicalFields(b, placeB);
+    await b.locator('[name="occurrence_precision"]').selectOption("unknown");
+    await b.locator('[name="occurred_on"]').fill("");
+    await b.locator('[name="source_verified"]').uncheck();
+    await b.locator('[name="instructions"]').fill(correctedInstructions);
+    await b.locator('[name="amendment_reason"]').fill(correctionReason);
+    await b.getByRole("button", { name: "Ajouter la révision" }).click();
+    await expect(b.locator(".clinical-entry")).toHaveCount(2);
+    await expect(
+      b.locator(".clinical-entry").getByText(instructions, { exact: true }),
+    ).toBeVisible();
+    await expect(
+      b
+        .locator(".clinical-entry")
+        .getByText(correctedInstructions, { exact: true }),
+    ).toBeVisible();
+    await fit(b);
+
+    await screen(
+      a,
+      `/patients/${child}/records/new?kind=risk`,
+      "Risque / allergie",
+      "risk-form",
+    );
+    await clinicalFields(a, placeA);
+    await a.locator('[name="source_type"]').selectOption("reported_history");
+    await a.locator('[name="source_reference"]').fill(riskReference);
+    await a.locator('[name="source_verified"]').uncheck();
+    await a.locator('[name="occurrence_precision"]').selectOption("estimated");
+    await a.locator('[name="category"]').selectOption("other");
+    await a.locator('[name="severity"]').selectOption("unknown");
+    await a.getByRole("button", { name: "Enregistrer le soin" }).click();
+    await expect(a.locator('[name="description"]')).toBeFocused();
+    await a.locator('[name="description"]').fill(riskOriginal);
+    await a.getByRole("button", { name: "Enregistrer le soin" }).click();
+    await expect(a).toHaveURL(/\/records\/[a-f0-9-]{36}$/i);
+    const riskPath = new URL(a.url()).pathname;
+    await b.goto(riskPath);
+    await clinicalFields(b, placeB);
+    await b.locator('[name="description"]').fill(riskCorrected);
+    await b.locator('[name="amendment_reason"]').fill(correctionReason);
+    await b.getByRole("button", { name: "Ajouter la révision" }).click();
+    await expect(b.locator(".clinical-entry")).toHaveCount(2);
+    await expect(
+      b.locator(".clinical-entry").getByText(riskOriginal, { exact: true }),
+    ).toBeVisible();
+    await expect(
+      b.locator(".clinical-entry").getByText(riskCorrected, { exact: true }),
+    ).toBeVisible();
+    await clinicalFields(b, placeB);
+    await b.locator('[name="entry_state"]').selectOption("withdrawn");
+    await b.locator('[name="amendment_reason"]').fill(withdrawalReason);
+    await b.getByRole("button", { name: "Ajouter la révision" }).click();
+    await expect(b.locator(".clinical-entry")).toHaveCount(3);
+    await expect(
+      b.getByRole("heading", {
+        name: "Risque / allergie — retirée",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await fit(b);
+
+    await screen(
+      a,
       `/patients/${child}/records/new?kind=growth`,
       "Mesures de croissance",
       "growth-form",
@@ -356,6 +468,7 @@ test("two doctors preserve identity, amendments, appointments and private access
     await a.getByLabel("Taille (cm)", { exact: true }).fill("74.5");
     await a.getByRole("button", { name: "Enregistrer le soin" }).click();
     await expect(a).toHaveURL(/\/records\/[a-f0-9-]{36}$/i);
+    const growthPath = new URL(a.url()).pathname;
     await screen(a, `/patients/${child}/growth`, "Croissance", "growth-chart");
     await expect(
       a.getByRole("img", { name: /^Poids, valeurs enregistrées/ }),
@@ -367,6 +480,69 @@ test("two doctors preserve identity, amendments, appointments and private access
       path: info.outputPath("clinical-growth.png"),
       fullPage: true,
     });
+
+    await b.goto(growthPath);
+    await clinicalFields(b, placeB);
+    await b.locator('[name="weight_kg"]').fill("9.35");
+    await b.locator('[name="amendment_reason"]').fill(correctionReason);
+    await b.getByRole("button", { name: "Ajouter la révision" }).click();
+    await expect(b.locator(".clinical-entry")).toHaveCount(2);
+    await screen(
+      a,
+      `/patients/${child}/growth`,
+      "Croissance",
+      "corrected-growth-chart",
+    );
+    await expect(
+      a.getByRole("cell", { name: "9.35", exact: true }),
+    ).toBeVisible();
+    await expect(
+      a.getByRole("cell", { name: "9.25", exact: true }),
+    ).toHaveCount(0);
+    await b.goto(growthPath);
+    await clinicalFields(b, placeB);
+    await b.locator('[name="entry_state"]').selectOption("withdrawn");
+    await b.locator('[name="amendment_reason"]').fill(withdrawalReason);
+    await b.getByRole("button", { name: "Ajouter la révision" }).click();
+    await expect(b.locator(".clinical-entry")).toHaveCount(3);
+    await screen(
+      a,
+      `/patients/${child}/growth`,
+      "Croissance",
+      "withdrawn-growth-chart",
+    );
+    await expect(a.getByRole("img")).toHaveCount(0);
+    await expect(
+      a.getByRole("cell", { name: "Retirée", exact: true }),
+    ).toBeVisible();
+    await expect(
+      a.getByRole("link", { name: "Version 3", exact: true }),
+    ).toBeVisible();
+
+    await screen(
+      a,
+      `/patients/${child}/records`,
+      "Dossier clinique",
+      "clinical-timeline",
+    );
+    await expect(a.locator(".clinical-entry")).toHaveCount(4);
+    await expect(
+      a.getByRole("heading", {
+        name: "Risque / allergie — retirée",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(
+      a.getByRole("heading", {
+        name: "Mesures de croissance — retirée",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(
+      a
+        .locator(".clinical-entry")
+        .getByText(correctedInstructions, { exact: true }),
+    ).toBeVisible();
 
     await screen(
       a,
@@ -415,7 +591,7 @@ test("two doctors preserve identity, amendments, appointments and private access
       childName,
       "clinical-summary",
     );
-    await expect(a.locator(".clinical-entry")).toHaveCount(3);
+    await expect(a.locator(".clinical-entry")).toHaveCount(10);
     const response = await get(a.context(), `/patients/${child}/export`);
     expect(response.status()).toBe(200);
     expect(response.headers()["cache-control"]).toContain("no-store");
@@ -426,7 +602,88 @@ test("two doctors preserve identity, amendments, appointments and private access
       ledger.child.id === child && ledger.child.universal_id === universal,
     ).toBe(true);
     const entries = ledger.clinical_entries as ClinicalEntry[];
-    expect(entries.length).toBe(3);
+    expect(entries.length).toBe(10);
+    const prescriptions = entries.filter(
+      (entry) => entry.kind === "prescription",
+    );
+    expect(prescriptions.length).toBe(2);
+    expect(
+      prescriptions.every(
+        (entry) =>
+          entry.occurred_on === null &&
+          entry.occurrence_precision === "unknown" &&
+          entry.source_type === "paper_transcription" &&
+          entry.source_reference === paperReference &&
+          !entry.source_verified &&
+          entry.payload.medication === medication,
+      ),
+    ).toBe(true);
+    expect(
+      prescriptions.some(
+        (entry) =>
+          entry.professional_id === platformA &&
+          entry.payload.instructions === instructions &&
+          entry.revision === 1,
+      ),
+    ).toBe(true);
+    expect(
+      prescriptions.some(
+        (entry) =>
+          entry.professional_id === platformB &&
+          entry.payload.instructions === correctedInstructions &&
+          entry.revision === 2 &&
+          entry.amendment_reason === correctionReason,
+      ),
+    ).toBe(true);
+    const risks = entries.filter((entry) => entry.kind === "risk");
+    expect(risks.length).toBe(3);
+    expect(
+      risks.every(
+        (entry) =>
+          entry.source_type === "reported_history" &&
+          entry.source_reference === riskReference &&
+          entry.occurrence_precision === "estimated",
+      ),
+    ).toBe(true);
+    expect(
+      risks.some(
+        (entry) =>
+          entry.professional_id === platformA &&
+          entry.payload.description === riskOriginal &&
+          entry.revision === 1 &&
+          !entry.source_verified,
+      ),
+    ).toBe(true);
+    expect(
+      risks.some(
+        (entry) =>
+          entry.professional_id === platformB &&
+          entry.payload.description === riskCorrected &&
+          entry.revision === 3 &&
+          entry.entry_state === "withdrawn" &&
+          entry.amendment_reason === withdrawalReason,
+      ),
+    ).toBe(true);
+    const growth = entries.filter((entry) => entry.kind === "growth");
+    expect(growth.length).toBe(3);
+    expect(
+      growth.some(
+        (entry) =>
+          entry.professional_id === platformA &&
+          entry.payload.weight_kg === 9.25 &&
+          entry.revision === 1,
+      ),
+    ).toBe(true);
+    expect(
+      growth.some(
+        (entry) =>
+          entry.professional_id === platformB &&
+          entry.payload.weight_kg === 9.35 &&
+          entry.revision === 3 &&
+          entry.entry_state === "withdrawn" &&
+          entry.amendment_reason === withdrawalReason,
+      ),
+    ).toBe(true);
     expect(
       entries.some(
         (entry) =>
@@ -496,7 +753,13 @@ test("two doctors preserve identity, amendments, appointments and private access
       shared_identity: true,
       a_local_number: "125",
       b_local_number: "078",
-      clinical_revisions: 3,
+      clinical_revisions: 10,
+      entry_kinds: ["consultation", "prescription", "risk", "growth"],
+      all_four_capability_denials: true,
+      paper_prescription_unknown_date_retained: true,
+      risk_correction_withdrawal_retained: true,
+      growth_correction_withdrawal_projection: true,
+      all_four_originals_and_corrections_exported: true,
       appointment_events: 2,
       unauthorized_exports_denied: true,
       capability_revocation_verified: true,

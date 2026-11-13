@@ -103,6 +103,8 @@ def prepare(session_only=False):
     if any(name.startswith(PREFIX) for name in secret_names()):
         raise RuntimeError('Finish the recorded clinical fixture run first')
     state = {'run': uuid.uuid4().hex[:16], 'actors': [], 'secrets': [], 'purpose': 'session' if session_only else 'clinical'}
+    if not session_only:
+        state['clinical_story_version'] = 2
     credentials = {}
     save(state, credentials)
     try:
@@ -155,8 +157,26 @@ def inspect(run):
         (select count(*) from public.appointment_events e join public.appointments a on a.id=e.appointment_id where a.child_id in(select id from children))::integer appointment_events,
         (select count(*) from public.access_grants where child_id in(select id from children) and professional_id='{b}' and revoked_at is not null)::integer revoked_second_doctor_grants""")
     expected = {'children': 3, 'clinical_revisions': 9, 'second_doctor_corrections': 3, 'growth_entries': 3, 'appointments': 3, 'appointment_events': 6, 'revoked_second_doctor_grants': 3}
+    if state.get('clinical_story_version') == 2:
+        expected.update(clinical_revisions=30, growth_entries=9)
     if rows != [expected]:
         raise RuntimeError('Full three-viewport clinical persistence was not proven')
+    if state.get('clinical_story_version') == 2:
+        details = sql(f"""with children as (select id from public.children where created_by='{a}'),
+            entries as (select * from public.clinical_entries where child_id in(select id from children))
+            select (select count(distinct root_id) from entries)::integer roots,
+            (select count(*) from entries where kind='prescription')::integer prescription_revisions,
+            (select count(*) from entries where kind='risk')::integer risk_revisions,
+            (select count(*) from entries where kind='risk' and entry_state='withdrawn' and revision=3 and author_id='{b}')::integer risk_withdrawals,
+            (select count(*) from entries where kind='growth' and entry_state='withdrawn' and revision=3 and author_id='{b}' and payload->>'weight_kg'='9.35')::integer growth_withdrawals,
+            (select count(*) from entries where kind='prescription' and occurrence_precision='unknown' and occurred_on is null and source_type='paper_transcription' and source_reference is not null and not source_verified)::integer uncertain_paper_prescriptions,
+            (select count(*) from entries where kind='risk' and occurrence_precision='estimated' and source_type='reported_history' and source_reference is not null)::integer attributed_risk_revisions,
+            (select count(*) from entries e join entries previous on previous.id=e.previous_id and previous.root_id=e.root_id and previous.child_id=e.child_id and previous.kind=e.kind and previous.revision+1=e.revision where e.author_id='{b}')::integer second_doctor_chain_links,
+            (select count(*) from entries where author_id not in('{a}','{b}'))::integer unrelated_authors""")
+        expected_details = {'roots': 12, 'prescription_revisions': 6, 'risk_revisions': 9, 'risk_withdrawals': 3, 'growth_withdrawals': 3, 'uncertain_paper_prescriptions': 6, 'attributed_risk_revisions': 9, 'second_doctor_chain_links': 18, 'unrelated_authors': 0}
+        if details != [expected_details]:
+            raise RuntimeError('Expanded clinical provenance and amendment chains were not proven')
+        print(json.dumps({'run': run, 'expanded_clinical_persistence_verified': True, **expected_details}), flush=True)
     print(json.dumps({'run': run, 'database_persistence_verified': True, **expected}), flush=True)
 
 
