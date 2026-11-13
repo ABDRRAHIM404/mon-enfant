@@ -107,6 +107,7 @@ test("workspace refresh persists real provider sessions without a public health 
     path: string;
     refresh_persisted: boolean;
     secure_cookie: boolean;
+    provider_refresh_token_rotated: boolean;
   }[] = [];
   for (const [path, heading] of routes) {
     // Stop the preceding page before changing its stored session expiry.
@@ -134,10 +135,13 @@ test("workspace refresh persists real provider sessions without a public health 
         (header) => header.name.toLowerCase() === "set-cookie",
       ),
     );
+    const rotated =
+      updated.session.refresh_token !== stale.session.refresh_token;
     const persisted =
       updated.session.expires_at > Date.now() / 1000 &&
       updated.encoded !== stale.encoded &&
-      cookieWritten;
+      cookieWritten &&
+      rotated;
     if (process.env.MON_ENFANT_LIVE_PROBE === "session-reproduce") {
       expect(persisted).toBe(false);
       expect(updated.session.expires_at === 1).toBe(true);
@@ -168,7 +172,12 @@ test("workspace refresh persists real provider sessions without a public health 
       );
     expect(secure).toBe(true);
     expect(errors).toBe(0);
-    proof.push({ path, refresh_persisted: persisted, secure_cookie: secure });
+    proof.push({
+      path,
+      refresh_persisted: persisted,
+      secure_cookie: secure,
+      provider_refresh_token_rotated: rotated,
+    });
   }
   await page.goto("/account");
   await page.getByRole("button", { name: "Se déconnecter" }).click();
