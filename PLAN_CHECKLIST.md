@@ -63,12 +63,13 @@ This checklist preserves PROJECT_PLAN.md's complete Phase 0–8 scope. It is not
 
 ## Phase 5 — appointments/continuity
 
-- [ ] Day/week/month calendar; manual create/reschedule/cancel and doctor alerts.
-- [ ] Separate missed appointments, unconfirmed/potentially overdue doses and unknown history.
-- [ ] Manual catch-up appointment selection with original missed-event history retained.
-- [ ] Second authorized doctor's administration reconciles the intended item and worklist.
-- [ ] Unrelated appointments remain; transactions/idempotency avoid duplicate/stale reminders.
-- [ ] Both complete acceptance scenarios plus negative/security/concurrency cases.
+- [x] Day/week/month calendar with complete day counts/paged lists; manual planning/reschedule/cancel/visit dispositions and scoped in-app alerts.
+- [x] Separate passed appointments without disposition, potentially overdue/unconfirmed references and unknown history; no missing-record-to-missed-dose inference.
+- [x] Clinician manually selects replacement dates; original missed slot, actor, old/new times and reason retained; no dose manufactured.
+- [x] Second authorized doctor's validated administration resolves the intended follow-up; corrections/withdrawals reopen it on fresh reads.
+- [x] Unrelated consultations remain; child locks, expected revisions, bound operation receipts and derived projections avoid duplicate/stale vaccine reminders.
+- [x] Both complete software acceptance scenarios plus negative/security/concurrency cases: 35 hosted checks and 140 cloud unit/database tests; see PROGRESS.md.
+- [ ] Qualified manual clinical review of the appointment/missed-follow-up workflows and underlying source before real-data use.
 
 ## Phase 6 — doctor/admin readiness
 
