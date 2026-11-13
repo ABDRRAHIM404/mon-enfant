@@ -198,7 +198,9 @@ try:
     check(status==409 and result.get('code')=='PT409','Stale reference decision returns actual HTTP 409')
     _,page,_=a['web'].get(path)
     _,page,_=a['web'].submit(path,page,{'facility_id':fa,'reason':basis['reason'],'eligibility_checked':'on','syntheticOnly':'on'},lambda f:'itemId' in f['fields'])
-    check('Version 3' in page and intended(a,child)[0]['state']=='active','Actual reactivation retains all three reference revisions')
+    status,changes=rpc(a,'vaccine_item_history',{'p_child_id':child,'p_item_id':item})
+    current_form=next(f for f in Forms(page).forms if 'itemId' in f['fields'])
+    check(status==200 and [c['state'] for c in changes]==['active','withdrawn','active'] and current_form['fields']['expected_revision']=='3' and intended(a,child)[0]['state']=='active','Actual reactivation retains all three reference revisions')
     race=[{**assign,'p_operation_id':str(uuid.uuid4()),'p_dose_code':'VPO2'} for _ in range(2)]
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
         results=list(pool.map(lambda data:rpc(a,'assign_vaccine_item',data),race))
