@@ -556,4 +556,77 @@ describe("current vaccination records and intended items", () => {
     await db.query("delete from auth.sessions where id=$1", [a.session]);
     await expect(rpc(a, "clinical_export", [child])).rejects.toThrow(/denied/);
   });
+  it("retains complete item decisions in scoped exports and preserves retired-version mappings", async () => {
+    const { a, child, facility } = await setup(),
+      id = await assign(a, child, facility),
+      outside = await actor();
+    await rpc(a, "change_vaccine_item", [
+      randomUUID(),
+      id,
+      1,
+      "withdrawn",
+      facility,
+      reason,
+      false,
+    ]);
+    await rpc(a, "change_vaccine_item", [
+      randomUUID(),
+      id,
+      2,
+      "active",
+      facility,
+      reason,
+      true,
+    ]);
+    expect(await rpc(a, "vaccine_items_export", [child])).toMatchObject([
+      {
+        id,
+        version_id: version,
+        rule: { dose_code: "VPO1" },
+        changes: [
+          { revision: 1, state: "active" },
+          { revision: 2, state: "withdrawn" },
+          { revision: 3, state: "active" },
+        ],
+      },
+    ]);
+    await expect(rpc(outside, "vaccine_items_export", [child])).rejects.toThrow(
+      /Child access denied/,
+    );
+    await rpc(editor, "change_vaccine_catalog", [
+      randomUUID(),
+      "retire",
+      version,
+      2,
+      { reason, evidence_reference: reason },
+    ]);
+    await expect(assign(a, child, facility, "VPO2")).rejects.toThrow(
+      /Approved routine/,
+    );
+    const wrong = entry(child, facility, payload(id, "BCG"));
+    await expect(rpc(a, "write_clinical_entry", wrong)).rejects.toThrow(
+      /Vaccine does not match/,
+    );
+    const estimated = entry(child, facility, payload(id));
+    estimated[5] = "estimated";
+    estimated[6] = "paper_transcription";
+    estimated[7] = reason;
+    await expect(rpc(a, "write_clinical_entry", estimated)).rejects.toThrow(
+      /exact date/,
+    );
+    const entryId = await rpc(
+      a,
+      "write_clinical_entry",
+      entry(child, facility, payload(id)),
+    );
+    expect(
+      await rpc(a, "clinical_entry_history", [child, entryId]),
+    ).toMatchObject([
+      { vaccine_mapping: { item_id: id, version_id: version } },
+    ]);
+    expect((await items(a, child))[0]).toMatchObject({
+      version_status: "retired",
+      documented_entries: [{ id: entryId }],
+    });
+  });
 });

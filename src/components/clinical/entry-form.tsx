@@ -1,4 +1,7 @@
 "use client";
+import Link from "next/link";
+import { VaccinationFields } from "@/components/vaccines/vaccination-fields";
+import type { VaccineItemExport } from "@/lib/vaccines/patient-types";
 import { useActionState } from "react";
 import { recordClinical } from "@/app/patients/clinical-actions";
 import type { ClinicalEntry, ClinicalKind } from "@/lib/clinical/types";
@@ -9,12 +12,14 @@ export function ClinicalForm({
   kind,
   facilities,
   previous,
+  vaccineItems = [],
 }: {
   childId: string;
   operationId: string;
   kind: ClinicalKind;
   facilities: Facility[];
   previous?: ClinicalEntry;
+  vaccineItems?: VaccineItemExport[];
 }) {
   const [state, action, pending] = useActionState(recordClinical, {});
   const data = previous?.payload;
@@ -38,7 +43,15 @@ export function ClinicalForm({
     );
   }
   return (
-    <form action={action} className="auth-form">
+    <form
+      action={action}
+      className="auth-form"
+      // React resets uncontrolled fields after an action returns. Keep the entered
+      // evidence available for duplicate review and validation retries.
+      onReset={
+        kind === "vaccination" ? (event) => event.preventDefault() : undefined
+      }
+    >
       <input type="hidden" name="childId" value={childId} />
       <input type="hidden" name="operationId" value={operationId} />
       <input type="hidden" name="kind" value={kind} />
@@ -121,6 +134,9 @@ export function ClinicalForm({
           J’ai contrôlé cette source. Une information rapportée reste attribuée
           à sa provenance.
         </label>
+        {kind === "vaccination" && (
+          <VaccinationFields previous={previous} items={vaccineItems} />
+        )}
         {kind === "consultation" && [
           input("reason", "Motif de consultation", 1000, true),
           input("findings", "Observations", 8000),
@@ -223,6 +239,8 @@ export function ClinicalForm({
               />
             </label>
             <p className="fine">
+              {kind === "vaccination" &&
+                "Pour un retrait, les dernières données cliniques et leur provenance sont conservées automatiquement ; seuls le motif et l’auteur du retrait sont ajoutés. "}
               La version {previous.revision} reste dans l’historique. Une
               correction concurrente impose de recharger le dossier.
             </p>
@@ -233,6 +251,45 @@ export function ClinicalForm({
           entièrement fictive dans cet environnement de test.
         </label>
       </fieldset>
+      {kind === "vaccination" && (
+        <button
+          className="button secondary"
+          name="intent"
+          value="check_duplicates"
+          disabled={pending}
+        >
+          Contrôler les doublons possibles
+        </button>
+      )}
+      {state.checked && !state.conflicts?.length && (
+        <p role="status">
+          Aucun doublon potentiel trouvé avec ces champs. Ce contrôle ne prouve
+          pas la validité clinique d’une dose.
+        </p>
+      )}
+      {!!state.conflicts?.length && (
+        <section className="notice" aria-label="Doublons possibles">
+          <h3>Événements à relire</h3>
+          <ul>
+            {state.conflicts.map((conflict) => (
+              <li key={conflict.id}>
+                <Link
+                  className="text-link"
+                  href={`/patients/${childId}/records/${conflict.root_id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {conflict.vaccine_label} ·{" "}
+                  {conflict.dose_label || "Dose inconnue"} ·{" "}
+                  {conflict.occurred_on || "Date inconnue"} ·{" "}
+                  {conflict.professional_id}
+                </Link>
+                <span className="fine"> — révision {conflict.id}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       {state.error && (
         <p className="form-error" role="alert">
           {state.error}

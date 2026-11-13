@@ -4,6 +4,7 @@ import { requireApprovedDoctor } from "@/lib/auth";
 import { DoctorNav } from "@/components/registry/doctor-nav";
 import { EntryCard } from "@/components/clinical/entry-card";
 import { PrintButton } from "@/components/clinical/print-button";
+import type { VaccineItemExport } from "@/lib/vaccines/patient-types";
 import type { ClinicalEntry } from "@/lib/clinical/types";
 import {
   uuidPattern,
@@ -20,13 +21,18 @@ export default async function Summary({
   const { supabase } = await requireApprovedDoctor();
   const { id } = await params;
   if (!uuidPattern.test(id)) notFound();
-  const [profile, ledger] = await Promise.all([
+  const [profile, ledger, vaccines] = await Promise.all([
     supabase.rpc("get_child_profile", { p_child_id: id }),
     supabase.rpc("clinical_export", { p_child_id: id }),
+    supabase.rpc("vaccine_items_export", { p_child_id: id }),
   ]);
-  if (profile.error?.code === "42501" || ledger.error?.code === "42501")
+  if (
+    profile.error?.code === "42501" ||
+    ledger.error?.code === "42501" ||
+    vaccines.error?.code === "42501"
+  )
     notFound();
-  if (ledger.error?.code === "54000")
+  if (ledger.error?.code === "54000" || vaccines.error?.code === "54000")
     return (
       <main className="account-page wide">
         <DoctorNav />
@@ -40,7 +46,7 @@ export default async function Summary({
         </section>
       </main>
     );
-  if (profile.error || ledger.error)
+  if (profile.error || ledger.error || vaccines.error)
     throw new Error("Impossible de générer le résumé.");
   const child = profile.data as ChildProfile,
     entries = ledger.data as ClinicalEntry[];
@@ -55,8 +61,9 @@ export default async function Summary({
         </p>
         <p className="fine">
           Généré le {new Date().toISOString()} · contient l’original et toutes
-          les corrections des soins enregistrés, y compris les retraits. Le
-          module vaccinal n’est pas encore inclus.
+          les corrections des soins enregistrés, y compris les retraits. Les
+          administrations vaccinales, leurs rapprochements et les décisions sur
+          les références sont inclus.
         </p>
       </div>
       <div className="tabs no-print">
@@ -71,6 +78,32 @@ export default async function Summary({
         provenance, la date et la dernière révision de chaque événement. Les
         valeurs de croissance n’ont pas d’interprétation automatique.
       </p>
+      <section className="panel">
+        <h2>Références vaccinales et toutes leurs décisions</h2>
+        {(vaccines.data as VaccineItemExport[]).map((item) => (
+          <article key={item.id}>
+            <h3>
+              {item.dose_code} · {item.version_label}
+            </h3>
+            <p className="fine">
+              Référence {item.id} · version {item.version_id}
+            </p>
+            <ul>
+              {item.changes.map((change) => (
+                <li key={change.id}>
+                  Révision {change.revision} ·{" "}
+                  {change.state === "active" ? "Active" : "Retirée"} ·{" "}
+                  {change.reason} · {change.professional_id} · lieu{" "}
+                  {change.facility_id} · {change.created_at}
+                </li>
+              ))}
+            </ul>
+          </article>
+        ))}
+        {!(vaccines.data as VaccineItemExport[]).length && (
+          <p>Aucune référence assignée.</p>
+        )}
+      </section>
       {entries.length ? (
         entries.map((entry) => (
           <EntryCard key={entry.id} entry={entry} link={false} />

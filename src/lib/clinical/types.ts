@@ -3,6 +3,7 @@ export const clinicalKinds = [
   "prescription",
   "risk",
   "growth",
+  "vaccination",
 ] as const;
 export type ClinicalKind = (typeof clinicalKinds)[number];
 export const clinicalLabels: Record<ClinicalKind, string> = {
@@ -10,6 +11,7 @@ export const clinicalLabels: Record<ClinicalKind, string> = {
   prescription: "Prescription / traitement",
   risk: "Risque / allergie",
   growth: "Mesures de croissance",
+  vaccination: "Vaccination",
 };
 export type ClinicalEntry = {
   id: string;
@@ -31,8 +33,32 @@ export type ClinicalEntry = {
   entry_state: "active" | "withdrawn";
   amendment_reason: string | null;
   recorded_at: string;
+  vaccine_mapping?: {
+    item_id: string;
+    version_id: string;
+    version_label: string;
+    dose_code: string;
+    source_age: unknown;
+    configured_age: unknown;
+  } | null;
+  duplicate_review?: { conflicting_entry_ids: string[]; reason: string } | null;
 };
 export const clinicalFieldLabels: Record<string, string> = {
+  vaccine_code: "Code vaccin",
+  vaccine_label: "Vaccin",
+  dose_label: "Dose déclarée",
+  lot_status: "Lot : certitude",
+  lot_number: "Numéro du lot",
+  site_status: "Site : certitude",
+  site: "Site d’administration",
+  provider_status: "Professionnel administrateur : certitude",
+  administered_by: "Professionnel ayant administré",
+  administration_facility_status: "Lieu d’administration : certitude",
+  administration_facility: "Lieu d’administration",
+  matching_status: "Rapprochement avec une référence",
+  schedule_item_id: "Identifiant de la référence",
+  duplicate_override_reason: "Motif de maintien malgré le doublon potentiel",
+  notes: "Notes",
   reason: "Motif",
   findings: "Observations",
   assessment: "Évaluation",
@@ -48,6 +74,10 @@ export const clinicalFieldLabels: Record<string, string> = {
   head_cm: "Périmètre crânien (cm)",
 };
 export const clinicalValueLabels: Record<string, string> = {
+  known: "Connu",
+  not_applicable: "Sans objet",
+  unmatched: "Non rapprochée — ne valide aucune référence",
+  clinician_validated: "Rapprochement validé par le clinicien",
   allergy: "Allergie",
   medical: "Médical",
   social: "Social",

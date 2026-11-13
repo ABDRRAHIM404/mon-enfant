@@ -7,8 +7,18 @@ import {
 } from "@/lib/auth";
 import { reportOperationalEvent } from "@/lib/operational-events";
 import { uuidPattern } from "@/lib/registry/types";
+import {
+  vaccinationFields,
+  type VaccinationConflict,
+} from "@/lib/vaccines/patient-types";
+import type { ClinicalEntry } from "@/lib/clinical/types";
 import { clinicalKinds } from "@/lib/clinical/types";
-export type ClinicalState = { error?: string; success?: boolean };
+export type ClinicalState = {
+  error?: string;
+  success?: boolean;
+  conflicts?: VaccinationConflict[];
+  checked?: boolean;
+};
 export async function recordClinical(
   _: ClinicalState,
   form: FormData,
@@ -35,13 +45,14 @@ export async function recordClinical(
     prescription: ["medication", "instructions", "duration"],
     risk: ["category", "description", "severity"],
     growth: ["weight_kg", "height_cm", "head_cm"],
+    vaccination: [...vaccinationFields],
   };
   const payload: Record<string, string | number> = {};
   for (const key of keys[kind])
     if (kind === "growth") {
       if (text(key)) payload[key] = Number(text(key));
     } else payload[key] = text(key);
-  const { data, error } = await supabase.rpc("write_clinical_entry", {
+  const input = {
     p_operation_id: operation,
     p_child_id: child,
     p_kind: kind,
@@ -56,8 +67,61 @@ export async function recordClinical(
     p_expected_revision: root ? Number(text("expected_revision")) : null,
     p_amendment_reason: root ? text("amendment_reason") : null,
     p_entry_state: root ? text("entry_state") : "active",
-  });
+  };
+  if (kind === "vaccination" && root && input.p_entry_state === "withdrawn") {
+    const history = await supabase.rpc("clinical_entry_history", {
+      p_child_id: child,
+      p_root_id: root,
+    });
+    if (history.error)
+      return { error: "L’historique est indisponible. Rechargez le dossier." };
+    const latest = (history.data as ClinicalEntry[]).at(-1);
+    if (
+      !latest ||
+      latest.kind !== kind ||
+      latest.revision !== input.p_expected_revision
+    )
+      return {
+        error:
+          "Une autre correction a été enregistrée. Rechargez l’historique.",
+      };
+    input.p_payload = latest.payload;
+    input.p_occurred_on = latest.occurred_on;
+    input.p_occurrence_precision = latest.occurrence_precision;
+    input.p_source_type = latest.source_type;
+    input.p_source_reference = latest.source_reference;
+    input.p_source_verified = latest.source_verified;
+  }
+  const checkDuplicates = () =>
+    supabase.rpc("check_vaccination_duplicates", {
+      p_child_id: child,
+      p_payload: input.p_payload,
+      p_occurred_on: input.p_occurred_on,
+      p_exclude_root: root || null,
+    });
+  if (kind === "vaccination" && text("intent") === "check_duplicates") {
+    const result = await checkDuplicates();
+    if (result.error)
+      return {
+        error:
+          "Vérifiez le vaccin et le rapprochement. Le contrôle des doublons est indisponible.",
+      };
+    return { checked: true, conflicts: result.data as VaccinationConflict[] };
+  }
+  const { data, error } = await supabase.rpc("write_clinical_entry", input);
   if (error) {
+    if (
+      kind === "vaccination" &&
+      error.code === "PT409" &&
+      error.hint === "vaccine_duplicate_review"
+    ) {
+      const result = await checkDuplicates();
+      return {
+        error:
+          "Vaccination potentiellement en doublon. Relisez les événements ci-dessous et justifiez explicitement toute administration distincte.",
+        conflicts: result.error ? [] : (result.data as VaccinationConflict[]),
+      };
+    }
     if (["40001", "PT409"].includes(error.code ?? ""))
       return {
         error:
@@ -83,6 +147,8 @@ export async function recordClinical(
   revalidatePath(`/patients/${child}`);
   revalidatePath(`/patients/${child}/records`);
   revalidatePath(`/patients/${child}/growth`);
+  revalidatePath(`/patients/${child}/vaccinations`);
+  revalidatePath(`/patients/${child}/summary`);
   if (root) revalidatePath(`/patients/${child}/records/${root}`);
   redirect(`/patients/${child}/records/${root || data}`);
 }

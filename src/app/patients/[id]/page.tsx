@@ -48,6 +48,7 @@ export default async function PatientProfile({
       </div>
       <div className="tabs">
         <Link href={`/patients/${id}/records`}>Dossier clinique</Link>
+        <Link href={`/patients/${id}/vaccinations`}>Vaccinations</Link>
         <Link href={`/patients/${id}/growth`}>Croissance</Link>
         <Link href={`/patients/${id}/summary`}>Résumé et impression</Link>
       </div>

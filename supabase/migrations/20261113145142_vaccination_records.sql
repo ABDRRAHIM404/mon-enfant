@@ -63,6 +63,7 @@ begin
  perform private.assert_facility(p_facility_id);
  result:=private.operation_result(p_operation_id,'vaccine_item',payload);if result is not null then return result;end if;
  if p_reason is null or length(trim(p_reason)) not between 10 and 1000 or p_eligibility_checked is distinct from true then raise exception 'Eligibility review and assignment reason required' using errcode='22023'; end if;
+ perform 1 from public.vaccine_versions where id=p_version_id for share;
  perform private.assert_vaccine_item_rule(p_child_id,p_version_id,p_dose_code);
  if exists(select 1 from public.child_vaccine_items where child_id=p_child_id and version_id=p_version_id and dose_code=p_dose_code) then raise exception 'Existing item must be reviewed instead of duplicated' using errcode='PT409';end if;
  select professional_id into platform from public.professional_profiles where user_id=actor;
@@ -86,6 +87,7 @@ begin
  if p_state is null or p_state not in ('active','withdrawn') or p_state=prior.state or p_reason is null or length(trim(p_reason)) not between 10 and 1000 then raise exception 'New item state and reason required' using errcode='22023';end if;
  if p_state='active' then
   if p_eligibility_checked is distinct from true then raise exception 'Eligibility review required' using errcode='22023';end if;
+  perform 1 from public.vaccine_versions where id=item.version_id for share;
   perform private.assert_vaccine_item_rule(item.child_id,item.version_id,item.dose_code);
  end if;
  select professional_id into platform from public.professional_profiles where user_id=actor;
@@ -119,7 +121,7 @@ language sql stable security definer set search_path='' as $$
  left join public.vaccination_entry_links link on link.entry_id=e.id
  left join public.child_vaccine_items old_item on old_item.id=link.item_id
  left join public.child_vaccine_items new_item on new_item.id=nullif(p_payload->>'schedule_item_id','')::uuid
- where e.entry_state='active' and e.payload->>'vaccine_code'=p_payload->>'vaccine_code'
+ where e.entry_state='active' and upper(e.payload->>'vaccine_code')=upper(p_payload->>'vaccine_code')
  and (p_occurred_on is null or e.occurred_on is null or e.occurred_on=p_occurred_on
   or (coalesce(p_payload->>'dose_label','')<>'' and lower(trim(e.payload->>'dose_label'))=lower(trim(p_payload->>'dose_label')))
   or (new_item.id is not null and old_item.dose_code=new_item.dose_code));
@@ -151,7 +153,7 @@ begin
   if not found or item.child_id<>p_child_id then raise exception 'Intended item denied' using errcode='42501';end if;
   select * into rule from public.vaccine_rules where version_id=item.version_id and dose_code=item.dose_code;
   select * into version from public.vaccine_versions where id=item.version_id;
-  if rule.vaccine_code is distinct from p_payload->>'vaccine_code' then raise exception 'Vaccine does not match the intended item' using errcode='22023';end if;
+  if upper(rule.vaccine_code) is distinct from upper(p_payload->>'vaccine_code') then raise exception 'Vaccine does not match the intended item' using errcode='22023';end if;
   if p_entry_state='withdrawn' then
    if prior.id is null or prior.payload is distinct from p_payload then raise exception 'Withdrawal must retain the last payload and mapping' using errcode='22023';end if;
   elsif not private.vaccine_item_active(item.id) or not version.review_verified or version.status not in ('approved','retired') or p_source_verified is distinct from true or p_occurrence_precision is distinct from 'exact' or p_occurred_on is null
@@ -328,10 +330,25 @@ end;$$;
 create or replace function public.clinical_export(p_child_id uuid) returns jsonb language sql security invoker set search_path='' as $$select private.clinical_export(p_child_id);$$;
 
 
+
+-- Complete intended-item history for authorized exports; never silently truncate.
+create function private.vaccine_items_export(p_child_id uuid) returns jsonb
+language plpgsql security definer set search_path='' as $$
+declare result jsonb;
+begin
+ if not private.can_access_child(p_child_id,false) then raise exception 'Child access denied' using errcode='42501';end if;
+ if (select count(*) from public.child_vaccine_items where child_id=p_child_id)>5000 or (select count(*) from public.vaccine_item_changes c join public.child_vaccine_items i on i.id=c.item_id where i.child_id=p_child_id)>5000 then raise exception 'Item export exceeds interactive limit' using errcode='54000';end if;
+ select coalesce(jsonb_agg(to_jsonb(i)||jsonb_build_object('version_label',v.label,'version_status',v.status,'review_verified',v.review_verified,'rule',to_jsonb(r),'changes',(select jsonb_agg(to_jsonb(c) order by revision) from public.vaccine_item_changes c where c.item_id=i.id)) order by i.created_at,i.id),'[]'::jsonb) into result
+ from public.child_vaccine_items i join public.vaccine_versions v on v.id=i.version_id join public.vaccine_rules r on r.version_id=i.version_id and r.dose_code=i.dose_code where i.child_id=p_child_id;
+ insert into public.audit_events(actor_id,entity_id,entity_type,action) values(auth.uid(),p_child_id,'vaccine_items_export','accessed');
+ return result;
+end;$$;
+create function public.vaccine_items_export(p_child_id uuid) returns jsonb language sql security invoker set search_path='' as $$select private.vaccine_items_export(p_child_id);$$;
+
 do $$declare fn record;begin
- for fn in select p.oid::regprocedure signature,p.proname from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname in ('public','private') and p.proname=any(array['vaccine_item_active','assert_vaccine_item_rule','assign_vaccine_item','change_vaccine_item','validate_vaccination_payload','vaccination_conflicts','write_clinical_entry','write_clinical_entry_base','guard_vaccination_link','guard_vaccination_override','vaccination_metadata','patient_vaccine_items','vaccine_item_history','check_vaccination_duplicates']) loop
+ for fn in select p.oid::regprocedure signature,p.proname from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname in ('public','private') and p.proname=any(array['vaccine_item_active','assert_vaccine_item_rule','assign_vaccine_item','change_vaccine_item','validate_vaccination_payload','vaccination_conflicts','write_clinical_entry','write_clinical_entry_base','guard_vaccination_link','guard_vaccination_override','vaccination_metadata','patient_vaccine_items','vaccine_item_history','check_vaccination_duplicates','vaccine_items_export']) loop
   execute format('revoke all on function %s from public,anon,authenticated',fn.signature);
-  if fn.proname=any(array['assign_vaccine_item','change_vaccine_item','write_clinical_entry','patient_vaccine_items','vaccine_item_history','check_vaccination_duplicates']) then execute format('grant execute on function %s to authenticated',fn.signature);end if;
+  if fn.proname=any(array['assign_vaccine_item','change_vaccine_item','write_clinical_entry','patient_vaccine_items','vaccine_item_history','check_vaccination_duplicates','vaccine_items_export']) then execute format('grant execute on function %s to authenticated',fn.signature);end if;
  end loop;
 end$$;
 commit;

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { VaccineItemExport } from "@/lib/vaccines/patient-types";
 import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
@@ -29,6 +30,14 @@ export default async function ClinicalHistory({
   const latest = entries[entries.length - 1];
   const allowed = (capabilities.data as string[]).includes(latest.kind);
   const places = facilities.data as Facility[];
+  const vaccineItems =
+    latest.kind === "vaccination"
+      ? await supabase.rpc("vaccine_items_export", { p_child_id: id })
+      : { data: [], error: null };
+  if (vaccineItems.error)
+    throw new Error(
+      "Impossible de charger toutes les références vaccinales. La limite interactive peut être dépassée.",
+    );
   return (
     <main className="account-page wide">
       <DoctorNav />
@@ -53,6 +62,7 @@ export default async function ClinicalHistory({
             operationId={randomUUID()}
             kind={latest.kind}
             facilities={places}
+            vaccineItems={vaccineItems.data as VaccineItemExport[]}
             previous={latest}
           />
         ) : (

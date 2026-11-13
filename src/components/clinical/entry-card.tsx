@@ -33,13 +33,38 @@ export function EntryCard({
               <dt>{clinicalFieldLabels[key] || key}</dt>
               <dd className="clinical-text">
                 {typeof value === "string" &&
-                ["category", "severity"].includes(key)
+                [
+                  "category",
+                  "severity",
+                  "matching_status",
+                  "lot_status",
+                  "site_status",
+                  "provider_status",
+                  "administration_facility_status",
+                ].includes(key)
                   ? clinicalValueLabels[value] || value
                   : value}
               </dd>
             </div>
           ))}
       </dl>
+      {entry.vaccine_mapping && (
+        <p className="fine">
+          Référence conservée : {entry.vaccine_mapping.dose_code} ·{" "}
+          {entry.vaccine_mapping.version_label} · version{" "}
+          {entry.vaccine_mapping.version_id} · référence{" "}
+          {entry.vaccine_mapping.item_id}
+        </p>
+      )}
+      {entry.duplicate_review && (
+        <div className="notice">
+          <p>Doublon potentiel relu : {entry.duplicate_review.reason}</p>
+          <p className="fine">
+            Révisions comparées :{" "}
+            {entry.duplicate_review.conflicting_entry_ids.join(", ")}
+          </p>
+        </div>
+      )}
       <p className="fine">
         Saisi par {entry.professional_id} · {entry.facility_name} · le{" "}
         {entry.recorded_at} · version {entry.revision}
