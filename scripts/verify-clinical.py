@@ -51,7 +51,7 @@ try:
  _,page,_=a['web'].get(f'/patients/{child}/records');check('Nouvelle saisie'in page and 'Consultation'in page,'Hosted clinical timeline reflects active explicit capabilities')
  path=f'/patients/{child}/records/new?kind=consultation';_,page,_=a['web'].get(path);form=next(f for f in Forms(page).forms if f['fields'].get('kind')=='consultation');operation=form['fields']['operationId']
  fields={'facility_id':fa,'occurred_on':'2026-01-02','occurrence_precision':'exact','source_type':'observed','source_verified':'on','reason':'Contrôle fictif','findings':'Observation originale fictive','syntheticOnly':'on'}
- url,page,_=a['web'].submit(path,page,fields,lambda f:f['fields'].get('kind')=='consultation');root=url.rsplit('/',1)[-1];uuid.UUID(root)
+ url,page,_=a['web'].submit(path,page,fields,lambda f:f['fields'].get('kind')=='consultation');root=url.rsplit('/',1)[-1];uuid.UUID(root);original_page=page
  status,history=rpc(a,'clinical_entry_history',{'p_child_id':child,'p_root_id':root});check(status==200 and len(history)==1 and history[0]['author_id']==a['id']and history[0]['professional_id']==a['platform'],'Hosted consultation records immutable identity, author and platform provenance')
  retry=entry(child,fa);retry['p_operation_id']=operation;status,same=rpc(a,'write_clinical_entry',retry);check(status==200 and same==root,'Retry of the hosted clinical form creates no duplicate event')
  for actor in(outsider,manager,plainadmin):
@@ -60,6 +60,8 @@ try:
  grant(manager,b,'consultation')
  path=f'/patients/{child}/records/{root}';_,page,_=b['web'].get(path);url,page,_=b['web'].submit(path,page,{**fields,'facility_id':fb,'findings':'Correction fictive du second médecin.','amendment_reason':'Source fictive relue, observation corrigée.','entry_state':'active'},lambda f:f['fields'].get('kind')=='consultation')
  status,history=rpc(a,'clinical_entry_history',{'p_child_id':child,'p_root_id':root});check(status==200 and len(history)==2 and history[0]['payload']['findings']=='Observation originale fictive'and history[1]['author_id']==b['id'],'Second doctor correction preserves A’s original and attributes the new revision to B')
+ _,stale_result,_=a['web'].submit(path,original_page,{**fields,'amendment_reason':'Correction fictive depuis un formulaire périmé.','entry_state':'active'},lambda f:f['fields'].get('kind')=='consultation')
+ check('Une autre correction a été enregistrée'in stale_result,'Hosted stale form returns the explicit reload/conflict message')
  stale={**entry(child,fa),'p_root_id':root,'p_expected_revision':1,'p_amendment_reason':'Correction fictive devenue obsolète.'};status,_=rpc(a,'write_clinical_entry',stale);check(status==409,'Stale correction cannot overwrite a newer revision')
  updates=[{**entry(child,fa),'p_root_id':root,'p_expected_revision':2,'p_amendment_reason':'Correction concurrente fictive contrôlée.'}for _ in range(2)]
  with concurrent.futures.ThreadPoolExecutor(max_workers=2)as pool:results=list(pool.map(lambda data:rpc(a,'write_clinical_entry',data),updates))
