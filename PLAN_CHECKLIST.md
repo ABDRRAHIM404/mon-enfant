@@ -75,7 +75,8 @@ This checklist preserves PROJECT_PLAN.md's complete Phase 0–8 scope. It is not
 
 - [x] Exact 4 MiB private evidence upload/download/review on desktop/tablet/phone, client/server oversize and spoof rejection, private access denial and independent database/Storage readback; see PROGRESS.md.
 
-- [ ] Full story-level browser/API/database verification, mobile/tablet/keyboard/accessibility/performance.
+- [x] Core clinical continuity browser story on desktop/tablet/phone: A/125–B/078 identity, capability decisions, consultation/correction, growth, appointment reschedule, private export and revocation/logout; growth hydration regression fixed. See PROGRESS.md.
+- [ ] Remaining story-level browser/API/database verification (including vaccination/catalog and other entry kinds), full keyboard/accessibility/performance acceptance.
 - [ ] Account/session, QR, export, RLS/Storage, secret and rate-limit review.
 - [ ] Backup/recovery drill, monitoring, incident response and retention execution evidence.
 - [ ] Formal clinical, legal/privacy and regulated hosting approvals before any identifiable-data pilot.
