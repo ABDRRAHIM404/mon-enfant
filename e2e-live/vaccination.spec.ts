@@ -790,8 +790,7 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
     const appointments = ledger.appointments_including_all_events;
     expect(appointments.length).toBe(2);
     const linked = appointments.find(
-      (p: { appointment: { purpose: string } }) =>
-        p.appointment.purpose === "vaccination",
+      (p: { purpose: string }) => p.purpose === "vaccination",
     );
     expect(
       linked.events.map((e: { state: string }) => e.state).join(",") ===
@@ -802,10 +801,7 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
         linked.events[2].professional_id === platformA,
     ).toBe(true);
     expect(
-      appointments.every(
-        (p: { appointment: { state: string } }) =>
-          p.appointment.state === "scheduled",
-      ),
+      appointments.every((p: { state: string }) => p.state === "scheduled"),
     ).toBe(true);
     await screen(a, `/patients/${child}/summary`, childName);
     await expect(a.locator(".clinical-entry")).toHaveCount(5);
