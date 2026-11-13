@@ -38,12 +38,12 @@ This checklist preserves PROJECT_PLAN.md's complete Phase 0–8 scope. It is not
 
 ## Phase 3 — registry
 
-- [ ] Doctor dashboard/worklists, scoped search/filtering and patient list.
-- [ ] New child registration with permanent identity and scoped local register.
-- [ ] Manual paper-record entry with source/uncertainty and duplicate review (no automatic merge).
-- [ ] Existing-child lookup/linking through a recorded authorization workflow.
-- [ ] Profile overview, appropriate guardian/contact use and access/correction traceability.
-- [ ] Multi-doctor acceptance: two register numbers, one immutable child; negative access cases.
+- [x] Doctor registry dashboard/worklists, scoped search/filtering and patient list. Appointment/clinical dashboard and last/next-visit additions remain tracked in Phases 4/5.
+- [x] New child registration with permanent identity and scoped local register.
+- [x] Manual paper-record entry with source/uncertainty and duplicate review (no automatic merge).
+- [x] Existing-child lookup/linking through a recorded authorization workflow.
+- [x] Profile overview, appropriate guardian/contact use and access/correction traceability.
+- [x] Multi-doctor acceptance: two register numbers, one immutable child; negative access cases.
 
 ## Phase 4 — clinical/vaccines
 

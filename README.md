@@ -1,6 +1,6 @@
 # Mon Enfant
 
-Digital Moroccan child health booklet. The implementation follows [PROJECT_PLAN.md](PROJECT_PLAN.md) in phase order. Foundation and professional verification/review are implemented. Work is moving into **Phase 3 — Doctor patient registry**; clinical and parent/mobile phases remain outstanding. See [PLAN_CHECKLIST.md](PLAN_CHECKLIST.md) for the complete scope and unresolved external gates.
+Digital Moroccan child health booklet. The implementation follows [PROJECT_PLAN.md](PROJECT_PLAN.md) in phase order. Foundation, professional verification/review and patient registry are implemented. Work is moving into **Phase 4 — Clinical records and vaccine tracking**; clinical and parent/mobile phases remain outstanding. See [PLAN_CHECKLIST.md](PLAN_CHECKLIST.md) for the complete scope and unresolved external gates.
 
 ## Development services
 
@@ -8,7 +8,7 @@ Digital Moroccan child health booklet. The implementation follows [PROJECT_PLAN.
 - Private source and CI: https://github.com/ABDRRAHIM404/mon-enfant
 - Supabase development: https://supabase.com/dashboard/project/zkkasbxvdvecnafgjpxd (Paris / `eu-west-3`).
 
-The initial schema is applied, all nine public tables have RLS, and the live security advisor reports no warnings. App credentials are configured on Vercel. Use fictional data only. The owner prefers remote verification to keep their PC responsive.
+Three migrations are applied and all 12 public tables have RLS. Patient reads use audited RPCs and require a current Auth session plus an approved doctor and active child grant. The latest security advisor reports disabled leaked-password screening (a paid-plan feature); no additional SQL/RLS/function warnings. See SECURITY.md. App credentials are configured on Vercel. Use fictional data only. The owner prefers remote verification to keep their PC responsive.
 
 ## Run locally (only when requested)
 

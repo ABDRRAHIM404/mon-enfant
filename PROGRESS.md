@@ -1,6 +1,6 @@
 # Mon Enfant — Implementation progress
 
-Updated: 13 November 2026. Execution follows `PROJECT_PLAN.md` in order. Current milestone: **Phase 3 — Doctor patient registry**. Foundation/verification technical workflows are implemented and verified; external readiness gates remain open. Full-scope audit: [PLAN_CHECKLIST.md](PLAN_CHECKLIST.md).
+Updated: 13 November 2026. Execution follows `PROJECT_PLAN.md` in order. Current milestone: **Phase 4 — Clinical records and vaccine tracking**. Foundation/verification/registry technical workflows are implemented and verified; external readiness gates remain open. Full-scope audit: [PLAN_CHECKLIST.md](PLAN_CHECKLIST.md).
 
 ## Phase 0 — Requirements and source validation
 
@@ -47,7 +47,7 @@ Docker is unavailable locally; no Docker installation or local stack was started
 
 ## Next ordered milestone
 
-Next: Phase 3 doctor dashboard, registry, manual registration/transcription and authorized existing-child linking. Phase 4 clinical/vaccination functionality remains unimplemented. The complete Phase 0–8 goal is tracked in PLAN_CHECKLIST.md; no full-goal completion is claimed.
+Next: Phase 4 append-only clinical records, explicit capabilities, draft versioned vaccine catalog and cautious routine-date calculations. Phase 3 registry acceptance passed; appointment/clinical dashboard additions depend on Phases 4/5. The complete Phase 0–8 goal is tracked in PLAN_CHECKLIST.md; no full-goal completion is claimed.
 
 ## Overnight continuation — professional verification
 
@@ -73,3 +73,15 @@ Implemented, migrated, cloud-verified and deployed from `feature/professional-ve
 - Feature `f79e6d4` passed cloud CI: https://github.com/ABDRRAHIM404/mon-enfant/actions/runs/43356763543 and main CI: https://github.com/ABDRRAHIM404/mon-enfant/actions/runs/43357698215 . Main Vercel deployment `dpl_84Ky2iXWbRqegdgNR2RsaUoEAF6o` is ready.
 - `scripts/verify-recovery.py` passed 12 actual hosted/provider checks, including one-use token confirmation, rejection of mismatched fields, old-password invalidation, new-password login, invalidation of earlier refresh sessions and a denied token replay. The fixture account was retired; no email was sent. Actual email delivery remains an external integration check.
 - Shared low-resource HTML client is in `scripts/operator_http.py`. Full Phase 0–8 scope and unresolved gates remain in PLAN_CHECKLIST.md. REGISTRY_SPEC.md captures the next coding contract, including explicit authorization, unknown paper demographics, audited clinical reads and current-session checks. It also records the still-unproven largest hosted file upload size for hardening.
+
+### Registry — applied, deployed and verified
+
+- Added the doctor dashboard with actual counts, scoped patient search/filters/pagination, declared practices, new/paper registration with demographic uncertainty and provenance, authorized existing-child linking, access-request approval/withdrawal, child overview and explicit manager delegation/revocation.
+- Audited patient/worklist/grant reads replace unaudited direct clinical SELECT. Current Auth session, professional approval, facility membership and child grants are checked at the database boundary. Registration and access decisions are transactional and retry-safe; register number 00125 remains distinct from another doctor’s 78 for the same immutable child.
+- Feature commit `2a4aeba` passed cloud lint/typecheck, 71 unit/PostgreSQL tests, production build and 10 desktop/mobile browser checks: https://github.com/ABDRRAHIM404/mon-enfant/actions/runs/43361240304 . Main deployment `dpl_4y4U5XNzdGNp9PejrsD1d7R7uz6K` is READY at the canonical origin. Main CI: https://github.com/ABDRRAHIM404/mon-enfant/actions/runs/43361525586 .
+- Migration `20261113042732_patient_registry.sql` is applied and present in the hosted migration ledger. The CLI’s optional Docker catalog-cache warning did not affect application; no Docker stack was installed or started.
+- Updated provider smoke run `ce77c0da86c8` passed 39 checks against the migrated database, including existing-token suspension and global-logout denial. Four fake users were retired and their evidence removed. No mail was sent.
+- Security advisor reports one Auth warning for disabled leaked-password screening (documented Pro feature); no additional SQL/RLS/function warnings. No paid plan was provisioned. This remains a readiness item in SECURITY.md.
+- Hosted registry run `20fd59e5d7` passed 25 checks: actual practice/registration/paper/request/approval/revocation forms, shared child identity with A’s local 00125/B’s 78, idempotency, non-disclosing unknown-ID receipts, simultaneous approval (one winner), simultaneous duplicate registration (one created/one review warning), revoked-session denial and actual read-audit events. Four fake accounts were retired; grants/practice memberships revoked and pending requests withdrawn.
+- Hosted verification regression run `7cade9f890` passed all 15 checks after the session/RLS changes, including private evidence download and actual review/logout forms. Two fake accounts were suspended and documents purged. No mail was sent. Main CI `43361525586` passed.
+- Phase 3 technical acceptance is complete. Phase 4 clinical events, explicit write capabilities, draft vaccine versions and reviewed routine reference logic are next. Appointment-driven dashboard/last-next-visit additions remain in Phases 4/5. Full Phases 4–8, actual mail delivery and all external clinical/legal/hosting/identity gates remain outstanding.

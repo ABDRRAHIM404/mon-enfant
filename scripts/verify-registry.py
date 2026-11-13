@@ -83,6 +83,10 @@ try:
  with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:results=list(pool.map(lambda _:rpc(a,'decide_child_access',decision),range(2)))
  check(sum(status==200 for status,_ in results)==1 and sum(status>=400 for status,_ in results)==1,'Concurrent access decisions yield exactly one committed approval')
  status,pb=rpc(b,'get_child_profile',{'p_child_id':child});check(status==200 and len(pb['registers'])==1,'Reauthorization preserves the existing register association')
+ # Simultaneous new operations for the same authorized demographic match require review.
+ race=[{'p_operation_id':str(uuid.uuid4()),'p_payload':{**payload,'family_name':run+'-race','local_number':number}} for number in ('R1','R2')]
+ with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:results=list(pool.map(lambda data:rpc(a,'register_child',data),race))
+ check(sum(status==200 for status,_ in results)==1 and sum(status>=400 for status,_ in results)==1,'Concurrent matching registrations commit once and require duplicate review')
  # Paper transcription carries unknown fields without inventing demographic data.
  _,page,_=get(a,'/patients/new?source=paper');url,page,_=submit(a,'/patients/new?source=paper',page,'register',{'facility_id':fa,'register_year':'2026','register_book':'PAPER','local_number':'0009','name_status':'unknown','birth_date_precision':'unknown','sex':'unknown','history_status':'partial','source_type':'paper_transcription','paper_reference':'Registre fictif page 9','syntheticOnly':'on'})
  paper=url.rsplit('/',1)[-1];status,pp=rpc(a,'get_child_profile',{'p_child_id':paper});check(status==200 and pp['given_name'] is None and pp['birth_date'] is None and pp['paper_reference']=='Registre fictif page 9','Hosted paper form preserves unknown demographics and provenance')
