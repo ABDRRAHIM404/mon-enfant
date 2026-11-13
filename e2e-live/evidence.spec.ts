@@ -159,7 +159,7 @@ test("private evidence browser-to-storage boundary and review", async ({
   await expect(
     page.getByRole("heading", { name: "Présentez vos qualifications." }),
   ).toBeVisible();
-  const displayName = `Professionnel fictif ${role}`,
+  const displayName = `Professionnel fictif ${role} ${run}`,
     registration = `QAR-${run}-${role.toUpperCase()}`;
   const fields = {
     displayName,
@@ -280,7 +280,11 @@ test("private evidence browser-to-storage boundary and review", async ({
   });
   await login(reviewer, "reviewer");
   await reviewer.goto("/admin/verifications");
-  await reviewer.getByRole("link", { name: displayName, exact: true }).click();
+  await reviewer
+    .getByRole("row")
+    .filter({ hasText: registration })
+    .getByRole("link", { name: "Examiner le dossier", exact: true })
+    .click();
   expect(
     await reviewer.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
