@@ -78,3 +78,14 @@ export async function clinicalDatabase() {
   );
   return db;
 }
+
+export async function vaccineDatabase() {
+  const db = await clinicalDatabase();
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/20261113091129_vaccine_catalog.sql",
+      "utf8",
+    ),
+  );
+  return db;
+}
