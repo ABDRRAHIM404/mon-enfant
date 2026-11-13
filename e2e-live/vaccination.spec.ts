@@ -566,6 +566,9 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
     const replacement = futureSlot(14);
     await a.locator('[name="starts_local"]').fill(replacement[0]);
     await a.locator('[name="ends_local"]').fill(replacement[1]);
+    // A replacement date can use a different Casablanca offset from the old slot.
+    await a.locator('[name="starts_offset"]').selectOption("auto");
+    await a.locator('[name="ends_offset"]').selectOption("auto");
     await a.locator('textarea[name="reason"]').fill(basis);
     await a.locator('[name="reviewed"]').check();
     await a.locator('[name="syntheticOnly"]').check();
