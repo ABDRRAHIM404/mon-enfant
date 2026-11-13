@@ -33,6 +33,8 @@ test("landing, auth navigation, and explicit unconfigured state", async ({
 });
 test("protected routes fail closed without Supabase", async ({ page }) => {
   for (const path of [
+    "/vaccines",
+    "/vaccines/00000000-0000-4000-8000-000000000000",
     "/account/clinical-permissions",
     "/admin/clinical-permissions",
     "/patients/00000000-0000-4000-8000-000000000000/records",

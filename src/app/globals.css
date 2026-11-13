@@ -977,3 +977,5 @@ th {
     font-size: 26px;
   }
 }
+
+.source-json { white-space: pre-wrap; overflow-wrap: anywhere; max-width: 100%; font-size: .8rem; }

@@ -54,3 +54,17 @@ export async function requireClinicalPermissionManager() {
   if (error || data !== true) redirect("/account");
   return result;
 }
+
+export async function requireVaccineCatalog() {
+  const result = await getProfessional();
+  if (result.profile?.verification_status !== "approved") redirect("/account");
+  const { data, error } = await result.supabase.rpc(
+    "vaccine_catalog_permissions",
+  );
+  if (error)
+    throw new Error("Impossible de vérifier les permissions du catalogue.");
+  const permissions = data as { manage: boolean; review: boolean };
+  if (result.profile.role !== "doctor" && !permissions.manage)
+    redirect("/account");
+  return { ...result, permissions };
+}

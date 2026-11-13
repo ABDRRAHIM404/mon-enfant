@@ -13,6 +13,7 @@ type Rule = {
   automatic_scheduling: boolean;
 };
 type Version = {
+  parent_id: string | null;
   id: string;
   status: string;
   revision: number;
@@ -110,11 +111,44 @@ afterAll(async () => {
   await db?.close();
 });
 describe("versioned vaccine catalog", () => {
+  it("paginates immutable snapshots without hiding the total or repeating decisions", async () => {
+    const editor = await actor("admin", true),
+      id = await draft(editor);
+    for (let revision = 1; revision <= 25; revision++)
+      await change(editor, "edit", id, revision, {
+        dose_code: "VPO1",
+        age: { unit: "weeks", value: revision % 2 ? 8 : 9 },
+        eligibility: "all",
+        automatic_scheduling: true,
+      });
+    const first = (await rpc(editor, "vaccine_catalog", [id, 1])) as {
+      history_total: number;
+      history: { id: string; revision: number; snapshot: Version }[];
+    };
+    const second = (await rpc(editor, "vaccine_catalog", [
+      id,
+      2,
+    ])) as typeof first;
+    expect(first.history_total).toBe(26);
+    expect(first.history).toHaveLength(20);
+    expect(second.history).toHaveLength(6);
+    expect(
+      new Set([...first.history, ...second.history].map((h) => h.id)).size,
+    ).toBe(26);
+    expect(second.history.at(-1)?.revision).toBe(26);
+    expect(second.history.at(-1)?.snapshot.rules).toHaveLength(25);
+    await expect(rpc(editor, "vaccine_catalog", [id, 0])).rejects.toThrow(
+      /Invalid catalog page/,
+    );
+  });
   it("preserves the original complete source, all 25 mappings and a disabled draft", async () => {
     const a = await actor(),
       list = (await rpc(a, "vaccine_catalog")) as { versions: Version[] };
-    expect(list.versions).toHaveLength(1);
-    const { version: v } = await detail(a, list.versions[0].id);
+    expect(list.versions.filter((v) => !v.parent_id)).toHaveLength(1);
+    const { version: v } = await detail(
+      a,
+      list.versions.find((v) => !v.parent_id)!.id,
+    );
     const bytes = readFileSync("data-for-supa/MON_ENFANT_PNI_DATA.json"),
       source = JSON.parse(bytes.toString());
     expect(v.source_sha256).toBe(

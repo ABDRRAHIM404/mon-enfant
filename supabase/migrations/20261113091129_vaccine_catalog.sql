@@ -109,16 +109,17 @@ language sql stable security definer set search_path='' as $$
  'rules',coalesce((select jsonb_agg(to_jsonb(r) order by r.dose_code) from public.vaccine_rules r where r.version_id=v.id),'[]'::jsonb))
  from public.vaccine_versions v join private.vaccine_sources s on s.id=v.source_id where v.id=p_id;
 $$;
-create function private.vaccine_catalog(p_version_id uuid default null) returns jsonb
+create function private.vaccine_catalog(p_version_id uuid default null,p_page integer default 1) returns jsonb
 language plpgsql stable security definer set search_path='' as $$
 begin
  perform private.assert_vaccine_catalog_reader();
+ if p_page is null or p_page not between 1 and 10000 then raise exception 'Invalid catalog page' using errcode='22023'; end if;
  if p_version_id is null then
-  return jsonb_build_object('permissions',private.vaccine_catalog_permissions(),'versions',coalesce((select jsonb_agg(to_jsonb(v) order by v.created_at desc,v.id) from public.vaccine_versions v),'[]'::jsonb));
+  return jsonb_build_object('permissions',private.vaccine_catalog_permissions(),'total',(select count(*) from public.vaccine_versions),'versions',coalesce((select jsonb_agg(to_jsonb(v) order by v.created_at desc,v.id) from (select * from public.vaccine_versions order by created_at desc,id limit 20 offset (p_page-1)*20) v),'[]'::jsonb));
  end if;
  if not exists(select 1 from public.vaccine_versions where id=p_version_id) then raise exception 'Unknown version' using errcode='22023'; end if;
  return jsonb_build_object('permissions',private.vaccine_catalog_permissions(),'version',private.vaccine_version_snapshot(p_version_id),
-  'history',coalesce((select jsonb_agg(to_jsonb(c) order by c.created_at,c.id) from public.vaccine_catalog_changes c where c.version_id=p_version_id),'[]'::jsonb));
+  'history_total',(select count(*) from public.vaccine_catalog_changes where version_id=p_version_id),'history',coalesce((select jsonb_agg(to_jsonb(c) order by c.created_at,c.id) from (select * from public.vaccine_catalog_changes where version_id=p_version_id order by created_at,id limit 20 offset (p_page-1)*20) c),'[]'::jsonb));
 end;$$;
 
 create function private.change_vaccine_catalog(p_operation_id uuid,p_action text,p_version_id uuid,p_expected_revision integer,p_input jsonb) returns uuid
@@ -169,10 +170,10 @@ begin
 end;$$;
 
 create function public.vaccine_catalog_permissions() returns jsonb language sql stable security invoker set search_path='' as $$select private.vaccine_catalog_permissions();$$;
-create function public.vaccine_catalog(p_version_id uuid default null) returns jsonb language sql stable security invoker set search_path='' as $$select private.vaccine_catalog(p_version_id);$$;
+create function public.vaccine_catalog(p_version_id uuid default null,p_page integer default 1) returns jsonb language sql stable security invoker set search_path='' as $$select private.vaccine_catalog(p_version_id,p_page);$$;
 create function public.change_vaccine_catalog(p_operation_id uuid,p_action text,p_version_id uuid,p_expected_revision integer,p_input jsonb) returns uuid language sql security invoker set search_path='' as $$select private.change_vaccine_catalog(p_operation_id,p_action,p_version_id,p_expected_revision,p_input);$$;
-revoke all on function private.vaccine_catalog_permissions(),private.assert_vaccine_catalog_reader(),private.guard_vaccine_rule(),private.guard_vaccine_version(),private.vaccine_version_snapshot(uuid),private.vaccine_catalog(uuid),private.change_vaccine_catalog(uuid,text,uuid,integer,jsonb),public.vaccine_catalog_permissions(),public.vaccine_catalog(uuid),public.change_vaccine_catalog(uuid,text,uuid,integer,jsonb) from public,anon,authenticated;
-grant execute on function private.vaccine_catalog_permissions(),private.vaccine_catalog(uuid),private.change_vaccine_catalog(uuid,text,uuid,integer,jsonb),public.vaccine_catalog_permissions(),public.vaccine_catalog(uuid),public.change_vaccine_catalog(uuid,text,uuid,integer,jsonb) to authenticated;
+revoke all on function private.vaccine_catalog_permissions(),private.assert_vaccine_catalog_reader(),private.guard_vaccine_rule(),private.guard_vaccine_version(),private.vaccine_version_snapshot(uuid),private.vaccine_catalog(uuid,integer),private.change_vaccine_catalog(uuid,text,uuid,integer,jsonb),public.vaccine_catalog_permissions(),public.vaccine_catalog(uuid,integer),public.change_vaccine_catalog(uuid,text,uuid,integer,jsonb) from public,anon,authenticated;
+grant execute on function private.vaccine_catalog_permissions(),private.vaccine_catalog(uuid,integer),private.change_vaccine_catalog(uuid,text,uuid,integer,jsonb),public.vaccine_catalog_permissions(),public.vaccine_catalog(uuid,integer),public.change_vaccine_catalog(uuid,text,uuid,integer,jsonb) to authenticated;
 
 -- SOURCE_SEED: original JSON snapshot below; never edited in place after application.
 

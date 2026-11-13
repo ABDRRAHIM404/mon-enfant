@@ -8,6 +8,7 @@ export function AdminNav() {
         <Link href="/admin/verifications">Demandes</Link>
         <Link href="/admin/professionals">Professionnels</Link>
         <Link href="/admin/clinical-permissions">Habilitations cliniques</Link>
+        <Link href="/vaccines">Règles vaccinales</Link>
         <Link href="/account">Mon compte</Link>
       </nav>
     </header>
