@@ -64,10 +64,12 @@ def check(reader=read_url, exercise_failure=False):
         except Exception:
             # Never print urllib errors, redirected URLs, response bodies or headers.
             results[name] = 'transport_failure'
-    if exercise_failure:
+    baseline_healthy = results == {'readiness': 'ok', 'anonymous_export': 'denied'}
+    failure_injected = exercise_failure and baseline_healthy
+    if failure_injected:
         results['readiness'] = 'controlled_failure_injected'
     healthy = results == {'readiness': 'ok', 'anonymous_export': 'denied'}
-    return {'status': 'ok' if healthy else 'unavailable', 'checked_at': datetime.now(timezone.utc).isoformat(), 'drill': exercise_failure, 'elapsed_ms': round((time.monotonic() - started) * 1000), **results}
+    return {'status': 'ok' if healthy else 'unavailable', 'checked_at': datetime.now(timezone.utc).isoformat(), 'drill': exercise_failure, 'failure_injected': failure_injected, 'elapsed_ms': round((time.monotonic() - started) * 1000), **results}
 
 
 def main():

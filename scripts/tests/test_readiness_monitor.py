@@ -65,6 +65,13 @@ class ReadinessMonitorTests(unittest.TestCase):
         self.assertTrue(report['drill'])
         self.assertEqual(report['status'], 'unavailable')
         self.assertEqual(report['readiness'], 'controlled_failure_injected')
+        self.assertTrue(report['failure_injected'])
+
+    def test_drill_does_not_mask_a_real_outage(self):
+        report = monitor.check(lambda path: (503, {}, b'private details') if path == monitor.READINESS else DENIED, exercise_failure=True)
+        self.assertEqual(report['status'], 'unavailable')
+        self.assertEqual(report['readiness'], 'unexpected_status')
+        self.assertFalse(report['failure_injected'])
 
     def test_probe_paths_are_fixed(self):
         with self.assertRaisesRegex(ValueError, 'Unsupported monitor path'):
