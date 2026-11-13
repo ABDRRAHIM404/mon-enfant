@@ -232,11 +232,17 @@ test("private evidence browser-to-storage boundary and review", async ({
   await page
     .getByRole("button", { name: "Soumettre pour vérification" })
     .click();
-  await expect(page.getByRole("alert")).toContainText("4 Mio");
+  await expect(
+    page.getByRole("alert").filter({ hasText: "Joignez un PDF" }),
+  ).toContainText("4 Mio");
   expect(posts).toBe(0);
   const tooLarge = await rawSubmission(page, pdfOfSize(4 * MIB + 1), fields);
   expect(tooLarge.status()).toBe(200);
-  expect((await tooLarge.text()).includes("4 Mio")).toBe(true);
+  expect(
+    (await tooLarge.text()).includes(
+      "Joignez un PDF, JPEG ou PNG de 4 Mio maximum",
+    ),
+  ).toBe(true);
   const spoof = await rawSubmission(
     page,
     Buffer.from("This is not a PDF file."),
