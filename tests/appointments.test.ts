@@ -1,0 +1,852 @@
+import { beforeAll, afterAll, describe, it, expect } from "vitest";
+import { randomUUID } from "node:crypto";
+import type { PGlite } from "@electric-sql/pglite";
+import { appointmentDatabase, sessionActing } from "./helpers/database";
+import { routineReference } from "../src/lib/vaccines/calendar";
+import type { CatalogSnapshot } from "../src/lib/vaccines/types";
+let db: PGlite, version: string, seed: string, editor: Actor, reviewer: Actor;
+type Actor = { id: string; session: string };
+type Row = {
+  id: string;
+  child_id: string;
+  effective_state: string;
+  state: string;
+  revision: number;
+  responsible_id: string;
+  documentation: null | { professional_id: string };
+  recorded_by_other: boolean;
+};
+type Work = { items: Row[]; total: number; counts: Record<string, number> };
+type Event = {
+  id: string;
+  revision: number;
+  action: string;
+  state: string;
+  starts_at: string;
+  ends_at: string;
+  previous_starts_at: string;
+  professional_id: string;
+  reason: string;
+};
+type History = { appointment: Row; events: Event[] };
+const reason = "Décision fictive relue sans valeur clinique.";
+const start = "2026-01-02T10:00:00+01:00",
+  end = "2026-01-02T10:30:00+01:00";
+const futureStart = "2030-01-03T10:00:00+01:00",
+  futureEnd = "2030-01-03T10:30:00+01:00";
+async function actor(
+  role = "doctor",
+  status = "approved",
+  appointment = true,
+): Promise<Actor> {
+  const id = randomUUID(),
+    session = randomUUID();
+  await db.query("insert into auth.users(id) values($1)", [id]);
+  await db.query("insert into auth.sessions(id,user_id) values($1,$2)", [
+    session,
+    id,
+  ]);
+  await db.query(
+    "insert into public.professional_profiles(user_id,role,verification_status,professional_id) values($1,$2,$3,$4)",
+    [id, role, status, status === "approved" ? `APT-${id}` : null],
+  );
+  if (appointment && role === "doctor")
+    await cap({ id, session }, "appointment");
+  return { id, session };
+}
+async function cap(a: Actor, kind: string, enabled = true) {
+  await db.query(
+    "insert into public.professional_capabilities(professional_id,capability,enabled,granted_by) values($1,$2,$3,$1) on conflict(professional_id,capability) do update set enabled=excluded.enabled",
+    [a.id, kind, enabled],
+  );
+}
+async function rpc<T = unknown>(
+  a: Actor,
+  name: string,
+  args: unknown[] = [],
+): Promise<T> {
+  const result = await sessionActing(
+    db,
+    a.id,
+    a.session,
+    `select public.${name}(${args.map((_, i) => `$${i + 1}`).join(",")}) as value`,
+    args,
+  );
+  return (result.rows[0] as { value: T }).value;
+}
+async function setup(dob: string | null = "2025-01-01", sex = "female") {
+  const a = await actor(),
+    facility = await rpc<string>(a, "create_facility", [
+      randomUUID(),
+      "Centre de rendez-vous fictif",
+      "Rabat",
+    ]);
+  const child = await rpc<string>(a, "register_child", [
+    randomUUID(),
+    {
+      facility_id: facility,
+      register_year: 2026,
+      register_book: "A",
+      local_number: "125",
+      given_name: "Enfant fictif",
+      family_name: randomUUID(),
+      birth_date: dob,
+      birth_date_precision: dob ? "exact" : "unknown",
+      sex,
+    },
+  ]);
+  return { a, facility, child };
+}
+async function item(a: Actor, child: string, facility: string, dose = "VPO1") {
+  await cap(a, "vaccination");
+  const id = await rpc<string>(a, "assign_vaccine_item", [
+    randomUUID(),
+    child,
+    version,
+    dose,
+    facility,
+    reason,
+    true,
+  ]);
+  await cap(a, "vaccination", false);
+  return id;
+}
+function createArgs(
+  child: string,
+  facility: string,
+  itemId: string | null = null,
+  from = start,
+  to = end,
+  op = randomUUID(),
+) {
+  return [
+    op,
+    child,
+    facility,
+    itemId ? "vaccination" : "consultation",
+    itemId ? "Vaccination fictive" : "Consultation fictive",
+    itemId,
+    from,
+    to,
+    reason,
+    true,
+  ];
+}
+function decision(
+  id: string,
+  revision: number,
+  action = "reschedule",
+  from: string | null = futureStart,
+  to: string | null = futureEnd,
+  op = randomUUID(),
+) {
+  return [op, id, revision, action, from, to, reason, true];
+}
+function payload(itemId = "") {
+  return {
+    vaccine_code: "VPO",
+    vaccine_label: "Vaccin fictif",
+    dose_label: "",
+    lot_status: "unknown",
+    lot_number: "",
+    site_status: "unknown",
+    site: "",
+    provider_status: "unknown",
+    administered_by: "",
+    administration_facility_status: "unknown",
+    administration_facility: "",
+    matching_status: itemId ? "clinician_validated" : "unmatched",
+    schedule_item_id: itemId,
+    duplicate_override_reason: "",
+    notes: "Données fictives",
+  };
+}
+function dose(child: string, facility: string, itemId = "") {
+  return [
+    randomUUID(),
+    child,
+    "vaccination",
+    facility,
+    "2026-01-02",
+    "exact",
+    "observed",
+    null,
+    true,
+    payload(itemId),
+  ];
+}
+async function link(a: Actor, b: Actor, child: string) {
+  await db.query(
+    "insert into public.access_grants(child_id,professional_id,granted_by) values($1,$2,$3)",
+    [child, b.id, a.id],
+  );
+}
+beforeAll(async () => {
+  db = await appointmentDatabase();
+  editor = await actor("admin");
+  reviewer = await actor();
+  await cap(reviewer, "vaccination");
+  await db.query(
+    "insert into private.staff_permissions(user_id,can_manage_vaccine_catalog,can_review_vaccine_catalog) values($1,true,false),($2,false,true)",
+    [editor.id, reviewer.id],
+  );
+  const list = await rpc<{
+    versions: { id: string; revision: number; parent_id: string | null }[];
+  }>(reviewer, "vaccine_catalog");
+  const source = list.versions.find((v) => !v.parent_id)!;
+  seed = source.id;
+  version = await rpc<string>(editor, "change_vaccine_catalog", [
+    randomUUID(),
+    "clone",
+    seed,
+    source.revision,
+    {
+      label: "Version de rendez-vous fictifs",
+      reason,
+      evidence_reference: reason,
+    },
+  ]);
+  await rpc(reviewer, "change_vaccine_catalog", [
+    randomUUID(),
+    "approve",
+    version,
+    1,
+    {
+      reason,
+      evidence_reference: reason,
+      source_authenticated: true,
+      clinical_reviewed: true,
+      birth_window_reviewed: true,
+    },
+  ]);
+});
+afterAll(async () => {
+  await db?.close();
+});
+describe("appointments, independent clinical permissions and cross-doctor continuity", () => {
+  it("keeps all direct appointment data and projection helpers private with RLS", async () => {
+    const { a } = await setup();
+    for (const table of ["appointments", "appointment_events"])
+      await expect(
+        sessionActing(db, a.id, a.session, `select * from public.${table}`),
+      ).rejects.toThrow(/permission denied/);
+    for (const call of [
+      "private.appointment_rows()",
+      "private.item_documentation(null)",
+      "private.item_reference(null)",
+      "private.list_patients_base()",
+    ])
+      await expect(
+        sessionActing(db, a.id, a.session, `select ${call}`),
+      ).rejects.toThrow(/permission denied/);
+    const r = await db.query<{ relrowsecurity: boolean }>(
+      "select relrowsecurity from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and c.relkind='r'",
+    );
+    expect(r.rows.every((row) => row.relrowsecurity)).toBe(true);
+  });
+  it("requires a separate appointment capability, current grant/facility and approved doctor", async () => {
+    const { a, child, facility } = await setup(),
+      outside = await actor(),
+      unverified = await actor("doctor", "unverified");
+    await cap(a, "appointment", false);
+    await cap(a, "vaccination");
+    await expect(
+      rpc(a, "create_appointment", createArgs(child, facility)),
+    ).rejects.toThrow(/Appointment capability/);
+    await cap(a, "appointment");
+    await cap(a, "vaccination", false);
+    await expect(
+      rpc(a, "write_clinical_entry", dose(child, facility)),
+    ).rejects.toThrow(/capability/);
+    for (const who of [outside, editor, unverified])
+      await expect(
+        rpc(who, "create_appointment", createArgs(child, facility)),
+      ).rejects.toThrow(/required/);
+    const other = await setup();
+    await expect(
+      rpc(a, "create_appointment", createArgs(child, other.facility)),
+    ).rejects.toThrow(/practice/);
+  });
+  it("uses the checked permission manager workflow without implying vaccination privileges", async () => {
+    const { a } = await setup();
+    await cap(a, "appointment", false);
+    const manager = await actor("admin");
+    await db.query(
+      "insert into private.staff_permissions(user_id,can_manage_clinical_permissions) values($1,true)",
+      [manager.id],
+    );
+    await rpc(manager, "set_clinical_capability", [
+      randomUUID(),
+      a.id,
+      "appointment",
+      true,
+      null,
+      reason,
+      reason,
+      true,
+    ]);
+    expect(await rpc(a, "my_clinical_capabilities")).toEqual(["appointment"]);
+    expect(await rpc(a, "clinical_capability_history", [a.id])).toMatchObject([
+      { capability: "appointment", enabled: true },
+    ]);
+    await expect(
+      rpc(editor, "set_clinical_capability", [
+        randomUUID(),
+        a.id,
+        "appointment",
+        true,
+        null,
+        reason,
+        reason,
+        true,
+      ]),
+    ).rejects.toThrow(/manager required/);
+  });
+  it("binds creation retries to one immutable appointment and exact input", async () => {
+    const { a, child, facility } = await setup(),
+      args = createArgs(child, facility),
+      id = await rpc(a, "create_appointment", args);
+    expect(await rpc(a, "create_appointment", args)).toBe(id);
+    const changed = [...args];
+    changed[4] = "Changed label";
+    await expect(rpc(a, "create_appointment", changed)).rejects.toThrow(
+      /reused/,
+    );
+    expect(await rpc(a, "appointment_history", [child, id])).toMatchObject({
+      appointment: {
+        id,
+        revision: 1,
+        responsible_id: a.id,
+        effective_state: "missed",
+      },
+      events: [{ action: "created", professional_id: `APT-${a.id}` }],
+    });
+    await expect(
+      db.query(
+        "update public.appointments set purpose_label='Other' where id=$1",
+        [id],
+      ),
+    ).rejects.toThrow(/Append-only/);
+    await expect(
+      db.query(
+        "delete from public.appointment_events where appointment_id=$1",
+        [id],
+      ),
+    ).rejects.toThrow(/Append-only/);
+  });
+  it("validates local offsets, repeated Casablanca times, clock gaps and slot bounds", async () => {
+    const { a, child, facility } = await setup();
+    for (const [from, to] of [
+      ["2026-01-02T10:00:00+00:00", "2026-01-02T10:30:00+00:00"],
+      ["2025-04-06T02:15:00+00:00", "2025-04-06T02:45:00+00:00"],
+      ["2025-04-06T02:15:00+01:00", "2025-04-06T02:45:00+01:00"],
+      [start, start],
+      [end, start],
+      [start, "2026-01-04T10:30:00+01:00"],
+      ["2026-01-02T10:00:00", end],
+    ])
+      await expect(
+        rpc(
+          a,
+          "create_appointment",
+          createArgs(child, facility, null, from, to),
+        ),
+      ).rejects.toThrow();
+    for (const offset of ["+01:00", "+00:00"])
+      await rpc(
+        a,
+        "create_appointment",
+        createArgs(
+          child,
+          facility,
+          null,
+          `2025-02-23T02:15:00${offset}`,
+          `2025-02-23T02:45:00${offset}`,
+        ),
+      );
+    const r = await rpc<{ items: Row[]; total: number }>(
+      a,
+      "appointment_calendar",
+      ["2025-02-23", "2025-02-23"],
+    );
+    expect(r.total).toBe(2);
+  });
+  it("preserves the original missed slot, actor and old/new dates while rescheduling leaves the dose pending", async () => {
+    const { a, child, facility } = await setup(),
+      reference = await item(a, child, facility),
+      id = await rpc<string>(
+        a,
+        "create_appointment",
+        createArgs(child, facility, reference),
+      );
+    expect(
+      (await rpc<Work>(a, "appointment_worklist", ["missed_vaccinations"]))
+        .total,
+    ).toBe(1);
+    const args = decision(id, 1);
+    const result = await rpc(a, "change_appointment", args);
+    expect(await rpc(a, "change_appointment", args)).toBe(result);
+    const history = await rpc<History>(a, "appointment_history", [child, id]);
+    expect(history.events).toMatchObject([
+      { revision: 1, state: "scheduled" },
+      { revision: 2, state: "missed", professional_id: `APT-${a.id}` },
+      { revision: 3, action: "rescheduled", state: "scheduled", reason },
+    ]);
+    expect(new Date(history.events[2].previous_starts_at).toISOString()).toBe(
+      "2026-01-02T09:00:00.000Z",
+    );
+    expect(new Date(history.events[2].starts_at).toISOString()).toBe(
+      "2030-01-03T09:00:00.000Z",
+    );
+    expect(history.appointment).toMatchObject({
+      effective_state: "scheduled",
+      revision: 3,
+      documentation: null,
+    });
+    expect(
+      (await rpc<Work>(a, "appointment_worklist", ["missed_vaccinations"]))
+        .total,
+    ).toBe(0);
+    expect(
+      (
+        await rpc<{ items: { followup_state: string }[] }>(
+          a,
+          "vaccine_followup_worklist",
+        )
+      ).items[0].followup_state,
+    ).toBe("potentially_overdue_unconfirmed");
+    expect(await rpc(a, "clinical_export", [child])).toEqual([]);
+    await expect(
+      rpc(a, "change_appointment", decision(id, 1)),
+    ).rejects.toMatchObject({ code: "PT409" });
+  });
+  it("does not manufacture vaccine completion or miss a future slot; records non-vaccination visit dispositions", async () => {
+    const { a, child, facility } = await setup(),
+      reference = await item(a, child, facility),
+      vax = await rpc(
+        a,
+        "create_appointment",
+        createArgs(child, facility, reference),
+      );
+    await expect(
+      rpc(
+        a,
+        "change_appointment",
+        decision(String(vax), 1, "complete", null, null),
+      ),
+    ).rejects.toThrow(/document doses/);
+    const future = await rpc<string>(
+      a,
+      "create_appointment",
+      createArgs(child, facility, null, futureStart, futureEnd),
+    );
+    await expect(
+      rpc(
+        a,
+        "change_appointment",
+        decision(future, 1, "mark_missed", null, null),
+      ),
+    ).rejects.toThrow(/passed/);
+    await expect(
+      rpc(a, "change_appointment", decision(future, 1, "complete", null, null)),
+    ).rejects.toThrow(/past/);
+    await rpc(
+      a,
+      "change_appointment",
+      decision(future, 1, "cancel", null, null),
+    );
+    expect(
+      (await rpc<History>(a, "appointment_history", [child, future]))
+        .appointment.effective_state,
+    ).toBe("cancelled");
+    const past = await rpc<string>(
+      a,
+      "create_appointment",
+      createArgs(child, facility),
+    );
+    await rpc(
+      a,
+      "change_appointment",
+      decision(past, 1, "complete", null, null),
+    );
+    expect(
+      (await rpc<History>(a, "appointment_history", [child, past])).events,
+    ).toMatchObject([
+      { state: "scheduled" },
+      { state: "missed" },
+      { state: "completed" },
+    ]);
+    expect(await rpc(a, "clinical_export", [child])).toEqual([]);
+  });
+  it("prevents duplicate owner/item reminders and denies another doctor's appointment changes", async () => {
+    const { a, child, facility } = await setup(),
+      reference = await item(a, child, facility),
+      id = await rpc<string>(
+        a,
+        "create_appointment",
+        createArgs(child, facility, reference),
+      ),
+      b = await actor();
+    await link(a, b, child);
+    await expect(
+      rpc(a, "create_appointment", createArgs(child, facility, reference)),
+    ).rejects.toMatchObject({ code: "PT409", hint: "appointment_duplicate" });
+    const fb = await rpc<string>(b, "create_facility", [
+      randomUUID(),
+      "Centre B fictif",
+      "Rabat",
+    ]);
+    await rpc(b, "create_appointment", createArgs(child, fb, reference));
+    await expect(
+      rpc(b, "change_appointment", decision(id, 1, "cancel", null, null)),
+    ).rejects.toThrow(/Responsible/);
+    expect(
+      (await rpc<{ total: number }>(b, "patient_appointments", [child])).total,
+    ).toBe(2);
+    expect((await rpc<Work>(a, "appointment_worklist", ["all"])).total).toBe(1);
+    expect((await rpc<Work>(b, "appointment_worklist", ["all"])).total).toBe(1);
+  });
+  it("A's queue resolves B's qualifying dose while retaining an independent consultation and raw appointment history", async () => {
+    const { a, child, facility } = await setup(),
+      reference = await item(a, child, facility),
+      vax = await rpc<string>(
+        a,
+        "create_appointment",
+        createArgs(child, facility, reference),
+      );
+    const consultation = await rpc<string>(
+      a,
+      "create_appointment",
+      createArgs(child, facility, null, futureStart, futureEnd),
+    );
+    const b = await actor();
+    await link(a, b, child);
+    await cap(b, "vaccination");
+    const fb = await rpc<string>(b, "create_facility", [
+      randomUUID(),
+      "Centre B fictif",
+      "Rabat",
+    ]);
+    await rpc(b, "write_clinical_entry", dose(child, fb, reference));
+    const work = await rpc<Work>(a, "appointment_worklist", [
+      "resolved_by_other",
+    ]);
+    expect(work).toMatchObject({
+      total: 1,
+      counts: { missed_vaccinations: 0, resolved_by_other: 1 },
+      items: [
+        {
+          id: vax,
+          effective_state: "dose_documented",
+          state: "scheduled",
+          recorded_by_other: true,
+          documentation: { professional_id: `APT-${b.id}` },
+        },
+      ],
+    });
+    const history = await rpc<History>(a, "appointment_history", [child, vax]);
+    expect(history.events).toHaveLength(1);
+    expect(history.events[0].state).toBe("scheduled");
+    expect(
+      (await rpc<History>(a, "appointment_history", [child, consultation]))
+        .appointment.effective_state,
+    ).toBe("scheduled");
+    expect(
+      (
+        await rpc<{ items: { followup_state: string }[] }>(
+          a,
+          "vaccine_followup_worklist",
+        )
+      ).items[0].followup_state,
+    ).toBe("documented");
+    const overview = await rpc<{
+      last_documented_care: string;
+      next_own_appointment: Row;
+    }>(a, "patient_visit_overview", [child]);
+    expect(overview).toMatchObject({
+      last_documented_care: "2026-01-02",
+      next_own_appointment: { id: consultation },
+    });
+    const registry = await rpc<{
+      items: { last_documented_care: string; next_own_appointment: Row }[];
+    }>(a, "list_patients");
+    expect(registry.items[0]).toMatchObject(overview);
+  });
+  it("reopens an outstanding vaccine follow-up on correction/withdrawal and keeps explicit cancellations", async () => {
+    const { a, child, facility } = await setup(),
+      reference = await item(a, child, facility),
+      id = await rpc<string>(
+        a,
+        "create_appointment",
+        createArgs(child, facility, reference),
+      );
+    await cap(a, "vaccination");
+    const original = dose(child, facility, reference),
+      root = await rpc<string>(a, "write_clinical_entry", original);
+    expect(
+      (await rpc<History>(a, "appointment_history", [child, id])).appointment
+        .effective_state,
+    ).toBe("dose_documented");
+    await rpc(a, "write_clinical_entry", [
+      ...dose(child, facility),
+      root,
+      1,
+      reason,
+      "active",
+    ]);
+    expect(
+      (await rpc<Work>(a, "appointment_worklist", ["missed_vaccinations"]))
+        .total,
+    ).toBe(1);
+    await rpc(a, "write_clinical_entry", [
+      ...dose(child, facility, reference),
+      root,
+      2,
+      reason,
+      "active",
+    ]);
+    expect(
+      (await rpc<Work>(a, "appointment_worklist", ["missed_vaccinations"]))
+        .total,
+    ).toBe(0);
+    await rpc(a, "write_clinical_entry", [
+      ...dose(child, facility, reference),
+      root,
+      3,
+      reason,
+      "withdrawn",
+    ]);
+    expect(
+      (await rpc<Work>(a, "appointment_worklist", ["missed_vaccinations"]))
+        .total,
+    ).toBe(1);
+    await rpc(a, "change_appointment", decision(id, 1, "cancel", null, null));
+    await rpc(a, "write_clinical_entry", [
+      ...dose(child, facility, reference),
+      root,
+      4,
+      reason,
+      "active",
+    ]);
+    expect(
+      (await rpc<History>(a, "appointment_history", [child, id])).appointment
+        .effective_state,
+    ).toBe("cancelled");
+  });
+  it("keeps unknown history and potentially overdue references distinct from actual missed appointments", async () => {
+    const { a, child, facility } = await setup();
+    await item(a, child, facility);
+    expect(
+      (await rpc<Work>(a, "appointment_worklist", ["missed_vaccinations"]))
+        .total,
+    ).toBe(0);
+    expect(await rpc(a, "vaccine_followup_worklist")).toMatchObject({
+      total: 1,
+      counts: { potentially_overdue_unconfirmed: 1, unknown_history: 1 },
+      items: [
+        {
+          followup_state: "potentially_overdue_unconfirmed",
+          history_status: "unknown",
+        },
+      ],
+    });
+    const unknown = await setup(null);
+    await item(unknown.a, unknown.child, unknown.facility);
+    expect(await rpc(unknown.a, "vaccine_followup_worklist")).toMatchObject({
+      items: [
+        {
+          followup_state: "reference_review",
+          reference: {
+            state: "birth_date_uncertain",
+            start_on: null,
+            end_on: null,
+          },
+        },
+      ],
+    });
+  });
+  it("keeps SQL routine dates/windows equal to the reviewed date-only kernel, including leap/year/month ends", async () => {
+    const { a, child, facility } = await setup("2024-01-31"),
+      detail = await rpc<{ version: CatalogSnapshot }>(a, "vaccine_catalog", [
+        version,
+      ]);
+    for (const rule of detail.version.rules.filter(
+      (r) => r.automatic_scheduling && r.dose_code !== "HB1",
+    )) {
+      const id = await item(a, child, facility, rule.dose_code),
+        r = await db.query<{
+          value: {
+            state: string;
+            start_on: string;
+            end_on: string;
+            is_window: boolean;
+          };
+        }>("select private.item_reference($1) value", [id]);
+      const expected = routineReference(
+        {
+          doseCode: rule.dose_code,
+          vaccineCode: rule.vaccine_code,
+          age: rule.age,
+          eligibility: rule.eligibility,
+          automaticScheduling: rule.automatic_scheduling,
+        },
+        { birthDate: "2024-01-31", birthPrecision: "exact", sex: "female" },
+        { status: "approved", reviewVerified: true },
+      );
+      expect(r.rows[0].value).toEqual({
+        state: expected.state,
+        start_on: expected.startOn,
+        end_on: expected.endOn,
+        is_window: expected.isWindow,
+      });
+    }
+    const leap = await setup("2024-02-29"),
+      id = await item(leap.a, leap.child, leap.facility, "HPV");
+    const r = await db.query<{ value: { start_on: string } }>(
+      "select private.item_reference($1) value",
+      [id],
+    );
+    expect(r.rows[0].value.start_on).toBe("2035-02-28");
+  });
+  it("paginates full calendar/day counts and shared history without hiding totals or repeating rows", async () => {
+    const { a, child, facility } = await setup();
+    for (let n = 0; n < 55; n++)
+      await rpc(
+        a,
+        "create_appointment",
+        createArgs(child, facility, null, futureStart, futureEnd),
+      );
+    const one = await rpc<{
+        items: Row[];
+        total: number;
+        days: { day: string; count: number }[];
+      }>(a, "appointment_calendar", ["2030-01-01", "2030-01-31", 1]),
+      two = await rpc<{ items: Row[]; total: number }>(
+        a,
+        "appointment_calendar",
+        ["2030-01-01", "2030-01-31", 2],
+      );
+    expect(one).toMatchObject({
+      total: 55,
+      days: [{ day: "2030-01-03", count: 55 }],
+    });
+    expect(one.items).toHaveLength(50);
+    expect(two.items).toHaveLength(5);
+    expect(
+      new Set([...one.items, ...two.items].map((row) => row.id)).size,
+    ).toBe(55);
+    expect(
+      (
+        await rpc<{ items: Row[]; total: number }>(a, "patient_appointments", [
+          child,
+          2,
+        ])
+      ).items,
+    ).toHaveLength(25);
+    expect(await rpc(a, "appointments_export", [child])).toHaveLength(55);
+    await expect(
+      rpc(a, "appointment_calendar", ["2030-01-01", "2030-03-01"]),
+    ).rejects.toThrow(/Invalid calendar/);
+  });
+  it("fails complete export explicitly beyond the interactive limit", async () => {
+    const { a, child, facility } = await setup();
+    await db.query(
+      "insert into public.appointments(child_id,responsible_id,professional_id,facility_id,purpose,purpose_label) select $1,$2,$3,$4,'other','Fixture volumétrique' from generate_series(1,5001)",
+      [child, a.id, `APT-${a.id}`, facility],
+    );
+    await expect(rpc(a, "appointments_export", [child])).rejects.toMatchObject({
+      code: "54000",
+    });
+  });
+  it("cuts writes on capability/facility revocation and all child data on expired grants or logout", async () => {
+    const { a, child, facility } = await setup(),
+      id = await rpc<string>(
+        a,
+        "create_appointment",
+        createArgs(child, facility),
+      );
+    await cap(a, "appointment", false);
+    await expect(rpc(a, "change_appointment", decision(id, 1))).rejects.toThrow(
+      /capability/,
+    );
+    expect(
+      (await rpc<History>(a, "appointment_history", [child, id])).events,
+    ).toHaveLength(1);
+    await cap(a, "appointment");
+    await db.query(
+      "update public.professional_facilities set revoked_at=now() where professional_id=$1",
+      [a.id],
+    );
+    await expect(rpc(a, "change_appointment", decision(id, 1))).rejects.toThrow(
+      /practice/,
+    );
+    await db.query(
+      "update public.access_grants set expires_at=now()-interval '1 second' where child_id=$1",
+      [child],
+    );
+    await expect(rpc(a, "appointment_history", [child, id])).rejects.toThrow(
+      /denied/,
+    );
+    await expect(rpc(a, "appointments_export", [child])).rejects.toThrow(
+      /denied/,
+    );
+    expect((await rpc<Work>(a, "appointment_worklist", ["all"])).total).toBe(0);
+    await db.query("delete from auth.sessions where id=$1", [a.session]);
+    await expect(
+      rpc(a, "appointment_calendar", ["2030-01-01", "2030-01-31"]),
+    ).rejects.toThrow(/required/);
+  });
+  it("keeps retired-version mappings but requires review for withdrawn/ineligible references", async () => {
+    const { a, child, facility } = await setup(),
+      reference = await item(a, child, facility, "HPV");
+    await db.query("update public.children set sex='male' where id=$1", [
+      child,
+    ]);
+    await expect(
+      rpc(a, "create_appointment", createArgs(child, facility, reference)),
+    ).rejects.toThrow(/Active reviewed/);
+    const current = await setup(),
+      id = await item(current.a, current.child, current.facility);
+    await rpc(editor, "change_vaccine_catalog", [
+      randomUUID(),
+      "retire",
+      version,
+      2,
+      { reason, evidence_reference: reason },
+    ]);
+    const appointment = await rpc<string>(
+      current.a,
+      "create_appointment",
+      createArgs(current.child, current.facility, id),
+    );
+    expect(await rpc(current.a, "vaccine_followup_worklist")).toMatchObject({
+      items: [
+        {
+          followup_state: "reference_review",
+          reference: { state: "unreviewed_version", start_on: null },
+        },
+      ],
+    });
+    await cap(current.a, "vaccination");
+    await rpc(current.a, "change_vaccine_item", [
+      randomUUID(),
+      id,
+      1,
+      "withdrawn",
+      current.facility,
+      reason,
+      false,
+    ]);
+    expect(
+      (
+        await rpc<History>(current.a, "appointment_history", [
+          current.child,
+          appointment,
+        ])
+      ).appointment.effective_state,
+    ).toBe("reference_review");
+    await expect(
+      rpc(current.a, "change_appointment", decision(appointment, 1)),
+    ).rejects.toThrow(/Active reviewed/);
+  });
+});

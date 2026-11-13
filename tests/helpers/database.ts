@@ -100,3 +100,14 @@ export async function vaccinationDatabase() {
   );
   return db;
 }
+
+export async function appointmentDatabase() {
+  const db = await vaccinationDatabase();
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/20261113154648_appointments_continuity.sql",
+      "utf8",
+    ),
+  );
+  return db;
+}
