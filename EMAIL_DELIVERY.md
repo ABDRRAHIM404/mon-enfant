@@ -1,10 +1,12 @@
 # Mon Enfant email delivery
 
-Supabase remains the authentication/session authority. Signup confirmation and password recovery continue through its existing Auth APIs and callback routes. Resend is the proposed delivery provider; registering its MCP connection alone does not configure SMTP or prove email delivery.
+Supabase remains the authentication/session authority. Signup confirmation and password recovery continue through its existing Auth APIs and callback routes. Resend now delivers owner-only development mail through SMTP. Registering its MCP connection alone does not prove SMTP or mailbox delivery; the actual evidence is recorded below.
 
 ## Current connection and activation
 
-The official hosted MCP endpoint `https://mcp.resend.com/mcp` is registered in the owner's local Codex configuration. The owner subsequently reported connecting the official Resend plugin successfully, but its tools have not yet appeared in this conversation; the separate local CLI entry still reports not logged in. These are distinct connection states. No local Resend server/dependency install is needed. The owner confirmed that no sending domain is owned yet and that the Resend account uses the same authorized test mailbox. No Resend API key is currently available to the operator scripts. The existing hosted SMTP settings have therefore not been changed.
+The official hosted MCP endpoint `https://mcp.resend.com/mcp` is registered in the owner's local Codex configuration. The owner saved a sending-only key in the ignored private environment file; the credential helper supplies it without storing it in Codex's config. A named-client MCP initialization and `tools/list` succeeded with 139 tool definitions. No business/email tool was called during that check; tool inventory does not grant domain/account management permissions. The separate hosted plugin was reported connected by the owner but its native tools are not exposed to this running chat. No local Resend server/dependency stack was installed.
+
+Hosted Supabase Auth now uses `smtp.resend.com:465`, username `resend`, the shared `onboarding@resend.dev` test sender, a 30-email/project/hour limit and a 60-second recipient cooldown. Targeted readback verified confirmation requirements, Auth/session settings and existing templates preserved. This remains owner-only testing: no domain is owned/verified, so delivery to other doctors or parents is not enabled.
 
 The `scripts/resend-mcp-headers.py` helper supports the independent local HTTP MCP connection using the same sending key. It reads only `RESEND_API_KEY` from the process environment or an explicitly selected owner-private dotenv file, without executing shell expressions or loading other variables. Its stdout contains the Authorization header and must be consumed only by Codex's `http_headers_helper` mechanism or captured privately for validation; never print its output in tool logs. The Codex configuration stores only the helper command/path, never the key. Sending-only credentials do not authorize domain/account management tools. Local MCP configuration does not grant a hosted chat access to the separately connected plugin.
 
@@ -33,9 +35,15 @@ For a verified domain, `scripts/configure-resend.py` supports:
 
 SMTP uses `smtp.resend.com`, implicit TLS port 465, username `resend`, and the sending API key as password. Defaults are 30 Auth emails/project/hour and a 60-second same-recipient cooldown. Provider daily/monthly/rate quotas still apply; custom SMTP removes the built-in two-per-hour constraint, not all limits. Broader pilot use needs a quota/abuse review. The script refuses activation if a Send Email hook overrides SMTP or if the canonical Auth origin/confirmation setting differs from the expected configuration.
 
-After a successful hosted apply, synchronize the SMTP environment references and rates in `supabase/config.toml` before any later `supabase config push`; the current file still records the existing built-in sender configuration. Avoid a broad config push to perform this targeted mail change.
+The SMTP environment reference and rates in `supabase/config.toml` now match the hosted owner-only settings. Avoid a broad config push to change SMTP; use a targeted mail update so unrelated Auth configuration is preserved.
 
-## Required delivery evidence
+## Delivery evidence and remaining checks
+
+- GitHub SMTP authentication preflight passed: https://github.com/ABDRRAHIM404/mon-enfant/actions/runs/43433356100 . The local proxy returned HTTP 502 for the SMTP tunnel, so the actual SMTP check ran in the cloud.
+- One fixed, idempotency-keyed owner test was accepted by Resend SMTP and received in the owner's inbox: https://github.com/ABDRRAHIM404/mon-enfant/actions/runs/43433668990 . Dedicated temporary GitHub test secrets were removed after both runs completed.
+- After the hosted SMTP switch, the owner requested a fresh recovery email through the canonical app and reported that delivery, password reset and sign-in with the new password all worked. No password or token link was shared with the agent.
+- Fresh signup confirmation using the Resend sender, broader-recipient delivery, verified-domain tracking settings, bounce/complaint handling and the application-notification workflows remain unverified/incomplete. The existing real signup confirmation evidence predates the sender switch.
+
 
 After activation, use an owner-controlled mailbox and a single fresh link per test. Record provider acceptance and mailbox delivery separately. Do not put addresses, passwords, token URLs or mail contents in project logs. Confirm signup, recovery/new-password sign-in and invalid/reused link behavior on the canonical app. Request recovery in the browser that will open the link; PKCE browser proof and one-use tokens still apply with Resend. Check provider logs without printing message content, then review bounce/complaint handling and quota consumption.
 
