@@ -268,9 +268,22 @@ test("private evidence browser-to-storage boundary and review", async ({
     viewport: page.viewportSize() ?? undefined,
   });
   const reviewer = await reviewerContext.newPage();
+  let reviewerErrors = 0;
+  reviewer.on("pageerror", () => {
+    reviewerErrors++;
+  });
   await login(reviewer, "reviewer");
   await reviewer.goto("/admin/verifications");
   await reviewer.getByRole("link", { name: displayName, exact: true }).click();
+  expect(
+    await reviewer.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await reviewer.screenshot({
+    path: info.outputPath("verification-review.png"),
+    fullPage: true,
+  });
   const evidencePath = await reviewer
     .getByRole("link", { name: "Télécharger le justificatif privé" })
     .getAttribute("href");
@@ -344,6 +357,7 @@ test("private evidence browser-to-storage boundary and review", async ({
     fullPage: true,
   });
   expect(pageErrors).toBe(0);
+  expect(reviewerErrors).toBe(0);
   await reviewerContext.close();
   const proof = {
     mode: "evidence_acceptance",
@@ -353,6 +367,7 @@ test("private evidence browser-to-storage boundary and review", async ({
     public_read_denied: true,
     unrelated_download_denied: true,
     page_errors: pageErrors,
+    reviewer_page_errors: reviewerErrors,
   };
   writeFileSync(info.outputPath("evidence-proof.json"), JSON.stringify(proof));
   console.log(JSON.stringify(proof));

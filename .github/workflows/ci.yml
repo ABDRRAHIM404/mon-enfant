@@ -105,5 +105,6 @@ jobs:
           path: |
             test-results/live/**/verification-form.png
             test-results/live/**/verification-history.png
+            test-results/live/**/verification-review.png
             test-results/live/**/evidence-proof.json
           retention-days: 3
