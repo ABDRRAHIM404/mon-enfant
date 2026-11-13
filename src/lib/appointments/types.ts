@@ -90,7 +90,7 @@ export const appointmentStates: Record<AppointmentState, string> = {
   cancelled: "Annulé",
   completed: "Visite déclarée réalisée",
   dose_documented: "Dose documentée — suivi vaccinal résolu",
-  reference_review: "Référence retirée — suivi à réexaminer",
+  reference_review: "Référence ou éligibilité à réexaminer",
 };
 export const appointmentBuckets = {
   today: "Aujourd’hui",

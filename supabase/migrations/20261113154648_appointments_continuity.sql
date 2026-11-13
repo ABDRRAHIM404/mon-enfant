@@ -166,7 +166,7 @@ create trigger appointment_event_guard before insert on public.appointment_event
 create function private.appointment_rows(p_child_id uuid default null,p_owned_only boolean default true) returns setof jsonb
 language sql stable security definer set search_path='' as $$
  select to_jsonb(a)||jsonb_build_object('revision',e.revision,'event_id',e.id,'state',e.state,'starts_at',e.starts_at,'ends_at',e.ends_at,'starts_on',(e.starts_at at time zone 'Africa/Casablanca')::date,'reason',e.reason,'event_recorded_at',e.recorded_at,
- 'effective_state',case when e.state in ('cancelled','completed') then e.state when a.purpose='vaccination' and not private.vaccine_item_active(a.vaccine_item_id) then 'reference_review' when a.purpose='vaccination' and doc.data is not null then 'dose_documented' when e.state='missed' or e.ends_at<=now() then 'missed' else 'scheduled' end,
+ 'effective_state',case when e.state in ('cancelled','completed') then e.state when a.purpose='vaccination' and (not private.vaccine_item_active(a.vaccine_item_id) or (rule.eligibility='female' and c.sex<>'female')) then 'reference_review' when a.purpose='vaccination' and doc.data is not null then 'dose_documented' when e.state='missed' or e.ends_at<=now() then 'missed' else 'scheduled' end,
  'is_mine',a.responsible_id=auth.uid(),'documentation',doc.data,'recorded_by_other',coalesce((doc.data->>'author_id')::uuid<>a.responsible_id,false),
  'was_missed',exists(select 1 from public.appointment_events past where past.appointment_id=a.id and past.state='missed'),
  'facility_name',f.name,'child_given_name',c.given_name,'child_family_name',c.family_name,'universal_id',c.universal_id,'history_status',c.history_status,
@@ -174,6 +174,7 @@ language sql stable security definer set search_path='' as $$
  from public.appointments a join public.children c on c.id=a.child_id join public.facilities f on f.id=a.facility_id
  join lateral(select * from public.appointment_events where appointment_id=a.id order by revision desc limit 1) e on true
  left join public.child_vaccine_items i on i.id=a.vaccine_item_id left join public.vaccine_versions v on v.id=i.version_id
+ left join public.vaccine_rules rule on rule.version_id=i.version_id and rule.dose_code=i.dose_code
  left join lateral(select private.item_documentation(a.vaccine_item_id) data) doc on a.purpose='vaccination'
  where (not p_owned_only or a.responsible_id=auth.uid()) and (p_child_id is null or a.child_id=p_child_id) and private.can_access_child(a.child_id,false);
 $$;

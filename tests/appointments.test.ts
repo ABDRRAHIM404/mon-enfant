@@ -800,9 +800,23 @@ describe("appointments, independent clinical permissions and cross-doctor contin
   it("keeps retired-version mappings but requires review for withdrawn/ineligible references", async () => {
     const { a, child, facility } = await setup(),
       reference = await item(a, child, facility, "HPV");
+    const beforeChange = await rpc<string>(
+      a,
+      "create_appointment",
+      createArgs(child, facility, reference),
+    );
     await db.query("update public.children set sex='male' where id=$1", [
       child,
     ]);
+    expect(
+      (await rpc<History>(a, "appointment_history", [child, beforeChange]))
+        .appointment.effective_state,
+    ).toBe("reference_review");
+    expect(
+      (await rpc<Work>(a, "appointment_worklist", ["missed_vaccinations"]))
+        .total,
+    ).toBe(0);
+
     await expect(
       rpc(a, "create_appointment", createArgs(child, facility, reference)),
     ).rejects.toThrow(/Active reviewed/);
