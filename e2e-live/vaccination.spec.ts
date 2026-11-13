@@ -839,6 +839,7 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
     await a
       .getByRole("button", { name: "Se déconnecter", exact: true })
       .click();
+    await expect(a).toHaveURL(/\/login$/);
     await a.goto(vaccinePath);
     await expect(a).toHaveURL(/\/login$/);
     expect(pageErrors).toBe(0);
