@@ -53,6 +53,7 @@ export default async function Account() {
           <div className="notice">Votre compte ne dispose actuellement d’aucun accès clinique. Contactez un administrateur habilité pour toute question sur votre statut.</div>
         )}
         {canReview&&canManageClinical&&<p><Link className="text-link" href="/admin/clinical-permissions">Gérer les habilitations cliniques</Link></p>}
+        {canAccessClinicalWorkspace(profile)&&<p><Link className="text-link" href="/account/clinical-permissions">Mes habilitations cliniques</Link></p>}
         <p className="fine">Environnement de développement · Données et documents fictifs uniquement</p>
       </section>
     </main>

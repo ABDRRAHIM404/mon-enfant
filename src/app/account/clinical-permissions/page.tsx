@@ -1,0 +1,10 @@
+import Link from 'next/link';
+import { requireApprovedDoctor } from '@/lib/auth';
+import { DoctorNav } from '@/components/registry/doctor-nav';
+import { clinicalLabels,type ClinicalKind } from '@/lib/clinical/types';
+export const dynamic='force-dynamic';
+export default async function MyClinicalPermissions(){
+ const{user,supabase}=await requireApprovedDoctor();const[caps,history]=await Promise.all([supabase.rpc('my_clinical_capabilities'),supabase.rpc('clinical_capability_history',{p_professional_id:user.id})]);if(caps.error||history.error)throw new Error('Impossible de charger vos habilitations.');const active=caps.data as string[];const changes=history.data as {id:string;capability:string;enabled:boolean;expires_at:string|null;evidence_reference:string;reason:string;created_at:string}[];
+ function label(kind:string){return clinicalLabels[kind as ClinicalKind]||'Vaccination';}
+ return <main className="account-page wide"><DoctorNav/><div className="page-heading"><h1>Mes habilitations cliniques</h1><p className="muted">L’approbation du compte et l’autorisation de chaque activité sont distinctes. Une habilitation ne donne pas accès à un enfant sans autorisation de dossier.</p></div><section className="panel"><h2>Activités actuellement autorisées</h2>{active.length?<ul>{active.map(c=><li key={c}>{label(c)}</li>)}</ul>:<p>Aucune habilitation clinique active. Vous pouvez consulter vos dossiers autorisés ; contactez le responsable habilité pour un contrôle de qualification.</p>}<Link className="text-link" href="/account">Mon compte</Link></section><section className="panel"><h2>Historique des décisions</h2><div className="record-list">{changes.map(c=><article key={c.id}><h3>{label(c.capability)} — {c.enabled?'accordée':'révoquée'}</h3><p>{c.reason}</p><p>Source du contrôle : {c.evidence_reference}</p><p className="fine">{c.created_at}{c.expires_at?` · échéance ${c.expires_at}`:''}</p></article>)}{!changes.length&&<p className="empty-state">Aucune décision enregistrée.</p>}</div></section></main>;
+}
