@@ -125,3 +125,36 @@ describe('fully migrated patient registry',()=>{
     expect((await sessionActing(db,a.id,a.session,'select * from storage.objects')).rows).toEqual([]);
   });
 });
+
+describe('registry lifecycle edge cases',()=>{
+  it('reuses a link operation result without changing the child identity',async()=>{
+    const {a,child,profile,f}=await registered(),op=randomUUID();
+    const args=[op,profile.universal_id,f,2026,'NEXT','00078'];
+    expect(await call(a,'link_child',args)).toBe(child);
+    expect(await call(a,'link_child',args)).toBe(child);
+    expect(await call(a,'get_child_profile',[child])).toMatchObject({universal_id:profile.universal_id,registers:expect.arrayContaining([{facility_id:f,facility_name:'Centre fictif',year:2026,book:'NEXT',number:'00078'}])});
+    await expect(db.query('update public.children set universal_id=$1 where id=$2',[randomUUID(),child])).rejects.toThrow(/immutable/);
+  });
+  it('supports explicit management delegation and immediate suspension or grant expiry',async()=>{
+    const {a,child,profile}=await registered(),b=await actor(),f=await facility(b);
+    const request=await call(b,'request_child_access',[randomUUID(),profile.universal_id,f,2026,'B','78','Autorisation de test documentée.']);
+    await call(a,'decide_child_access',[request,true,'Délégation fictive contrôlée.',true,true]);
+    expect(await call(b,'get_child_profile',[child])).toMatchObject({can_manage_access:true});
+    expect(await call(b,'child_access_grants',[child])).toBeInstanceOf(Array);
+    await expect(call(b,'revoke_child_access',[child,b.id,'Tentative de retrait personnel.'])).rejects.toThrow(/handoff/);
+    await db.query("update public.professional_profiles set verification_status='suspended' where user_id=$1",[b.id]);
+    await expect(call(b,'get_child_profile',[child])).rejects.toThrow(/denied/);
+    await db.query("update public.professional_profiles set verification_status='approved' where user_id=$1",[b.id]);
+    await db.query("update public.access_grants set granted_at=now()-interval '2 hours',expires_at=now()-interval '1 hour' where child_id=$1 and professional_id=$2",[child,b.id]);
+    await expect(call(b,'get_child_profile',[child])).rejects.toThrow(/denied/);
+    expect(await call(b,'list_patients')).toMatchObject({items:[],total:0});
+  });
+  it('limits paged lists and literal-search filters to accessible associations',async()=>{
+    const a=await actor(),f=await facility(a);
+    for(let i=0;i<31;i++) await call(a,'register_child',[randomUUID(),{...payload(f,String(i)),given_name:`Fictif ${i}`}]);
+    const first=await call(a,'list_patients') as {items:{id:string}[];total:number};
+    const second=await call(a,'list_patients',['','all','all',2]) as {items:{id:string}[];total:number};
+    expect(first.total).toBe(31);expect(first.items).toHaveLength(30);expect(second.items).toHaveLength(1);expect(first.items.map(p=>p.id)).not.toContain(second.items[0].id);
+    expect(await call(a,'list_patients',['%','all','all',1])).toMatchObject({total:0});
+  });
+});

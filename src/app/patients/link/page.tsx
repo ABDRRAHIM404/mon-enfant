@@ -1,0 +1,13 @@
+import Link from 'next/link';
+import { randomUUID } from 'node:crypto';
+import { requireApprovedDoctor } from '@/lib/auth';
+import { DoctorNav } from '@/components/registry/doctor-nav';
+import { LinkForm } from '@/components/registry/forms';
+import type { Facility } from '@/lib/registry/types';
+export const dynamic='force-dynamic';
+export default async function LinkPatient({searchParams}:{searchParams:Promise<{mode?:string}>}) {
+  const {supabase}=await requireApprovedDoctor();const {mode}=await searchParams;const request=mode!=='authorized';
+  const {data,error}=await supabase.rpc('my_facilities');if(error) throw new Error('Impossible de charger les lieux d’exercice.');
+  const facilities=data as Facility[];
+  return <main className="account-page wide"><DoctorNav/><div className="page-heading"><h1>Rattacher un dossier existant</h1><p className="muted">Un même enfant conserve son identifiant universel entre les professionnels. Chaque professionnel conserve son numéro local.</p></div><div className="tabs"><Link href="/patients/link" aria-current={request?'page':undefined}>Demander un accès</Link><Link href="/patients/link?mode=authorized" aria-current={!request?'page':undefined}>J’ai déjà un accès</Link></div><section className="panel">{facilities.length?<LinkForm key={request?'request':'link'} operationId={randomUUID()} facilities={facilities} request={request}/>:<p>Déclarez d’abord un <Link className="text-link" href="/practices">lieu d’exercice</Link>.</p>}</section></main>;
+}

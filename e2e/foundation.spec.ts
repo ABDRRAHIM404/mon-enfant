@@ -27,7 +27,7 @@ test("landing, auth navigation, and explicit unconfigured state", async ({ page 
   ).toBe(true);
 });
 test("protected routes fail closed without Supabase", async ({ page }) => {
-  for (const path of ["/dashboard", "/account", "/verification", "/admin", "/auth/reset-password", "/admin/verifications", "/admin/professionals", "/admin/evidence/00000000-0000-4000-8000-000000000000"]) {
+  for (const path of ["/patients", "/patients/new", "/patients/link", "/patients/00000000-0000-4000-8000-000000000000", "/practices", "/access-requests", "/dashboard", "/account", "/verification", "/admin", "/auth/reset-password", "/admin/verifications", "/admin/professionals", "/admin/evidence/00000000-0000-4000-8000-000000000000"]) {
     await page.goto(path);
     await expect(page).toHaveURL(/\/login$/);
     await expect(
