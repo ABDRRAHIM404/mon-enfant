@@ -1,6 +1,6 @@
 # Development security boundaries
 
-This is a Phase 1 development foundation. Use fictional data only. No real patient pilot, legal certification, hosted database or deployment is implied.
+This is a Phase 1 development foundation. Use fictional data only. A dedicated synthetic-data Supabase project and Vercel development deployment are connected; this does not imply a real patient pilot or legal certification.
 
 ## Implemented
 
@@ -18,11 +18,11 @@ This is a Phase 1 development foundation. Use fictional data only. No real patie
 
 ## Required before phase completion / later rollout
 
-- Connect a synthetic-data Supabase stack and test actual sign-up, confirmation, login, refresh, logout, direct REST denial and role changes.
+- Finish actual sign-up, confirmation, login, refresh, logout and role-change integration checks. The hosted Auth health and anonymous REST denial checks already pass.
 - Before Phase 1 completion: private verification-evidence storage and submission. Phase 2 adds controlled review, reviewer permissions and decision audit; document retention remains an explicit decision.
 - Configure production Auth rate limits, bot controls and MFA/session policies after selecting hosting and the deployment threat model.
 - Expand transactional audit/corrections alongside clinical writes; restrict privileged service keys and operator access.
-- Run Supabase advisors, verify storage policies and permissions, and test full live RLS boundaries before deployment.
+- Verify future storage policies and full authenticated live RLS boundaries. The initial hosted security advisor returned no issues; rerun it after schema changes.
 - Agree on identity evidence verification sources, retention, session revocation, recovery and incident response.
 - Complete backups/recovery drills and security/accessibility review in Phase 6.
 - Obtain qualified Moroccan privacy/health-data advice and clinical/hosting sign-off before storing identifiable data, per the project baseline.

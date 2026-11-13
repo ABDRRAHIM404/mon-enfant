@@ -2,7 +2,15 @@
 
 Digital Moroccan child health booklet. The implementation follows [PROJECT_PLAN.md](PROJECT_PLAN.md) in phase order. Work is currently in **Phase 1 — Technical foundation**. Doctor verification/review, patient registration and clinical functions belong to subsequent phases.
 
-## Run locally
+## Development services
+
+- App: https://mon-enfant.vercel.app (Vercel protection is enabled).
+- Private source and CI: https://github.com/ABDRRAHIM404/mon-enfant
+- Supabase development: https://supabase.com/dashboard/project/zkkasbxvdvecnafgjpxd (Paris / `eu-west-3`).
+
+The initial schema is applied, all six public tables have RLS, and the live security advisor reports no warnings. App credentials are configured on Vercel. Use fictional data only. The owner prefers remote verification to keep their PC responsive.
+
+## Run locally (only when requested)
 
 Requires Node.js 24 and npm.
 
@@ -27,13 +35,11 @@ supabase migration up --local
 
 Check commands with `supabase <command> --help` for your installed version. Copy the local API URL and publishable key from the CLI output to `.env.local`, then restart Next.js. Never put a secret/service-role key in a `NEXT_PUBLIC_*` variable.
 
-Email confirmation is enabled in `supabase/config.toml`. In Auth settings, set the site URL to `http://localhost:3000` (or `http://127.0.0.1:3000`) and use this confirmation template:
+Email confirmation is enabled in `supabase/config.toml`. The connected development project's site URL is `https://mon-enfant.vercel.app`; localhost callback URLs are also allowed. For a separate local stack, set `auth.site_url` to your local origin and set `NEXT_PUBLIC_SITE_URL` in `.env.local` to the same origin.
 
-```html
-<a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup">Confirmer mon adresse</a>
-```
+The default Supabase confirmation email uses the PKCE flow. Sign-up sets `emailRedirectTo` to `/auth/callback`; the callback exchanges the code for a session using the signup browser's verifier cookie. Complete confirmation in the same browser that signed up. Cross-device onboarding needs a later supported token-hash/email-template flow. Free-tier default-email-provider projects cannot customize templates, so no paid SMTP dependency was added.
 
-For local development, retrieve confirmation mail in the local mail inbox reported by `supabase status`. Hosted development projects also need a confirmed sender/email setup and the same template. Configure password length to at least 12 characters. Sign up, confirm email, sign in, and initialize the unverified profile in `/account`. Approval is **not** available to users; the review workflow is Phase 2. Only a trusted database operator can provision test approval until that workflow exists.
+For local Supabase, retrieve mail in the inbox reported by `supabase status`. The remote default email provider has account/recipient restrictions; configure an appropriate sender before a wider pilot. Passwords require at least 12 characters. Sign up, confirm email, sign in, and activate the unverified professional profile in `/account`. Approval is **not** available to users; the review workflow is Phase 2. Only a trusted database operator can provision test approval until that workflow exists.
 
 Do not use identifiable patient data. See [SECURITY.md](SECURITY.md).
 

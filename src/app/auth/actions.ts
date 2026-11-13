@@ -42,7 +42,11 @@ export async function signUp(_: AuthState, form: FormData): Promise<AuthState> {
         "Indiquez un e-mail valide et un mot de passe de 12 à 128 caractères.",
     };
   const client = await createClient();
-  const { error } = await client.auth.signUp(input);
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const { error } = await client.auth.signUp({
+    ...input,
+    options: { emailRedirectTo: new URL("/auth/callback", siteUrl).toString() },
+  });
   if (error)
     return {
       error: "Inscription indisponible. Réessayez dans quelques instants.",

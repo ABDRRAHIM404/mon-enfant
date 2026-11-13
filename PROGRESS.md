@@ -22,13 +22,18 @@ The supplied requirements, roadmap and 25-dose source files are the development 
 
 ## Phase 1 — Still required before exit criteria are met
 
-- Run the complete Supabase stack locally or connect a dedicated synthetic-data development project; configure environment and email confirmation.
+- Complete the real email-confirmation/session lifecycle smoke test against the connected development project.
 - Verify real Auth email/sign-in/refresh/logout, profile initialization through PostgREST, live API denial and suspension behavior. Isolated PostgreSQL tests do not prove the hosted integration.
-- Run Supabase database advisors and apply any findings in that environment.
 - Create private verification-evidence storage and the minimal submission workflow required by Phase 1, before any documents are accepted. Admin review screens remain Phase 2.
 - Establish staging and privacy-preserving operational error monitoring before external use.
 
-No hosted Supabase project or deployment has been created. The private GitHub repository is https://github.com/ABDRRAHIM404/mon-enfant. Docker is unavailable in the current execution environment. Phase 1 is not marked complete.
+Connected services:
+- Private GitHub: https://github.com/ABDRRAHIM404/mon-enfant
+- Vercel project: `mon-enfant`, Node.js 24, Git-linked remote builds, deployment protection enabled. Initial deployment passed.
+- Supabase: `mon-enfant` / `zkkasbxvdvecnafgjpxd`, healthy in Paris (`eu-west-3`). The initial migration was applied and the CLI is linked. Public app configuration is installed in Vercel and in ignored `.env.local`; the database password is stored only in the owner-readable local file.
+- Auth configuration uses email confirmation, minimum 12-character passwords, the hosted origin and exact callback allowlist. The default confirmation template is retained on the free plan; PKCE callback support was added.
+
+Docker is unavailable locally; no Docker installation or local stack was started. Phase 1 is not marked complete.
 
 ## Verification
 
@@ -36,7 +41,8 @@ No hosted Supabase project or deployment has been created. The private GitHub re
 - `npm run typecheck`: passed.
 - `npm test`: 29 tests passed across authorization and actual PostgreSQL/RLS suites. The first cold run hit a database-startup timeout; the successful rerun used a longer setup timeout and one worker.
 - `npm run build`: passed with Next.js 16.4.6.
-- Browser checks: stopped at the user’s request to reduce PC load; no passing local browser result is claimed. The desktop/mobile suite will run in GitHub Actions.
+- Local browser checks were stopped at the user’s request. The first remote CI run passed five browser cases and found an ambiguous alert selector in one mobile case; the selector is fixed and the updated suite adds default-email PKCE callback denial coverage. Remote rerun pending.
+- Live Supabase checks: Auth health HTTP 200; anonymous children/profile REST reads HTTP 401 (`42501`); RLS enabled on all six tables; security advisor returned no issues.
 - All owned local development/browser processes were stopped. Future heavy checks/builds run remotely; local work stays lightweight.
 
 ## Next ordered milestone

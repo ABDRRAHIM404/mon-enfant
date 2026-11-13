@@ -25,3 +25,9 @@ CI runs lint, typecheck, database/unit tests, a production build and desktop/mob
 ## 13 November 2026 — Remote verification preference
 
 The user asked to keep their PC responsive and use GitHub/Vercel for heavy work. Local builds/tests/browser servers have been stopped. Future full verification runs in GitHub Actions, with Vercel available for remote preview builds. Local work is limited to small edits, reads and Git operations. This preference is also recorded in AGENTS.md.
+
+## 13 November 2026 — Connected development services
+
+Created the private GitHub repository, linked Vercel project `mon-enfant` (Node.js 24, default deployment protection retained), and created a dedicated Supabase development project `zkkasbxvdvecnafgjpxd` in the existing organization, Paris (`eu-west-3`). Applied the foundation migration and checked live RLS/anonymous denial and database advisors. This region is for fictional-data development; regulated hosting approval is still open.
+
+Only Supabase public client configuration is provided to the web app. The generated database password stays in ignored, owner-readable `.env.local`. No service-role key is provided to Next.js. The free plan does not allow custom templates with the default email provider, so sign-up uses the built-in confirmation email and same-browser PKCE `/auth/callback` route. No paid plan or SMTP dependency was enabled.

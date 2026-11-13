@@ -1,6 +1,6 @@
 # Phase 1 database foundation
 
-Migration: `supabase/migrations/20261113021114_foundation.sql`.
+Migration: `supabase/migrations/20261113021114_foundation.sql`. Applied to the dedicated development project `zkkasbxvdvecnafgjpxd`; live RLS flags and anonymous denial verified, with no security-advisor issues.
 
 | Table | Purpose | Authenticated API access |
 | --- | --- | --- |

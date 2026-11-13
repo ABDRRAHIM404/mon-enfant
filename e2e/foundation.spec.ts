@@ -40,5 +40,11 @@ test("invalid confirmation tokens return to login with feedback", async ({
 }) => {
   await page.goto("/auth/confirm?token_hash=invalid&type=signup");
   await expect(page).toHaveURL(/confirmation=invalid/);
-  await expect(page.getByRole("alert")).toContainText("invalide ou a expiré");
+  await expect(page.getByRole("alert").filter({ hasText: "Le lien de confirmation" })).toContainText("invalide ou a expiré");
+});
+
+test("missing PKCE callback codes fail closed", async ({ page }) => {
+  await page.goto("/auth/callback");
+  await expect(page).toHaveURL(/confirmation=invalid/);
+  await expect(page.getByRole("alert").filter({ hasText: "Le lien de confirmation" })).toContainText("invalide ou a expiré");
 });
