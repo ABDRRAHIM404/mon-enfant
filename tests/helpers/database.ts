@@ -22,3 +22,17 @@ export async function acting(db:PGlite,user:string,sql:string) {
   await db.exec("set role authenticated");
   try { return await db.query(sql); } finally { await db.exec("reset role"); }
 }
+
+export async function registryDatabase() {
+  const db = await verificationDatabase();
+  await db.exec(`create table auth.sessions(id uuid primary key,user_id uuid not null references auth.users(id),not_after timestamptz);
+    create or replace function auth.jwt() returns jsonb language sql stable as $$
+      select jsonb_build_object('is_anonymous',false,'session_id',nullif(current_setting('request.jwt.claim.session_id',true),'')) $$;`);
+  await db.exec(readFileSync('supabase/migrations/20261113042732_patient_registry.sql','utf8'));
+  return db;
+}
+export async function sessionActing(db:PGlite,user:string,session:string,sql:string,params:unknown[] = []) {
+  await db.query("select set_config('request.jwt.claim.sub',$1,false),set_config('request.jwt.claim.session_id',$2,false)",[user,session]);
+  await db.exec('set role authenticated');
+  try { return await db.query(sql,params); } finally { await db.exec('reset role'); }
+}
