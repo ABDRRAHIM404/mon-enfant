@@ -5,8 +5,10 @@
 domain, SMTP authentication and hosted settings without modifying them. --apply
 does the same preflight, PATCHes only mail configuration, and verifies the result.
 Only --send-owner-test sends email: one fixed non-clinical SMTP test to the
-Resend account owner's address. It never changes Supabase. All other modes send
-no email. Do not run with HTTP debug logging enabled.
+Resend account owner's address. It never changes Supabase. --apply-owner-auth
+explicitly configures the synthetic app's Auth sender for owner-only testing;
+other recipients still need a verified domain. All setup modes send no email.
+Do not run with HTTP debug logging enabled.
 """
 import argparse
 import http.client
@@ -162,17 +164,24 @@ def owner_test(env, send=False):
     print("Provider acceptance is not mailbox-delivery proof; confirm receipt privately.")
 
 
-def configure(env, apply=False):
-    mail = settings(env)
+def configure(env, apply=False, owner_only=False):
+    if owner_only:
+        recipient = required(env, "RESEND_TEST_RECIPIENT")
+        if not ADDRESS.fullmatch(recipient):
+            raise SetupError("Owner-only Auth testing needs the Resend account owner's single email address.")
+        mail = settings({**env, "MAIL_FROM_EMAIL": TEST_SENDER})
+    else:
+        mail = settings(env)
     token = required(env, "SUPABASE_ACCESS_TOKEN")
-    domain_id = required(env, "RESEND_DOMAIN_ID")
-    if not re.fullmatch(r"[0-9a-fA-F-]{36}", domain_id):
-        raise SetupError("RESEND_DOMAIN_ID must be the verified domain's UUID.")
-    # Keep the domain-management credential operator-only. A domain-restricted
-    # sending key is used as the SMTP password and never shipped to the browser.
-    admin = required(env, "RESEND_ADMIN_API_KEY")
-    domain = request_json("https://api.resend.com/domains/" + domain_id, admin)
-    validate_domain(domain, mail["smtp_admin_email"])
+    if not owner_only:
+        domain_id = required(env, "RESEND_DOMAIN_ID")
+        if not re.fullmatch(r"[0-9a-fA-F-]{36}", domain_id):
+            raise SetupError("RESEND_DOMAIN_ID must be the verified domain's UUID.")
+        # Keep the domain-management credential operator-only. A domain-restricted
+        # sending key is used as the SMTP password and never shipped to the browser.
+        admin = required(env, "RESEND_ADMIN_API_KEY")
+        domain = request_json("https://api.resend.com/domains/" + domain_id, admin)
+        validate_domain(domain, mail["smtp_admin_email"])
     verify_smtp(mail["smtp_pass"])
     before = request_json(AUTH_URL, token)
     if before.get("site_url") != SITE or before.get("mailer_autoconfirm") is not False:
@@ -195,8 +204,11 @@ def configure(env, apply=False):
         # Print only connection/limit state; do not print even the sender address.
         actual.pop("smtp_admin_email", None)
         actual.pop("smtp_sender_name", None)
-        print("PASS: verified sender domain, tracking disabled and SMTP TLS/authentication accepted.")
+        print("PASS: owner-only test sender and SMTP TLS/authentication checked." if owner_only else
+            "PASS: verified sender domain, tracking disabled and SMTP TLS/authentication accepted.")
         print("Current hosted mail settings:", json.dumps(actual, sort_keys=True))
+    if owner_only:
+        print("OWNER-ONLY TEST MODE: Resend restricts the shared sender to its account owner's inbox. Other recipients require a verified domain.")
     print("No email sent. Real signup/recovery delivery still requires a mailbox walkthrough.")
 
 
@@ -208,19 +220,23 @@ def main():
     modes.add_argument("--apply", action="store_true")
     modes.add_argument("--check-owner-test", action="store_true")
     modes.add_argument("--send-owner-test", action="store_true")
+    modes.add_argument("--check-owner-auth", action="store_true")
+    modes.add_argument("--apply-owner-auth", action="store_true")
     args = parser.parse_args()
     if args.plan:
         print("Target: Mon Enfant hosted Supabase Auth; Resend SMTP over TLS on port 465.")
         print("Default limits: 30 Auth emails/hour; 60-second recipient cooldown. Provider quotas also apply.")
         print("Required environment names: RESEND_API_KEY, RESEND_ADMIN_API_KEY, RESEND_DOMAIN_ID, MAIL_FROM_EMAIL, SUPABASE_ACCESS_TOKEN.")
         print("Without a domain: --check-owner-test needs RESEND_API_KEY; --send-owner-test additionally needs RESEND_TEST_RECIPIENT and a retained RESEND_SMOKE_OPERATION_ID UUID.")
+        print("Owner-only Auth setup: --check-owner-auth / --apply-owner-auth also need RESEND_TEST_RECIPIENT and SUPABASE_ACCESS_TOKEN; shared sender is forced to onboarding@resend.dev.")
         print("No network calls, changes or email sent.")
         return 0
     try:
         if args.check_owner_test or args.send_owner_test:
             owner_test(os.environ, send=args.send_owner_test)
         else:
-            configure(os.environ, args.apply)
+            configure(os.environ, apply=args.apply or args.apply_owner_auth,
+                owner_only=args.check_owner_auth or args.apply_owner_auth)
         return 0
     except SetupError as error:
         print("SETUP PENDING:", str(error), file=sys.stderr)

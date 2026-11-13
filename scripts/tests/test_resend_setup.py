@@ -63,6 +63,26 @@ class ResendSetupTests(unittest.TestCase):
         with patch.object(setup, "request_json", side_effect=[DOMAIN, BEFORE, {}, changed]), patch.object(setup, "verify_smtp"), self.assertRaisesRegex(setup.SetupError, "changed unexpectedly"):
             setup.configure(ENV, apply=True)
 
+    def test_owner_auth_mode_forces_the_shared_sender_without_domain_admin_credentials(self):
+        owner = {"RESEND_API_KEY": "synthetic-sending-key", "RESEND_TEST_RECIPIENT": "owner@example.invalid",
+            "SUPABASE_ACCESS_TOKEN": "synthetic-management-key", "MAIL_FROM_EMAIL": "unverified@example.invalid"}
+        mail = setup.settings({**owner, "MAIL_FROM_EMAIL": setup.TEST_SENDER})
+        output = io.StringIO()
+        with patch.object(setup, "request_json", side_effect=[BEFORE, {}, {**BEFORE, **mail}]) as request, patch.object(setup, "verify_smtp"), contextlib.redirect_stdout(output):
+            setup.configure(owner, apply=True, owner_only=True)
+        patch_call = request.call_args_list[1]
+        self.assertEqual(patch_call.args[2], "PATCH")
+        self.assertEqual(patch_call.args[3]["smtp_admin_email"], "onboarding@resend.dev")
+        self.assertTrue(all(c.args[0] == setup.AUTH_URL for c in request.call_args_list))
+        self.assertIn("OWNER-ONLY TEST MODE", output.getvalue())
+        self.assertNotIn(owner["RESEND_TEST_RECIPIENT"], output.getvalue())
+
+    def test_owner_auth_mode_rejects_missing_or_multiple_recipients_before_network(self):
+        for recipient in ["", "owner@example.invalid,other@example.invalid"]:
+            with patch.object(setup, "request_json") as request, self.assertRaises(setup.SetupError):
+                setup.configure({"RESEND_TEST_RECIPIENT": recipient}, apply=True, owner_only=True)
+            request.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()
