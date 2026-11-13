@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { appointmentTime } from "@/lib/appointments/calendar";
 import { notFound } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
 import { DoctorNav } from "@/components/registry/doctor-nav";
@@ -20,12 +21,23 @@ export default async function PatientProfile({
   const { supabase } = await requireApprovedDoctor();
   const { id } = await params;
   if (!uuidPattern.test(id)) notFound();
-  const { data, error } = await supabase.rpc("get_child_profile", {
-    p_child_id: id,
-  });
-  if (error?.code === "42501" || (!data && !error)) notFound();
-  if (error) throw new Error("Impossible de charger ce dossier.");
+  const [{ data, error }, visits] = await Promise.all([
+    supabase.rpc("get_child_profile", { p_child_id: id }),
+    supabase.rpc("patient_visit_overview", { p_child_id: id }),
+  ]);
+  if (
+    error?.code === "42501" ||
+    visits.error?.code === "42501" ||
+    (!data && !error)
+  )
+    notFound();
+  if (error || visits.error)
+    throw new Error("Impossible de charger ce dossier.");
   const child = data as ChildProfile;
+  const overview = visits.data as {
+    last_documented_care: string | null;
+    next_own_appointment: { starts_at: string } | null;
+  };
   let grants: AccessGrant[] = [];
   if (child.can_manage_access) {
     const result = await supabase.rpc("child_access_grants", {
@@ -53,6 +65,20 @@ export default async function PatientProfile({
         <Link href={`/patients/${id}/growth`}>Croissance</Link>
         <Link href={`/patients/${id}/summary`}>Résumé et impression</Link>
       </div>
+      <section className="panel">
+        <h2>Continuité des soins</h2>
+        <p>
+          Dernier soin documenté :{" "}
+          {overview.last_documented_care || "non documenté"}.
+        </p>
+        <p>
+          Mon prochain rendez-vous :{" "}
+          {overview.next_own_appointment
+            ? appointmentTime(overview.next_own_appointment.starts_at)
+            : "non planifié"}
+          .
+        </p>
+      </section>
       <div className="two-columns">
         <section className="panel">
           <h2>Identité et provenance</h2>

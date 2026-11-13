@@ -212,7 +212,7 @@ try:
     status2,retained_history=rpc(a,'clinical_entry_history',{'p_child_id':child,'p_root_id':retained})
     check(status==400 and status2==200 and retained_history[0]['vaccine_mapping']['version_id']==version,'Retirement prevents new assignments while retaining original administration mappings')
     _,content,headers=a['web'].get(f'/patients/{child}/export');export=json.loads(content)
-    check(export['format']=='mon-enfant-clinical-ledger-v2' and export['vaccination_module_included'] and len(export['clinical_entries'])==6 and len(export['vaccine_items_including_all_decisions'])==2 and len(export['vaccine_items_including_all_decisions'][0]['changes'])==3 and 'no-store' in headers.get('Cache-Control',''),'Private JSON export includes all vaccine revisions, mappings and intended-item decisions')
+    check(export['format']=='mon-enfant-clinical-ledger-v3' and export['appointments_including_all_events']==[] and export['vaccination_module_included'] and len(export['clinical_entries'])==6 and len(export['vaccine_items_including_all_decisions'])==2 and len(export['vaccine_items_including_all_decisions'][0]['changes'])==3 and 'no-store' in headers.get('Cache-Control',''),'Private JSON export includes all vaccine revisions, mappings and intended-item decisions')
     _,page,_=a['web'].get(f'/patients/{child}/summary')
     check('Références vaccinales et toutes leurs décisions' in page and a['platform'] in page and b['platform'] in page,'Printable summary retains both authors and reference decision history')
     sql(f"update public.professional_capabilities set enabled=false where professional_id='{a['id']}'")

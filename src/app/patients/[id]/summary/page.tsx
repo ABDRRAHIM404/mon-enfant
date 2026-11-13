@@ -1,4 +1,10 @@
 import Link from "next/link";
+import { AppointmentCard } from "@/components/appointments/card";
+import { appointmentTime } from "@/lib/appointments/calendar";
+import type {
+  AppointmentRow,
+  AppointmentEvent,
+} from "@/lib/appointments/types";
 import { notFound } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
 import { DoctorNav } from "@/components/registry/doctor-nav";
@@ -21,18 +27,24 @@ export default async function Summary({
   const { supabase } = await requireApprovedDoctor();
   const { id } = await params;
   if (!uuidPattern.test(id)) notFound();
-  const [profile, ledger, vaccines] = await Promise.all([
+  const [profile, ledger, vaccines, appointments] = await Promise.all([
     supabase.rpc("get_child_profile", { p_child_id: id }),
     supabase.rpc("clinical_export", { p_child_id: id }),
     supabase.rpc("vaccine_items_export", { p_child_id: id }),
+    supabase.rpc("appointments_export", { p_child_id: id }),
   ]);
   if (
     profile.error?.code === "42501" ||
     ledger.error?.code === "42501" ||
-    vaccines.error?.code === "42501"
+    vaccines.error?.code === "42501" ||
+    appointments.error?.code === "42501"
   )
     notFound();
-  if (ledger.error?.code === "54000" || vaccines.error?.code === "54000")
+  if (
+    ledger.error?.code === "54000" ||
+    vaccines.error?.code === "54000" ||
+    appointments.error?.code === "54000"
+  )
     return (
       <main className="account-page wide">
         <DoctorNav />
@@ -46,7 +58,7 @@ export default async function Summary({
         </section>
       </main>
     );
-  if (profile.error || ledger.error || vaccines.error)
+  if (profile.error || ledger.error || vaccines.error || appointments.error)
     throw new Error("Impossible de générer le résumé.");
   const child = profile.data as ChildProfile,
     entries = ledger.data as ClinicalEntry[];
@@ -102,6 +114,35 @@ export default async function Summary({
         ))}
         {!(vaccines.data as VaccineItemExport[]).length && (
           <p>Aucune référence assignée.</p>
+        )}
+      </section>
+      <section className="panel">
+        <h2>Rendez-vous et toutes leurs décisions</h2>
+        {(
+          appointments.data as (AppointmentRow & {
+            events: AppointmentEvent[];
+          })[]
+        ).map((appointment) => (
+          <article key={appointment.id}>
+            <AppointmentCard appointment={appointment} link={false} />
+            <ul>
+              {appointment.events.map((event) => (
+                <li key={event.id}>
+                  Révision {event.revision} · {event.action} ·{" "}
+                  {appointmentTime(event.starts_at)} →{" "}
+                  {appointmentTime(event.ends_at)}
+                  {event.previous_starts_at
+                    ? ` · ancien début ${appointmentTime(event.previous_starts_at)}`
+                    : ""}{" "}
+                  · {event.reason} · {event.professional_id} ·{" "}
+                  {event.recorded_at}
+                </li>
+              ))}
+            </ul>
+          </article>
+        ))}
+        {!(appointments.data as unknown[]).length && (
+          <p>Aucun rendez-vous documenté.</p>
         )}
       </section>
       {entries.length ? (

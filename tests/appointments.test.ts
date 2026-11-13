@@ -2,6 +2,7 @@ import { beforeAll, afterAll, describe, it, expect } from "vitest";
 import { randomUUID } from "node:crypto";
 import type { PGlite } from "@electric-sql/pglite";
 import { appointmentDatabase, sessionActing } from "./helpers/database";
+import { resolveAppointmentTime } from "../src/lib/appointments/calendar";
 import { routineReference } from "../src/lib/vaccines/calendar";
 import type { CatalogSnapshot } from "../src/lib/vaccines/types";
 let db: PGlite, version: string, seed: string, editor: Actor, reviewer: Actor;
@@ -32,8 +33,8 @@ type History = { appointment: Row; events: Event[] };
 const reason = "Décision fictive relue sans valeur clinique.";
 const start = "2026-01-02T10:00:00+01:00",
   end = "2026-01-02T10:30:00+01:00";
-const futureStart = "2030-01-03T10:00:00+01:00",
-  futureEnd = "2030-01-03T10:30:00+01:00";
+const futureStart = resolveAppointmentTime("2030-01-03T10:00"),
+  futureEnd = resolveAppointmentTime("2030-01-03T10:30");
 async function actor(
   role = "doctor",
   status = "approved",
@@ -396,7 +397,7 @@ describe("appointments, independent clinical permissions and cross-doctor contin
       "2026-01-02T09:00:00.000Z",
     );
     expect(new Date(history.events[2].starts_at).toISOString()).toBe(
-      "2030-01-03T09:00:00.000Z",
+      new Date(futureStart).toISOString(),
     );
     expect(history.appointment).toMatchObject({
       effective_state: "scheduled",
@@ -781,7 +782,7 @@ describe("appointments, independent clinical permissions and cross-doctor contin
       /facility/,
     );
     await db.query(
-      "update public.access_grants set expires_at=now()-interval '1 second' where child_id=$1",
+      "update public.access_grants set granted_at=now()-interval '2 days',expires_at=now()-interval '1 second' where child_id=$1",
       [child],
     );
     await expect(rpc(a, "appointment_history", [child, id])).rejects.toThrow(

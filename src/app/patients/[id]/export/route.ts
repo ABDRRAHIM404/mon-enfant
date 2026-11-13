@@ -18,35 +18,43 @@ export async function GET(
       { error: "Dossier indisponible." },
       { status: 404, headers },
     );
-  const [profile, ledger, vaccines] = await Promise.all([
+  const [profile, ledger, vaccines, appointments] = await Promise.all([
     supabase.rpc("get_child_profile", { p_child_id: id }),
     supabase.rpc("clinical_export", { p_child_id: id }),
     supabase.rpc("vaccine_items_export", { p_child_id: id }),
+    supabase.rpc("appointments_export", { p_child_id: id }),
   ]);
   if (
     profile.error?.code === "42501" ||
     ledger.error?.code === "42501" ||
-    vaccines.error?.code === "42501"
+    vaccines.error?.code === "42501" ||
+    appointments.error?.code === "42501"
   )
     return NextResponse.json(
       { error: "Dossier indisponible." },
       { status: 404, headers },
     );
-  if (profile.error || ledger.error || vaccines.error) {
+  if (profile.error || ledger.error || vaccines.error || appointments.error) {
     const reference =
-      ledger.error?.code === "54000" || vaccines.error?.code === "54000"
+      ledger.error?.code === "54000" ||
+      vaccines.error?.code === "54000" ||
+      appointments.error?.code === "54000"
         ? null
         : reportOperationalEvent("clinical_export_failed");
     return NextResponse.json(
       {
         error:
-          ledger.error?.code === "54000" || vaccines.error?.code === "54000"
+          ledger.error?.code === "54000" ||
+          vaccines.error?.code === "54000" ||
+          appointments.error?.code === "54000"
             ? "La limite interactive est dépassée. Utilisez une procédure d’export autorisée avec un périmètre convenu."
             : `Export indisponible. Référence : ${reference}`,
       },
       {
         status:
-          ledger.error?.code === "54000" || vaccines.error?.code === "54000"
+          ledger.error?.code === "54000" ||
+          vaccines.error?.code === "54000" ||
+          appointments.error?.code === "54000"
             ? 413
             : 503,
         headers,
@@ -54,12 +62,14 @@ export async function GET(
     );
   }
   const metadata = {
-    format: "mon-enfant-clinical-ledger-v2",
+    format: "mon-enfant-clinical-ledger-v3",
     generated_at: new Date().toISOString(),
     synthetic_environment: true,
-    scope: "demographics_and_clinical_entries_including_all_amendments",
+    scope:
+      "demographics_clinical_entries_references_and_appointments_with_all_revisions",
     vaccination_module_included: true,
     vaccine_items_including_all_decisions: vaccines.data,
+    appointments_including_all_events: appointments.data,
     child: profile.data,
   };
   const entries = ledger.data as unknown[];
