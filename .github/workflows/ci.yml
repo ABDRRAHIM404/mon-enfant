@@ -9,18 +9,27 @@ on:
         type: choice
         options: [none, check, send]
         default: none
+      live_probe:
+        description: Explicit synthetic authenticated cloud-browser check (never sends email)
+        type: choice
+        options: [none, evidence-reproduce, evidence-accept]
+        default: none
+      fixture_run:
+        description: Prepared synthetic readiness fixture run (16 hex characters)
+        type: string
+        default: ""
       operation_id:
         description: Retained UUID for the single owner test message (send only)
         type: string
         default: ""
 concurrency:
-  group: ci-${{ github.ref }}-${{ github.event_name == 'workflow_dispatch' && inputs.mail_probe != 'none' && 'mail' || 'app' }}
-  cancel-in-progress: true
+  group: ci-${{ github.ref }}-${{ github.event_name == 'workflow_dispatch' && inputs.live_probe != 'none' && inputs.live_probe != '' && 'live' || github.event_name == 'workflow_dispatch' && inputs.mail_probe != 'none' && 'mail' || 'app' }}
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' || inputs.live_probe == 'none' || inputs.live_probe == '' }}
 permissions:
   contents: read
 jobs:
   checks:
-    if: github.event_name != 'workflow_dispatch' || inputs.mail_probe == 'none'
+    if: github.event_name != 'workflow_dispatch' || (inputs.mail_probe == 'none' && (inputs.live_probe == 'none' || inputs.live_probe == ''))
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -62,3 +71,36 @@ jobs:
       - name: Send one owner-only SMTP test with a retained idempotency key
         if: inputs.mail_probe == 'send'
         run: python3 scripts/configure-resend.py --send-owner-test
+
+  live-browser:
+    if: github.event_name == 'workflow_dispatch' && inputs.live_probe != 'none' && inputs.live_probe != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+      MON_ENFANT_LIVE_PROBE: ${{ inputs.live_probe }}
+      MON_ENFANT_QA_RUN: ${{ inputs.fixture_run }}
+      MON_ENFANT_READINESS_DESKTOP_EMAIL: ${{ secrets.MON_ENFANT_READINESS_DESKTOP_EMAIL }}
+      MON_ENFANT_READINESS_DESKTOP_PASSWORD: ${{ secrets.MON_ENFANT_READINESS_DESKTOP_PASSWORD }}
+      MON_ENFANT_READINESS_TABLET_EMAIL: ${{ secrets.MON_ENFANT_READINESS_TABLET_EMAIL }}
+      MON_ENFANT_READINESS_TABLET_PASSWORD: ${{ secrets.MON_ENFANT_READINESS_TABLET_PASSWORD }}
+      MON_ENFANT_READINESS_MOBILE_EMAIL: ${{ secrets.MON_ENFANT_READINESS_MOBILE_EMAIL }}
+      MON_ENFANT_READINESS_MOBILE_PASSWORD: ${{ secrets.MON_ENFANT_READINESS_MOBILE_PASSWORD }}
+      MON_ENFANT_READINESS_REVIEWER_EMAIL: ${{ secrets.MON_ENFANT_READINESS_REVIEWER_EMAIL }}
+      MON_ENFANT_READINESS_REVIEWER_PASSWORD: ${{ secrets.MON_ENFANT_READINESS_REVIEWER_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium --only-shell
+      - name: Verify the deployed private evidence flow in cloud browsers
+        run: npx playwright test --config=playwright.live.config.ts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: synthetic-live-evidence-results
+          path: test-results/
+          retention-days: 3
