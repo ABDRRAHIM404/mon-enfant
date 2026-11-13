@@ -21,6 +21,8 @@ export default defineConfig({
   outputDir: "test-results/live",
   use: {
     baseURL: "https://mon-enfant.vercel.app",
+    actionTimeout: 20000,
+    navigationTimeout: 30000,
     trace: "off",
     video: "off",
     screenshot: "off",

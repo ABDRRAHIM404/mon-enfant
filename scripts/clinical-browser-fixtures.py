@@ -122,9 +122,11 @@ def prepare():
                 sql(f"insert into private.staff_permissions(user_id,can_manage_clinical_permissions) values('{uid}',true)")
             for field in ('EMAIL', 'PASSWORD'):
                 key = PREFIX + role + '_' + field
-                command(['gh', 'secret', 'set', key, '--repo', REPO], credentials[key])
+                # Record the intended secret before publishing, so interrupted
+                # setup can remove it even if GitHub accepted a timed-out call.
                 state['secrets'].append(key)
                 save(state, credentials)
+                command(['gh', 'secret', 'set', key, '--repo', REPO], credentials[key])
     except Exception:
         print(json.dumps({'run': state['run'], 'setup_incomplete': True, 'cleanup_required': True}), flush=True)
         raise

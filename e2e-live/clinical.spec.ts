@@ -81,11 +81,9 @@ async function permission(
       name: `Modifier l’habilitation — ${platform}`,
     }),
   ).toBeVisible();
+  await manager.locator('[name="capability"]').selectOption(capability);
   await manager
-    .getByLabel("Habilitation", { exact: true })
-    .selectOption(capability);
-  await manager
-    .getByLabel("Décision", { exact: true })
+    .locator('[name="decision"]')
     .selectOption(enable ? "enable" : "disable");
   await manager
     .locator('[name="evidence_reference"]')
@@ -157,6 +155,8 @@ test("two doctors preserve identity, amendments, appointments and private access
       deviceScaleFactor: use.deviceScaleFactor,
       userAgent: use.userAgent,
     });
+    context.setDefaultTimeout(20000);
+    context.setDefaultNavigationTimeout(30000);
     contexts.push(context);
     const target = await context.newPage();
     target.on("pageerror", () => pageErrors++);
@@ -169,7 +169,13 @@ test("two doctors preserve identity, amendments, appointments and private access
       b = await actor("B"),
       manager = await actor("MANAGER"),
       outside = await actor("OUTSIDE");
+    console.log(
+      JSON.stringify({ viewport, phase: "synthetic_actors_authenticated" }),
+    );
     await permission(manager, platformA, "consultation", false);
+    console.log(
+      JSON.stringify({ viewport, phase: "explicit_capability_denial_set" }),
+    );
     await facility(a, placeA);
     await facility(b, placeB);
     await screen(a, "/patients/new", "Inscrire un enfant", "registration");
@@ -262,14 +268,10 @@ test("two doctors preserve identity, amendments, appointments and private access
       404,
     );
     await a.goto("/access-requests");
-    const request = a
-      .locator("article")
-      .filter({
-        has: a.getByRole("heading", { name: childName, exact: true }),
-      });
-    await request
-      .getByLabel("Décision", { exact: true })
-      .selectOption("approve");
+    const request = a.locator("article").filter({
+      has: a.getByRole("heading", { name: childName, exact: true }),
+    });
+    await request.locator('[name="decision"]').selectOption("approve");
     await request.locator('[name="authorizationChecked"]').check();
     await request
       .locator('[name="reason"]')
@@ -507,6 +509,6 @@ test("two doctors preserve identity, amendments, appointments and private access
     );
     console.log(JSON.stringify(proof));
   } finally {
-    await Promise.all(contexts.map((context) => context.close()));
+    await Promise.allSettled(contexts.map((context) => context.close()));
   }
 });
