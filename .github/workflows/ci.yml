@@ -19,6 +19,8 @@ on:
             evidence-accept,
             clinical-accept,
             clinical-inspect,
+            session-reproduce,
+            session-accept,
           ]
         default: none
       fixture_run:
@@ -116,7 +118,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: ${{ inputs.live_probe == 'clinical-accept' && 'synthetic-live-clinical-results' || 'synthetic-live-evidence-results' }}
+          name: ${{ startsWith(inputs.live_probe, 'session-') && 'synthetic-live-session-results' || inputs.live_probe == 'clinical-accept' && 'synthetic-live-clinical-results' || 'synthetic-live-evidence-results' }}
           path: |
             test-results/live/**/verification-form.png
             test-results/live/**/verification-history.png
@@ -127,4 +129,5 @@ jobs:
             test-results/live/**/clinical-growth.png
             test-results/live/**/clinical-summary.png
             test-results/live/**/clinical-proof.json
+            test-results/live/**/session-proof.json
           retention-days: 3

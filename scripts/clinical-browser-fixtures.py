@@ -99,14 +99,14 @@ def validate(state):
     return ids
 
 
-def prepare():
+def prepare(session_only=False):
     if any(name.startswith(PREFIX) for name in secret_names()):
         raise RuntimeError('Finish the recorded clinical fixture run first')
-    state = {'run': uuid.uuid4().hex[:16], 'actors': [], 'secrets': []}
+    state = {'run': uuid.uuid4().hex[:16], 'actors': [], 'secrets': [], 'purpose': 'session' if session_only else 'clinical'}
     credentials = {}
     save(state, credentials)
     try:
-        for role in ROLES:
+        for role in (('A',) if session_only else ROLES):
             email = f"qa-cbrowser-{state['run']}-{role.lower()}@example.invalid"
             password = secrets.token_urlsafe(32)
             user = api('/auth/v1/admin/users', {'email': email, 'password': password, 'email_confirm': True, 'app_metadata': {'synthetic_fixture': True, 'fixture_run': state['run'], 'fixture_kind': 'clinical_browser'}})
@@ -136,6 +136,12 @@ def prepare():
 def inspect(run):
     state = load(run)
     ids = validate(state)
+    if state.get('purpose') == 'session':
+        rows = sql(f"select (select count(*) from public.children where created_by in({ids}))::integer children,(select count(*) from public.clinical_entries where author_id in({ids}))::integer clinical_entries,(select count(*) from public.access_grants where professional_id in({ids}))::integer grants,(select count(*) from public.professional_capabilities where professional_id in({ids}))::integer capabilities,(select count(*) from private.staff_permissions where user_id in({ids}))::integer staff_permissions")
+        if len(state['actors']) != 1 or rows != [{'children': 0, 'clinical_entries': 0, 'grants': 0, 'capabilities': 0, 'staff_permissions': 0}]:
+            raise RuntimeError('Session-only fixture scope was not proven')
+        print(json.dumps({'run': run, 'session_only_scope_verified': True, **rows[0]}), flush=True)
+        return
     if len(state['actors']) != 4:
         raise RuntimeError('Fixture setup incomplete')
     a = next(actor['id'] for actor in state['actors'] if actor['role'] == 'A')
@@ -205,10 +211,13 @@ if __name__ == '__main__':
     modes.add_argument('--check', action='store_true')
     modes.add_argument('--cleanup', action='store_true')
     parser.add_argument('--run')
+    parser.add_argument('--session-only', action='store_true', help='Prepare only one fictional doctor, without capabilities, grants or staff permissions')
     args = parser.parse_args()
+    if args.session_only and not args.prepare:
+        parser.error('--session-only requires --prepare')
     try:
         if args.prepare:
-            prepare()
+            prepare(args.session_only)
         elif args.check:
             inspect(args.run)
         else:

@@ -6,6 +6,8 @@ if (
     "evidence-accept",
     "clinical-accept",
     "clinical-inspect",
+    "session-reproduce",
+    "session-accept",
   ].includes(probe ?? "")
 )
   throw new Error("An explicit supported live evidence mode is required.");
@@ -13,8 +15,9 @@ if (!/^[a-f0-9]{16}$/.test(process.env.MON_ENFANT_QA_RUN ?? ""))
   throw new Error("A dedicated synthetic fixture run is required.");
 export default defineConfig({
   testDir: "./e2e-live",
-  testMatch:
-    probe === "clinical-inspect"
+  testMatch: probe?.startsWith("session-")
+    ? "session.spec.ts"
+    : probe === "clinical-inspect"
       ? "clinical-inspect.spec.ts"
       : probe === "clinical-accept"
         ? "clinical.spec.ts"
@@ -35,7 +38,11 @@ export default defineConfig({
     screenshot: "off",
   },
   reporter: [["list"]],
-  projects: ["evidence-reproduce", "clinical-inspect"].includes(probe ?? "")
+  projects: [
+    "evidence-reproduce",
+    "clinical-inspect",
+    "session-reproduce",
+  ].includes(probe ?? "")
     ? [{ name: "desktop", use: { ...devices["Desktop Chrome"] } }]
     : [
         { name: "desktop", use: { ...devices["Desktop Chrome"] } },
