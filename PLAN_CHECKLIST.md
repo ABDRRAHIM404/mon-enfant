@@ -85,7 +85,8 @@ This checklist preserves PROJECT_PLAN.md's complete Phase 0–8 scope. It is not
 - [x] Public-page automated accessibility and keyboard baseline on desktop/mobile: fourteen scans, zero violations/incomplete results and native bypass/auth-navigation checks; see PROGRESS.md.
 - [x] General workspace automated accessibility and keyboard baseline on desktop/tablet/phone: fifty-four scans, zero violations/incomplete results, named pending login, bypass, practice creation, logout/denial and independent zero-clinical-scope proof; see PROGRESS.md.
 - [x] Detailed clinical automatic-violation and targeted keyboard baseline: 114 scans on desktop/tablet/phone, zero violations/page errors, corrected heading hierarchy, bypass and consultation keyboard input, independent thirty-revision persistence proof. Seven incomplete contrast results remain open below.
-- [ ] Resolve growth SVG axis-text and mobile table-cell/link contrast review results; complete broader clinical/vaccine/evidence keyboard and accessibility acceptance.
+- [x] Targeted growth SVG/table contrast and keyboard disclosure on desktop/tablet/phone: nine reports/165 text samples, text minimum 5.492:1, history outline 4.956:1 and fully visible keyboard history link; retained axe incomplete results reviewed within this solid-color scope. See PROGRESS.md.
+- [ ] Broader clinical/vaccine/evidence keyboard and accessibility acceptance; vaccine/catalog harness implemented and regular-CI verified, fresh authenticated coverage pending.
 - [ ] Full keyboard/accessibility/performance acceptance.
 - [x] Workspace refresh-cookie regression: actual provider refresh-token rotation, persisted secure cookies, public-health isolation and logout denial for vaccine/appointment/follow-up routes on desktop/tablet/phone; see PROGRESS.md.
 - [ ] Account/session, QR, export, RLS/Storage, secret and rate-limit review.
