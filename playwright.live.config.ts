@@ -1,5 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 const probe = process.env.MON_ENFANT_LIVE_PROBE;
+const cloudRuntime = ["updates-cloud-accept", "design-cloud-accept"].includes(
+  probe ?? "",
+);
 if (
   ![
     "design-cloud-accept",
@@ -28,8 +31,7 @@ export default defineConfig({
   testMatch:
     probe === "design-cloud-accept"
       ? "design.spec.ts"
-      : probe === "updates-accept" ||
-          ["updates-cloud-accept", "design-cloud-accept"].includes(probe ?? "")
+      : probe === "updates-accept" || probe === "updates-cloud-accept"
         ? ["updates.spec.ts", "design.spec.ts"]
         : probe === "parent-accept"
           ? "parent.spec.ts"
@@ -47,28 +49,27 @@ export default defineConfig({
                       probe === "clinical-performance"
                     ? "clinical.spec.ts"
                     : "evidence.spec.ts",
-  webServer:
-    probe === "updates-cloud-accept"
-      ? [
-          {
-            command: "npm run start -- --hostname 127.0.0.1",
-            url: "http://127.0.0.1:3000/login",
-            reuseExistingServer: false,
-            timeout: 120000,
-            stdout: "ignore",
-            stderr: "ignore",
-          },
-          {
-            command: "node scripts/cloud-https-proxy.mjs",
-            url: "https://localhost:3443/login",
-            ignoreHTTPSErrors: true,
-            reuseExistingServer: false,
-            timeout: 120000,
-            stdout: "ignore",
-            stderr: "ignore",
-          },
-        ]
-      : undefined,
+  webServer: cloudRuntime
+    ? [
+        {
+          command: "npm run start -- --hostname 127.0.0.1",
+          url: "http://127.0.0.1:3000/login",
+          reuseExistingServer: false,
+          timeout: 120000,
+          stdout: "ignore",
+          stderr: "ignore",
+        },
+        {
+          command: "node scripts/cloud-https-proxy.mjs",
+          url: "https://localhost:3443/login",
+          ignoreHTTPSErrors: true,
+          reuseExistingServer: false,
+          timeout: 120000,
+          stdout: "ignore",
+          stderr: "ignore",
+        },
+      ]
+    : undefined,
   fullyParallel: false,
   workers: 1,
   retries: 0,
@@ -104,11 +105,10 @@ export default defineConfig({
   expect: { timeout: 20000 },
   outputDir: "test-results/live",
   use: {
-    baseURL:
-      probe === "updates-cloud-accept"
-        ? "https://localhost:3443"
-        : "https://mon-enfant.vercel.app",
-    ignoreHTTPSErrors: probe === "updates-cloud-accept",
+    baseURL: cloudRuntime
+      ? "https://localhost:3443"
+      : "https://mon-enfant.vercel.app",
+    ignoreHTTPSErrors: cloudRuntime,
     actionTimeout: 20000,
     navigationTimeout: 30000,
     trace: "off",
