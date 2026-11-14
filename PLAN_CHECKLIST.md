@@ -95,6 +95,7 @@ This checklist preserves PROJECT_PLAN.md's complete Phase 0–8 scope. It is not
 - [x] Workspace refresh-cookie regression: actual provider refresh-token rotation, persisted secure cookies, public-health isolation and logout denial for vaccine/appointment/follow-up routes on desktop/tablet/phone; see PROGRESS.md.
 - [x] Repeatable read-only hosted schema/ACL/Storage baseline: nineteen checks including column grants/private definers; real PostgreSQL regression tests detect introduced drift. See SECURITY_REVIEW.md.
 - [ ] Complete account/session, QR, export, RLS/Storage policy, secret and rate-limit review.
+- [ ] Resolve the existing disabled leaked-password-protection advisor before production readiness; Supabase restricts it to Pro-and-above. No paid upgrade is authorized.
 - [x] Credential-free development readiness monitor, verified scheduled execution and live healthy/failure/recovery reporting drill; owner reports GitHub notifications arriving. See PROGRESS.md.
 - [x] Isolated recovery implementation in cloud: real migrated PostgreSQL model snapshot/restore, full row/ACL hashes, restored-session containment, ledger/denial/immutability/source checks and separate fictional object bytes; see RECOVERY.md.
 - [x] Distinct-runner synthetic artifact-transfer/recovery drill: verified private transfer, complete row/ACL integrity, restored-session containment, immutable history and separate object bytes; run 43594753650.
@@ -142,6 +143,9 @@ The complete goal remains active until the full required scope and its approval 
 - [x] Publish and verify the new canonical Vercel deployment after the owner-requested account/address switch (43635401242 / native e95b68ad4f284f34). Preserve all external approval gates and complete Phase 8 afterward.
 
 ## Supplied Update 3 — design and preserved functionality
+
+- [x] Implemented protected read/dashboard layouts, actual permission-scoped summaries and unassigned uncertain vaccination history: source CI 43646114379, hosted cloud 43646708223 / post-fix 43647899263, native persistence/permission proof and direct paired review (design-qa.md). Purpose-bound sharing remains open.
+- [x] Retire both protected verification fixtures: c833b127ec5544c0 and 1e57ebcee3134c5d, four accounts/nine temporary values each, retirement verified.
 
 - [x] Shared/public foundation implemented and visually accepted: full source CI 43642867793, configured sixteen-screen paired capture 43642889015 and direct review in design-qa.md; earlier three-device authenticated run 43639674164 passed both cookie-retention modes. Protected Update 3 screens remain open.
 - [x] Publish the public foundation on canonical Vercel (READY dpl_3U36g4ViF3NS4mhCtsEF7wuvmJBP, source 6b0e2a9); live health/page markers and anonymous export denial pass. Synchronize clean primary main with origin/main.
