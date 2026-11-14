@@ -1,0 +1,26 @@
+# Update 3 temporary parent-to-clinician sharing
+
+Implementation contract; not implemented or accepted yet. Synthetic records only. This is separate from the permanent identification QR, professional registry associations, clinical grants and provisional workspaces. No real-data or clinical/privacy approval is implied.
+
+## Parent consent and authority
+
+A confirmed active parent with a live Auth session may issue a share only for a currently verified, non-revoked, unexpired guardian link that explicitly permits export. This export permission was separately granted by the existing authorized guardian reviewer; a self-declared profile, relationship, email or child identifier is insufficient. A temporary share is a controlled read of information that this parent is already permitted to export. It never gives authority to administer, amend, prescribe, approve or manage access.
+
+The parent explicitly chooses the purpose and information scope before displaying a code. The vaccination screen defaults to vaccination history/references; a separate explicit selection may share the permitted booklet for a consultation. The UI describes exactly which data is included and how to revoke it. Both scopes preserve dates, uncertainty, authorship, amendments and source-review status; no unsupported vaccine coverage/catch-up is generated.
+
+## Token and recipient contract
+
+- Generate a cryptographically random secret of at least 256 bits server-side. Store only its digest, issuer/guardian link/session, child, fixed purpose/scope, expiry and lifecycle facts in private RLS tables with no direct API table grants. Audit rows contain entity/actor/purpose/state, never the secret or clinical payload.
+- The displayed QR uses a dedicated application route with the secret in the URL fragment. It contains no child ID, universal ID, name, professional credential or medical data. Clear the fragment from browser history immediately; never persist it in localStorage, logs, analytics, query strings or screenshots.
+- Issuance lasts at most five minutes. A fresh issue invalidates the preceding unused code for that guardian/child. Rate-limit issuance and redemption attempts. The database, not the browser clock, decides expiry.
+- Redemption requires an actual current approved doctor/nurse with a platform professional ID and a live Auth session. General admins, rejected/unverified/suspended accounts and unrelated parents are denied. There is no patient existence response for invalid/expired/replayed/revoked tokens.
+- Redeem atomically once; concurrent scanners cannot both consume the code. Bind the resulting read ticket to the recipient's user AND Auth session, with an expiry no later than the original share deadline. A consumer refresh does not extend this deadline. A different clinician/session cannot reuse it.
+- Every subsequent read rechecks the recipient/session/approval, the original issuing session/account, guardian link/export permission, purpose and deadline. Parent/clinician logout, ban, suspension, revoked/expired guardianship or explicit parent cancellation cuts off existing tickets immediately.
+- Dedicated purpose-checked read RPCs return only that scope's current data and audit the actual recipient. Never impersonate the parent or change JWT claims to call parent RPCs. Any common internal projection is inaccessible directly and is called only after the existing parent guard or the new share guard; preserve existing parent behavior with regression tests.
+- No permanent public.access_grants row, local register association, clinical capability or write permission is created. Ordinary clinical RPCs remain denied without their existing grants/capabilities. Provisional records are never eligible for issuing or consuming a shared child view and never promote on account approval.
+
+## Required implementation and proof
+
+Parent create/display/revoke/status controls; a genuine QR and usable same-purpose link; clinician paste/scan entry and authenticated redemption; read-only vaccine/booklet view with visible purpose, issuer consent boundary and countdown/expiry. Do not substitute a decorative QR or a permanent identification QR.
+
+Full-current-schema and hosted HTTP tests must cover issuance permission/consent, current-session/account/link checks, expiry, one-use/concurrent claims, recipient/session binding, purpose escalation, explicit cancellation, logout/revocation with existing JWTs, no direct-table read, no new clinical writes/registry grants, and complete provisional isolation. Cloud browsers must exercise the actual parent/clinician journey with synthetic accounts, inspect the rendered QR/view and retire all fixtures. Keep applied migrations immutable; business revision/validation conflicts use PT409, never 40001/40P01.
