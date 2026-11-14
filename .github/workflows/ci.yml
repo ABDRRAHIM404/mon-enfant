@@ -134,6 +134,7 @@ jobs:
             test-results/live/**/clinical-proof.json
             test-results/live/**/session-proof.json
             test-results/live/**/vaccination-proof.json
+            test-results/live/**/contrast-*.json
             test-results/live/**/a11y-*.json
             test-results/live/**/accessibility-proof.json
           retention-days: 3

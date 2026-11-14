@@ -7,6 +7,7 @@ import {
   tabTo,
   type AccessibilityProof,
 } from "../e2e-support/accessibility";
+import { reviewGrowthContrast } from "../e2e-support/growth-contrast";
 import type { ClinicalEntry } from "../src/lib/clinical/types";
 
 const SITE = "https://mon-enfant.vercel.app";
@@ -182,6 +183,12 @@ test("two doctors preserve identity, amendments, appointments and private access
       await target.keyboard.press("Enter");
       await expect(target.getByRole("heading", { level: 1 })).toBeFocused();
       await inspect(target, label);
+      if (
+        label === "growth-chart" ||
+        label === "corrected-growth-chart" ||
+        label === "withdrawn-growth-chart"
+      )
+        await reviewGrowthContrast(target, label, info);
     }
   }
   async function actor(role: Role) {
@@ -839,6 +846,7 @@ test("two doctors preserve identity, amendments, appointments and private access
             ),
             keyboard_bypass_on_screen_navigation: true,
             keyboard_consultation_after_provenance_setup: true,
+            growth_text_contrast_and_keyboard_visibility: true,
             manual_review_required: true,
           }
         : {}),

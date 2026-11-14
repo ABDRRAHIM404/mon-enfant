@@ -44,7 +44,7 @@ button:disabled {
   opacity: 0.5;
 }
 :focus-visible {
-  outline: 3px solid #c28b44;
+  outline: 3px solid #94672d;
   outline-offset: 4px;
 }
 h1,
