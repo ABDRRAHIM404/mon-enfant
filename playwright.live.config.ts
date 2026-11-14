@@ -8,6 +8,7 @@ if (
     "clinical-accessibility",
     "accessibility-accept",
     "vaccination-accept",
+    "vaccine-accessibility",
     "clinical-inspect",
     "session-reproduce",
     "session-accept",
@@ -22,7 +23,7 @@ export default defineConfig({
     ? "session.spec.ts"
     : probe === "accessibility-accept"
       ? "accessibility.spec.ts"
-      : probe === "vaccination-accept"
+      : probe === "vaccination-accept" || probe === "vaccine-accessibility"
         ? "vaccination.spec.ts"
         : probe === "clinical-inspect"
           ? "clinical-inspect.spec.ts"
@@ -32,21 +33,25 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   retries: 0,
-  maxFailures: ["accessibility-accept", "clinical-accessibility"].includes(
-    probe ?? "",
-  )
+  maxFailures: [
+    "accessibility-accept",
+    "clinical-accessibility",
+    "vaccine-accessibility",
+  ].includes(probe ?? "")
     ? 0
     : 1,
   timeout:
-    probe === "clinical-accessibility"
-      ? 360000
-      : probe === "accessibility-accept"
-        ? 180000
-        : probe === "vaccination-accept"
-          ? 360000
-          : probe === "clinical-accept"
-            ? 240000
-            : 120000,
+    probe === "vaccine-accessibility"
+      ? 480000
+      : probe === "clinical-accessibility"
+        ? 360000
+        : probe === "accessibility-accept"
+          ? 180000
+          : probe === "vaccination-accept"
+            ? 360000
+            : probe === "clinical-accept"
+              ? 240000
+              : 120000,
   expect: { timeout: 20000 },
   outputDir: "test-results/live",
   use: {

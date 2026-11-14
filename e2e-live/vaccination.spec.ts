@@ -1,6 +1,12 @@
 import { test, expect, type Page, type BrowserContext } from "@playwright/test";
 import { writeFileSync } from "node:fs";
 import { observeBrowserErrors } from "./browser-errors";
+import {
+  scanAccessibility,
+  assertAccessible,
+  tabTo,
+  type AccessibilityProof,
+} from "../e2e-support/accessibility";
 import type { ClinicalEntry } from "../src/lib/clinical/types";
 const SITE = "https://mon-enfant.vercel.app";
 const UUID = /^[a-f0-9-]{36}$/i;
@@ -189,6 +195,13 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
   const observedPages: { role: string; page: Page }[] = [{ role: "A", page }];
   let pageErrors = 0;
   const timings: { screen: string; navigation_ms: number }[] = [];
+  const accessibility =
+    process.env.MON_ENFANT_LIVE_PROBE === "vaccine-accessibility";
+  const accessibilityProofs: AccessibilityProof[] = [];
+  async function inspect(target: Page, label: string) {
+    if (accessibility)
+      accessibilityProofs.push(await scanAccessibility(target, label, info));
+  }
   observeBrowserErrors(page, "vaccine-A", () => pageErrors++);
   async function screen(
     target: Page,
@@ -204,6 +217,18 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
     await fit(target);
     timings.push({ screen: label, navigation_ms: Date.now() - start });
     expect(pageErrors).toBe(0);
+    if (accessibility) {
+      await target.keyboard.press("Tab");
+      const bypass = target.getByRole("link", {
+        name: "Aller au contenu principal",
+        exact: true,
+      });
+      await expect(bypass).toBeFocused();
+      await expect(bypass).toBeInViewport();
+      await target.keyboard.press("Enter");
+      await expect(target.getByRole("heading", { level: 1 })).toBeFocused();
+      await inspect(target, label);
+    }
   }
   async function actor(role: Role) {
     const use = info.project.use;
@@ -270,11 +295,13 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
       .innerText();
     expect(UUID.test(universal)).toBe(true);
     await fit(a);
+    await inspect(a, "registered-vaccine-child");
 
     await screen(
       a,
       `/patients/${child}/records/new?kind=vaccination`,
       "Vaccination",
+      "vaccination-capability-denial",
     );
     await expect(
       a.getByRole("button", { name: "Enregistrer le soin" }),
@@ -305,6 +332,7 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
       b.getByRole("status").filter({ hasText: "Opération enregistrée" }),
     ).toBeVisible();
     await b.goto("/access-requests");
+    await inspect(b, "vaccine-link-request-receipt");
     expect((await b.locator("main").innerText()).includes(childName)).toBe(
       false,
     );
@@ -312,6 +340,7 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
       404,
     );
     await a.goto("/access-requests");
+    await inspect(a, "vaccine-access-review-form");
     const request = a.locator("article").filter({
       has: a.getByRole("heading", { name: childName, exact: true }),
     });
@@ -355,15 +384,18 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
         break;
     }
     expect(found).toBe(true);
+    await inspect(manager, "catalog-paginated-list");
     await manager.getByRole("link", { name: seedLabel, exact: true }).click();
     const seedPath = new URL(manager.url()).pathname;
     await expect(
       manager.getByText("Brouillon — non activé · révision 1", { exact: true }),
     ).toBeVisible();
+    await inspect(manager, "original-draft-clone-form");
     await a.goto(seedPath);
     await expect(
       a.getByRole("button", { name: "Approuver cette version", exact: true }),
     ).toHaveCount(0);
+    await inspect(a, "catalog-unqualified-review-denial");
     const clone = await catalogBasis(manager, "clone");
     await clone.locator('[name="label"]').fill(label);
     await clone
@@ -376,6 +408,7 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
     const version = versionPath.split("/").at(-1)!;
     expect(UUID.test(version) && versionPath !== seedPath).toBe(true);
     await fit(manager);
+    await inspect(manager, "qa-draft-catalog");
     for (const [platform, capability] of [
       [platformA, "vaccination"],
       [platformA, "appointment"],
@@ -424,9 +457,11 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
         })
         .getByText(/Filles uniquement/),
     ).toBeVisible();
+    await inspect(manager, "catalog-rules-and-editor");
     // An invalid HB1 activation is rejected without changing the source.
     await manager.goto(`${versionPath}?dose=HB1`);
     const invalid = await catalogBasis(manager, "edit");
+    await inspect(manager, "hb1-disabled-editor");
     await invalid.locator('[name="automatic_scheduling"]').check();
     await invalid
       .getByRole("button", { name: "Enregistrer la règle", exact: true })
@@ -434,6 +469,7 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
     await expect(manager.getByRole("main").getByRole("alert")).toContainText(
       "HB1 reste désactivé",
     );
+    await inspect(manager, "hb1-rejected-error");
     for (const [value, revision] of [
       ["9", 2],
       ["8", 3],
@@ -450,9 +486,11 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
           exact: true,
         }),
       ).toBeVisible();
+      await inspect(manager, `catalog-rule-edited-${revision}`);
     }
     await a.goto(versionPath);
     const approval = await catalogBasis(a, "approve");
+    await inspect(a, "independent-catalog-review-form");
     for (const name of [
       "source_authenticated",
       "clinical_reviewed",
@@ -466,6 +504,7 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
       a.getByText("Approuvée · révision 4", { exact: true }),
     ).toBeVisible();
     await fit(a);
+    await inspect(a, "qa-approved-catalog");
     await outside.goto(versionPath);
     await expect(
       outside.getByRole("button", {
@@ -477,11 +516,13 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
       outside.getByRole("button", { name: "Créer le brouillon", exact: true }),
     ).toHaveCount(0);
 
+    await inspect(outside, "catalog-staff-actions-denied");
     const vaccinePath = `/patients/${child}/vaccinations`;
     await screen(
       a,
       `${vaccinePath}?version=${version}`,
       `Vaccinations — ${childName}`,
+      "routine-reference-assignment",
     );
     await expect(
       a.locator('[name="dose_code"] option[value="HB1"]'),
@@ -512,18 +553,21 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
     const item = itemPath!.split("/").at(-1)!;
     expect(UUID.test(item)).toBe(true);
 
+    await inspect(a, "assigned-routine-reference");
     const newRecord = `/patients/${child}/records/new?kind=vaccination`;
-    await screen(a, newRecord, "Vaccination");
+    await screen(a, newRecord, "Vaccination", "uncertain-vaccination-form");
     await vaccineFields(a, placeA, "BCG");
     await a.locator('[name="occurrence_precision"]').selectOption("unknown");
     await a.locator('[name="occurred_on"]').fill("");
     await a.locator('[name="source_type"]').selectOption("paper_transcription");
     await a.locator('[name="source_reference"]').fill(paper);
     await a.locator('[name="source_verified"]').uncheck();
+    await inspect(a, "unknown-date-paper-vaccination");
     await a
       .getByRole("button", { name: "Enregistrer le soin", exact: true })
       .click();
     await expect(a).toHaveURL(/\/records\/[a-f0-9-]{36}$/i);
+    await inspect(a, "uncertain-vaccination-history");
     await a.goto(vaccinePath);
     await expect(
       a.getByText("Administration non confirmée", { exact: true }),
@@ -534,6 +578,7 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
         a,
         `/patients/${child}/appointments/new${itemId ? `?item=${itemId}` : ""}`,
         `Planifier — ${childName}`,
+        itemId ? "vaccine-appointment-form" : "independent-appointment-form",
       );
       await a
         .locator('[name="facility_id"]')
@@ -564,7 +609,9 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
     await expect(
       a.getByRole("heading", { name: vaccineVisit, exact: true }),
     ).toBeVisible();
+    await inspect(a, "missed-vaccine-follow-up");
     await a.goto(appointmentPath);
+    await inspect(a, "missed-slot-and-replacement-form");
     const replacement = futureSlot(14);
     await a.locator('[name="starts_local"]').fill(replacement[0]);
     await a.locator('[name="ends_local"]').fill(replacement[1]);
@@ -583,9 +630,10 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
         exact: true,
       }),
     ).toBeVisible();
+    await inspect(a, "manual-replacement-history");
     await plan(otherVisit, futureSlot(15, "11"));
 
-    await screen(b, newRecord, "Vaccination");
+    await screen(b, newRecord, "Vaccination", "validated-vaccination-form");
     await vaccineFields(b, placeB, "VPO", lot);
     await b
       .locator('[name="matching_status"]')
@@ -601,11 +649,13 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
       "Aucun doublon potentiel",
     );
     await expect(b.locator('[name="lot_number"]')).toHaveValue(lot);
+    await inspect(b, "no-duplicate-status-retained-inputs");
     await b
       .getByRole("button", { name: "Enregistrer le soin", exact: true })
       .click();
     await expect(b).toHaveURL(/\/records\/[a-f0-9-]{36}$/i);
     const rootPath = new URL(b.url()).pathname;
+    await inspect(b, "validated-vaccination-history");
     await a.goto(vaccinePath);
     await expect(
       a.getByText("Administration documentée et rapprochée", { exact: true }),
@@ -613,7 +663,9 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
     await expect(
       a.getByRole("link", { name: new RegExp(platformB) }),
     ).toBeVisible();
+    await inspect(a, "cross-doctor-fulfilled-reference");
     await a.goto("/follow-up?bucket=resolved_by_other");
+    await inspect(a, "resolved-by-other-worklist");
     await expect(
       a.getByRole("heading", { name: vaccineVisit, exact: true }),
     ).toBeVisible();
@@ -637,16 +689,32 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
       a.getByRole("region", { name: "Doublons possibles", exact: true }),
     ).toContainText(platformB);
     await expect(a.locator('[name="lot_number"]')).toHaveValue(lot);
-    await a.locator('[name="duplicate_override_reason"]').fill(override);
-    await a
-      .getByRole("button", { name: "Enregistrer le soin", exact: true })
-      .click();
+    await inspect(a, "duplicate-warning-and-reason-form");
+    if (accessibility) {
+      await tabTo(a, a.locator('[name="duplicate_override_reason"]'));
+      await a.keyboard.type(override);
+    } else {
+      await a.locator('[name="duplicate_override_reason"]').fill(override);
+    }
+    if (accessibility) {
+      await tabTo(
+        a,
+        a.getByRole("button", { name: "Enregistrer le soin", exact: true }),
+      );
+      await a.keyboard.press("Enter");
+    } else {
+      await a
+        .getByRole("button", { name: "Enregistrer le soin", exact: true })
+        .click();
+    }
     await expect(a).toHaveURL(/\/records\/[a-f0-9-]{36}$/i);
     await expect(a.locator(".clinical-entry")).toContainText(override);
+    await inspect(a, "audited-duplicate-override-history");
     const stale = await b.context().newPage();
     observeBrowserErrors(stale, "vaccine-stale", () => pageErrors++);
     await stale.goto(rootPath);
     await b.goto(rootPath);
+    await inspect(b, "vaccine-correction-form");
     await clinicalFields(b, placeB);
     await b.locator('[name="matching_status"]').selectOption("unmatched");
     await b.locator('[name="schedule_item_id"]').selectOption("");
@@ -656,6 +724,7 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
       .getByRole("button", { name: "Ajouter la révision", exact: true })
       .click();
     await expect(b.locator(".clinical-entry")).toHaveCount(2);
+    await inspect(b, "unmatched-correction-history");
     await clinicalFields(stale, placeB);
     await stale.locator('[name="amendment_reason"]').fill(correction);
     await stale
@@ -664,6 +733,7 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
     await expect(stale.getByRole("main").getByRole("alert")).toContainText(
       "Une autre correction a été enregistrée",
     );
+    await inspect(stale, "stale-vaccine-correction-error");
     await stale.close();
     await a.goto(vaccinePath);
     await expect(
@@ -674,6 +744,7 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
       a.getByRole("heading", { name: vaccineVisit, exact: true }),
     ).toHaveCount(0);
     await a.goto("/follow-up?bucket=upcoming");
+    await inspect(a, "reopened-vaccine-follow-up");
     await expect(
       a.getByRole("heading", { name: vaccineVisit, exact: true }),
     ).toBeVisible();
@@ -693,9 +764,11 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
       .click();
     await expect(b.locator(".clinical-entry")).toHaveCount(3);
     await fit(b);
+    await inspect(b, "withdrawn-vaccination-preserved-history");
 
     for (const state of ["withdrawn", "active"]) {
       await a.goto(itemPath!);
+      await inspect(a, `reference-decision-${state}`);
       await a
         .locator('[name="facility_id"]')
         .selectOption({ label: `${placeA} — Rabat fictif` });
@@ -728,6 +801,7 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
     await expect(
       manager.getByText("Retirée · révision 5", { exact: true }),
     ).toBeVisible();
+    await inspect(manager, "retired-qa-catalog-history");
     await a.goto(`${vaccinePath}?version=${version}`);
     await expect(
       a.getByRole("button", { name: "Assigner la référence", exact: true }),
@@ -738,6 +812,7 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
         { exact: true },
       ),
     ).toBeVisible();
+    await inspect(a, "retired-version-assignment-denial");
     await manager.goto(seedPath);
     await expect(
       manager.getByText("Brouillon — non activé · révision 1", { exact: true }),
@@ -808,7 +883,12 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
     expect(
       appointments.every((p: { state: string }) => p.state === "scheduled"),
     ).toBe(true);
-    await screen(a, `/patients/${child}/summary`, childName);
+    await screen(
+      a,
+      `/patients/${child}/summary`,
+      childName,
+      "vaccine-private-summary",
+    );
     await expect(a.locator(".clinical-entry")).toHaveCount(5);
     for (const denied of [outside, manager]) {
       const blocked = await get(denied.context(), `/patients/${child}/export`);
@@ -823,6 +903,7 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
     await expect(
       b.getByRole("button", { name: "Ajouter la révision", exact: true }),
     ).toHaveCount(0);
+    await inspect(b, "revoked-vaccination-capability-history");
     await a.goto(`/patients/${child}`);
     const grant = a.locator("article").filter({ hasText: platformB });
     await grant
@@ -865,6 +946,22 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
       private_export_and_revocation: true,
       page_errors: pageErrors,
       clinical_approval_claimed: false,
+      ...(accessibility
+        ? {
+            automatic_accessibility_screens: accessibilityProofs.length,
+            automatic_violations: accessibilityProofs.reduce(
+              (n, p) => n + p.violations.length,
+              0,
+            ),
+            incomplete_rules: accessibilityProofs.reduce(
+              (n, p) => n + p.incomplete.length,
+              0,
+            ),
+            keyboard_bypass_on_named_navigation: true,
+            keyboard_duplicate_override_after_retained_inputs: true,
+            manual_review_required: true,
+          }
+        : {}),
       timings,
     };
     writeFileSync(
@@ -872,6 +969,10 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
       JSON.stringify(proof),
     );
     console.log(JSON.stringify(proof));
+    if (accessibility) {
+      expect(accessibilityProofs.length).toBeGreaterThanOrEqual(35);
+      assertAccessible(accessibilityProofs);
+    }
   } catch (error) {
     // Classify known UI failures in memory; never emit message bodies or DOM.
     const classes: Record<string, string> = {
