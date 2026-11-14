@@ -22,7 +22,7 @@ function credentials(role: string) {
 }
 async function login(page: Page, role: string) {
   const account = credentials(role);
-  await page.goto("/login");
+  await page.goto("/login?audience=clinician");
   if (accessibility) {
     await tabTo(page, page.locator('input[name="email"]'));
     await page.keyboard.type(account.email);
@@ -35,7 +35,7 @@ async function login(page: Page, role: string) {
   if (accessibility) await page.keyboard.type(account.password);
   else await page.locator('input[name="password"]').fill(account.password);
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/\/account$/);
+  await expect(page).toHaveURL(/\/(account|dashboard|provisional)$/);
   await page.goto("/account");
   const activate = page.getByRole("button", {
     name: "Activer mon espace professionnel",

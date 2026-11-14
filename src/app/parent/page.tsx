@@ -30,7 +30,7 @@ export default async function ParentWorkspace() {
           <Link href="/parent/notifications">Notifications</Link>
           <Link href="/parent/requests">Mes demandes</Link>
           <Link href="/parent/settings">Préférences</Link>
-          <Link href="/account">Mon compte</Link>
+          <Link href="/parent/account">Mon compte</Link>
           <form action={signOut}>
             <button className="text-link">Se déconnecter</button>
           </form>

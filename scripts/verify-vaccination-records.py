@@ -74,7 +74,7 @@ def create(kind,role='doctor',manage=False,review=False,capable=False):
     fixtures.append(uid)
     web = Browser()
     _,page,_ = web.login(email,password)
-    web.submit('/account',page,{},lambda f:'Activer mon espace professionnel' in f['text'])
+    web.submit('/account',page,{},lambda f:'Activer mon espace soignant' in f['text'])
     platform = f'QAV-{run}-{kind}'
     sql(f"update public.professional_profiles set role='{role}',verification_status='approved',professional_id='{platform}' where user_id='{uid}'; insert into private.staff_permissions(user_id,can_manage_vaccine_catalog,can_review_vaccine_catalog) values('{uid}',{str(manage).lower()},{str(review).lower()});")
     if capable:

@@ -54,7 +54,7 @@ export default async function ChildBooklet({
         <Brand />
         <nav aria-label="Navigation parent">
           <Link href="/parent">Mes enfants</Link>
-          <Link href="/account">Mon compte</Link>
+          <Link href="/parent/account">Mon compte</Link>
         </nav>
       </header>
       <section className="page-heading">

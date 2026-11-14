@@ -4,5 +4,6 @@ export function authDestination(
 ): "/account" | "/parent" | "/parent/invitation" {
   if (value === "parent") return "/parent";
   if (value === "parent-invitation") return "/parent/invitation";
-  return "/account";
+  if (value === "account") return "/account";
+  return "/parent";
 }

@@ -10,11 +10,11 @@ test("inspect existing fictional clinical screens without clinical mutations", a
   const password = process.env.MON_ENFANT_CLINICAL_BROWSER_A_PASSWORD;
   if (!email || !password)
     throw new Error("Dedicated clinical diagnostic credentials missing.");
-  await page.goto("/login");
+  await page.goto("/login?audience=clinician");
   await page.locator('[name="email"]').fill(email);
   await page.locator('[name="password"]').fill(password);
   await page.getByRole("button", { name: "Se connecter", exact: true }).click();
-  await expect(page).toHaveURL(/\/account$/);
+  await expect(page).toHaveURL(/\/(account|dashboard|provisional)$/);
   await page.goto("/patients");
   const childPath = await page
     .locator('a[href^="/patients/"]')

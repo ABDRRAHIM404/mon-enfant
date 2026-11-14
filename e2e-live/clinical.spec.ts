@@ -24,7 +24,7 @@ async function login(page: Page, role: Role) {
     password = process.env[prefix + "PASSWORD"];
   if (!email || !password)
     throw new Error("Dedicated fictional clinical credentials are missing.");
-  await page.goto("/login");
+  await page.goto("/login?audience=clinician");
   await page
     .getByLabel("Adresse e-mail professionnelle", { exact: true })
     .fill(email);
@@ -32,7 +32,7 @@ async function login(page: Page, role: Role) {
   await expect(page.locator('[name="password"]')).toBeFocused();
   await page.locator('[name="password"]').fill(password);
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/\/account$/);
+  await expect(page).toHaveURL(/\/(account|dashboard|provisional)$/);
 }
 
 async function fit(page: Page) {

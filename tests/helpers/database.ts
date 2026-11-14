@@ -193,3 +193,13 @@ export async function registrationUpdatesDatabase() {
   );
   return db;
 }
+
+export async function clinicianUpdatesDatabase() {
+  const db = await registrationUpdatesDatabase();
+  for (const file of [
+    "20261114194747_clinician_role.sql",
+    "20261114194750_clinician_provisional_workspace.sql",
+  ])
+    await db.exec(readFileSync(`supabase/migrations/${file}`, "utf8"));
+  return db;
+}

@@ -35,7 +35,7 @@ def create(kind,role='doctor'):
  status,u=api('/auth/v1/admin/users',{'email':email,'password':password,'email_confirm':True,'app_metadata':{'synthetic_fixture':True,'fixture_run':run}},admin=True)
  assert status in (200,201);uid=u['id'];fixtures.append(uid)
  browser=Browser();_,page,_=browser.login(email,password)
- browser.submit('/account',page,{},lambda f:'Activer mon espace professionnel' in f['text'])
+ browser.submit('/account',page,{},lambda f:'Activer mon espace soignant' in f['text'])
  sql(f"update public.professional_profiles set role='{role}',verification_status='approved',professional_id='QAR-{run}-{kind}' where user_id='{uid}'")
  status,session=api('/auth/v1/token?grant_type=password',{'email':email,'password':password});assert status==200;sessions.append(session)
  return {'id':uid,'web':browser,'token':session['access_token']}

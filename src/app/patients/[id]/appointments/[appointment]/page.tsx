@@ -85,8 +85,8 @@ export default async function History({
           />
         ) : (
           <p className="notice">
-            Seul le médecin responsable, avec une habilitation active, peut
-            modifier ce rendez-vous. Un autre médecin autorisé peut documenter
+            Seul le soignant responsable, avec une habilitation active, peut
+            modifier ce rendez-vous. Un autre soignant autorisé peut documenter
             les soins dans le dossier clinique.
           </p>
         )}

@@ -6,7 +6,7 @@ This is a software model derived from the agreed requirements, not a medical pro
 
 Keep the immutable child key and permanent universal ID distinct from professional/facility/year/book/local-register numbers. An association in a register is not an authorization grant. Every read/write must check the current account state and an active, non-expired, non-revoked child grant in the database. A child lookup QR identifies a record and confers no permission. Existing-child linking requires a recorded authorization workflow, not a global unrestricted demographic search.
 
-Account approval permits the professional workspace and authorized record reads. It must not silently grant every clinical action. Vaccination and other privileged writes need explicit verified capabilities managed by authorized staff, with an audit trail. Future nurse/support roles receive narrower capabilities.
+Account approval permits the professional workspace and authorized record reads. It must not silently grant every clinical action. Vaccination and other privileged writes need explicit verified capabilities managed by authorized staff, with an audit trail. Update 2 gives verified doctors and nurses the same permitted features, retaining explicit capabilities and child grants. Unverified clinicians use a separate author-only provisional ledger; approval never promotes earlier provisional records.
 
 ## Clinical events and corrections
 

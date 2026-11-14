@@ -33,7 +33,7 @@ export default async function Settings() {
           les accès à un enfant, ouvrez « Confidentialité et accès » depuis son
           carnet.
         </p>
-        <Link href="/account">Consulter mon compte</Link>
+        <Link href="/parent/account">Consulter mon compte</Link>
       </section>
       <section className="panel">
         <h2>Historique des préférences</h2>

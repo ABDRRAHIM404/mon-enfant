@@ -37,3 +37,7 @@ Derived from PROJECT_INFO.md and PROJECT_PLAN.md. These are software acceptance 
 ## Explicit scope decisions awaiting qualified/human approval
 
 Official credential and guardianship verification sources; real document retention/holds; clinical source approval and any vaccine exceptions; production hosting/privacy obligations; final brand/languages; native release/distribution arrangements. Fictional-data implementation may progress while these remain open. No code or green test substitutes for these approvals.
+
+## Requested Update 2 acceptance
+
+Parents use primary public authentication and their own account/settings without clinician enrollment. Explicit soignant entry supports doctor/nurse declaration, with no self-approval. Verified doctors and nurses have equal features under the same explicit capabilities and child grants. Unverified clinicians create persistent author-only provisional children, care, vaccination history and appointments. Immutable revisions retain actor role/status, source, date certainty and original values. No cross-author lookup/import, QR, export, duplicate probe, direct-table read or promotion on account approval. Promotion policy and real-data authorization remain unresolved external gates.

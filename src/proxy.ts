@@ -30,6 +30,7 @@ export const config = {
     "/dashboard/:path*",
     "/patients/:path*",
     "/parent/:path*",
+    "/provisional/:path*",
     "/parent-requests/:path*",
     "/registration-reviews/:path*",
     "/registration-cases/:path*",

@@ -10,7 +10,13 @@ test("landing, auth navigation, and explicit unconfigured state", async ({
     path: testInfo.outputPath("home.png"),
     fullPage: true,
   });
+  await expect(
+    page.getByRole("link", { name: "Espace soignant", exact: true }).first(),
+  ).toHaveAttribute("href", "/login?audience=clinician");
   await page.getByRole("link", { name: /Accéder à mon espace/ }).click();
+  await expect(
+    page.getByText("MON ENFANT · PARENTS", { exact: true }),
+  ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Heureux de vous retrouver." }),
   ).toBeVisible();
@@ -33,6 +39,9 @@ test("landing, auth navigation, and explicit unconfigured state", async ({
 });
 test("protected routes fail closed without Supabase", async ({ page }) => {
   for (const path of [
+    "/provisional",
+    "/provisional/00000000-0000-4000-8000-000000000000",
+    "/parent/account",
     "/appointments",
     "/follow-up",
     "/patients/00000000-0000-4000-8000-000000000000/appointments",
@@ -117,4 +126,26 @@ test("public readiness fails closed without configuration and exposes no details
   expect(await response.json()).toEqual({ status: "unavailable" });
   expect(response.headers()["cache-control"]).toContain("no-store");
   expect(response.headers()["set-cookie"]).toBeUndefined();
+});
+
+test("clinician authentication stays separate and discoverable", async ({
+  page,
+}) => {
+  await page.goto("/login?audience=clinician");
+  await expect(
+    page.getByText("MÉDECINS ET INFIRMIER(E)S", { exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("link", { name: "Créer un compte", exact: true })
+    .click();
+  await expect(page).toHaveURL(/audience=clinician/);
+  await expect(
+    page.getByLabel("Adresse e-mail professionnelle", { exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("link", { name: "Accéder à l’espace parent", exact: true })
+    .click();
+  await expect(
+    page.getByText("MON ENFANT · PARENTS", { exact: true }),
+  ).toBeVisible();
 });

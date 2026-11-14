@@ -4,7 +4,7 @@ export function DoctorNav() {
   return (
     <header className="workspace-header">
       <Brand />
-      <nav aria-label="Espace médecin">
+      <nav aria-label="Espace soignant">
         <Link href="/dashboard">Tableau de bord</Link>
         <Link href="/patients">Patients</Link>
         <Link href="/vaccines">Vaccinations</Link>
@@ -14,6 +14,7 @@ export function DoctorNav() {
         <Link href="/registration-reviews">Revues d’inscription</Link>
         <Link href="/parent-requests">Demandes des parents</Link>
         <Link href="/practices">Lieux d’exercice</Link>
+        <Link href="/provisional">Dossiers provisoires</Link>
         <Link href="/account">Mon compte</Link>
       </nav>
     </header>

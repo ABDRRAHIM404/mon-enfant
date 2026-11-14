@@ -97,7 +97,7 @@ export const appointmentBuckets = {
   upcoming: "À venir",
   missed: "Rendez-vous passés à revoir",
   missed_vaccinations: "Rendez-vous vaccinaux manqués",
-  resolved_by_other: "Dose enregistrée par un autre médecin",
+  resolved_by_other: "Dose enregistrée par un autre soignant",
   reference_review: "Références à réexaminer",
   all: "Tous mes rendez-vous",
 };

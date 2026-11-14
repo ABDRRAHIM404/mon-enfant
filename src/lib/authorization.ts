@@ -8,7 +8,7 @@ export const verificationStates = [
 export type VerificationState = (typeof verificationStates)[number];
 export type Professional = {
   user_id: string;
-  role: "doctor" | "admin";
+  role: "doctor" | "nurse" | "admin";
   verification_status: VerificationState;
   professional_id: string | null;
 };
@@ -16,7 +16,7 @@ export function canAccessClinicalWorkspace(
   profile: Professional | null,
 ): boolean {
   return (
-    profile?.role === "doctor" &&
+    (profile?.role === "doctor" || profile?.role === "nurse") &&
     profile.verification_status === "approved" &&
     profile.professional_id !== null
   );
@@ -24,7 +24,7 @@ export function canAccessClinicalWorkspace(
 export const statusLabels: Record<VerificationState, string> = {
   unverified: "Non vérifié",
   under_review: "En cours de vérification",
-  approved: "Approuvé",
+  approved: "Vérifié",
   rejected: "Demande rejetée",
   suspended: "Compte suspendu",
 };

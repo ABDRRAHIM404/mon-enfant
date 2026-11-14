@@ -64,7 +64,7 @@ export async function requireVaccineCatalog() {
   if (error)
     throw new Error("Impossible de vérifier les permissions du catalogue.");
   const permissions = data as { manage: boolean; review: boolean };
-  if (result.profile.role !== "doctor" && !permissions.manage)
+  if (!["doctor", "nurse"].includes(result.profile.role) && !permissions.manage)
     redirect("/account");
   return { ...result, permissions };
 }

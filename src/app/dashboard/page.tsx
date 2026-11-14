@@ -76,7 +76,7 @@ export default async function Dashboard() {
       </div>
       <p className="notice">
         Une référence non confirmée n’est pas un rendez-vous manqué. Les soins
-        enregistrés par un autre médecin autorisé recalculent les suivis
+        enregistrés par un autre soignant autorisé recalculent les suivis
         vaccinaux, sans annuler les consultations indépendantes.
       </p>
       <section className="panel">

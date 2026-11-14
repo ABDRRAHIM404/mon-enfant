@@ -8,7 +8,7 @@ export default async function Signup({
   return (
     <AuthShell
       mode="signup"
-      parent={q.audience === "parent"}
+      parent={q.audience !== "clinician"}
       invitation={q.next === "invitation"}
     />
   );

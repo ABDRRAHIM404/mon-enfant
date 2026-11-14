@@ -26,7 +26,7 @@ export default async function Login({
       )}
       <AuthShell
         mode="login"
-        parent={audience === "parent"}
+        parent={audience !== "clinician"}
         invitation={next === "invitation"}
       />
     </>

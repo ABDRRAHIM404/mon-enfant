@@ -15,6 +15,7 @@ export default function Home() {
       <header className="site-header">
         <Brand />
         <nav aria-label="Navigation principale">
+          <Link href="/login?audience=clinician">Espace soignant</Link>
           <Link href="/login">Se connecter</Link>
           <Link href="/signup" className="button primary small">
             Créer un compte <ArrowRight size={16} />
@@ -34,13 +35,14 @@ export default function Home() {
             </h1>
             <p>
               Un même carnet de santé tout au long de l’enfance. Un espace
-              professionnel pensé pour relier les soins et simplifier le suivi.
+              parent pour consulter le carnet partagé de votre enfant et suivre
+              ses rendez-vous.
             </p>
             <div className="hero-actions">
               <Link href="/login" className="button primary">
                 Accéder à mon espace <ArrowRight size={18} />
               </Link>
-              <span className="fine">Professionnels de santé</span>
+              <span className="fine">Parents et responsables autorisés</span>
             </div>
             <div className="hero-note">
               <ShieldCheck size={17} /> En développement · Données fictives
@@ -100,34 +102,37 @@ export default function Home() {
         <section className="foundation">
           <div>
             <span className="eyebrow">ÉTAPE ACTUELLE</span>
-            <h2>Les fondations d’abord.</h2>
+            <h2>Le carnet de votre enfant.</h2>
             <p className="muted">
-              Le projet avance dans l’ordre du plan : sécuriser les comptes et
-              les accès avant d’ouvrir les fonctions cliniques.
+              Créez votre espace parent. Un carnet existant vous sera partagé
+              après une invitation sécurisée et une vérification de votre
+              qualité de responsable.
             </p>
           </div>
           <ol className="milestones">
             <li className="current">
               <span>01</span>
               <div>
-                <strong>Fondation technique</strong>
-                <p>Comptes, autorisations, base de données</p>
+                <strong>Un compte parent</strong>
+                <p>Connexion et préférences personnelles</p>
               </div>
-              <span className="pill">En cours</span>
+              <span className="pill">Parents</span>
             </li>
             <li>
               <span>02</span>
               <div>
-                <strong>Vérification professionnelle</strong>
-                <p>Justificatifs et revue administrative</p>
+                <strong>Un lien autorisé</strong>
+                <p>
+                  Invitation et vérification de votre qualité de responsable
+                </p>
               </div>
               <Circle size={17} />
             </li>
             <li>
               <span>03</span>
               <div>
-                <strong>Registre des patients</strong>
-                <p>Inscription et continuité du dossier</p>
+                <strong>Le carnet partagé</strong>
+                <p>Soins, vaccinations et rendez-vous autorisés</p>
               </div>
               <Circle size={17} />
             </li>
@@ -136,9 +141,9 @@ export default function Home() {
       </main>
       <footer className="site-footer">
         <span>© 2026 Mon Enfant</span>
-        <span>Projet en développement · Version professionnelle</span>
-        <Link href="/login">
-          Espace professionnel <ArrowRight size={14} />
+        <span>Projet en développement · Données fictives</span>
+        <Link href="/login?audience=clinician">
+          Espace soignant <ArrowRight size={14} />
         </Link>
       </footer>
     </div>

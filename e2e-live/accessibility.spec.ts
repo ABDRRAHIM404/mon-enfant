@@ -31,7 +31,7 @@ test("approved workspace supports accessible pages and keyboard-only account and
     await expect(page.getByRole("main")).toBeVisible();
     proofs.push(await scanAccessibility(page, screen, info));
   }
-  await page.goto("/login");
+  await page.goto("/login?audience=clinician");
   await tabTo(page, page.locator('input[name="email"]'));
   await page.keyboard.type(email);
   await page.keyboard.press("Tab");
@@ -89,7 +89,7 @@ test("approved workspace supports accessible pages and keyboard-only account and
   } finally {
     releaseLogin();
   }
-  await expect(page).toHaveURL(/\/account$/);
+  await expect(page).toHaveURL(/\/(account|dashboard|provisional)$/);
   await page.unrouteAll({ behavior: "wait" });
   proofs.push(await scanAccessibility(page, "account", info));
   await tabTo(

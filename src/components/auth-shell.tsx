@@ -5,7 +5,7 @@ import { AuthForm } from "./auth-form";
 import { supabaseConfig } from "@/lib/supabase/config";
 export function AuthShell({
   mode,
-  parent = false,
+  parent = true,
   invitation = false,
 }: {
   mode: "login" | "signup";
@@ -19,7 +19,7 @@ export function AuthShell({
         <Brand />
         <div className="story-copy">
           <span className="eyebrow light">
-            {parent ? "ESPACE PARENT" : "ESPACE PROFESSIONNEL"}
+            {parent ? "ESPACE PARENT" : "ESPACE SOIGNANT"}
           </span>
           <p className="story-title">
             Une histoire de santé.
@@ -42,7 +42,7 @@ export function AuthShell({
         <p className="story-footer">
           {parent
             ? "Un carnet partagé avec les professionnels qui suivent votre enfant."
-            : "Conçu pour les professionnels de santé au Maroc."}
+            : "Pour les médecins et infirmier(e)s au Maroc."}
         </p>
       </section>
       <section className="auth-main">
@@ -51,7 +51,7 @@ export function AuthShell({
         </Link>
         <div className="auth-card">
           <span className="eyebrow">
-            {parent ? "MON ENFANT · PARENTS" : "MON ENFANT · PROFESSIONNELS"}
+            {parent ? "MON ENFANT · PARENTS" : "MÉDECINS ET INFIRMIER(E)S"}
           </span>
           <h1 id="main-content" tabIndex={-1}>
             {mode === "login"
@@ -63,7 +63,7 @@ export function AuthShell({
               ? "Connectez-vous à votre espace sécurisé."
               : parent
                 ? "Créez votre compte parent. Aucun carnet ne sera ouvert avant vérification."
-                : "Créez votre compte professionnel."}
+                : "Créez votre compte soignant. Déclarez ensuite votre métier dans votre espace."}
           </p>
           {!configured && (
             <div className="notice">
@@ -91,10 +91,17 @@ export function AuthShell({
                 (mode === "login" ? "/signup" : "/login") +
                 (parent
                   ? `?audience=parent${invitation ? "&next=invitation" : ""}`
-                  : "")
+                  : "?audience=clinician")
               }
             >
               {mode === "login" ? "Créer un compte" : "Se connecter"}
+            </Link>
+          </p>
+          <p className="auth-switch">
+            <Link href={parent ? "/login?audience=clinician" : "/login"}>
+              {parent
+                ? "Espace soignant · Médecins et infirmier(e)s"
+                : "Accéder à l’espace parent"}
             </Link>
           </p>
         </div>

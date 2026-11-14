@@ -29,4 +29,4 @@ class Browser:
   parts.append(f'--{boundary}--\r\n'.encode());req=urllib.request.Request(SITE+path,data=b''.join(parts),headers={'Content-Type':f'multipart/form-data; boundary={boundary}','Origin':SITE},method='POST')
   with self.opener.open(req,timeout=50) as r:return r.geturl(),r.read().decode('utf8'),r.headers
  def login(self,email,password):
-  _,page,_=self.get('/login');return self.submit('/login',page,{'email':email,'password':password},lambda f:'email' in f['names'])
+  _,page,_=self.get('/login?audience=clinician');return self.submit('/login?audience=clinician',page,{'email':email,'password':password},lambda f:'email' in f['names'])

@@ -1,3 +1,4 @@
+import { authDestination } from "@/lib/auth-destination";
 import { type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { supabaseConfig } from "@/lib/supabase/config";
@@ -16,7 +17,9 @@ export async function GET(request: NextRequest) {
     if (!error)
       return authRedirect(
         request.url,
-        type === "recovery" ? "/auth/reset-password" : "/account",
+        type === "recovery"
+          ? "/auth/reset-password"
+          : authDestination(request.nextUrl.searchParams.get("next")),
       );
   }
   return authRedirect(request.url, callbackFailurePath(type === "recovery"));

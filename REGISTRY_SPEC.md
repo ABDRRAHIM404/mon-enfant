@@ -6,7 +6,7 @@ This is the implemented registry contract. It implements the registry scope in P
 
 ## Data and unknowns
 
-- Add professional/facility membership. Approved doctors can maintain a declared practice/register scope; unverified/suspended/admin accounts cannot create clinical registry records. Record the declaring professional and timestamp. Facility declaration is not proof of institutional licensure.
+- Add professional/facility membership. Approved doctors can maintain a declared practice/register scope; unverified/suspended/admin accounts cannot create trusted clinical registry records. Update 2 permits unverified doctors/nurses to create isolated records in the separate private provisional ledger, without trusted grants or sharing. Record the declaring professional and timestamp. Facility declaration is not proof of institutional licensure.
 - Retain both immutable child keys. Extend demographics to represent unknown/provisional names and exact/estimated/unknown birth dates. Never manufacture a date/name for an old paper record. Unknown/estimated birth date must prevent unqualified automatic vaccine date classification later. Sex can remain unknown.
 - New-child and paper-transcription forms share the registry transaction but retain source type, paper reference, history completeness and verification/provenance. Minimum fields and conditional validation must match the selected certainty/source.
 - Optional declared guardian/contact details are care contact information, not a verified legal guardianship link. Do not merge children or grant parent access based on matching names, dates or phones.

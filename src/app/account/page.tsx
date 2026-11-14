@@ -29,7 +29,9 @@ export default async function Account() {
         <span className="round-icon">
           <ShieldCheck />
         </span>
-        <span className="eyebrow">MON COMPTE PROFESSIONNEL</span>
+        <span className="eyebrow">
+          ESPACE SOIGNANT · MÉDECINS ET INFIRMIER(E)S
+        </span>
         <h1 id="main-content" tabIndex={-1}>
           Votre statut de vérification
         </h1>
@@ -45,8 +47,13 @@ export default async function Account() {
         </p>
         {!profile ? (
           <form action={initializeProfile}>
+            <label htmlFor="role">Votre métier</label>
+            <select id="role" name="role" required>
+              <option value="doctor">Médecin</option>
+              <option value="nurse">Infirmier(e)</option>
+            </select>
             <button className="button primary">
-              Activer mon espace professionnel
+              Activer mon espace soignant
             </button>
           </form>
         ) : canReview ? (
@@ -61,7 +68,7 @@ export default async function Account() {
           <Link className="button primary" href="/dashboard">
             Ouvrir mon espace
           </Link>
-        ) : profile.role === "doctor" &&
+        ) : ["doctor", "nurse"].includes(profile.role) &&
           profile.verification_status !== "suspended" ? (
           <Link className="button primary" href="/verification">
             {profile.verification_status === "under_review"
@@ -89,11 +96,17 @@ export default async function Account() {
             </Link>
           </p>
         )}
-        <p>
-          <Link className="button secondary" href="/parent">
-            Ouvrir mon espace parent
-          </Link>
-        </p>
+        {profile &&
+          ["doctor", "nurse"].includes(profile.role) &&
+          ["unverified", "under_review", "approved"].includes(
+            profile.verification_status,
+          ) && (
+            <p>
+              <Link className="button secondary" href="/provisional">
+                Ouvrir mes dossiers provisoires
+              </Link>
+            </p>
+          )}
         <p className="fine">
           Environnement de développement · Données et documents fictifs
           uniquement

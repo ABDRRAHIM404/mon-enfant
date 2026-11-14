@@ -90,13 +90,13 @@ test("workspace refresh persists real provider sessions without a public health 
       await route.abort();
     else await route.continue();
   });
-  await page.goto("/login");
+  await page.goto("/login?audience=clinician");
   await page.locator('[name="email"]').fill(email);
   await page.keyboard.press("Tab");
   await expect(page.locator('[name="password"]')).toBeFocused();
   await page.locator('[name="password"]').fill(password);
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/\/account$/);
+  await expect(page).toHaveURL(/\/(account|dashboard|provisional)$/);
 
   const routes = [
     ["/vaccines", "Catalogue vaccinal"],

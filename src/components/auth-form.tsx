@@ -6,7 +6,7 @@ import { signIn, signUp } from "@/app/auth/actions";
 export function AuthForm({
   mode,
   configured,
-  destination = "account",
+  destination = "parent",
 }: {
   mode: "login" | "signup";
   configured: boolean;
@@ -30,7 +30,7 @@ export function AuthForm({
         type="email"
         autoComplete="email"
         placeholder={
-          destination === "account" ? "docteur@exemple.ma" : "vous@exemple.ma"
+          destination === "account" ? "soignant@exemple.ma" : "vous@exemple.ma"
         }
         required
         maxLength={254}
@@ -84,8 +84,8 @@ export function AuthForm({
         {destination !== "account"
           ? "Confirmez votre e-mail. Chaque carnet nécessite ensuite une vérification distincte de votre qualité de responsable."
           : mode === "signup"
-            ? "Votre compte sera non vérifié. L’accès clinique nécessite une validation professionnelle."
-            : "Espace réservé aux professionnels de santé."}
+            ? "Votre compte sera non vérifié. Vos premiers dossiers resteront provisoires et privés."
+            : "Médecins et infirmier(e)s · Les accès partagés nécessitent une vérification."}
       </p>
     </form>
   );

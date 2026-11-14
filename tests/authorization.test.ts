@@ -20,6 +20,24 @@ describe("professional authorization", () => {
       );
     });
   }
+  it("allows verified nurses under the same workspace conditions", () => {
+    expect(
+      canAccessClinicalWorkspace({
+        user_id: "n",
+        role: "nurse",
+        verification_status: "approved",
+        professional_id: "N-001",
+      }),
+    ).toBe(true);
+    expect(
+      canAccessClinicalWorkspace({
+        user_id: "n",
+        role: "nurse",
+        verification_status: "unverified",
+        professional_id: null,
+      }),
+    ).toBe(false);
+  });
   it("does not give administrators clinical access", () => {
     expect(
       canAccessClinicalWorkspace({

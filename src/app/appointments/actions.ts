@@ -91,7 +91,7 @@ export async function saveAppointment(
     if (result.error.code === "42501")
       return {
         error:
-          "Le médecin responsable, le lieu, votre accès au dossier ou l’habilitation ne permet plus cette décision.",
+          "Le soignant responsable, le lieu, votre accès au dossier ou l’habilitation ne permet plus cette décision.",
       };
     if (
       ["22023", "22P02", "22007", "22008", "23514", "23502"].includes(

@@ -23,14 +23,14 @@ function credential(role: Role, field: "EMAIL" | "PASSWORD") {
 async function login(page: Page, role: Role) {
   await page.goto(
     role === "DOCTOR" || role === "OUTSIDE"
-      ? "/login"
+      ? "/login?audience=clinician"
       : "/login?audience=parent",
   );
   await page.locator('[name="email"]').fill(credential(role, "EMAIL"));
   await page.locator('[name="password"]').fill(credential(role, "PASSWORD"));
   await page.getByRole("button", { name: "Se connecter", exact: true }).click();
   await expect(page).toHaveURL(
-    role === "DOCTOR" || role === "OUTSIDE" ? /\/account$/ : /\/parent$/,
+    role === "DOCTOR" || role === "OUTSIDE" ? /\/dashboard$/ : /\/parent$/,
   );
 }
 async function token(context: BrowserContext) {

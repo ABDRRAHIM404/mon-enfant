@@ -26,7 +26,7 @@ def sql(text):
  return json.loads(r.stdout).get('rows',[])
 def create(kind,role='doctor',manager=False):
  email=f'qa-clinical-{run}-{kind}@example.invalid';password=secrets.token_urlsafe(30);status,u=api('/auth/v1/admin/users',{'email':email,'password':password,'email_confirm':True,'app_metadata':{'synthetic_fixture':True,'fixture_run':run}},admin=True);assert status in(200,201);uid=u['id'];fixtures.append(uid)
- web=Browser();_,page,_=web.login(email,password);web.submit('/account',page,{},lambda f:'Activer mon espace professionnel'in f['text'])
+ web=Browser();_,page,_=web.login(email,password);web.submit('/account',page,{},lambda f:'Activer mon espace soignant'in f['text'])
  platform=f'QAC-{run}-{kind}';sql(f"update public.professional_profiles set role='{role}',verification_status='approved',professional_id='{platform}' where user_id='{uid}'")
  if manager:sql(f"insert into private.staff_permissions(user_id,can_manage_clinical_permissions) values('{uid}',true)")
  status,session=api('/auth/v1/token?grant_type=password',{'email':email,'password':password});assert status==200;sessions.append(session);return{'id':uid,'web':web,'token':session['access_token'],'platform':platform}

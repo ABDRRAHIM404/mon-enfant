@@ -31,13 +31,13 @@ def create(kind):
  fixtures.append(user['id']);return user['id'],email,password
 try:
  doctor,email,password=create('doctor');owner=Browser();url,page,_=owner.login(email,password)
- check(url.endswith('/account') and 'Activer mon espace professionnel' in page,'Hosted login form creates a working server session')
+ check(url.endswith('/account') and 'Activer mon espace soignant' in page,'Hosted login form creates a working server session')
  auth_cookies=[c for c in owner.jar if c.name.startswith('sb-') and 'auth-token' in c.name]
  check(auth_cookies and all(c.secure and c.has_nonstandard_attr('HttpOnly') for c in auth_cookies),'Hosted session cookies are Secure and HTTP-only')
- url,page,_=owner.submit('/account',page,{},lambda f:'Activer mon espace professionnel' in f['text'])
- check(url.endswith('/account') and 'Soumettre mes justificatifs' in page,'Profile activation form initializes the unverified account')
+ url,page,_=owner.submit('/account',page,{},lambda f:'Activer mon espace soignant' in f['text'])
+ check(url.endswith('/provisional') and 'Non vérifié' in page,'Profile activation form initializes the unverified account')
  reviewer,email2,password2=create('reviewer');staff=Browser();_,page,_=staff.login(email2,password2)
- staff.submit('/account',page,{},lambda f:'Activer mon espace professionnel' in f['text'])
+ staff.submit('/account',page,{},lambda f:'Activer mon espace soignant' in f['text'])
  sql(f"begin; update public.professional_profiles set role='admin',verification_status='approved',professional_id='QAW-ADMIN-{run}' where user_id='{reviewer}'; insert into private.staff_permissions(user_id,can_review_professionals) values ('{reviewer}',true); commit;")
  reviewReady=True
  _,page,_=owner.get('/verification')

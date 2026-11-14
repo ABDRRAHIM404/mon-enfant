@@ -40,7 +40,8 @@ export async function submitApplication(
     .single();
   if (
     profileError ||
-    profile?.role !== "doctor" ||
+    !profile ||
+    !["doctor", "nurse"].includes(profile.role) ||
     !["unverified", "rejected"].includes(profile.verification_status)
   )
     return { error: "Votre compte ne permet pas une nouvelle soumission." };

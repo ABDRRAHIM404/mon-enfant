@@ -39,7 +39,31 @@ export async function signIn(_: AuthState, form: FormData): Promise<AuthState> {
       error:
         "Connexion impossible. Vérifiez vos identifiants et la confirmation de votre e-mail.",
     };
-  redirect(authDestination(form.get("destination")));
+  const destination = authDestination(form.get("destination"));
+  if (destination === "/account") {
+    const {
+      data: { user },
+    } = await client.auth.getUser();
+    if (user) {
+      const { data: profile } = await client
+        .from("professional_profiles")
+        .select("role,verification_status,professional_id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (profile && ["doctor", "nurse"].includes(profile.role)) {
+        if (
+          profile.verification_status === "approved" &&
+          profile.professional_id
+        )
+          redirect("/dashboard");
+        if (
+          ["unverified", "under_review"].includes(profile.verification_status)
+        )
+          redirect("/provisional");
+      }
+    }
+  }
+  redirect(destination);
 }
 export async function signUp(_: AuthState, form: FormData): Promise<AuthState> {
   if (!supabaseConfig())
@@ -72,6 +96,7 @@ export async function signUp(_: AuthState, form: FormData): Promise<AuthState> {
       "next",
       destination === "/parent" ? "parent" : "parent-invitation",
     );
+  else confirmation.searchParams.set("next", "account");
   const { error } = await client.auth.signUp({
     ...input,
     options: { emailRedirectTo: confirmation.toString() },
@@ -87,17 +112,14 @@ export async function signUp(_: AuthState, form: FormData): Promise<AuthState> {
       "Si cette adresse peut être inscrite, un e-mail de confirmation vous sera envoyé. Confirmez votre adresse, puis connectez-vous.",
   };
 }
-export async function initializeProfile() {
-  const { user, supabase } = await requireUser();
-  // RLS and column grants enforce unverified doctor defaults, even for direct API calls.
-  const { error } = await supabase
-    .from("professional_profiles")
-    .upsert(
-      { user_id: user.id },
-      { onConflict: "user_id", ignoreDuplicates: true },
-    );
-  if (error) throw new Error("Impossible de créer le profil professionnel.");
-  redirect("/account");
+export async function initializeProfile(form: FormData) {
+  const { supabase } = await requireUser();
+  const role = String(form.get("role") ?? "doctor");
+  if (!["doctor", "nurse"].includes(role))
+    throw new Error("Choisissez votre métier.");
+  const { error } = await supabase.rpc("enroll_clinician", { p_role: role });
+  if (error) throw new Error("Impossible de créer le profil soignant.");
+  redirect("/provisional");
 }
 export async function signOut() {
   const { supabase } = await requireUser();
