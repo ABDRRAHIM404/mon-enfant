@@ -13,6 +13,11 @@ function failure(code: string | undefined) {
       error:
         "Demande indisponible ou modifiée. Vérifiez vos autorisations et actualisez la page.",
     };
+  if (code === "PT429")
+    return {
+      error:
+        "Trop de demandes. Attendez avant de réessayer, ou contactez le professionnel pour une question urgente.",
+    };
   if (code === "22023")
     return {
       error: "Vérifiez les informations, le motif et les contrôles requis.",
@@ -183,5 +188,88 @@ export async function revokeGuardianAccess(
   revalidatePath(`/patients/${child}/guardians`);
   revalidatePath(`/parent/children/${child}`);
   revalidatePath("/parent");
+  return { success: true };
+}
+
+export async function saveParentSettings(
+  _: ParentState,
+  form: FormData,
+): Promise<ParentState> {
+  const { supabase } = await requireUser();
+  const phone = String(form.get("contactPhone") ?? "").trim(),
+    days = Number(form.get("reminderDays"));
+  if ((phone && !/^[+0-9 ()-]{5,32}$/.test(phone)) || ![1, 3, 7].includes(days))
+    return failure("22023");
+  const { error } = await supabase.rpc("save_parent_settings", {
+    p_contact_phone: phone || null,
+    p_email_updates: form.get("emailUpdates") === "on",
+    p_reminder_days: days,
+  });
+  if (error) return failure(error.code);
+  revalidatePath("/parent/settings");
+  return { success: true };
+}
+export async function requestParentCorrection(
+  _: ParentState,
+  form: FormData,
+): Promise<ParentState> {
+  const { supabase } = await requireUser();
+  const operation = String(form.get("operationId") ?? ""),
+    child = String(form.get("childId") ?? ""),
+    category = String(form.get("category") ?? ""),
+    entry = String(form.get("entryId") ?? ""),
+    message = String(form.get("message") ?? "").trim();
+  if (
+    !uuid.test(operation) ||
+    !uuid.test(child) ||
+    !["clinical", "identity", "access", "other"].includes(category) ||
+    (entry && !uuid.test(entry)) ||
+    message.length < 20 ||
+    message.length > 2000
+  )
+    return failure("22023");
+  const { error } = await supabase.rpc("request_parent_correction", {
+    p_operation_id: operation,
+    p_child_id: child,
+    p_category: category,
+    p_entry_id: entry || null,
+    p_message: message,
+  });
+  if (error) return failure(error.code);
+  revalidatePath(`/parent/children/${child}/requests`);
+  revalidatePath("/parent/requests");
+  revalidatePath("/parent-requests");
+  return { success: true };
+}
+export async function respondParentCorrection(
+  _: ParentState,
+  form: FormData,
+): Promise<ParentState> {
+  const { supabase } = await requireUser();
+  const operation = String(form.get("operationId") ?? ""),
+    request = String(form.get("requestId") ?? ""),
+    child = String(form.get("childId") ?? ""),
+    outcome = String(form.get("outcome") ?? ""),
+    entry = String(form.get("correctionEntryId") ?? ""),
+    message = String(form.get("message") ?? "").trim();
+  if (
+    ![operation, request, child].every((id) => uuid.test(id)) ||
+    !["answered", "rejected", "corrected", "withdrawn"].includes(outcome) ||
+    (entry && !uuid.test(entry)) ||
+    message.length < 10 ||
+    message.length > 2000
+  )
+    return failure("22023");
+  const { error } = await supabase.rpc("respond_parent_correction", {
+    p_operation_id: operation,
+    p_request_id: request,
+    p_outcome: outcome,
+    p_message: message,
+    p_correction_entry_id: entry || null,
+  });
+  if (error) return failure(error.code);
+  revalidatePath(`/parent/children/${child}/requests`);
+  revalidatePath("/parent/requests");
+  revalidatePath("/parent-requests");
   return { success: true };
 }

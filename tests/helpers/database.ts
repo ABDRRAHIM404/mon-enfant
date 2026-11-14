@@ -149,3 +149,14 @@ export async function guardianDatabase() {
   );
   return db;
 }
+
+export async function parentPrivacyDatabase() {
+  const db = await guardianDatabase();
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/20261114151738_parent_requests_privacy.sql",
+      "utf8",
+    ),
+  );
+  return db;
+}

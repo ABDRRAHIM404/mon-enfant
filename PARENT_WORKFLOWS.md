@@ -1,0 +1,27 @@
+# Parent account, requests and privacy
+
+This is the synthetic-data application contract. Qualified guardianship, clinical and privacy approvals remain separate external gates.
+
+## Existing-child access
+
+A parent account label has no clinical authority. A child manager creates a recipient-bound 24-hour invitation, stored only as a SHA-256 hash. The personal URL places the secret in its fragment. The browser retains it per tab while the user signs in and removes the fragment from the displayed URL. Claiming requires the current confirmed recipient account and creates only a pending receipt. A distinct approved doctor with current child-management authority records identity and guardianship checks, source/reference, reason, bounded expiry and separate export permission before a link is created. Multiple verified guardians are independent; withdrawing or revoking one link leaves the other links and the clinical record intact.
+
+Parents can read their linked child's attributed care/vaccinations, raw growth measurements and shared appointment states. They cannot use professional writes. Export requires its explicit guardian-link flag and includes retained clinical revisions and vaccine/appointment history. No automatic catch-up or schedule approval is introduced. Invitation email, QR and the full hosted scanner/claim acceptance remain separate outstanding work.
+
+## Requests instead of overwrites
+
+From a care entry, a parent can request a verification/correction tied to that immutable entry and revision. General requests concern identity, access or another question. Only a guardian with a current verified child link can submit/read their own request or withdraw an unanswered one. A second guardian cannot see another parent's messages merely because they share access to the child.
+
+A doctor currently managing the child's access sees a scoped queue and may answer, refuse with an explanation, or reference an already-recorded clinical amendment. Marking a request corrected requires a newer revision of the same child/root, recorded after the request by the responder, plus the responder's current matching clinical capability. The doctor must use the normal clinical amendment workflow first. Requests and final responses are append-only; the unique response and PT409 business conflict prevent competing closures. Submissions/replies use retained operation UUIDs for safe retries. Limits are ten pending requests per child/guardian and twenty submissions per guardian in 24 hours.
+
+This queue is asynchronous, without a promised response time or emergency service. No request submission sends an email in the current implementation.
+
+## Contact and delivery preferences
+
+The account may save an optional private phone number, follow-up email consent (initially false) and a preferred reminder lead time of 1, 3 or 7 days. Each saved setting has an immutable private history. Settings do not change Auth identity, guardianship, professional approval, treatment or other guardians' preferences. Saved consent does not mean delivery is enabled: email follow-up/reminder delivery still requires the separate Resend worker/domain integration. No SMS capability is implied.
+
+## Access history
+
+An active guardian can page through known consultation/export/request activities since the beginning of their current verified link. The projection identifies their own activity and professional platform IDs where appropriate, while other guardians remain anonymous. It returns metadata, never tokens, email addresses, other guardians' names or clinical payloads. History reads are themselves audited. Once the link expires or is revoked, the child history/requests are no longer accessible through that parent link. This consultation log is separate from immutable clinical authorship/revisions and from any formal data-subject request process still requiring an approved policy.
+
+All tables remain private with RLS and no client table grants. Public RPCs use caller sessions and explicit database authorization. No general-admin, registry-only or editable-metadata bypass is added.

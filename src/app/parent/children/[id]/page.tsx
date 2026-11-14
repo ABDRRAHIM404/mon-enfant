@@ -81,6 +81,12 @@ export default async function ChildBooklet({
         <a href="#growth">Croissance</a>
         <a href="#appointments">Rendez-vous</a>
         <a href="#access">Mon accès</a>
+        <Link href={`/parent/children/${id}/requests`}>
+          Demandes et corrections
+        </Link>
+        <Link href={`/parent/children/${id}/privacy`}>
+          Confidentialité et accès
+        </Link>
       </nav>
       <div className="actions no-print">
         <PrintButton />
@@ -105,7 +111,16 @@ export default async function ChildBooklet({
         </p>
         {entries.length ? (
           entries.map((entry) => (
-            <EntryCard key={entry.id} entry={entry} link={false} />
+            <div key={entry.id}>
+              <EntryCard entry={entry} link={false} />
+              <p className="no-print">
+                <Link
+                  href={`/parent/children/${id}/requests?entry=${entry.id}`}
+                >
+                  Demander une correction pour ce soin
+                </Link>
+              </p>
+            </div>
           ))
         ) : (
           <p>Aucun soin documenté sur cette page.</p>
