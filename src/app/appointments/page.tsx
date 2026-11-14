@@ -121,10 +121,10 @@ export default async function Calendar({
                   ? "muted"
                   : ""
               }
-              aria-label={`${day.slice(8)} ${counts.get(day) || 0} RDV — ${day}`}
             >
               <span>{day.slice(8)}</span>
               <small>{counts.get(day) || 0} RDV</small>
+              <span className="sr-only"> — {day}</span>
             </Link>
           ))}
         </div>

@@ -41,18 +41,40 @@ test("approved workspace supports accessible pages and keyboard-only account and
     page,
     page.getByRole("button", { name: "Se connecter", exact: true }),
   );
+  await expect
+    .poll(
+      async () => (await page.locator('[name="email"]').inputValue()) === email,
+    )
+    .toBe(true);
+  await expect
+    .poll(
+      async () =>
+        (await page.locator('[name="password"]').inputValue()) === password,
+    )
+    .toBe(true);
+  expect(
+    await page
+      .locator("form.auth-form")
+      .evaluate((form) => (form as HTMLFormElement).checkValidity()),
+  ).toBe(true);
+  await expect(
+    page.getByRole("button", { name: "Se connecter", exact: true }),
+  ).toBeFocused();
   let releaseLogin = () => {};
   let requestHeld = false;
   const loginGate = new Promise<void>((resolve) => {
     releaseLogin = resolve;
   });
-  await page.route("**/login", async (route) => {
-    if (route.request().method() === "POST") {
-      requestHeld = true;
-      await loginGate;
-    }
-    await route.continue();
-  });
+  await page.route(
+    (url) => url.pathname === "/login",
+    async (route) => {
+      if (route.request().method() === "POST") {
+        requestHeld = true;
+        await loginGate;
+      }
+      await route.continue();
+    },
+  );
   try {
     await page.keyboard.press("Enter");
     await expect.poll(() => requestHeld).toBe(true);
