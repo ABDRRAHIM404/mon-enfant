@@ -47,6 +47,17 @@ async function actor(db, label, manager = false) {
     );
   return value;
 }
+async function fixtureAppointmentTime(db, wallTime) {
+  const local = `${wallTime}:00`;
+  const row = (
+    await db.query(
+      "select (($1::text||'+01:00')::timestamptz at time zone 'Africa/Casablanca'=$1::timestamp) plus_one, (($1::text||'+00:00')::timestamptz at time zone 'Africa/Casablanca'=$1::timestamp) utc_zero",
+      [local],
+    )
+  ).rows[0];
+  assert.equal(Number(row.plus_one) + Number(row.utc_zero), 1);
+  return local + (row.plus_one ? "+01:00" : "+00:00");
+}
 async function fingerprint(db) {
   const tables = (
     await db.query(
@@ -169,8 +180,8 @@ async function backup() {
       "consultation",
       "Rendez-vous fictif",
       null,
-      "2026-01-02T10:00:00+01:00",
-      "2026-01-02T10:30:00+01:00",
+      await fixtureAppointmentTime(db, "2026-01-02T10:00"),
+      await fixtureAppointmentTime(db, "2026-01-02T10:30"),
       "Création fictive pour récupération.",
       true,
     ]);
@@ -179,8 +190,8 @@ async function backup() {
       appointment,
       1,
       "reschedule",
-      "2030-01-03T10:00:00+01:00",
-      "2030-01-03T10:30:00+01:00",
+      await fixtureAppointmentTime(db, "2030-01-03T10:00"),
+      await fixtureAppointmentTime(db, "2030-01-03T10:30"),
       "Déplacement entièrement fictif.",
       true,
     ]);
