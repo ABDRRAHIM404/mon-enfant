@@ -386,6 +386,7 @@ test("QA catalog review and cross-doctor vaccine continuity preserve every decis
     expect(found).toBe(true);
     await inspect(manager, "catalog-paginated-list");
     await manager.getByRole("link", { name: seedLabel, exact: true }).click();
+    await expect(manager).toHaveURL(/\/vaccines\/[a-f0-9-]{36}$/i);
     const seedPath = new URL(manager.url()).pathname;
     await expect(
       manager.getByText("Brouillon — non activé · révision 1", { exact: true }),
