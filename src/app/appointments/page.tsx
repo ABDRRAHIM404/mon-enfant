@@ -133,6 +133,7 @@ export default async function Calendar({
           du calendrier couvrent toute la période ; la liste est paginée par 50.
         </p>
       </section>
+      <h2>Rendez-vous de la période</h2>
       {data.items.map((appointment) => (
         <AppointmentCard key={appointment.id} appointment={appointment} />
       ))}

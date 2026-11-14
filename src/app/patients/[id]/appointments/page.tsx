@@ -37,7 +37,9 @@ export default async function PatientAppointments({
     <main className="account-page wide">
       <DoctorNav />
       <div className="page-heading">
-        <h1 id="main-content" tabIndex={-1}>Rendez-vous — {patientName(profile.data as ChildProfile)}</h1>
+        <h1 id="main-content" tabIndex={-1}>
+          Rendez-vous — {patientName(profile.data as ChildProfile)}
+        </h1>
         <p className="muted">
           Les rendez-vous des professionnels autorisés restent attribués à leur
           responsable.
@@ -54,6 +56,7 @@ export default async function PatientAppointments({
         )}
       </div>
       <LiveRefresh />
+      <h2>Rendez-vous conservés</h2>
       {data.items.map((appointment) => (
         <AppointmentCard key={appointment.id} appointment={appointment} />
       ))}
