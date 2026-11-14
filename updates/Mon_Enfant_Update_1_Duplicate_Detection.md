@@ -1,3 +1,5 @@
+> Implementation checkpoint: source/cloud and hosted API checks passed (see PROGRESS.md). Combined authenticated UI acceptance remains pending. Original requirements follow.
+
 # Mon Enfant — Next Update
 
 **Feature:** Child registration duplicate detection  
