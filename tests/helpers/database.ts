@@ -111,3 +111,19 @@ export async function appointmentDatabase() {
   );
   return db;
 }
+
+// Complete current model, including the minimal Auth email/ban fields needed by
+// mail dispatch. Existing phase-specific migration tests retain their scope.
+export async function notificationDatabase() {
+  const db = await appointmentDatabase();
+  await db.exec(
+    "alter table auth.users add column email text, add column email_confirmed_at timestamptz, add column banned_until timestamptz;",
+  );
+  for (const file of [
+    "20261113190856_evidence_upload_limit.sql",
+    "20261113203528_operational_readiness.sql",
+    "20261114134227_approval_notifications.sql",
+  ])
+    await db.exec(readFileSync(`supabase/migrations/${file}`, "utf8"));
+  return db;
+}

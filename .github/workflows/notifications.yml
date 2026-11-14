@@ -1,0 +1,21 @@
+name: Approval notification delivery
+on:
+  schedule:
+    - cron: "43 */6 * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: approval-notifications
+  cancel-in-progress: false
+jobs:
+  dispatch:
+    if: github.event_name == 'workflow_dispatch' || vars.APP_EMAIL_DISPATCH_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dispatch committed approval notices through the scoped application worker
+        env:
+          APP_EMAIL_CRON_SECRET: ${{ secrets.APP_EMAIL_CRON_SECRET }}
+        run: python3 scripts/dispatch-notifications.py

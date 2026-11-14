@@ -82,3 +82,9 @@ incident/retention acceptance stay open in PLAN_CHECKLIST.md.
   private Storage behavior, deployment health and monitoring after recovery.
 - Agree and demonstrate loss/recovery targets, incident escalation and retention/
   legal holds with the responsible owner and qualified reviewers before a pilot.
+
+
+Application mail must be disabled during hosted recovery and its outbox reconciled
+against provider history before dispatch resumes. A restored pending snapshot can
+otherwise replay a notice already sent after that snapshot, beyond the provider's
+idempotency retention. See [APPLICATION_EMAIL.md](APPLICATION_EMAIL.md).

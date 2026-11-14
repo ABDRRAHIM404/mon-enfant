@@ -7,7 +7,7 @@ import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import assert from "node:assert/strict";
 import {
-  appointmentDatabase,
+  notificationDatabase,
   sessionActing,
 } from "../tests/helpers/database.ts";
 
@@ -108,13 +108,8 @@ function verifyBytes(manifest, database, object) {
 
 async function backup() {
   stage = "backup-schema";
-  const db = await appointmentDatabase();
+  const db = await notificationDatabase();
   try {
-    for (const file of [
-      "20261113190856_evidence_upload_limit.sql",
-      "20261113203528_operational_readiness.sql",
-    ])
-      await db.exec(await readFile(`supabase/migrations/${file}`, "utf8"));
     stage = "backup-fixture";
     const doctor = await actor(db, "DOCTOR"),
       outside = await actor(db, "OUTSIDE"),

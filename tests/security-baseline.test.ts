@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import type { PGlite } from "@electric-sql/pglite";
-import { appointmentDatabase } from "./helpers/database";
+import { notificationDatabase } from "./helpers/database";
 
 let db: PGlite;
 const review = readFileSync("supabase/checks/security-baseline.sql", "utf8");
@@ -9,12 +9,7 @@ async function inspect() {
   return (await db.query<Record<string, unknown>>(review)).rows[0];
 }
 beforeAll(async () => {
-  db = await appointmentDatabase();
-  for (const file of [
-    "20261113190856_evidence_upload_limit.sql",
-    "20261113203528_operational_readiness.sql",
-  ])
-    await db.exec(readFileSync(`supabase/migrations/${file}`, "utf8"));
+  db = await notificationDatabase();
 });
 afterAll(async () => {
   await db?.close();
