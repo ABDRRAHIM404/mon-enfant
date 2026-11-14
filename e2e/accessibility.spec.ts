@@ -54,7 +54,7 @@ test("public authentication navigation is operable from the keyboard", async ({
 }) => {
   await page.goto("/");
   const enter = page.getByRole("link", {
-    name: "Accéder à mon espace",
+    name: "Accéder à mon espace parent",
     exact: true,
   });
   await tabTo(page, enter);
@@ -62,7 +62,7 @@ test("public authentication navigation is operable from the keyboard", async ({
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/login$/);
   const signup = page.getByRole("link", {
-    name: "Créer un compte",
+    name: "Créer un compte parent",
     exact: true,
   });
   await tabTo(page, signup);

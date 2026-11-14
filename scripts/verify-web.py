@@ -59,7 +59,7 @@ try:
  _,page,_=owner.get('/account');check('Ouvrir mon espace' in page,'Approved doctor receives the clinical workspace link')
  _,page,_=owner.get('/verification');check('Motif de décision' in page,'Applicant history renders the persisted decision relationship')
  _,page,_=owner.get('/account');url,page,_=owner.submit('/account',page,{},lambda f:'Se déconnecter' in f['text'])
- check('/login' in url and 'Heureux de vous retrouver' in page,'Hosted logout clears the session and returns to login')
+ check('/login' in url and 'Se connecter' in page,'Hosted logout clears the session and returns to login')
  url,_,_=owner.get('/account');check('/login' in url,'The logged-out cookie jar cannot revisit the protected account')
 finally:
  # Close only our synthetic pending applications, including previously interrupted runs.

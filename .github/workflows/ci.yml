@@ -164,6 +164,8 @@ jobs:
           path: |
             test-results/performance-targets.json
             test-results/live/**/updates-proof.json
+            test-results/live/**/design-proof.json
+            test-results/live/**/design-*.png
             test-results/live/**/parent-proof.json
             test-results/live/**/verification-form.png
             test-results/live/**/verification-history.png

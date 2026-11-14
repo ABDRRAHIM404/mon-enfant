@@ -105,7 +105,7 @@ test("requested duplicate and provisional onboarding fixes preserve private boun
     await page.goto("/");
     await page.getByRole("link", { name: /Accéder à mon espace/ }).click();
     await expect(
-      page.getByText("MON ENFANT · PARENTS", { exact: true }),
+      page.getByText("ESPACE PARENT", { exact: true }),
     ).toBeVisible();
     await login(page, "PARENT", true);
     await page.getByRole("link", { name: "Mon compte", exact: true }).click();

@@ -1,16 +1,33 @@
 import Link from "next/link";
-import { HeartPulse } from "lucide-react";
+import Image from "next/image";
+import { ThemeControl } from "./theme-control";
 export function Brand() {
   return (
-    <Link href="/" className="brand">
-      <span className="brand-icon" aria-hidden="true">
-        <HeartPulse size={24} />
-      </span>
-      <span>
-        mon enfant
-        <span className="brand-sub">LE CARNET QUI GRANDIT AVEC LUI</span>
-        <span className="sr-only"> — Accueil</span>
-      </span>
-    </Link>
+    <div className="brand-group">
+      <Link href="/" className="brand">
+        <span className="brand-emblem" aria-hidden="true">
+          <Image
+            className="emblem-light"
+            src="/brand/emblem-light.png"
+            width={44}
+            height={44}
+            alt=""
+          />
+          <Image
+            className="emblem-dark"
+            src="/brand/emblem-dark.png"
+            width={44}
+            height={44}
+            alt=""
+          />
+        </span>
+        <span>
+          mon enfant
+          <span className="brand-sub">LE CARNET QUI GRANDIT AVEC LUI</span>
+          <span className="sr-only"> — Accueil</span>
+        </span>
+      </Link>
+      <ThemeControl />
+    </div>
   );
 }

@@ -1,147 +1,123 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   ArrowRight,
+  Syringe,
+  ChartNoAxesCombined,
+  CalendarDays,
+  FileText,
   ShieldCheck,
-  Fingerprint,
-  ClipboardCheck,
-  HeartPulse,
-  Check,
-  Circle,
 } from "lucide-react";
-import { Brand } from "@/components/brand";
+import { PublicHeader } from "@/components/public-header";
+const features = [
+  {
+    Icon: Syringe,
+    title: "Vaccinations",
+    description: "Calendrier, historique et rappels.",
+  },
+  {
+    Icon: ChartNoAxesCombined,
+    title: "Croissance",
+    description: "Mesures et courbes de suivi.",
+  },
+  {
+    Icon: CalendarDays,
+    title: "Rendez-vous",
+    description: "Prochains soins et consultations.",
+  },
+  {
+    Icon: FileText,
+    title: "Documents",
+    description: "Carnet et documents médicaux.",
+  },
+];
 export default function Home() {
   return (
-    <div className="home">
-      <header className="site-header">
-        <Brand />
-        <nav aria-label="Navigation principale">
-          <Link href="/login?audience=clinician">Espace soignant</Link>
-          <Link href="/login">Se connecter</Link>
-          <Link href="/signup" className="button primary small">
-            Créer un compte <ArrowRight size={16} />
-          </Link>
-        </nav>
-      </header>
-      <main>
-        <section className="hero">
-          <div className="hero-text">
-            <span className="eyebrow">
-              <span className="dot" /> CARNET DE SANTÉ NUMÉRIQUE · MAROC
-            </span>
+    <div className="public-site">
+      <PublicHeader />
+      <main className="landing-main">
+        <section className="landing-hero">
+          <div className="landing-copy">
+            <span className="eyebrow">CARNET DE SANTÉ NUMÉRIQUE · MAROC</span>
             <h1 id="main-content" tabIndex={-1}>
-              Grandir en confiance.
-              <br />
-              <em>Soigner en continuité.</em>
+              Le carnet de santé de votre enfant, <em>à portée de main.</em>
             </h1>
-            <p>
-              Un même carnet de santé tout au long de l’enfance. Un espace
-              parent pour consulter le carnet partagé de votre enfant et suivre
-              ses rendez-vous.
+            <p className="muted">
+              Vaccinations, consultations, croissance et prochains rendez-vous.
+              Un suivi clair pour les parents, dans un seul espace sécurisé.
             </p>
-            <div className="hero-actions">
+            <div className="landing-actions">
               <Link href="/login" className="button primary">
-                Accéder à mon espace <ArrowRight size={18} />
+                Accéder à mon espace parent <ArrowRight size={17} />
               </Link>
-              <span className="fine">Parents et responsables autorisés</span>
+              <Link href="/signup" className="button secondary">
+                Créer un compte parent
+              </Link>
             </div>
-            <div className="hero-note">
-              <ShieldCheck size={17} /> En développement · Données fictives
-              uniquement
-            </div>
+            <p className="clinician-entry">
+              Vous êtes médecin ou infirmier(ère) ?{" "}
+              <Link href="/login?audience=clinician">
+                Espace soignant <ArrowRight size={14} />
+              </Link>
+            </p>
           </div>
-          <div className="booklet">
-            <div className="booklet-top">
-              <HeartPulse size={22} />
-              <span>MON ENFANT</span>
-              <span className="booklet-dot" />
-            </div>
-            <div className="booklet-content">
-              <span className="eyebrow">UN SUIVI QUI SE TRANSMET</span>
-              <h2>Chaque étape compte.</h2>
-              <p>
-                Une identité permanente.
-                <br />
-                Une histoire de soins continue.
-              </p>
-              <div className="booklet-line">
-                <span className="round-icon">
-                  <Fingerprint size={22} />
-                </span>
-                <div>
-                  <strong>Un enfant, un identifiant</strong>
-                  <span>À travers les lieux de soins</span>
-                </div>
-                <Check size={16} />
-              </div>
-              <div className="booklet-line">
-                <span className="round-icon">
-                  <ClipboardCheck size={22} />
-                </span>
-                <div>
-                  <strong>Des soins traçables</strong>
-                  <span>Chaque professionnel identifié</span>
-                </div>
-                <Check size={16} />
-              </div>
-              <div className="booklet-line">
-                <span className="round-icon">
-                  <ShieldCheck size={22} />
-                </span>
-                <div>
-                  <strong>Des accès autorisés</strong>
-                  <span>Au plus près du besoin de soin</span>
-                </div>
-                <Check size={16} />
-              </div>
-            </div>
-            <div className="booklet-footer">
-              LE CARNET QUI GRANDIT AVEC LUI <span>✳</span>
-            </div>
+          <figure className="family-card">
+            <Image
+              src="/brand/family.png"
+              alt="Une mère et son enfant partagent un moment de tendresse."
+              width={560}
+              height={476}
+              sizes="(max-width: 700px) 90vw, 40vw"
+              priority
+            />
+            <figcaption>
+              <strong>Sa santé. Son histoire. Toujours avec vous.</strong>
+              <p>Un carnet qui grandit avec votre enfant.</p>
+            </figcaption>
+          </figure>
+        </section>
+        <section
+          className="landing-features"
+          id="fonctionnalites"
+          aria-label="Les fonctionnalités du carnet"
+        >
+          {features.map(({ Icon, title, description }) => (
+            <article className="feature-card" key={title}>
+              <span className="round-icon">
+                <Icon size={25} aria-hidden="true" />
+              </span>
+              <h2>{title}</h2>
+              <p className="muted">{description}</p>
+            </article>
+          ))}
+        </section>
+        <section className="landing-guidance" id="securite">
+          <ShieldCheck size={24} aria-hidden="true" />
+          <div>
+            <h2>Un carnet partagé, des accès autorisés.</h2>
+            <p>
+              Une invitation sécurisée et une vérification de votre qualité de
+              responsable sont nécessaires pour relier un carnet existant. Votre
+              inscription ne crée pas de dossier médical.
+            </p>
           </div>
         </section>
-        <section className="foundation">
-          <div>
-            <span className="eyebrow">ÉTAPE ACTUELLE</span>
-            <h2>Le carnet de votre enfant.</h2>
-            <p className="muted">
-              Créez votre espace parent. Un carnet existant vous sera partagé
-              après une invitation sécurisée et une vérification de votre
-              qualité de responsable.
-            </p>
-          </div>
-          <ol className="milestones">
-            <li className="current">
-              <span>01</span>
-              <div>
-                <strong>Un compte parent</strong>
-                <p>Connexion et préférences personnelles</p>
-              </div>
-              <span className="pill">Parents</span>
-            </li>
-            <li>
-              <span>02</span>
-              <div>
-                <strong>Un lien autorisé</strong>
-                <p>
-                  Invitation et vérification de votre qualité de responsable
-                </p>
-              </div>
-              <Circle size={17} />
-            </li>
-            <li>
-              <span>03</span>
-              <div>
-                <strong>Le carnet partagé</strong>
-                <p>Soins, vaccinations et rendez-vous autorisés</p>
-              </div>
-              <Circle size={17} />
-            </li>
-          </ol>
+        <section className="landing-help" id="aide">
+          <h2>Besoin d’aide pour commencer ?</h2>
+          <p>
+            Créez votre compte parent, puis utilisez l’invitation remise par un
+            soignant autorisé.{" "}
+            <Link className="text-link" href="/forgot-password">
+              Retrouver l’accès à mon compte
+            </Link>
+            .
+          </p>
         </section>
       </main>
-      <footer className="site-footer">
-        <span>© 2026 Mon Enfant</span>
-        <span>Projet en développement · Données fictives</span>
+      <footer className="site-footer landing-footer">
+        <span>
+          © 2026 Mon Enfant · En développement · Données fictives uniquement
+        </span>
         <Link href="/login?audience=clinician">
           Espace soignant <ArrowRight size={14} />
         </Link>

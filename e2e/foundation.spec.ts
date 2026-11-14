@@ -4,7 +4,7 @@ test("landing, auth navigation, and explicit unconfigured state", async ({
 }, testInfo) => {
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: /Grandir en confiance/ }),
+    page.getByRole("heading", { name: /Le carnet de santé de votre enfant/ }),
   ).toBeVisible();
   await page.screenshot({
     path: testInfo.outputPath("home.png"),
@@ -14,19 +14,17 @@ test("landing, auth navigation, and explicit unconfigured state", async ({
     page.getByRole("link", { name: "Espace soignant", exact: true }).first(),
   ).toHaveAttribute("href", "/login?audience=clinician");
   await page.getByRole("link", { name: /Accéder à mon espace/ }).click();
+  await expect(page.getByText("ESPACE PARENT", { exact: true })).toBeVisible();
   await expect(
-    page.getByText("MON ENFANT · PARENTS", { exact: true }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: "Heureux de vous retrouver." }),
+    page.getByRole("heading", { name: "Se connecter" }),
   ).toBeVisible();
   await expect(page.getByText("Configuration en cours")).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Se connecter" }),
   ).toBeDisabled();
-  await page.getByRole("link", { name: "Créer un compte" }).click();
+  await page.getByRole("link", { name: "Créer un compte parent" }).click();
   await expect(
-    page.getByRole("heading", { name: "Votre espace commence ici." }),
+    page.getByRole("heading", { name: "Créer mon compte" }),
   ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Créer mon compte" }),
@@ -77,7 +75,7 @@ test("protected routes fail closed without Supabase", async ({ page }) => {
     await page.goto(path);
     await expect(page).toHaveURL(/\/login$/);
     await expect(
-      page.getByRole("heading", { name: "Heureux de vous retrouver." }),
+      page.getByRole("heading", { name: "Se connecter" }),
     ).toBeVisible();
   }
 });
@@ -133,10 +131,10 @@ test("clinician authentication stays separate and discoverable", async ({
 }) => {
   await page.goto("/login?audience=clinician");
   await expect(
-    page.getByText("MÉDECINS ET INFIRMIER(E)S", { exact: true }),
+    page.getByText("ESPACE SOIGNANT", { exact: true }),
   ).toBeVisible();
   await page
-    .getByRole("link", { name: "Créer un compte", exact: true })
+    .getByRole("link", { name: "Créer un compte soignant", exact: true })
     .click();
   await expect(page).toHaveURL(/audience=clinician/);
   await expect(
@@ -145,7 +143,5 @@ test("clinician authentication stays separate and discoverable", async ({
   await page
     .getByRole("link", { name: "Accéder à l’espace parent", exact: true })
     .click();
-  await expect(
-    page.getByText("MON ENFANT · PARENTS", { exact: true }),
-  ).toBeVisible();
+  await expect(page.getByText("ESPACE PARENT", { exact: true })).toBeVisible();
 });

@@ -26,7 +26,7 @@ export default defineConfig({
   testDir: "./e2e-live",
   testMatch:
     probe === "updates-accept" || probe === "updates-cloud-accept"
-      ? "updates.spec.ts"
+      ? ["updates.spec.ts", "design.spec.ts"]
       : probe === "parent-accept"
         ? "parent.spec.ts"
         : probe?.startsWith("session-")

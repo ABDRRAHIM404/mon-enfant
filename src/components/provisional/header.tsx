@@ -15,7 +15,13 @@ export function ProvisionalHeader({ profile }: { profile: Professional }) {
           )}
         </nav>
       </header>
-      <section className="panel">
+      <section
+        className={
+          profile.verification_status === "approved"
+            ? "panel"
+            : "panel provisional-warning"
+        }
+      >
         <span className="eyebrow">MÉDECINS ET INFIRMIER(E)S</span>
         <p className="status">
           Compte : {statusLabels[profile.verification_status]} ·{" "}
