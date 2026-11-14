@@ -3,7 +3,7 @@
  */
 import { PGlite } from "@electric-sql/pglite";
 import { createHash, randomUUID } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import assert from "node:assert/strict";
 import {
@@ -15,9 +15,11 @@ const root = "test-results/recovery";
 const bundle = join(root, "bundle");
 const mode = process.argv[2];
 let stage = "mode";
+const knownBusinessErrors = new Set();
 const digest = (bytes) => createHash("sha256").update(bytes).digest("hex");
 async function rpc(db, actor, name, args = []) {
   assert.match(name, /^[a-z_]+$/);
+  stage = `${mode}-rpc-${name}`;
   const result = await sessionActing(
     db,
     actor.id,
@@ -396,13 +398,28 @@ try {
   assert.ok(process.env.GITHUB_ACTIONS === "true", "Cloud runner required.");
   assert.match(process.env.GITHUB_SHA ?? "", /^[a-f0-9]{40}$/);
   assert.ok(["backup", "restore"].includes(mode));
+  // Only exact, constant migration validation messages can enter diagnostics.
+  // Interpolated messages and raw engine/provider details remain withheld.
+  for (const file of await readdir("supabase/migrations")) {
+    if (!/^\d{14}_[a-z_]+\.sql$/.test(file)) continue;
+    const sql = await readFile(`supabase/migrations/${file}`, "utf8");
+    for (const match of sql.matchAll(/raise exception '([^']+)'/g))
+      knownBusinessErrors.add(match[1]);
+  }
   if (mode === "backup") await backup();
   else await restore();
-} catch {
+} catch (error) {
   console.error(
     JSON.stringify({
       status: "failed",
       stage,
+      failure_code:
+        typeof error?.code === "string" && /^[A-Z0-9]{5}$/.test(error.code)
+          ? error.code
+          : "unclassified",
+      business_error: knownBusinessErrors.has(error?.message)
+        ? error.message
+        : "unclassified",
       synthetic_only: true,
       hosted_restore_acceptance_claimed: false,
     }),
