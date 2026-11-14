@@ -1,7 +1,10 @@
 import { test, expect, type Page, type BrowserContext } from "@playwright/test";
 import { writeFileSync } from "node:fs";
 import { observeBrowserErrors } from "./browser-errors";
-const SITE = "https://mon-enfant.vercel.app",
+const SITE =
+    process.env.MON_ENFANT_LIVE_PROBE === "updates-cloud-accept"
+      ? "https://localhost:3443"
+      : "https://mon-enfant.vercel.app",
   API = "https://zkkasbxvdvecnafgjpxd.supabase.co";
 type Role = "DOCTOR" | "OUTSIDE" | "PARENT" | "SECOND";
 const credential = (role: Role, field: string) => {
@@ -88,6 +91,10 @@ test("requested duplicate and provisional onboarding fixes preserve private boun
   const proof: Record<string, unknown> = {
     passed: false,
     synthetic_only: true,
+    application_runtime:
+      process.env.MON_ENFANT_LIVE_PROBE === "updates-cloud-accept"
+        ? "github-cloud-production"
+        : "canonical-vercel",
     device: info.project.name,
   };
   let stage = "parent-entry",
@@ -224,6 +231,7 @@ test("requested duplicate and provisional onboarding fixes preserve private boun
     stage = "cross-author-denial";
     const outsideContext = await browser.newContext({
       baseURL: SITE,
+      ignoreHTTPSErrors: SITE === "https://localhost:3443",
       viewport: info.project.use.viewport,
       isMobile: info.project.use.isMobile,
       hasTouch: info.project.use.hasTouch,
@@ -252,6 +260,7 @@ test("requested duplicate and provisional onboarding fixes preserve private boun
     stage = "duplicate-registration";
     const doctorContext = await browser.newContext({
       baseURL: SITE,
+      ignoreHTTPSErrors: SITE === "https://localhost:3443",
       viewport: info.project.use.viewport,
       isMobile: info.project.use.isMobile,
       hasTouch: info.project.use.hasTouch,
