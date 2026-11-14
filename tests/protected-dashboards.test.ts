@@ -86,10 +86,10 @@ async function linked() {
     true,
   ]);
   const expires = (
-    await db.query<{ day: string }>(
-      "select ((now() at time zone 'Africa/Casablanca')::date+30)::text day",
+    await db.query<{ current_day: string }>(
+      "select ((now() at time zone 'Africa/Casablanca')::date+30)::text current_day",
     )
-  ).rows[0].day;
+  ).rows[0].current_day;
   const link = await rpc<string>(doctor, "review_guardian_claim", [
     randomUUID(),
     claim,
@@ -155,15 +155,15 @@ describe("protected dashboard projections on the complete migrated schema", () =
       identity,
     ]);
     const today = (
-      await db.query<{ day: string }>(
-        "select (now() at time zone 'Africa/Casablanca')::date::text day",
+      await db.query<{ current_day: string }>(
+        "select (now() at time zone 'Africa/Casablanca')::date::text current_day",
       )
-    ).rows[0].day;
+    ).rows[0].current_day;
     const future = (
-      await db.query<{ time: string }>(
-        "select to_char(now()+interval '2 days','YYYY-MM-DD\"T\"HH24:MI:SS')||'+00:00' time",
+      await db.query<{ future_time: string }>(
+        "select to_char(now()+interval '2 days','YYYY-MM-DD\"T\"HH24:MI:SS')||'+00:00' future_time",
       )
-    ).rows[0].time;
+    ).rows[0].future_time;
     const first = await rpc<string>(a, "write_provisional_entry", [
       randomUUID(),
       child,

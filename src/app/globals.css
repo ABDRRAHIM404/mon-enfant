@@ -2279,7 +2279,7 @@ th {
     gap: 10px;
   }
   .workspace-topbar .brand-sub,
-  .workspace-topbar .workspace-account .workspace-chip {
+  .workspace-topbar .workspace-account-label {
     display: none;
   }
   .workspace-discovery,
@@ -2423,5 +2423,29 @@ th {
   .workspace-content {
     margin: 0;
     padding: 0;
+  }
+}
+
+.workspace-account-icon {
+  display: none;
+}
+.workspace-account-link {
+  min-width: 44px;
+  min-height: 44px;
+  justify-content: center;
+}
+@media (max-width: 700px) {
+  .workspace-topbar .workspace-account .workspace-account-link {
+    display: inline-flex;
+    padding: 10px;
+  }
+  .workspace-topbar .workspace-account-label {
+    display: none;
+  }
+  .workspace-topbar .workspace-account-icon {
+    display: block;
+  }
+  .workspace-topbar .workspace-account {
+    gap: 4px;
   }
 }

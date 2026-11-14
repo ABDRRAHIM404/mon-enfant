@@ -181,10 +181,18 @@ export function WorkspaceShell({
             )}
           </Link>
           <Link
-            className="workspace-chip"
+            className="workspace-chip workspace-account-link"
+            aria-label={parent ? "Mon compte" : "Compte soignant"}
             href={parent ? "/parent/account" : "/account"}
           >
-            {parent ? "Compte parent" : "Compte soignant"}
+            <UserRound
+              className="workspace-account-icon"
+              size={19}
+              aria-hidden="true"
+            />
+            <span className="workspace-account-label">
+              {parent ? "Compte parent" : "Compte soignant"}
+            </span>
           </Link>
         </nav>
       </header>
