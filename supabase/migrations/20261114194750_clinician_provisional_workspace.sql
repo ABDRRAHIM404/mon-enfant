@@ -17,14 +17,14 @@ begin
 end $parity$;
 -- Own unverified enrollment only; role choice is a declaration, never approval.
 create function private.enroll_clinician(p_role text) returns void language plpgsql security definer set search_path='' as $$
-declare actor uuid:=auth.uid(); current_role public.professional_role;
+declare actor uuid:=auth.uid(); existing_role public.professional_role;
 begin
  if not private.has_live_session() then raise exception 'Not authorized' using errcode='42501';end if;
  if p_role is null or p_role not in ('doctor','nurse') then raise exception 'Invalid declared role' using errcode='22023';end if;
  perform pg_advisory_xact_lock(hashtextextended('clinician-enroll:'||actor::text,0));
- select role into current_role from public.professional_profiles where user_id=actor;
+ select role into existing_role from public.professional_profiles where user_id=actor;
  if found then
-  if current_role::text<>p_role then raise exception 'Existing role cannot be changed by enrollment' using errcode='42501';end if;
+  if existing_role::text<>p_role then raise exception 'Existing role cannot be changed by enrollment' using errcode='42501';end if;
   return;
  end if;
  insert into public.professional_profiles(user_id,role) values(actor,p_role::public.professional_role);

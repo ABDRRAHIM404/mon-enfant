@@ -15,6 +15,7 @@ on:
         options:
           [
             none,
+            updates-accept,
             parent-accept,
             evidence-reproduce,
             evidence-accept,
@@ -152,6 +153,7 @@ jobs:
           name: ${{ inputs.live_probe == 'accessibility-accept' && 'synthetic-live-accessibility-results' || (inputs.live_probe == 'vaccination-accept' || inputs.live_probe == 'vaccine-accessibility') && 'synthetic-live-vaccination-results' || startsWith(inputs.live_probe, 'session-') && 'synthetic-live-session-results' || (inputs.live_probe == 'clinical-accept' || inputs.live_probe == 'clinical-accessibility' || inputs.live_probe == 'clinical-performance') && 'synthetic-live-clinical-results' || 'synthetic-live-evidence-results' }}
           path: |
             test-results/performance-targets.json
+            test-results/live/**/updates-proof.json
             test-results/live/**/parent-proof.json
             test-results/live/**/verification-form.png
             test-results/live/**/verification-history.png

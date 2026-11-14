@@ -2,6 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 const probe = process.env.MON_ENFANT_LIVE_PROBE;
 if (
   ![
+    "updates-accept",
     "parent-accept",
     "evidence-reproduce",
     "evidence-accept",
@@ -23,21 +24,24 @@ if (!/^[a-f0-9]{16}$/.test(process.env.MON_ENFANT_QA_RUN ?? ""))
 export default defineConfig({
   testDir: "./e2e-live",
   testMatch:
-    probe === "parent-accept"
-      ? "parent.spec.ts"
-      : probe?.startsWith("session-")
-        ? "session.spec.ts"
-        : probe === "accessibility-accept"
-          ? "accessibility.spec.ts"
-          : probe === "vaccination-accept" || probe === "vaccine-accessibility"
-            ? "vaccination.spec.ts"
-            : probe === "clinical-inspect"
-              ? "clinical-inspect.spec.ts"
-              : probe === "clinical-accept" ||
-                  probe === "clinical-accessibility" ||
-                  probe === "clinical-performance"
-                ? "clinical.spec.ts"
-                : "evidence.spec.ts",
+    probe === "updates-accept"
+      ? "updates.spec.ts"
+      : probe === "parent-accept"
+        ? "parent.spec.ts"
+        : probe?.startsWith("session-")
+          ? "session.spec.ts"
+          : probe === "accessibility-accept"
+            ? "accessibility.spec.ts"
+            : probe === "vaccination-accept" ||
+                probe === "vaccine-accessibility"
+              ? "vaccination.spec.ts"
+              : probe === "clinical-inspect"
+                ? "clinical-inspect.spec.ts"
+                : probe === "clinical-accept" ||
+                    probe === "clinical-accessibility" ||
+                    probe === "clinical-performance"
+                  ? "clinical.spec.ts"
+                  : "evidence.spec.ts",
   fullyParallel: false,
   workers: 1,
   retries: 0,
@@ -51,7 +55,7 @@ export default defineConfig({
     ? 0
     : 1,
   timeout:
-    probe === "parent-accept"
+    probe === "parent-accept" || probe === "updates-accept"
       ? 480000
       : probe === "clinical-performance"
         ? 480000

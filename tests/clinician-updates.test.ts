@@ -38,7 +38,7 @@ const identity = () => ({
   name_status: "confirmed",
   birth_date: "2025-01-01",
   birth_date_precision: "exact",
-  sex: "unknown",
+  sex: "male",
 });
 async function child(a: Actor) {
   return rpc<string>(a, "create_provisional_child", [randomUUID(), identity()]);
