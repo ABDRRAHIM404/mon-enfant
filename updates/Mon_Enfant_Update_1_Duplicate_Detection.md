@@ -1,4 +1,4 @@
-> Implementation checkpoint: source/cloud and hosted API checks passed (see PROGRESS.md). Combined authenticated UI acceptance passed in GitHub production builds against hosted Supabase (43632064585); canonical Vercel release remains separate. Original requirements follow.
+> Implementation checkpoint: source/cloud and hosted API checks passed (see PROGRESS.md). Combined authenticated UI acceptance passed in GitHub production builds against hosted Supabase (43632064585); canonical Vercel acceptance also passed (43635401242). Original requirements follow.
 
 # Mon Enfant — Next Update
 

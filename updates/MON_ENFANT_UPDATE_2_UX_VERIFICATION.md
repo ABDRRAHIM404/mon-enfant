@@ -1,6 +1,6 @@
 # Mon Enfant — Update 2: Onboarding UX and clinician verification workflow
 
-**Status:** Implemented; synthetic cloud/UI/API acceptance verified (43632064585 / native f660a957f2064606). Canonical Vercel release/account switch remains pending. Visual design was preserved.
+**Status:** Implemented; synthetic cloud/UI/API acceptance verified (43632064585 / native f660a957f2064606). Canonical Vercel release/account switch verified (43635401242 / native e95b68ad4f284f34). Visual design was preserved.
 **Scope:** Parent/clinician entry points, terminology, and account/record verification behavior.
 **Separate from:** Update 1 (child duplicate detection).
 

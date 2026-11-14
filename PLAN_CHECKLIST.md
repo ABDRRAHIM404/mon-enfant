@@ -139,4 +139,12 @@ The complete goal remains active until the full required scope and its approval 
 - [x] Update 2 (cloud software acceptance 43632064585 / native f660a957f2064606): actual persistent author-only provisional child/care/vaccination/appointment workflows for unverified clinicians; API/QR/export/existence isolation and immutable revisions.
 - [x] Account approval leaves prior provisional records untrusted and unshareable until an explicit later validation/promotion policy is decided; real-data and credential-checking approvals remain open.
 - [x] Record combined cloud acceptance and publish/synchronize the primary main checkout (see PROGRESS.md).
-- [ ] Publish and verify the new canonical Vercel deployment after the owner-requested account/address switch. Preserve all external approval gates and complete Phase 8 afterward.
+- [x] Publish and verify the new canonical Vercel deployment after the owner-requested account/address switch (43635401242 / native e95b68ad4f284f34). Preserve all external approval gates and complete Phase 8 afterward.
+
+## Supplied Update 3 — design and preserved functionality
+
+- [ ] Review the supplied mockups/current screens and implement the chosen shared brand, light/dark/system themes, persisted override, responsive public/parent/clinician screens and accessible contrast/keyboard/touch behavior.
+- [ ] Keep verified Updates 1–2, clinical/vaccine/grant/audit controls, deferred verification and synthetic-only boundaries intact; no fabricated patient/calendar data from mockups.
+- [ ] Treat the PNG emblem honestly as a raster reference; production vector master/adaptive icon approval remains open.
+- [ ] Resolve/implement the specified parent-issued short-lived, purpose-bound clinician QR under an explicit authorization contract; identification alone never grants access. This is a functional extension, not a cosmetic button.
+- [ ] Verify design changes in cloud, publish/synchronize the complete primary main checkout, then continue full Phase 8 scope.
