@@ -30,7 +30,9 @@ export default async function Account() {
           <ShieldCheck />
         </span>
         <span className="eyebrow">MON COMPTE PROFESSIONNEL</span>
-        <h1 id="main-content" tabIndex={-1}>Votre statut de vérification</h1>
+        <h1 id="main-content" tabIndex={-1}>
+          Votre statut de vérification
+        </h1>
         <p className="muted">
           L’accès à l’espace clinique dépend de la validation de vos
           qualifications et de vos autorisations.
@@ -87,6 +89,11 @@ export default async function Account() {
             </Link>
           </p>
         )}
+        <p>
+          <Link className="button secondary" href="/parent">
+            Ouvrir mon espace parent
+          </Link>
+        </p>
         <p className="fine">
           Environnement de développement · Données et documents fictifs
           uniquement

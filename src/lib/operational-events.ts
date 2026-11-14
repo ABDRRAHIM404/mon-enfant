@@ -18,6 +18,7 @@ const events = [
   "appointment_action_failed",
   "operational_readiness_failed",
   "notification_dispatch_failed",
+  "parent_action_failed",
 ] as const;
 export function reportOperationalEvent(event: (typeof events)[number]): string {
   const reference = crypto.randomUUID();

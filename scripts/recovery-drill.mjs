@@ -6,10 +6,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import assert from "node:assert/strict";
-import {
-  notificationDatabase,
-  sessionActing,
-} from "../tests/helpers/database.ts";
+import { parentDatabase, sessionActing } from "../tests/helpers/database.ts";
 
 const root = "test-results/recovery";
 const bundle = join(root, "bundle");
@@ -108,7 +105,7 @@ function verifyBytes(manifest, database, object) {
 
 async function backup() {
   stage = "backup-schema";
-  const db = await notificationDatabase();
+  const db = await parentDatabase();
   try {
     stage = "backup-fixture";
     const doctor = await actor(db, "DOCTOR"),

@@ -1,6 +1,6 @@
 # Full plan execution and completion audit
 
-Current implementation phase: **Phase 6 — Doctor/admin hardening and pilot readiness**.
+Current development focus: **Phase 7 — Parent web**, per the user’s feature-first priority. Remaining Phase 6 checks/operations stay open and are deferred until the app is built, except major authentication, access-control, data-integrity and build checks.
 
 See [PROGRESS.md](PROGRESS.md) for verification evidence and remaining approval gates.
 
@@ -101,16 +101,9 @@ This checklist preserves PROJECT_PLAN.md's complete Phase 0–8 scope. It is not
 - [ ] Hosted backup/recovery and incident/retention drills; pilot monitoring ownership, response targets and scheduled alert-delivery acceptance.
 - [ ] Formal clinical, legal/privacy and regulated hosting approvals before any identifiable-data pilot.
 
-### Phase 6 closeout work
+### Deferred Phase 6 closeout
 
-Reuse the accepted evidence above. Additional checks must address a remaining plan requirement, a changed behavior or a reproduced failure; repeated passing benchmarks and new certification targets are not prerequisites for parent development.
-
-1. Complete the scoped account/session, export, RLS/Storage, secret and rate-limit review; fix concrete gaps found. Verify future QR/invitation permissions when those Phase 7 features are implemented.
-2. Finish the required development backup/recovery, incident and retention work, recording the specific hosted/configuration prerequisites and unresolved operating approvals. The embedded drill does not close hosted recovery.
-3. Implement the earlier outstanding transactional doctor-approval notification workflow with retry/duplicate controls. Keep recipient/domain restrictions and actual broader delivery acceptance explicit.
-4. Reconcile doctor/admin accessibility, keyboard, responsive/form/error acceptance against existing evidence and resolve uncovered failures, then publish/sync the technical checkpoint before Phase 7.
-
-Qualified clinical/source, legal/privacy, hosting and operating approvals remain open before any real-data pilot. No technical checkpoint silently grants those approvals. The full Phase 7/8 scope below remains required.
+The user explicitly requested that minor checks/hardening wait until the app features are built. The unchecked requirements above remain open. Reuse accepted evidence; do not expand verification into new minor submilestones. Keep major security/data-correctness/build checks with each feature. Required qualified clinical/source, legal/privacy, hosting and operating approvals remain mandatory before a real-data pilot.
 
 ## Phase 7 — parent web
 

@@ -7,6 +7,10 @@
 
 > A synthetic-data development deployment is available. No real clinical data is connected. Development and verification must use fictional/synthetic patient information until the external approval gates are met. Timelines are deliberately not promised.
 
+## Execution priority — 14 November 2026
+
+The user prioritized completing the remaining application features, including parent web and mobile, before minor hardening and repeated checks. Continue the original full scope below; keep the major authentication, access-control, data-integrity and build checks with feature work. Carry unfinished Phase 6 hardening/operations and external approvals forward as explicit open items. This changes development priority, not completion criteria or permission to use identifiable patients.
+
 ## 1. Build principles
 
 - **Doctor workflows first**: useful even before parents join.

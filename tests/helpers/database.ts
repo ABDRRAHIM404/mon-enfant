@@ -127,3 +127,14 @@ export async function notificationDatabase() {
     await db.exec(readFileSync(`supabase/migrations/${file}`, "utf8"));
   return db;
 }
+
+export async function parentDatabase() {
+  const db = await notificationDatabase();
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/20261114142213_parent_workspace.sql",
+      "utf8",
+    ),
+  );
+  return db;
+}

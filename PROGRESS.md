@@ -1,6 +1,6 @@
 # Mon Enfant — Implementation progress
 
-Updated: 14 November 2026. Execution follows `PROJECT_PLAN.md` in order. Current milestone: **Phase 6 — Doctor/admin hardening and pilot readiness**. Foundation, professional review, registry, clinical/vaccine records and appointments have technical verification. Remaining notification, qualified clinical/source and external readiness gates remain open. Full-scope audit: [PLAN_CHECKLIST.md](PLAN_CHECKLIST.md).
+Updated: 14 November 2026. Execution follows `PROJECT_PLAN.md` in order. Current development focus: **Phase 7 — Parent web**. The user prioritized app feature completion before minor hardening; unfinished Phase 6 checks/operations remain open. Major authentication, authorization, data-integrity and build checks continue with feature work. Foundation, professional review, registry, clinical/vaccine records and appointments have technical verification. Remaining notification, qualified clinical/source and external readiness gates remain open. Full-scope audit: [PLAN_CHECKLIST.md](PLAN_CHECKLIST.md).
 
 ## Phase 0 — Requirements and source validation
 
@@ -494,3 +494,17 @@ Implemented, migrated, cloud-verified and deployed from `feature/professional-ve
 - Added real PostgreSQL tests for atomic queue/rollback, separate worker authorization and clinical denial, confirmed/restricted recipients, stable exclusive leases and PT409, bounded retries, suspension/email/session/worker revocation, hourly cap and immutable events. Transport tests cover minimal content, frozen idempotency, owner restriction, permanent/transient/uncertain results and privacy. Full latest-schema security/recovery checks now include the private notification schema. React review confirms a minimal client form boundary with named pending/disabled controls; decisions/status and authorization remain server-side. Cloud CI, hosted migration/configuration and application delivery acceptance are pending; no checklist completion is claimed.
 
 - Initial notification CI `43597663730` passed Python checks and lint, then caught strict TypeScript row types in the new PostgreSQL tests before execution/deployment. Added explicit metadata-row typing; production source and authorization rules are unchanged by this test typing correction. No migration or email was applied/sent.
+
+
+### Feature-first priority and verified notification source checkpoint
+
+- Per the user's explicit steering, move into parent-web app construction and carry minor Phase 6 hardening/operations forward unchecked. This does not waive major authentication/authorization, data-integrity, build checks or any real-data approval gate. The full Phase 0–8 checklist remains intact.
+- Notification source `7f3b207` passed full cloud CI [43597926910](https://github.com/ABDRRAHIM404/mon-enfant/actions/runs/43597926910): 190 unit/database/reference tests, 46 Python tests, isolated latest-schema recovery component, production build and 20 standard browser cases. New migration `20261114134227` was applied atomically with migration history; readback verified all three private notification tables protected with RLS and the original 24 public tables unchanged. Applied source SHA-256: `0ca908ffbbcc012c28d1d5ae2179fded2e54c0a8070cecec691319514663c0b2`.
+- Approval queue/transport/reviewer status and retry UI are implemented and verified in source. Dispatch remains disabled by default: no worker credentials/provider configuration or application email delivery test was provisioned, and no notification was sent. Delivery/domain acceptance stays open rather than holding parent feature construction. Supabase Auth and clinical authorization are unchanged.
+
+
+### Phase 7 parent workspace — first feature slice under cloud verification
+
+- Added a separate authenticated parent workspace with an account entry link, real server-backed parent profile activation/editing and clear invitation/guardianship boundaries. A parent label is private self-service account data, never professional approval or verified child access. No child search, child creation, clinical permission or automatic guardian link is exposed by activation.
+- New unapplied parent migration uses current Auth session, confirmed account and ban checks, private RLS/no direct client table privileges, own-profile RPCs and metadata-only audit. Added parent route refresh coverage. Major tests cover own/cross-account isolation, absence of professional/capability/child grants, clinical denial and unconfirmed/stale/banned account denial. Latest-schema security and existing fast recovery component include the new private schema. No extra minor benchmark/accessibility campaign was added.
+- This starts the real Phase 7 app; invitation/QR, separate recorded guardianship approval, child booklet/appointments/exports and multiple-guardian/revocation features remain required and uncompleted. Cloud verification and hosted parent migration are pending. All live data remains synthetic; doctor/admin approval notifications stay safely disabled until provider worker configuration is completed.
