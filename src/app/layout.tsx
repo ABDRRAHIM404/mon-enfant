@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { themeBootstrap } from "@/lib/theme";
+import { Suspense } from "react";
+import { ParentMobileNav } from "@/components/parent-mobile-nav";
 export const metadata: Metadata = {
   title: "Mon Enfant · Le carnet de votre enfant",
   description:
@@ -19,6 +21,9 @@ export default function RootLayout({
           Aller au contenu principal
         </a>
         {children}
+        <Suspense fallback={null}>
+          <ParentMobileNav />
+        </Suspense>
       </body>
     </html>
   );

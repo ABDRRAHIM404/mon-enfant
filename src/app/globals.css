@@ -1750,3 +1750,76 @@ th {
   display: inline-flex;
   align-items: center;
 }
+
+/* Selected Update 3 public proportions and safe, real parent destinations. */
+.auth-main {
+  padding: 43px 52px;
+}
+.auth-card {
+  margin: 0;
+}
+.auth-story .story-copy {
+  text-align: center;
+}
+.auth-card h1 {
+  margin-top: 16px;
+}
+.parent-mobile-nav {
+  display: none;
+}
+@media (max-width: 700px) {
+  body:has(.parent-mobile-nav) {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
+  }
+  .parent-mobile-nav {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 30;
+    border-top: 1px solid var(--line);
+    background: var(--card);
+    padding: 7px 10px calc(7px + env(safe-area-inset-bottom));
+  }
+  .parent-mobile-nav a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 54px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .parent-mobile-nav a[aria-current] {
+    color: var(--teal);
+  }
+  .auth-main {
+    padding: 26px 22px;
+  }
+  .auth-card {
+    margin: 0;
+  }
+  .landing-hero {
+    padding-top: 25px;
+  }
+  .landing-copy h1 {
+    margin: 16px 0;
+  }
+  .landing-actions .button {
+    min-height: 52px;
+    padding: 12px 22px;
+  }
+  .family-card strong {
+    line-height: 1.2;
+  }
+  .family-card figcaption p {
+    font-size: 14px;
+  }
+}
+@media print {
+  .parent-mobile-nav {
+    display: none;
+  }
+}

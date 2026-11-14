@@ -15,6 +15,7 @@ on:
         options:
           [
             none,
+            design-cloud-accept,
             updates-cloud-accept,
             updates-accept,
             parent-accept,
@@ -110,7 +111,7 @@ jobs:
       NEXT_TELEMETRY_DISABLED: 1
       MON_ENFANT_LIVE_PROBE: ${{ inputs.live_probe }}
       NEXT_PUBLIC_SUPABASE_URL: https://zkkasbxvdvecnafgjpxd.supabase.co
-      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.MON_ENFANT_PARENT_BROWSER_PUBLIC_KEY }}
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ inputs.live_probe == 'design-cloud-accept' && secrets.MON_ENFANT_PUBLIC_BROWSER_KEY || secrets.MON_ENFANT_PARENT_BROWSER_PUBLIC_KEY }}
       NEXT_PUBLIC_SITE_URL: https://localhost:3443
       MON_ENFANT_QA_RUN: ${{ inputs.fixture_run }}
       MON_ENFANT_READINESS_DESKTOP_EMAIL: ${{ secrets.MON_ENFANT_READINESS_DESKTOP_EMAIL }}
@@ -147,10 +148,10 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium --only-shell
       - name: Build current application for explicit GitHub-hosted update acceptance
-        if: inputs.live_probe == 'updates-cloud-accept'
+        if: inputs.live_probe == 'updates-cloud-accept' || inputs.live_probe == 'design-cloud-accept'
         run: npm run build
       - name: Prepare ephemeral runner TLS for production Secure cookies
-        if: inputs.live_probe == 'updates-cloud-accept'
+        if: inputs.live_probe == 'updates-cloud-accept' || inputs.live_probe == 'design-cloud-accept'
         run: openssl req -x509 -newkey rsa:2048 -sha256 -nodes -keyout "$RUNNER_TEMP/updates-key.pem" -out "$RUNNER_TEMP/updates-cert.pem" -days 1 -subj /CN=localhost 2>/dev/null
       - name: Verify the selected deployed workflow in cloud browsers
         run: npx playwright test --config=playwright.live.config.ts

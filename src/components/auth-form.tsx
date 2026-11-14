@@ -19,6 +19,21 @@ export function AuthForm({
   return (
     <form action={action} className="auth-form" aria-busy={pending}>
       <input type="hidden" name="destination" value={destination} />
+      {mode === "signup" && destination === "account" && (
+        <>
+          <label htmlFor="display-name">Nom complet</label>
+          <input
+            id="display-name"
+            name="displayName"
+            autoComplete="name"
+            placeholder="Prénom et nom"
+            minLength={2}
+            maxLength={100}
+            required
+            disabled={!configured}
+          />
+        </>
+      )}
       <label htmlFor="email">
         {destination === "account"
           ? "Adresse e-mail professionnelle"
@@ -84,13 +99,15 @@ export function AuthForm({
           </>
         )}
       </button>
-      <p className="fine">
-        {destination !== "account"
-          ? "Confirmez votre e-mail. Chaque carnet nécessite ensuite une vérification distincte de votre qualité de responsable."
-          : mode === "signup"
-            ? "Votre compte sera non vérifié. Vos premiers dossiers resteront provisoires et privés."
-            : "Médecins et infirmier(e)s · Les accès partagés nécessitent une vérification."}
-      </p>
+      {mode === "signup" && (
+        <p className="fine">
+          {destination !== "account"
+            ? "Confirmez votre e-mail. Chaque carnet nécessite ensuite une vérification distincte de votre qualité de responsable."
+            : mode === "signup"
+              ? "Votre compte sera non vérifié. Vos premiers dossiers resteront provisoires et privés."
+              : "Médecins et infirmier(e)s · Les accès partagés nécessitent une vérification."}
+        </p>
+      )}
     </form>
   );
 }

@@ -8,7 +8,18 @@ import { signOut } from "@/app/auth/actions";
 import { createClient } from "@/lib/supabase/server";
 import { supabaseConfig } from "@/lib/supabase/config";
 export const dynamic = "force-dynamic";
-export default async function ParentWorkspace() {
+export default async function ParentWorkspace({
+  searchParams,
+}: {
+  searchParams: Promise<{ view?: string }>;
+}) {
+  const { view } = await searchParams;
+  const focus =
+    view === "appointments"
+      ? "appointments"
+      : view === "documents"
+        ? "documents"
+        : null;
   if (!supabaseConfig()) redirect("/login");
   const supabase = await createClient();
   const {
@@ -49,13 +60,29 @@ export default async function ParentWorkspace() {
         </p>
       </section>
       <section className="panel">
-        <h2>Les carnets de mes enfants</h2>
+        <h2>
+          {focus === "appointments"
+            ? "Les rendez-vous de mes enfants"
+            : focus === "documents"
+              ? "Les documents de mes enfants"
+              : "Les carnets de mes enfants"}
+        </h2>
+        {focus && (
+          <p className="muted">
+            Choisissez un enfant dont le carnet vous est relié pour consulter{" "}
+            {focus === "appointments"
+              ? "ses rendez-vous."
+              : "son carnet et ses documents."}
+          </p>
+        )}
         {children.length ? (
           <div className="record-list">
             {children.map((child) => (
               <article key={child.id}>
                 <h3>
-                  <Link href={`/parent/children/${child.id}`}>
+                  <Link
+                    href={`/parent/children/${child.id}${focus === "appointments" ? "/appointments" : focus === "documents" ? "#documents" : ""}`}
+                  >
                     {patientName(child)}
                   </Link>
                 </h3>

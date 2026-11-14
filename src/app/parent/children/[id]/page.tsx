@@ -94,7 +94,7 @@ export default async function ChildBooklet({
           Confidentialité et accès
         </Link>
       </nav>
-      <div className="actions no-print">
+      <div id="documents" className="actions no-print">
         <PrintButton />
         {link.can_export && (
           <a

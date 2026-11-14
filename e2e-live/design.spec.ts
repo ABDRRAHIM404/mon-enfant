@@ -1,9 +1,10 @@
 import { test, expect } from "@playwright/test";
 import { readFileSync, writeFileSync } from "node:fs";
-const SITE =
-  process.env.MON_ENFANT_LIVE_PROBE === "updates-cloud-accept"
-    ? "https://localhost:3443"
-    : "https://mon-enfant.vercel.app";
+const SITE = ["updates-cloud-accept", "design-cloud-accept"].includes(
+  process.env.MON_ENFANT_LIVE_PROBE ?? "",
+)
+  ? "https://localhost:3443"
+  : "https://mon-enfant.vercel.app";
 const root = "updates/Mon_Enfant_Design_Update_3_Fresh_Copy/mockups";
 test("capture configured public screens and paired selected references", async ({
   page,

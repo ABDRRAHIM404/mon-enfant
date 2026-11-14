@@ -73,3 +73,26 @@ test("small-screen menu exposes both account journeys", async ({ page }) => {
     "médecin / infirmier(ère)",
   );
 });
+
+test("mobile parent shortcuts retain guarded destinations", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 430, height: 940 });
+  await page.goto("/");
+  const nav = page.getByRole("navigation", { name: "Accès rapides parent" });
+  await expect(nav).toBeVisible();
+  await expect(
+    nav.getByRole("link", { name: "Accueil", exact: true }),
+  ).toHaveAttribute("aria-current", "page");
+  await expect(
+    nav.getByRole("link", { name: "Rendez-vous", exact: true }),
+  ).toHaveAttribute("href", "/parent?view=appointments");
+  await expect(
+    nav.getByRole("link", { name: "Documents", exact: true }),
+  ).toHaveAttribute("href", "/parent?view=documents");
+  await nav.getByRole("link", { name: "Enfants", exact: true }).click();
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(
+    page.getByRole("heading", { name: "Se connecter" }),
+  ).toBeVisible();
+});

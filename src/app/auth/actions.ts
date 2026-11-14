@@ -83,6 +83,18 @@ export async function signUp(_: AuthState, form: FormData): Promise<AuthState> {
   if (!supabaseConfig())
     return { error: "Le service de connexion est en cours de configuration." };
   const input = credentials(form);
+  const destination = authDestination(form.get("destination"));
+  const displayName = String(form.get("displayName") ?? "").trim();
+  if (
+    destination === "/account" &&
+    (displayName.length < 2 ||
+      displayName.length > 100 ||
+      [...displayName].some(
+        (character) =>
+          character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127,
+      ))
+  )
+    return { error: "Indiquez votre nom complet (2 à 100 caractères)." };
   if (!input)
     return {
       error:
@@ -104,7 +116,6 @@ export async function signUp(_: AuthState, form: FormData): Promise<AuthState> {
     };
   }
   const confirmation = new URL("/auth/callback", siteUrl);
-  const destination = authDestination(form.get("destination"));
   if (destination !== "/account")
     confirmation.searchParams.set(
       "next",
@@ -113,7 +124,13 @@ export async function signUp(_: AuthState, form: FormData): Promise<AuthState> {
   else confirmation.searchParams.set("next", "account");
   const { error } = await client.auth.signUp({
     ...input,
-    options: { emailRedirectTo: confirmation.toString() },
+    options: {
+      emailRedirectTo: confirmation.toString(),
+      // Self-declared presentation data only. Enrollment and authorization remain server-owned.
+      ...(destination === "/account"
+        ? { data: { display_name: displayName } }
+        : {}),
+    },
   });
   if (error)
     return {

@@ -131,7 +131,7 @@ test("clinician authentication stays separate and discoverable", async ({
 }) => {
   await page.goto("/login?audience=clinician");
   await expect(
-    page.getByText("ESPACE SOIGNANT", { exact: true }),
+    page.getByText("MÉDECIN / INFIRMIER(ÈRE)", { exact: true }),
   ).toBeVisible();
   await page
     .getByRole("link", { name: "Créer un compte soignant", exact: true })

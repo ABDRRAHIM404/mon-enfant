@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { UsersRound, Stethoscope, LockKeyhole, ArrowLeft } from "lucide-react";
+import { UsersRound, Stethoscope, LockKeyhole } from "lucide-react";
 import { PublicHeader } from "./public-header";
 import { AuthForm } from "./auth-form";
 import { supabaseConfig } from "@/lib/supabase/config";
@@ -34,25 +34,30 @@ export function AuthShell({
             <h2>
               {parent
                 ? "Votre famille, au cœur du suivi"
-                : "Un espace dédié aux soignants"}
+                : mode === "signup"
+                  ? "Rejoignez Mon Enfant"
+                  : "Un espace dédié aux soignants"}
             </h2>
             <p>
               {parent
                 ? "Retrouvez le carnet de santé et les rendez-vous de vos enfants."
-                : "Pour les médecins et infirmier(ère)s."}
+                : mode === "signup"
+                  ? "Créez votre compte soignant. La vérification professionnelle peut être soumise ensuite."
+                  : "Pour les médecins et infirmier(ère)s."}
             </p>
           </div>
         </section>
         <section className="auth-main">
-          <Link className="back-link" href="/">
-            <ArrowLeft size={15} /> Retour à l’accueil
-          </Link>
           <div className="auth-card">
             <span className="eyebrow">
-              {parent ? "ESPACE PARENT" : "ESPACE SOIGNANT"}
+              {parent ? "ESPACE PARENT" : "MÉDECIN / INFIRMIER(ÈRE)"}
             </span>
             <h1 id="main-content" tabIndex={-1}>
-              {mode === "login" ? "Se connecter" : "Créer mon compte"}
+              {mode === "login"
+                ? "Se connecter"
+                : parent
+                  ? "Créer mon compte"
+                  : "Créer un compte"}
             </h1>
             <p className="muted">
               {mode === "login"
@@ -61,9 +66,9 @@ export function AuthShell({
                   : "Accédez à votre espace médecin / infirmier(ère)."
                 : parent
                   ? "Un compte parent, avant de relier un carnet existant."
-                  : "Votre espace soignant commence ici. La vérification peut être complétée plus tard."}
+                  : "Confirmez votre e-mail, puis ouvrez votre espace privé avec un statut non vérifié."}
             </p>
-            {!parent && (
+            {!parent && mode === "login" && (
               <p className="notice clinician-notice">
                 Vous n’êtes pas encore vérifié ? Vous pouvez utiliser votre
                 espace. Vos dossiers restent provisoires et privés.
