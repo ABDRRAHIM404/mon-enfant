@@ -81,7 +81,8 @@ This checklist preserves PROJECT_PLAN.md's complete Phase 0–8 scope. It is not
 
 - [x] Core clinical continuity browser story on desktop/tablet/phone: A/125–B/078 identity, capability decisions, consultation/correction, growth, appointment reschedule, private export and revocation/logout; growth hydration regression fixed. See PROGRESS.md.
 - [x] Expanded consultation/prescription/risk/growth browser story on desktop/tablet/phone: explicit capability denial, uncertain paper provenance, second-doctor corrections, risk/growth withdrawals, chart/timeline projection and all-revision private export; independent thirty-revision database proof in PROGRESS.md.
-- [ ] Vaccination/catalog story-level browser verification and full keyboard/accessibility/performance acceptance.
+- [x] Vaccination/catalog and appointment-continuity browser story on desktop/tablet/phone: QA review/source preservation, HB1 rejection, uncertain transcription, duplicate review, amendments/withdrawal, second-doctor resolution/reopening, preserved unrelated appointments, export and denial; independent database proof in PROGRESS.md.
+- [ ] Full keyboard/accessibility/performance acceptance.
 - [x] Workspace refresh-cookie regression: actual provider refresh-token rotation, persisted secure cookies, public-health isolation and logout denial for vaccine/appointment/follow-up routes on desktop/tablet/phone; see PROGRESS.md.
 - [ ] Account/session, QR, export, RLS/Storage, secret and rate-limit review.
 - [x] Credential-free development readiness monitor, active scheduled configuration and live healthy/failure/recovery reporting drill; owner reports GitHub notifications arriving. See PROGRESS.md.
