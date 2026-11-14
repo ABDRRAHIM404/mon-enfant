@@ -1,0 +1,23 @@
+name: Prepare accessibility dependency lock
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  dependency-lock:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Resolve the pinned accessibility test dependency without lifecycle scripts
+        run: npm install --package-lock-only --ignore-scripts --save-dev --save-exact @axe-core/playwright@4.14.0
+      - uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-dependency-lock
+          path: |
+            package.json
+            package-lock.json
+          retention-days: 3
