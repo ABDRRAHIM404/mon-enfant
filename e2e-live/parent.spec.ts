@@ -90,13 +90,21 @@ async function rpc(
   return { status: response.status(), data };
 }
 async function decode(svg: Locator) {
+  const box = await svg.boundingBox();
+  console.log(
+    JSON.stringify({
+      event: "synthetic_parent_qr_geometry",
+      width: box?.width ?? 0,
+      height: box?.height ?? 0,
+    }),
+  );
   const png = await svg.screenshot();
   const { data, info } = await sharp(png)
     .ensureAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true });
   const decoded = jsQR(new Uint8ClampedArray(data), info.width, info.height);
-  if (!decoded) throw new Error("Hosted QR did not decode");
+  if (!decoded) throw new Error("PARENT_QR_DECODE_FAILED");
   return decoded.data;
 }
 async function profile(page: Page, name: string) {
@@ -346,9 +354,11 @@ test("verified parents use an existing child; unrelated, replayed and revoked ac
         })
       ).status,
     ).toBe(200);
-    stage = "invitation-unrelated";
+    stage = "invitation-create-and-decode";
     const url = await invite(doctor, child, "PARENT"),
       secret = new URL(url).hash.slice("#invite=".length);
+    proof.invitation_qr_decoded = true;
+    stage = "invitation-unrelated";
     await outside.goto(url);
     await outside.locator('[name="relationship"]').selectOption("other");
     await outside.locator('[name="consent"]').check();
@@ -601,8 +611,10 @@ test("verified parents use an existing child; unrelated, replayed and revoked ac
     expect(pageErrors).toBe(0);
     proof.page_errors = pageErrors;
     proof.passed = true;
-  } catch {
+  } catch (error) {
     proof.failed_stage = stage;
+    if (error instanceof Error && error.message === "PARENT_QR_DECODE_FAILED")
+      proof.failure_code = "qr_decode_failed";
     throw new Error(
       `Synthetic parent workflow failed at ${stage}; private URLs, tokens, credentials and DOM withheld.`,
     );

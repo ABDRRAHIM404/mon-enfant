@@ -48,7 +48,7 @@ export function CorrectionList({
             </Link>
           )}
           {request.response ? (
-            <div className="notice">
+            <div className="notice stacked-notice">
               <h3>{correctionOutcomes[request.response.outcome]}</h3>
               <p className="clinical-text">{request.response.message}</p>
               <p className="fine">

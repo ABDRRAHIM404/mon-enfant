@@ -1054,3 +1054,6 @@ th {
 .qr-code svg { display: block; width: 100%; height: auto; max-width: 240px; background: white; }
 .qr-code figcaption { margin-top: .5rem; }
 @media print { .qr-code { break-inside: avoid; } }
+
+/* Multi-part results must keep QR symbols and paragraphs at readable widths. */
+.notice.stacked-notice { display: block; }

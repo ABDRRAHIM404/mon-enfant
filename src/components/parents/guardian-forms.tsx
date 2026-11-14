@@ -42,7 +42,7 @@ export function GuardianInviteForm({ childId }: { childId: string }) {
         </p>
       ) : null}
       {state.invitationUrl ? (
-        <div className="notice">
+        <div className="notice stacked-notice">
           <p role="status">
             Invitation créée. Transmettez ce lien au destinataire par un canal
             approprié.
