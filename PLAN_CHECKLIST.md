@@ -1,6 +1,6 @@
 # Full plan execution and completion audit
 
-Current development focus: **Phase 7 — Parent web**, per the user’s feature-first priority. Remaining Phase 6 checks/operations stay open and are deferred until the app is built, except major authentication, access-control, data-integrity and build checks.
+Current development focus: **Phase 8 — Parent mobile**, following the verified synthetic Phase 7 web walkthrough, per the user’s feature-first priority. Remaining Phase 6 checks/operations stay open and are deferred until the app is built, except major authentication, access-control, data-integrity and build checks.
 
 See [PROGRESS.md](PROGRESS.md) for verification evidence and remaining approval gates.
 
@@ -107,7 +107,7 @@ The user explicitly requested that minor checks/hardening wait until the app fea
 
 ## Phase 7 — parent web
 
-Verified feature checkpoint: parent profile plus guardian invitations, independent verification, child booklet/appointments/export and revocation passed cloud CI; both migrations are hosted. The remaining acceptance below includes live guardian/browser/HTTP-conflict proof and external verification sources. Correction requests, contact/preferences and scoped access history also have a cloud-verified technical checkpoint. Invitation/identification QR and in-app notifications now also have a cloud-verified technical checkpoint. Dedicated parent calendar/upcoming-reference views now also have a cloud-verified technical checkpoint. Actual invitation/follow-up email and full hosted scanner/parent acceptance remain open.
+Synthetic web technical acceptance is verified: full hosted desktop/tablet/phone flow 43622260572 plus independent database persistence and fixture retirement. This verifies software behavior, not genuine identity/guardianship, clinical/source or privacy approval. Actual invitation/follow-up email delivery remains open and does not hold independent mobile construction.
 
 - [x] Parent profile foundation: own confirmed/current account, independent from professional authority; cloud CI and hosted migration.
 - [x] Parent day/week/month calendar and assigned reviewed vaccine-reference views; cross-provider/guardian/revocation/source/retirement and old-token Auth-ban cases, cloud CI and hosted migration.
@@ -116,12 +116,12 @@ Verified feature checkpoint: parent profile plus guardian invitations, independe
 - [x] Parent correction requests, doctor replies tied to real clinical amendments, private preferences and scoped access history; cloud security/data-integrity/build/browser CI and hosted migration.
 - [x] Guardian/booklet technical slice: hashed recipient-bound one-use invitations, independent child-manager approval, scoped multiple-guardian reads/export/revocation; cloud access/integrity/build/browser CI and hosted migration.
 
-- [ ] Parent account and recorded guardianship verification.
-- [ ] One-use hashed expiring invitations and safe claim/linking of an existing child.
+- [x] Parent account and recorded guardianship verification.
+- [x] One-use hashed expiring invitations and safe claim/linking of an existing child.
 - [ ] Resend parent invitation delivery, separately from Auth identity confirmation and recorded guardianship approval.
-- [ ] Child/health/vaccine/growth/booklet views, appointments, notifications and permitted export.
-- [ ] Multiple guardians, revocation, correction requests, privacy/access history and look-up QR boundaries.
-- [ ] Full parent claim and unrelated-scanner rejection acceptance/security checks.
+- [x] Child/health/vaccine/growth/booklet views, appointments, notifications and permitted export.
+- [x] Multiple guardians, revocation, correction requests, privacy/access history and look-up QR boundaries.
+- [x] Full parent claim and unrelated-scanner rejection acceptance/security checks.
 
 ## Phase 8 — mobile
 
