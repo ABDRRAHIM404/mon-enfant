@@ -162,8 +162,8 @@ async function backup() {
       appointment,
       1,
       "reschedule",
-      "2026-01-03T10:00:00+01:00",
-      "2026-01-03T10:30:00+01:00",
+      "2030-01-03T10:00:00+01:00",
+      "2030-01-03T10:30:00+01:00",
       "Déplacement entièrement fictif.",
       true,
     ]);
@@ -308,7 +308,13 @@ async function restore() {
     ).rows[0];
     assert.equal(rows.clinical_revisions, 2);
     assert.equal(rows.appointments, 1);
-    assert.equal(rows.appointment_events, 2);
+    assert.equal(rows.appointment_events, 3);
+    const appointmentActions = (
+      await db.query(
+        "select action from public.appointment_events order by revision",
+      )
+    ).rows.map((event) => event.action);
+    assert.deepEqual(appointmentActions, ["created", "missed", "rescheduled"]);
     assert.ok(rows.audit_events > 0);
     assert.equal(rows.vaccine_rules, 25);
     assert.equal(rows.original_drafts, 1);
@@ -348,6 +354,7 @@ async function restore() {
       unrelated_and_admin_denied: true,
       anonymous_table_denied: true,
       append_only_preserved: true,
+      original_missed_slot_retained: true,
       original_draft_preserved: true,
       separate_object_bytes_recovered: true,
       ...rows,
