@@ -1,6 +1,12 @@
 import { test, expect, type Page, type BrowserContext } from "@playwright/test";
 import { writeFileSync } from "node:fs";
 import { observeBrowserErrors } from "./browser-errors";
+import {
+  scanAccessibility,
+  assertAccessible,
+  tabTo,
+  type AccessibilityProof,
+} from "../e2e-support/accessibility";
 import type { ClinicalEntry } from "../src/lib/clinical/types";
 
 const SITE = "https://mon-enfant.vercel.app";
@@ -144,6 +150,13 @@ test("two doctors preserve identity, amendments, appointments and private access
   let pageErrors = 0;
   observeBrowserErrors(page, "A", () => pageErrors++);
   const timings: { screen: string; navigation_ms: number }[] = [];
+  const accessibility =
+    process.env.MON_ENFANT_LIVE_PROBE === "clinical-accessibility";
+  const accessibilityProofs: AccessibilityProof[] = [];
+  async function inspect(target: Page, label: string) {
+    if (accessibility)
+      accessibilityProofs.push(await scanAccessibility(target, label, info));
+  }
   async function screen(
     target: Page,
     path: string,
@@ -158,6 +171,18 @@ test("two doctors preserve identity, amendments, appointments and private access
     timings.push({ screen: label, navigation_ms: Date.now() - start });
     await fit(target);
     expect(pageErrors).toBe(0);
+    if (accessibility) {
+      await target.keyboard.press("Tab");
+      const bypass = target.getByRole("link", {
+        name: "Aller au contenu principal",
+        exact: true,
+      });
+      await expect(bypass).toBeFocused();
+      await expect(bypass).toBeInViewport();
+      await target.keyboard.press("Enter");
+      await expect(target.getByRole("heading", { level: 1 })).toBeFocused();
+      await inspect(target, label);
+    }
   }
   async function actor(role: Role) {
     const use = info.project.use;
@@ -230,6 +255,7 @@ test("two doctors preserve identity, amendments, appointments and private access
       .innerText();
     expect(UUID.test(universal)).toBe(true);
     await fit(a);
+    await inspect(a, "registered-child-profile");
     await a.screenshot({
       path: info.outputPath("clinical-profile.png"),
       fullPage: true,
@@ -283,6 +309,7 @@ test("two doctors preserve identity, amendments, appointments and private access
       b.getByRole("status").filter({ hasText: "Opération enregistrée" }),
     ).toBeVisible();
     await b.goto("/access-requests");
+    await inspect(b, "pending-request-receipt");
     expect((await b.locator("main").innerText()).includes(childName)).toBe(
       false,
     );
@@ -290,6 +317,7 @@ test("two doctors preserve identity, amendments, appointments and private access
       404,
     );
     await a.goto("/access-requests");
+    await inspect(a, "access-review-form");
     const request = a.locator("article").filter({
       has: a.getByRole("heading", { name: childName, exact: true }),
     });
@@ -329,18 +357,35 @@ test("two doctors preserve identity, amendments, appointments and private access
       "Consultation",
       "consultation-form",
     );
+    await inspect(manager, "clinical-permission-decisions");
     await clinicalFields(a, placeA);
     await a.getByRole("button", { name: "Enregistrer le soin" }).click();
     await expect(
       a.getByLabel("Motif de consultation", { exact: true }),
     ).toBeFocused();
-    await a
-      .getByLabel("Motif de consultation", { exact: true })
-      .fill("Contrôle entièrement fictif");
-    await a.getByLabel("Observations", { exact: true }).fill(original);
-    await a.getByRole("button", { name: "Enregistrer le soin" }).click();
+    await inspect(a, "consultation-required-motive");
+    if (accessibility) {
+      await expect(
+        a.getByLabel("Motif de consultation", { exact: true }),
+      ).toBeFocused();
+      await a.keyboard.type("Contrôle entièrement fictif");
+      await tabTo(a, a.getByLabel("Observations", { exact: true }));
+      await a.keyboard.type(original);
+      await tabTo(
+        a,
+        a.getByRole("button", { name: "Enregistrer le soin", exact: true }),
+      );
+      await a.keyboard.press("Enter");
+    } else {
+      await a
+        .getByLabel("Motif de consultation", { exact: true })
+        .fill("Contrôle entièrement fictif");
+      await a.getByLabel("Observations", { exact: true }).fill(original);
+      await a.getByRole("button", { name: "Enregistrer le soin" }).click();
+    }
     await expect(a).toHaveURL(/\/records\/[a-f0-9-]{36}$/i);
     const entryPath = new URL(a.url()).pathname;
+    await inspect(a, "consultation-original-and-amendment-form");
     await expect(
       a.getByRole("heading", { name: "Historique de la saisie", exact: true }),
     ).toBeVisible();
@@ -352,6 +397,7 @@ test("two doctors preserve identity, amendments, appointments and private access
       b.getByRole("heading", { name: "Historique de la saisie", exact: true }),
     ).toBeVisible();
     await clinicalFields(b, placeB);
+    await inspect(b, "second-doctor-consultation-amendment");
     await b.locator('[name="findings"]').fill(corrected);
     await b.locator('[name="amendment_reason"]').fill(correctionReason);
     await b.getByRole("button", { name: "Ajouter la révision" }).click();
@@ -363,6 +409,7 @@ test("two doctors preserve identity, amendments, appointments and private access
       b.locator(".clinical-entry").getByText(corrected, { exact: true }),
     ).toBeVisible();
     await fit(b);
+    await inspect(b, "consultation-corrected-history");
     await b.screenshot({
       path: info.outputPath("clinical-history.png"),
       fullPage: true,
@@ -382,13 +429,16 @@ test("two doctors preserve identity, amendments, appointments and private access
     await a.locator('[name="source_verified"]').uncheck();
     await a.getByRole("button", { name: "Enregistrer le soin" }).click();
     await expect(a.locator('[name="medication"]')).toBeFocused();
+    await inspect(a, "paper-prescription-required-medication");
     await a.locator('[name="medication"]').fill(medication);
     await a.getByRole("button", { name: "Enregistrer le soin" }).click();
     await expect(a.locator('[name="instructions"]')).toBeFocused();
+    await inspect(a, "paper-prescription-required-instructions");
     await a.locator('[name="instructions"]').fill(instructions);
     await a.getByRole("button", { name: "Enregistrer le soin" }).click();
     await expect(a).toHaveURL(/\/records\/[a-f0-9-]{36}$/i);
     const prescriptionPath = new URL(a.url()).pathname;
+    await inspect(a, "uncertain-prescription-history");
     await expect(
       a
         .locator(".clinical-entry")
@@ -412,6 +462,7 @@ test("two doctors preserve identity, amendments, appointments and private access
         .getByText(correctedInstructions, { exact: true }),
     ).toBeVisible();
     await fit(b);
+    await inspect(b, "corrected-prescription-history");
 
     await screen(
       a,
@@ -428,10 +479,12 @@ test("two doctors preserve identity, amendments, appointments and private access
     await a.locator('[name="severity"]').selectOption("unknown");
     await a.getByRole("button", { name: "Enregistrer le soin" }).click();
     await expect(a.locator('textarea[name="description"]')).toBeFocused();
+    await inspect(a, "reported-risk-required-description");
     await a.locator('textarea[name="description"]').fill(riskOriginal);
     await a.getByRole("button", { name: "Enregistrer le soin" }).click();
     await expect(a).toHaveURL(/\/records\/[a-f0-9-]{36}$/i);
     const riskPath = new URL(a.url()).pathname;
+    await inspect(a, "reported-risk-history");
     await b.goto(riskPath);
     await clinicalFields(b, placeB);
     await b.locator('textarea[name="description"]').fill(riskCorrected);
@@ -456,6 +509,7 @@ test("two doctors preserve identity, amendments, appointments and private access
       }),
     ).toBeVisible();
     await fit(b);
+    await inspect(b, "withdrawn-risk-history");
 
     await screen(
       a,
@@ -482,6 +536,7 @@ test("two doctors preserve identity, amendments, appointments and private access
     });
 
     await b.goto(growthPath);
+    await inspect(b, "growth-amendment-form");
     await clinicalFields(b, placeB);
     await b.locator('[name="weight_kg"]').fill("9.35");
     await b.locator('[name="amendment_reason"]').fill(correctionReason);
@@ -564,11 +619,13 @@ test("two doctors preserve identity, amendments, appointments and private access
     await a.getByRole("button", { name: "Planifier le rendez-vous" }).click();
     await expect(a).toHaveURL(/\/appointments\/[a-f0-9-]{36}$/i);
     const appointmentPath = new URL(a.url()).pathname;
+    await inspect(a, "appointment-history-and-decision-form");
     await expect(
       a.getByRole("heading", { name: "Historique du rendez-vous" }),
     ).toBeVisible();
     await b.goto(appointmentPath);
     await expect(b.getByText(/Seul le médecin responsable/)).toBeVisible();
+    await inspect(b, "appointment-responsibility-denial");
     await expect(
       b.getByRole("button", { name: "Ajouter la décision" }),
     ).toHaveCount(0);
@@ -584,6 +641,7 @@ test("two doctors preserve identity, amendments, appointments and private access
       a.getByRole("heading", { name: "Révision 2 — Replanification manuelle" }),
     ).toBeVisible();
     await fit(a);
+    await inspect(a, "rescheduled-appointment-history");
 
     await screen(
       a,
@@ -726,6 +784,7 @@ test("two doctors preserve identity, amendments, appointments and private access
       b.getByRole("button", { name: "Ajouter la révision" }),
     ).toHaveCount(0);
     await expect(b.locator(".clinical-entry")).toHaveCount(2);
+    await inspect(b, "revoked-capability-readable-history");
     await a.goto(`/patients/${child}`);
     const grant = a.locator("article").filter({ hasText: platformB });
     await grant
@@ -741,6 +800,7 @@ test("two doctors preserve identity, amendments, appointments and private access
       b.getByRole("heading", { name: "Cette page est introuvable." }),
     ).toBeVisible();
 
+    await inspect(b, "revoked-grant-private-not-found");
     await a.goto("/account");
     await a.getByRole("button", { name: "Se déconnecter" }).click();
     await expect(a).toHaveURL(/\/login$/);
@@ -766,6 +826,22 @@ test("two doctors preserve identity, amendments, appointments and private access
       grant_revocation_verified: true,
       logout_denied: true,
       page_errors: pageErrors,
+      ...(accessibility
+        ? {
+            automatic_accessibility_screens: accessibilityProofs.length,
+            automatic_violations: accessibilityProofs.reduce(
+              (n, p) => n + p.violations.length,
+              0,
+            ),
+            incomplete_rules: accessibilityProofs.reduce(
+              (n, p) => n + p.incomplete.length,
+              0,
+            ),
+            keyboard_bypass_on_screen_navigation: true,
+            keyboard_consultation_after_provenance_setup: true,
+            manual_review_required: true,
+          }
+        : {}),
       timings,
     };
     writeFileSync(
@@ -773,6 +849,10 @@ test("two doctors preserve identity, amendments, appointments and private access
       JSON.stringify(proof),
     );
     console.log(JSON.stringify(proof));
+    if (accessibility) {
+      expect(accessibilityProofs.length).toBeGreaterThanOrEqual(30);
+      assertAccessible(accessibilityProofs);
+    }
   } finally {
     await Promise.allSettled(contexts.map((context) => context.close()));
   }
