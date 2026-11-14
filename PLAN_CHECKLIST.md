@@ -107,7 +107,10 @@ The user explicitly requested that minor checks/hardening wait until the app fea
 
 ## Phase 7 — parent web
 
-Implementation underway: parent profile foundation passed cloud CI and its migration is hosted. Guardian invitations, independent verification, child booklet/appointments/export and revocation are now implemented in source; cloud acceptance and the new guardian migration are pending. Invitation email/QR, correction requests, settings/access history and the remaining phase acceptance stay open.
+Verified feature checkpoint: parent profile plus guardian invitations, independent verification, child booklet/appointments/export and revocation passed cloud CI; both migrations are hosted. The remaining acceptance below includes live guardian/browser/HTTP-conflict proof and external verification sources. Invitation email/QR, correction requests, settings/access history and remaining phase requirements stay open.
+
+- [x] Parent profile foundation: own confirmed/current account, independent from professional authority; cloud CI and hosted migration.
+- [x] Guardian/booklet technical slice: hashed recipient-bound one-use invitations, independent child-manager approval, scoped multiple-guardian reads/export/revocation; cloud access/integrity/build/browser CI and hosted migration.
 
 - [ ] Parent account and recorded guardianship verification.
 - [ ] One-use hashed expiring invitations and safe claim/linking of an existing child.
