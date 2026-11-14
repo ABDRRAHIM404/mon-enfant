@@ -96,7 +96,9 @@ This checklist preserves PROJECT_PLAN.md's complete Phase 0–8 scope. It is not
 - [x] Repeatable read-only hosted schema/ACL/Storage baseline: nineteen checks including column grants/private definers; real PostgreSQL regression tests detect introduced drift. See SECURITY_REVIEW.md.
 - [ ] Complete account/session, QR, export, RLS/Storage policy, secret and rate-limit review.
 - [x] Credential-free development readiness monitor, verified scheduled execution and live healthy/failure/recovery reporting drill; owner reports GitHub notifications arriving. See PROGRESS.md.
-- [ ] Backup/recovery and incident/retention drills; pilot monitoring ownership, response targets and scheduled alert-delivery acceptance.
+- [x] Isolated recovery implementation in cloud: real migrated PostgreSQL model snapshot/restore, full row/ACL hashes, restored-session containment, ledger/denial/immutability/source checks and separate fictional object bytes; see RECOVERY.md.
+- [ ] Distinct-runner synthetic artifact-transfer/recovery drill.
+- [ ] Hosted backup/recovery and incident/retention drills; pilot monitoring ownership, response targets and scheduled alert-delivery acceptance.
 - [ ] Formal clinical, legal/privacy and regulated hosting approvals before any identifiable-data pilot.
 
 ## Phase 7 — parent web
