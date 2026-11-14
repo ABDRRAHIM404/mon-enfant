@@ -616,6 +616,11 @@ test("verified parents use an existing child; unrelated, replayed and revoked ac
     proof.passed = true;
   } catch (error) {
     proof.failed_stage = stage;
+    if (
+      error instanceof Error &&
+      error.message.includes("strict mode violation")
+    )
+      proof.failure_code = "selector_not_unique";
     if (error instanceof Error && error.message === "PARENT_QR_DECODE_FAILED")
       proof.failure_code = "qr_decode_failed";
     throw new Error(
