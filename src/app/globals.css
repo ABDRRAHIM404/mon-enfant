@@ -1759,7 +1759,7 @@ th {
   margin: 0;
 }
 .auth-story .story-copy {
-  text-align: center;
+  text-align: left;
 }
 .auth-card h1 {
   margin-top: 16px;
@@ -1822,4 +1822,32 @@ th {
   .parent-mobile-nav {
     display: none;
   }
+}
+
+/* Match the supplied form rhythm without changing clinical form controls. */
+.public-site .eyebrow {
+  display: block;
+  line-height: 1.2;
+}
+.public-site .auth-card h1 {
+  line-height: 1.05;
+}
+.public-site .auth-card > .muted {
+  line-height: 1.55;
+}
+.public-site .auth-form label {
+  line-height: 1.2;
+  font-weight: 700;
+}
+.public-site .auth-form input:not([type="checkbox"]) {
+  height: 50px;
+  min-height: 50px;
+  line-height: 20px;
+  margin-bottom: 8px;
+}
+.public-site .auth-form .button {
+  margin-top: 0;
+}
+.public-site .auth-options {
+  min-height: 44px;
 }

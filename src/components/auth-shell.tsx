@@ -118,13 +118,11 @@ export function AuthShell({
                   : "Se connecter"}
               </Link>
             </p>
-            <p className="auth-switch">
-              <Link href={parent ? "/login?audience=clinician" : "/login"}>
-                {parent
-                  ? "Espace soignant · Médecin / Infirmier(ère)"
-                  : "Accéder à l’espace parent"}
-              </Link>
-            </p>
+            {!parent && (
+              <p className="auth-switch">
+                <Link href="/login">Accéder à l’espace parent</Link>
+              </p>
+            )}
           </div>
           <p className="fine auth-bottom">
             <LockKeyhole size={13} /> Environnement de développement · Données
