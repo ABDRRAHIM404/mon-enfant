@@ -363,12 +363,15 @@ test("verified parents use an existing child; unrelated, replayed and revoked ac
     await outside.locator('[name="relationship"]').selectOption("other");
     await outside.locator('[name="consent"]').check();
     await outside.getByRole("button", { name: "Soumettre ma demande" }).click();
-    await expect(outside.getByRole("alert")).toContainText(
+    await expect(outside.locator(".form-error[role=alert]")).toContainText(
       "Invitation indisponible",
     );
     expect(
       (await outside.locator("body").innerText()).includes(childName),
     ).toBe(false);
+    proof.unrelated_business_error_count = await outside
+      .locator(".form-error[role=alert]")
+      .count();
     proof.unrelated_scanner_denied = true;
     stage = "claim-and-pending";
     const operation = await claim(parent, url);
