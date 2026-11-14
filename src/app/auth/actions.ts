@@ -1,4 +1,5 @@
 "use server";
+import { authDestination } from "@/lib/auth-destination";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { emailSendingLimited, emailLimitMessage } from "@/lib/auth-email";
@@ -38,7 +39,7 @@ export async function signIn(_: AuthState, form: FormData): Promise<AuthState> {
       error:
         "Connexion impossible. Vérifiez vos identifiants et la confirmation de votre e-mail.",
     };
-  redirect("/account");
+  redirect(authDestination(form.get("destination")));
 }
 export async function signUp(_: AuthState, form: FormData): Promise<AuthState> {
   if (!supabaseConfig())
@@ -64,9 +65,16 @@ export async function signUp(_: AuthState, form: FormData): Promise<AuthState> {
         "L’origine de la demande ne correspond pas à cet espace. Rechargez la page.",
     };
   }
+  const confirmation = new URL("/auth/callback", siteUrl);
+  const destination = authDestination(form.get("destination"));
+  if (destination !== "/account")
+    confirmation.searchParams.set(
+      "next",
+      destination === "/parent" ? "parent" : "parent-invitation",
+    );
   const { error } = await client.auth.signUp({
     ...input,
-    options: { emailRedirectTo: new URL("/auth/callback", siteUrl).toString() },
+    options: { emailRedirectTo: confirmation.toString() },
   });
   if (error)
     return {

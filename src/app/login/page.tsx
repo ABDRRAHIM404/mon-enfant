@@ -2,9 +2,14 @@ import { AuthShell } from "@/components/auth-shell";
 export default async function Login({
   searchParams,
 }: {
-  searchParams: Promise<{ confirmation?: string; password?: string }>;
+  searchParams: Promise<{
+    confirmation?: string;
+    password?: string;
+    audience?: string;
+    next?: string;
+  }>;
 }) {
-  const { confirmation, password } = await searchParams;
+  const { confirmation, password, audience, next } = await searchParams;
   return (
     <>
       {confirmation === "invalid" && (
@@ -13,8 +18,17 @@ export default async function Login({
           lien à votre administrateur.
         </div>
       )}
-      {password === "updated" && <div className="notice" role="status">Votre mot de passe a été modifié. Connectez-vous avec le nouveau mot de passe.</div>}
-      <AuthShell mode="login" />
+      {password === "updated" && (
+        <div className="notice" role="status">
+          Votre mot de passe a été modifié. Connectez-vous avec le nouveau mot
+          de passe.
+        </div>
+      )}
+      <AuthShell
+        mode="login"
+        parent={audience === "parent"}
+        invitation={next === "invitation"}
+      />
     </>
   );
 }

@@ -245,7 +245,12 @@ export default async function ChildBooklet({
           Vous pouvez retirer votre propre accès. Cette action ne modifie pas
           les soins enregistrés ni les accès des autres responsables.
         </p>
-        <GuardianRevokeForm id={link.id} childId={id} kind="link" />
+        <GuardianRevokeForm
+          id={link.id}
+          childId={id}
+          kind="link"
+          returnToParent
+        />
       </section>
       <p className="fine">
         Environnement de développement · Données fictives uniquement

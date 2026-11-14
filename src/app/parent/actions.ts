@@ -1,4 +1,5 @@
 "use server";
+import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { reportOperationalEvent } from "@/lib/operational-events";
@@ -188,6 +189,7 @@ export async function revokeGuardianAccess(
   revalidatePath(`/patients/${child}/guardians`);
   revalidatePath(`/parent/children/${child}`);
   revalidatePath("/parent");
+  if (form.get("returnTo") === "parent") redirect("/parent");
   return { success: true };
 }
 

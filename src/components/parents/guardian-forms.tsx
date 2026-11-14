@@ -185,8 +185,14 @@ export function GuardianClaimForm({ operationId }: { operationId: string }) {
       <button className="button primary" disabled={pending}>
         {pending ? "Enregistrement…" : "Soumettre ma demande"}
       </button>
-      <Link href="/login" className="text-link">
+      <Link href="/login?audience=parent&next=invitation" className="text-link">
         Me connecter
+      </Link>
+      <Link
+        href="/signup?audience=parent&next=invitation"
+        className="text-link"
+      >
+        Créer mon compte parent
       </Link>
       <Link href="/parent" className="text-link">
         Activer ou consulter mon profil parent
@@ -292,10 +298,12 @@ export function GuardianRevokeForm({
   id,
   childId,
   kind,
+  returnToParent = false,
 }: {
   id: string;
   childId: string;
   kind: "invitation" | "link";
+  returnToParent?: boolean;
 }) {
   const [state, action, pending] = useActionState(revokeGuardianAccess, {});
   return (
@@ -303,6 +311,7 @@ export function GuardianRevokeForm({
       <input type="hidden" name="id" value={id} />
       <input type="hidden" name="childId" value={childId} />
       <input type="hidden" name="kind" value={kind} />
+      {returnToParent && <input type="hidden" name="returnTo" value="parent" />}
       <label>
         Motif du retrait
         <textarea name="reason" minLength={10} maxLength={1000} required />

@@ -3,14 +3,24 @@ import { ShieldCheck, LockKeyhole, HeartHandshake } from "lucide-react";
 import { Brand } from "./brand";
 import { AuthForm } from "./auth-form";
 import { supabaseConfig } from "@/lib/supabase/config";
-export function AuthShell({ mode }: { mode: "login" | "signup" }) {
+export function AuthShell({
+  mode,
+  parent = false,
+  invitation = false,
+}: {
+  mode: "login" | "signup";
+  parent?: boolean;
+  invitation?: boolean;
+}) {
   const configured = !!supabaseConfig();
   return (
     <main className="auth-layout">
       <section className="auth-story">
         <Brand />
         <div className="story-copy">
-          <span className="eyebrow light">ESPACE PROFESSIONNEL</span>
+          <span className="eyebrow light">
+            {parent ? "ESPACE PARENT" : "ESPACE PROFESSIONNEL"}
+          </span>
           <p className="story-title">
             Une histoire de santé.
             <br />
@@ -30,7 +40,9 @@ export function AuthShell({ mode }: { mode: "login" | "signup" }) {
           </div>
         </div>
         <p className="story-footer">
-          Conçu pour les professionnels de santé au Maroc.
+          {parent
+            ? "Un carnet partagé avec les professionnels qui suivent votre enfant."
+            : "Conçu pour les professionnels de santé au Maroc."}
         </p>
       </section>
       <section className="auth-main">
@@ -38,7 +50,9 @@ export function AuthShell({ mode }: { mode: "login" | "signup" }) {
           ← Retour à l’accueil
         </Link>
         <div className="auth-card">
-          <span className="eyebrow">MON ENFANT · PROFESSIONNELS</span>
+          <span className="eyebrow">
+            {parent ? "MON ENFANT · PARENTS" : "MON ENFANT · PROFESSIONNELS"}
+          </span>
           <h1 id="main-content" tabIndex={-1}>
             {mode === "login"
               ? "Heureux de vous retrouver."
@@ -47,7 +61,9 @@ export function AuthShell({ mode }: { mode: "login" | "signup" }) {
           <p className="muted">
             {mode === "login"
               ? "Connectez-vous à votre espace sécurisé."
-              : "Créez votre compte professionnel."}
+              : parent
+                ? "Créez votre compte parent. Aucun carnet ne sera ouvert avant vérification."
+                : "Créez votre compte professionnel."}
           </p>
           {!configured && (
             <div className="notice">
@@ -61,10 +77,23 @@ export function AuthShell({ mode }: { mode: "login" | "signup" }) {
               </div>
             </div>
           )}
-          <AuthForm mode={mode} configured={configured} />
+          <AuthForm
+            mode={mode}
+            configured={configured}
+            destination={
+              parent ? (invitation ? "parent-invitation" : "parent") : "account"
+            }
+          />
           <p className="auth-switch">
             {mode === "login" ? "Vous nous rejoignez ?" : "Déjà un compte ?"}{" "}
-            <Link href={mode === "login" ? "/signup" : "/login"}>
+            <Link
+              href={
+                (mode === "login" ? "/signup" : "/login") +
+                (parent
+                  ? `?audience=parent${invitation ? "&next=invitation" : ""}`
+                  : "")
+              }
+            >
               {mode === "login" ? "Créer un compte" : "Se connecter"}
             </Link>
           </p>

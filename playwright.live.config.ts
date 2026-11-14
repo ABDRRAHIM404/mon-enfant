@@ -2,6 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 const probe = process.env.MON_ENFANT_LIVE_PROBE;
 if (
   ![
+    "parent-accept",
     "evidence-reproduce",
     "evidence-accept",
     "evidence-accessibility",
@@ -21,19 +22,22 @@ if (!/^[a-f0-9]{16}$/.test(process.env.MON_ENFANT_QA_RUN ?? ""))
   throw new Error("A dedicated synthetic fixture run is required.");
 export default defineConfig({
   testDir: "./e2e-live",
-  testMatch: probe?.startsWith("session-")
-    ? "session.spec.ts"
-    : probe === "accessibility-accept"
-      ? "accessibility.spec.ts"
-      : probe === "vaccination-accept" || probe === "vaccine-accessibility"
-        ? "vaccination.spec.ts"
-        : probe === "clinical-inspect"
-          ? "clinical-inspect.spec.ts"
-          : probe === "clinical-accept" ||
-              probe === "clinical-accessibility" ||
-              probe === "clinical-performance"
-            ? "clinical.spec.ts"
-            : "evidence.spec.ts",
+  testMatch:
+    probe === "parent-accept"
+      ? "parent.spec.ts"
+      : probe?.startsWith("session-")
+        ? "session.spec.ts"
+        : probe === "accessibility-accept"
+          ? "accessibility.spec.ts"
+          : probe === "vaccination-accept" || probe === "vaccine-accessibility"
+            ? "vaccination.spec.ts"
+            : probe === "clinical-inspect"
+              ? "clinical-inspect.spec.ts"
+              : probe === "clinical-accept" ||
+                  probe === "clinical-accessibility" ||
+                  probe === "clinical-performance"
+                ? "clinical.spec.ts"
+                : "evidence.spec.ts",
   fullyParallel: false,
   workers: 1,
   retries: 0,
@@ -47,21 +51,23 @@ export default defineConfig({
     ? 0
     : 1,
   timeout:
-    probe === "clinical-performance"
+    probe === "parent-accept"
       ? 480000
-      : probe === "evidence-accessibility"
-        ? 240000
-        : probe === "vaccine-accessibility"
-          ? 480000
-          : probe === "clinical-accessibility"
-            ? 360000
-            : probe === "accessibility-accept"
-              ? 180000
-              : probe === "vaccination-accept"
-                ? 360000
-                : probe === "clinical-accept"
-                  ? 240000
-                  : 120000,
+      : probe === "clinical-performance"
+        ? 480000
+        : probe === "evidence-accessibility"
+          ? 240000
+          : probe === "vaccine-accessibility"
+            ? 480000
+            : probe === "clinical-accessibility"
+              ? 360000
+              : probe === "accessibility-accept"
+                ? 180000
+                : probe === "vaccination-accept"
+                  ? 360000
+                  : probe === "clinical-accept"
+                    ? 240000
+                    : 120000,
   expect: { timeout: 20000 },
   outputDir: "test-results/live",
   use: {

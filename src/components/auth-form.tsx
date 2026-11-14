@@ -6,9 +6,11 @@ import { signIn, signUp } from "@/app/auth/actions";
 export function AuthForm({
   mode,
   configured,
+  destination = "account",
 }: {
   mode: "login" | "signup";
   configured: boolean;
+  destination?: "account" | "parent" | "parent-invitation";
 }) {
   const [state, action, pending] = useActionState(
     mode === "login" ? signIn : signUp,
@@ -16,13 +18,20 @@ export function AuthForm({
   );
   return (
     <form action={action} className="auth-form" aria-busy={pending}>
-      <label htmlFor="email">Adresse e-mail professionnelle</label>
+      <input type="hidden" name="destination" value={destination} />
+      <label htmlFor="email">
+        {destination === "account"
+          ? "Adresse e-mail professionnelle"
+          : "Adresse e-mail"}
+      </label>
       <input
         id="email"
         name="email"
         type="email"
         autoComplete="email"
-        placeholder="docteur@exemple.ma"
+        placeholder={
+          destination === "account" ? "docteur@exemple.ma" : "vous@exemple.ma"
+        }
         required
         maxLength={254}
         disabled={!configured}
@@ -72,9 +81,11 @@ export function AuthForm({
         </Link>
       )}
       <p className="fine">
-        {mode === "signup"
-          ? "Votre compte sera non vérifié. L’accès clinique nécessite une validation professionnelle."
-          : "Espace réservé aux professionnels de santé."}
+        {destination !== "account"
+          ? "Confirmez votre e-mail. Chaque carnet nécessite ensuite une vérification distincte de votre qualité de responsable."
+          : mode === "signup"
+            ? "Votre compte sera non vérifié. L’accès clinique nécessite une validation professionnelle."
+            : "Espace réservé aux professionnels de santé."}
       </p>
     </form>
   );

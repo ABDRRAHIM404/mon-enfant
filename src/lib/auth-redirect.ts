@@ -3,6 +3,8 @@ export function authRedirect(
   requestUrl: string,
   path:
     | "/account"
+    | "/parent"
+    | "/parent/invitation"
     | "/auth/reset-password"
     | "/login?confirmation=invalid"
     | "/forgot-password?recovery=invalid"
