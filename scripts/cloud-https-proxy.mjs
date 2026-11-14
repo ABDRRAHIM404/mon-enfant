@@ -6,7 +6,9 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 if (
   process.env.GITHUB_ACTIONS !== "true" ||
-  process.env.MON_ENFANT_LIVE_PROBE !== "updates-cloud-accept"
+  !["updates-cloud-accept", "design-cloud-accept"].includes(
+    process.env.MON_ENFANT_LIVE_PROBE,
+  )
 )
   throw new Error("Explicit cloud-only update acceptance required");
 const root = process.env.RUNNER_TEMP;
