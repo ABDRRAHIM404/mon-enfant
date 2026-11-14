@@ -178,3 +178,6 @@ Use standard clinical `--prepare`, then dispatch this mode after regular CI pass
 
 
 Development performance targets and the strict credential-free downloaded-artifact analyzer are documented in [PERFORMANCE.md](PERFORMANCE.md). A green measurement run proves observations were collected, not that these targets passed. Analyze complete classified files and retain any misses explicitly before wider acceptance.
+
+
+The repeatable read-only schema/ACL/Storage configuration review is documented in [SECURITY_REVIEW.md](SECURITY_REVIEW.md). It inspects both column and table privileges, retains the explicit self-profile exception, reports drift without automatic repair and does not replace functional authorization or full security acceptance.
