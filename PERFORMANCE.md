@@ -16,8 +16,7 @@ The targets use the published good-experience guidance for
 [TTFB](https://web.dev/articles/ttfb), [FCP](https://web.dev/articles/fcp) and
 [Core Web Vitals](https://web.dev/articles/vitals). Applying them to each controlled
 sample is a development policy. Field Core Web Vitals acceptance requires the
-75th percentile, including INP, across representative real sessions. A single
-synthetic sample per case cannot establish a percentile or field compliance.
+75th percentile, including INP, across representative real sessions. Three repeated synthetic samples per case check basic repeatability; they cannot establish a representative percentile or field compliance.
 
 The constrained profile uses 4x CPU slowdown, 150 ms browser request latency,
 1.6 Mbps download and 750 kbps upload. Both profiles disable the browser cache
@@ -35,7 +34,7 @@ credential-free analyzer:
 python3 scripts/analyze-performance.py --input-dir /private/artifact-directory
 ```
 
-It requires exactly eighteen files, six screens × two profiles × three viewports,
+It requires exactly eighteen files and 108 observations: six screens × two profiles × three viewports × three samples,
 and validates fixed metadata, finite measurements, conditions and full coverage.
 The viewport is taken from Playwright's fixed project-name suffix on each output
 directory. It reports only allowlisted labels and numeric measurements, never
@@ -49,7 +48,11 @@ browser measurement and retains `performance-targets.json` with the classified
 artifact. A missed target fails that distinct workflow step; invalid or incomplete
 measurements also fail. Browser measurement success alone cannot make this gate green.
 
-Repeated representative measurements, response to any misses, interaction/load
+For the archived first baseline only, pass `--samples-per-case 1` to validate its
+36 observations without pretending it meets the repeated-sample requirement.
+The default checker rejects that smaller archive.
+
+Representative repeated measurements, response to any misses, interaction/load
 coverage and agreed pilot operating targets remain required before broader
 performance/readiness acceptance. The independent clinical-ledger readback and
 four-account/eight-secret retirement remain mandatory even when measurement fails.

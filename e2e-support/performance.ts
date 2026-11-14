@@ -9,6 +9,7 @@ const installed = new WeakSet<Page>();
 export type PerformanceProof = {
   screen: string;
   profile: "baseline" | "constrained";
+  sample: number;
   cpu_slowdown: number;
   latency_ms: number;
   download_bytes_per_second: number;
@@ -45,109 +46,112 @@ export async function measureClinicalRead(
   try {
     await session.send("Network.enable");
     await session.send("Network.setCacheDisabled", { cacheDisabled: true });
-    for (const profile of ["baseline", "constrained"] as const) {
-      const constrained = profile === "constrained";
-      const conditions = {
-        latency: constrained ? 150 : 0,
-        downloadThroughput: constrained ? 200000 : -1,
-        uploadThroughput: constrained ? 93750 : -1,
-        connectionType: constrained
-          ? ("cellular4g" as const)
-          : ("wifi" as const),
-      };
-      stage = "profile";
-      await session.send("Emulation.setCPUThrottlingRate", {
-        rate: constrained ? 4 : 1,
-      });
-      await session.send("Network.emulateNetworkConditionsByRule", {
-        offline: false,
-        matchedNetworkConditions: constrained
-          ? [{ urlPattern: "", ...conditions }]
-          : [],
-      });
-      await session.send("Network.overrideNetworkState", {
-        offline: false,
-        ...conditions,
-      });
-      stage = "navigate";
-      const response = await page.goto(path);
-      if (!response?.ok()) throw new Error("Document navigation failed.");
-      await expect(
-        page.getByRole("heading", { name: heading, exact: true }),
-      ).toBeVisible();
-      await page.evaluate(() => document.fonts.ready);
-      stage = "observe";
-      await page.waitForFunction(
-        () => {
-          const state = (window as ProbeWindow).__monEnfantPerformance;
-          const navigation = performance.getEntriesByType("navigation")[0] as
-            PerformanceNavigationTiming | undefined;
-          return (
-            state?.supported &&
-            state.lcp > 0 &&
-            document.readyState === "complete" &&
-            navigation?.loadEventEnd &&
-            performance.now() -
-              Math.max(state.lastBusy, navigation.loadEventEnd) >=
-              1000
-          );
-        },
-        undefined,
-        { timeout: 30000, polling: 100 },
-      );
-      stage = "read";
-      const metrics = await page.evaluate(() => {
-        const state = (window as ProbeWindow).__monEnfantPerformance!;
-        const navigation = performance.getEntriesByType(
-          "navigation",
-        )[0] as PerformanceNavigationTiming;
-        const resources = performance.getEntriesByType(
-          "resource",
-        ) as PerformanceResourceTiming[];
-        const firstPaint = performance.getEntriesByName(
-          "first-contentful-paint",
-        )[0];
-        return {
-          document_ttfb_ms: navigation.responseStart,
-          fcp_ms: firstPaint?.startTime ?? 0,
-          lcp_ms: state.lcp,
-          cls: state.cls,
-          observed_long_task_blocking_ms: state.blocking,
-          load_ms: navigation.loadEventEnd,
-          observation_end_ms: performance.now(),
-          reported_transfer_bytes:
-            navigation.transferSize +
-            resources.reduce((sum, entry) => sum + entry.transferSize, 0),
-          resource_count: resources.length,
+    for (const sample of [1, 2, 3]) {
+      for (const profile of ["baseline", "constrained"] as const) {
+        const constrained = profile === "constrained";
+        const conditions = {
+          latency: constrained ? 150 : 0,
+          downloadThroughput: constrained ? 200000 : -1,
+          uploadThroughput: constrained ? 93750 : -1,
+          connectionType: constrained
+            ? ("cellular4g" as const)
+            : ("wifi" as const),
         };
-      });
-      if (
-        !Object.values(metrics).every(
-          (value) => Number.isFinite(value) && value >= 0,
-        ) ||
-        metrics.fcp_ms <= 0 ||
-        metrics.lcp_ms <= 0
-      )
-        throw new Error("Required numeric observations were not proven.");
-      const proof: PerformanceProof = {
-        screen,
-        profile,
-        cpu_slowdown: constrained ? 4 : 1,
-        latency_ms: conditions.latency,
-        download_bytes_per_second: conditions.downloadThroughput,
-        upload_bytes_per_second: conditions.uploadThroughput,
-        cache_disabled: true,
-        ...metrics,
-        performance_acceptance_claimed: false,
-      };
-      proofs.push(proof);
-      console.log(
-        JSON.stringify({
-          event: "synthetic_performance_observation",
-          viewport: info.project.name,
-          ...proof,
-        }),
-      );
+        stage = "profile";
+        await session.send("Emulation.setCPUThrottlingRate", {
+          rate: constrained ? 4 : 1,
+        });
+        await session.send("Network.emulateNetworkConditionsByRule", {
+          offline: false,
+          matchedNetworkConditions: constrained
+            ? [{ urlPattern: "", ...conditions }]
+            : [],
+        });
+        await session.send("Network.overrideNetworkState", {
+          offline: false,
+          ...conditions,
+        });
+        stage = "navigate";
+        const response = await page.goto(path);
+        if (!response?.ok()) throw new Error("Document navigation failed.");
+        await expect(
+          page.getByRole("heading", { name: heading, exact: true }),
+        ).toBeVisible();
+        await page.evaluate(() => document.fonts.ready);
+        stage = "observe";
+        await page.waitForFunction(
+          () => {
+            const state = (window as ProbeWindow).__monEnfantPerformance;
+            const navigation = performance.getEntriesByType("navigation")[0] as
+              PerformanceNavigationTiming | undefined;
+            return (
+              state?.supported &&
+              state.lcp > 0 &&
+              document.readyState === "complete" &&
+              navigation?.loadEventEnd &&
+              performance.now() -
+                Math.max(state.lastBusy, navigation.loadEventEnd) >=
+                1000
+            );
+          },
+          undefined,
+          { timeout: 30000, polling: 100 },
+        );
+        stage = "read";
+        const metrics = await page.evaluate(() => {
+          const state = (window as ProbeWindow).__monEnfantPerformance!;
+          const navigation = performance.getEntriesByType(
+            "navigation",
+          )[0] as PerformanceNavigationTiming;
+          const resources = performance.getEntriesByType(
+            "resource",
+          ) as PerformanceResourceTiming[];
+          const firstPaint = performance.getEntriesByName(
+            "first-contentful-paint",
+          )[0];
+          return {
+            document_ttfb_ms: navigation.responseStart,
+            fcp_ms: firstPaint?.startTime ?? 0,
+            lcp_ms: state.lcp,
+            cls: state.cls,
+            observed_long_task_blocking_ms: state.blocking,
+            load_ms: navigation.loadEventEnd,
+            observation_end_ms: performance.now(),
+            reported_transfer_bytes:
+              navigation.transferSize +
+              resources.reduce((sum, entry) => sum + entry.transferSize, 0),
+            resource_count: resources.length,
+          };
+        });
+        if (
+          !Object.values(metrics).every(
+            (value) => Number.isFinite(value) && value >= 0,
+          ) ||
+          metrics.fcp_ms <= 0 ||
+          metrics.lcp_ms <= 0
+        )
+          throw new Error("Required numeric observations were not proven.");
+        const proof: PerformanceProof = {
+          screen,
+          profile,
+          sample,
+          cpu_slowdown: constrained ? 4 : 1,
+          latency_ms: conditions.latency,
+          download_bytes_per_second: conditions.downloadThroughput,
+          upload_bytes_per_second: conditions.uploadThroughput,
+          cache_disabled: true,
+          ...metrics,
+          performance_acceptance_claimed: false,
+        };
+        proofs.push(proof);
+        console.log(
+          JSON.stringify({
+            event: "synthetic_performance_observation",
+            viewport: info.project.name,
+            ...proof,
+          }),
+        );
+      }
     }
     writeFileSync(
       info.outputPath(`performance-${screen}.json`),

@@ -28,7 +28,9 @@ FIELDS = {'screen', 'profile', 'cpu_slowdown', 'latency_ms',
           'cache_disabled', 'performance_acceptance_claimed', *METRICS}
 
 
-def analyze(root):
+def analyze(root, samples=3):
+    if type(samples) is not int or samples not in (1, 3):
+        raise ValueError("Only explicit legacy or repeated sample coverage is supported.")
     observations = {}
     files = list(Path(root).rglob('performance-*.json'))
     if len(files) != len(SCREENS) * len(DEVICES):
@@ -38,10 +40,11 @@ def analyze(root):
         if device not in DEVICES or path.stat().st_size > 65536:
             raise ValueError('Unexpected artifact grouping or size.')
         data = json.loads(path.read_text())
-        if not isinstance(data, list) or len(data) != len(PROFILES):
-            raise ValueError('Each screen requires both controlled profiles.')
+        if not isinstance(data, list) or len(data) != len(PROFILES) * samples:
+            raise ValueError('Each screen requires all controlled profile samples.')
         for proof in data:
-            if not isinstance(proof, dict) or set(proof) != FIELDS:
+            required_fields = FIELDS if samples == 1 else FIELDS | {'sample'}
+            if not isinstance(proof, dict) or set(proof) != required_fields:
                 raise ValueError('Unexpected performance fields.')
             screen, profile = proof['screen'], proof['profile']
             if (not isinstance(screen, str) or screen not in SCREENS
@@ -64,23 +67,27 @@ def analyze(root):
             if (proof['fcp_ms'] <= 0 or proof['lcp_ms'] <= 0
                     or proof['observation_end_ms'] < max(proof['load_ms'], proof['lcp_ms'])):
                 raise ValueError('Unproven paint or observation window.')
-            key = (device, screen, profile)
+            sample = proof.get('sample', 1)
+            if type(sample) is not int or sample not in range(1, samples + 1):
+                raise ValueError('Unexpected sample identifier.')
+            key = (device, screen, profile, sample)
             if key in observations:
                 raise ValueError('Duplicate observation cannot establish coverage.')
             observations[key] = proof
-    expected = {(device, screen, profile) for device in DEVICES
-                for screen in SCREENS for profile in PROFILES}
+    expected = {(device, screen, profile, sample) for device in DEVICES
+                for screen in SCREENS for profile in PROFILES
+                for sample in range(1, samples + 1)}
     if set(observations) != expected:
         raise ValueError('Incomplete device, screen or profile coverage.')
     failures = []
-    for (device, screen, profile), proof in sorted(observations.items()):
+    for (device, screen, profile, sample), proof in sorted(observations.items()):
         for metric, limit in TARGETS.items():
             if proof[metric] > limit:
                 failures.append({'viewport': device, 'screen': screen,
-                                 'profile': profile, 'metric': metric,
+                                 'profile': profile, 'sample': sample, 'metric': metric,
                                  'observed': proof[metric], 'target': limit})
     return {'status': 'targets_missed' if failures else 'targets_met',
-            'observations': len(observations), 'samples_per_case': 1,
+            'observations': len(observations), 'samples_per_case': samples,
             'targets': TARGETS, 'failures': failures,
             'maximums': {metric: max(p[metric] for p in observations.values())
                          for metric in METRICS},
@@ -91,9 +98,11 @@ def analyze(root):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--input-dir', required=True)
+    parser.add_argument('--samples-per-case', type=int, choices=(1, 3), default=3,
+                        help='Three samples required by default; one only for the archived first baseline')
     args = parser.parse_args()
     try:
-        report = analyze(args.input_dir)
+        report = analyze(args.input_dir, args.samples_per_case)
     except Exception:
         print(json.dumps({'status': 'invalid_artifacts',
                           'performance_acceptance_claimed': False}))

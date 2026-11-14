@@ -883,7 +883,7 @@ test("two doctors preserve identity, amendments, appointments and private access
       JSON.stringify(proof),
     );
     console.log(JSON.stringify(proof));
-    if (performanceMode) expect(performanceProofs.length).toBe(12);
+    if (performanceMode) expect(performanceProofs.length).toBe(36);
     if (accessibility) {
       expect(accessibilityProofs.length).toBeGreaterThanOrEqual(30);
       assertAccessible(accessibilityProofs);

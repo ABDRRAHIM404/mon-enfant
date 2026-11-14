@@ -31,7 +31,8 @@ class PerformanceAnalysisTests(unittest.TestCase):
                                  resource_count=12)
                     proof.update(zip(('cpu_slowdown', 'latency_ms',
                                       'download_bytes_per_second', 'upload_bytes_per_second'), settings))
-                    proofs.append(proof)
+                    for sample in range(1, 4):
+                        proofs.append({**proof, "sample": sample})
                 path = folder / ('performance-' + screen + '.json')
                 path.write_text(json.dumps(proofs))
                 self.paths.append(path)
@@ -44,16 +45,17 @@ class PerformanceAnalysisTests(unittest.TestCase):
     def test_exact_boundaries_pass_but_do_not_claim_field_or_full_acceptance(self):
         result = analysis.analyze(self.root)
         self.assertEqual(result['status'], 'targets_met')
-        self.assertEqual(result['observations'], 36)
+        self.assertEqual(result['observations'], 108)
+        self.assertEqual(result['samples_per_case'], 3)
         self.assertFalse(result['performance_acceptance_claimed'])
         self.assertFalse(result['field_compliance_claimed'])
 
     def test_exceedance_identifies_case_without_input_paths(self):
-        self.mutate(lambda data: data[1].update(lcp_ms=2501))
+        self.mutate(lambda data: data[3].update(lcp_ms=2501))
         result = analysis.analyze(self.root)
         self.assertEqual(result['status'], 'targets_missed')
         self.assertEqual(result['failures'], [dict(viewport='desktop', screen='registration',
-                         profile='constrained', metric='lcp_ms', observed=2501, target=2500)])
+                         profile='constrained', sample=1, metric='lcp_ms', observed=2501, target=2500)])
         self.assertNotIn(str(self.root), json.dumps(result))
 
     def test_missing_screen_cannot_be_reported_as_pass(self):
@@ -65,7 +67,7 @@ class PerformanceAnalysisTests(unittest.TestCase):
         with self.assertRaises(ValueError): analysis.analyze(self.root)
 
     def test_wrong_throttling_cannot_be_reported_as_constrained(self):
-        self.mutate(lambda data: data[1].update(cpu_slowdown=1))
+        self.mutate(lambda data: data[3].update(cpu_slowdown=1))
         with self.assertRaises(ValueError): analysis.analyze(self.root)
 
     def test_unrecognized_raw_field_is_rejected(self):
@@ -82,4 +84,20 @@ class PerformanceAnalysisTests(unittest.TestCase):
 
     def test_unknown_artifact_device_cannot_hide_missing_coverage(self):
         self.paths[0].parent.rename(self.root / 'unrecognized-device')
+        with self.assertRaises(ValueError): analysis.analyze(self.root)
+
+    def test_archived_single_sample_requires_explicit_legacy_mode(self):
+        for path in self.paths:
+            data = json.loads(path.read_text())
+            legacy = [{key: value for key, value in proof.items() if key != 'sample'}
+                      for proof in data if proof['sample'] == 1]
+            path.write_text(json.dumps(legacy))
+        with self.assertRaises(ValueError): analysis.analyze(self.root)
+        result = analysis.analyze(self.root, samples=1)
+        self.assertEqual(result['observations'], 36)
+        self.assertEqual(result['samples_per_case'], 1)
+        self.assertFalse(result['performance_acceptance_claimed'])
+
+    def test_repeated_sample_identifiers_must_prove_each_distinct_observation(self):
+        self.mutate(lambda data: data[1].update(sample=1))
         with self.assertRaises(ValueError): analysis.analyze(self.root)
