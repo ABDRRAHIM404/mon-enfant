@@ -33,7 +33,9 @@ export default async function Growth({
     <main className="account-page wide">
       <DoctorNav />
       <div className="page-heading">
-        <h1 id="main-content" tabIndex={-1}>Croissance</h1>
+        <h1 id="main-content" tabIndex={-1}>
+          Croissance
+        </h1>
         <p className="muted">
           Mesures actives datées de cette page (30 saisies au maximum). Les
           corrections remplacent la projection sans effacer l’original.
@@ -69,7 +71,12 @@ export default async function Growth({
           {result.total} saisie(s) de mesure · page {page}
         </p>
         {result.items.length ? (
-          <div className="table-scroll">
+          <div
+            className="table-scroll"
+            role="region"
+            aria-label="Valeurs et provenance des mesures"
+            tabIndex={0}
+          >
             <table>
               <thead>
                 <tr>

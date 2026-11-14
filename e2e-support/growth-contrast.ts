@@ -2,80 +2,15 @@ import { expect, type Page, type TestInfo } from "@playwright/test";
 import { writeFileSync } from "node:fs";
 import { contrastRatio, type RGB } from "./contrast-math";
 import { tabTo } from "./accessibility";
+import { exerciseScrollRegion } from "./keyboard-region";
+import { collectSolidTextSamples } from "./solid-text-colors";
 
 export async function reviewGrowthContrast(
   page: Page,
   screen: "growth-chart" | "corrected-growth-chart" | "withdrawn-growth-chart",
   info: TestInfo,
 ) {
-  // Scope is fixed to the previously incomplete chart labels and growth table.
-  // Return colors/structure only: never text, HTML, selectors or patient values.
-  const samples = await page
-    .locator(
-      "svg.growth-chart text, .table-scroll th, .table-scroll td, .table-scroll a",
-    )
-    .evaluateAll((elements) => {
-      const rgba = (value: string): [number, number, number, number] | null => {
-        const match = value.match(
-          /^rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:\s*[,/]\s*([\d.]+))?\s*\)$/,
-        );
-        if (!match) return null;
-        const result = [
-          Number(match[1]),
-          Number(match[2]),
-          Number(match[3]),
-          match[4] === undefined ? 1 : Number(match[4]),
-        ] as [number, number, number, number];
-        return result.every(Number.isFinite) &&
-          result
-            .slice(0, 3)
-            .every((channel) => channel >= 0 && channel <= 255) &&
-          result[3] >= 0 &&
-          result[3] <= 1
-          ? result
-          : null;
-      };
-      return elements.map((element) => {
-        const style = getComputedStyle(element);
-        const svg = element.tagName.toLowerCase() === "text";
-        const foreground = rgba(svg ? style.fill : style.color);
-        let background: [number, number, number, number] | null = null;
-        let unsupported =
-          !foreground ||
-          foreground[3] !== 1 ||
-          (svg && Number(style.fillOpacity) !== 1);
-        for (
-          let ancestor: Element | null = element;
-          ancestor;
-          ancestor = ancestor.parentElement
-        ) {
-          const current = getComputedStyle(ancestor);
-          if (
-            Number(current.opacity) !== 1 ||
-            current.filter !== "none" ||
-            current.mixBlendMode !== "normal" ||
-            current.textShadow !== "none"
-          )
-            unsupported = true;
-          if (!background) {
-            if (current.backgroundImage !== "none") unsupported = true;
-            const color = rgba(current.backgroundColor);
-            if (!color || (color[3] !== 0 && color[3] !== 1))
-              unsupported = true;
-            if (color?.[3] === 1) background = color;
-          }
-        }
-        if (!background) unsupported = true;
-        const bounds = element.getBoundingClientRect();
-        return {
-          tag: element.tagName.toLowerCase(),
-          foreground: foreground?.slice(0, 3) ?? null,
-          background: background?.slice(0, 3) ?? null,
-          has_box: bounds.width > 0 && bounds.height > 0,
-          unsupported,
-        };
-      });
-    });
+  const samples = await collectSolidTextSamples(page, "growth");
   expect(samples.length > 0).toBe(true);
   expect(samples.filter((sample) => sample.tag === "text").length).toBe(
     screen === "withdrawn-growth-chart" ? 0 : 8,
@@ -106,6 +41,13 @@ export async function reviewGrowthContrast(
   });
   expect(measured.every((sample) => sample.ratio >= 4.5)).toBe(true);
 
+  const regionProof = await exerciseScrollRegion(
+    page,
+    page.getByRole("region", {
+      name: "Valeurs et provenance des mesures",
+      exact: true,
+    }),
+  );
   const history = page.locator(".table-scroll a");
   const before = await history.evaluate((element) => {
     const scroller = element.closest(".table-scroll") as HTMLElement | null;
@@ -181,6 +123,7 @@ export async function reviewGrowthContrast(
       ).values(),
     ],
     focus_contrast_ratio: focusRatio,
+    ...regionProof,
     keyboard_history_visible: true,
     horizontal_scroll_required: before?.link_clipped ?? null,
     initial_geometry: before,

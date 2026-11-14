@@ -7,6 +7,7 @@ import {
   tabTo,
   type AccessibilityProof,
 } from "../e2e-support/accessibility";
+import { reviewQueueContrast } from "../e2e-support/reviewer-queue-contrast";
 const accessibility =
   process.env.MON_ENFANT_LIVE_PROBE === "evidence-accessibility";
 const SITE = "https://mon-enfant.vercel.app",
@@ -402,11 +403,14 @@ test("private evidence browser-to-storage boundary and review", async ({
   await login(reviewer, "reviewer");
   await reviewer.goto("/admin/verifications");
   await inspect(reviewer, "reviewer-synthetic-queue");
-  await reviewer
+  const queueLink = reviewer
     .getByRole("row")
     .filter({ hasText: registration })
-    .getByRole("link", { name: "Examiner le dossier", exact: true })
-    .click();
+    .getByRole("link", { name: "Examiner le dossier", exact: true });
+  if (accessibility) {
+    await reviewQueueContrast(reviewer, queueLink, info);
+    await reviewer.keyboard.press("Enter");
+  } else await queueLink.click();
   await expect(
     reviewer.getByRole("heading", { name: displayName, exact: true }),
   ).toBeVisible();
@@ -531,6 +535,8 @@ test("private evidence browser-to-storage boundary and review", async ({
           keyboard_identity_fields_and_submit: true,
           file_selection_uses_synthetic_driver_fixture: true,
           named_disabled_upload_pending: true,
+          keyboard_reviewer_queue_disclosure: true,
+          reviewer_queue_solid_contrast_verified: true,
           keyboard_reviewer_rejection: true,
           manual_review_required: true,
         }
