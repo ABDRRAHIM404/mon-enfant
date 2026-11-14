@@ -1,10 +1,15 @@
 "use server";
 import { authDestination } from "@/lib/auth-destination";
 import { redirect } from "next/navigation";
-import { headers } from "next/headers";
+import { headers, cookies } from "next/headers";
 import { emailSendingLimited, emailLimitMessage } from "@/lib/auth-email";
 import { authOrigin } from "@/lib/auth-origin";
 import { createClient } from "@/lib/supabase/server";
+import {
+  rememberedSeconds,
+  sessionPreferenceCookie,
+} from "@/lib/supabase/cookie-lifetime";
+import { sessionCookieOptions } from "@/lib/supabase/config";
 import { supabaseConfig } from "@/lib/supabase/config";
 import { requireUser } from "@/lib/auth";
 import { reportOperationalEvent } from "@/lib/operational-events";
@@ -32,13 +37,22 @@ export async function signIn(_: AuthState, form: FormData): Promise<AuthState> {
       error:
         "Vérifiez votre adresse e-mail et votre mot de passe (12 à 128 caractères).",
     };
-  const client = await createClient();
+  const remembered = form.get("remember") === "on";
+  const client = await createClient(remembered);
   const { error } = await client.auth.signInWithPassword(input);
   if (error)
     return {
       error:
         "Connexion impossible. Vérifiez vos identifiants et la confirmation de votre e-mail.",
     };
+  (await cookies()).set(
+    sessionPreferenceCookie,
+    remembered ? "persistent" : "session",
+    {
+      ...sessionCookieOptions(),
+      ...(remembered ? { maxAge: rememberedSeconds } : {}),
+    },
+  );
   const destination = authDestination(form.get("destination"));
   if (destination === "/account") {
     const {

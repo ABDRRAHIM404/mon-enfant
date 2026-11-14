@@ -1705,3 +1705,48 @@ th {
     padding: 22px;
   }
 }
+
+.auth-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  font-size: 13px;
+  margin: 0 0 8px;
+}
+.auth-form .remember-option {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 400;
+}
+.auth-form .remember-option input {
+  width: 16px;
+  height: 16px;
+  min-height: 16px;
+  padding: 0;
+  margin: 0;
+  accent-color: var(--action);
+}
+@media (max-width: 380px) {
+  .auth-options {
+    gap: 6px;
+    font-size: 12px;
+  }
+  .auth-form .remember-option {
+    font-size: 12px;
+  }
+}
+
+.auth-options .remember-option,
+.auth-options > a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+.public-links a,
+.brand {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}

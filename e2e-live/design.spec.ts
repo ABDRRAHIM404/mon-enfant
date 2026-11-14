@@ -22,12 +22,13 @@ test("capture configured public screens and paired selected references", async (
     page_errors: 0,
   };
   page.on("pageerror", () => proof.page_errors++);
+  await page.goto(SITE);
   for (const platform of ["web", "mobile"]) {
     const width = platform === "web" ? 1440 : 430,
       height = platform === "web" ? 900 : 940;
     await page.setViewportSize({ width, height });
     for (const theme of ["light", "dark"]) {
-      await page.addInitScript(
+      await page.evaluate(
         (t) => localStorage.setItem("mon-enfant-theme", t),
         theme,
       );
@@ -40,6 +41,11 @@ test("capture configured public screens and paired selected references", async (
         await page.goto(SITE + route);
         await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
         await expect(page.getByRole("main")).toBeVisible();
+        await expect(
+          page.getByRole("button", {
+            name: new RegExp(`Thème ${theme === "light" ? "clair" : "sombre"}`),
+          }),
+        ).toBeVisible();
         await page
           .locator("img:visible")
           .evaluateAll((images) =>

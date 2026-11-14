@@ -27,8 +27,9 @@ test("both themes preserve public accessibility and discoverable clinician entry
   page,
 }, info) => {
   const proofs = [];
+  await page.goto("/");
   for (const theme of ["light", "dark"]) {
-    await page.addInitScript(
+    await page.evaluate(
       (t) => localStorage.setItem("mon-enfant-theme", t),
       theme,
     );

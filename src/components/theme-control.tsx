@@ -32,7 +32,11 @@ function apply(preference: Theme) {
   document.documentElement.style.colorScheme = resolved;
 }
 export function ThemeControl() {
-  const theme = useSyncExternalStore(subscribe, snapshot, () => "system");
+  const theme = useSyncExternalStore<Theme>(
+    subscribe,
+    snapshot,
+    () => "system",
+  );
   const next =
     theme === "system" ? "light" : theme === "light" ? "dark" : "system";
   const labels = { system: "système", light: "clair", dark: "sombre" };

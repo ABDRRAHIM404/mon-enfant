@@ -1,6 +1,11 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { supabaseConfig, sessionCookieOptions } from "@/lib/supabase/config";
+import {
+  authCookieLifetime,
+  rememberedPreference,
+  sessionPreferenceCookie,
+} from "@/lib/supabase/cookie-lifetime";
 export async function proxy(request: NextRequest) {
   const config = supabaseConfig();
   if (!config) return NextResponse.next();
@@ -13,7 +18,17 @@ export async function proxy(request: NextRequest) {
         values.forEach(({ name, value }) => request.cookies.set(name, value));
         response = NextResponse.next({ request });
         values.forEach(({ name, value, options }) =>
-          response.cookies.set(name, value, options),
+          response.cookies.set(
+            name,
+            value,
+            authCookieLifetime(
+              name,
+              options,
+              rememberedPreference(
+                request.cookies.get(sessionPreferenceCookie)?.value,
+              ),
+            ),
+          ),
         );
       },
     },

@@ -29,9 +29,7 @@ export function AuthForm({
         name="email"
         type="email"
         autoComplete="email"
-        placeholder={
-          destination === "account" ? "soignant@exemple.ma" : "vous@exemple.ma"
-        }
+        placeholder={"exemple@email.ma"}
         required
         maxLength={254}
         disabled={!configured}
@@ -48,6 +46,17 @@ export function AuthForm({
         placeholder="12 caractères minimum"
         disabled={!configured}
       />
+      {mode === "login" && (
+        <div className="auth-options">
+          <label className="remember-option">
+            <input type="checkbox" name="remember" disabled={!configured} />
+            Se souvenir de moi
+          </label>
+          <Link className="text-link" href="/forgot-password">
+            Mot de passe oublié ?
+          </Link>
+        </div>
+      )}
       {state.error && (
         <p className="form-error" role="alert">
           {state.error}
@@ -75,11 +84,6 @@ export function AuthForm({
           </>
         )}
       </button>
-      {mode === "login" && (
-        <Link className="text-link" href="/forgot-password">
-          Mot de passe oublié ?
-        </Link>
-      )}
       <p className="fine">
         {destination !== "account"
           ? "Confirmez votre e-mail. Chaque carnet nécessite ensuite une vérification distincte de votre qualité de responsable."

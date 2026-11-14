@@ -16,10 +16,27 @@ async function login(page: Page, role: Role, parent = false) {
   await page.goto(parent ? "/login" : "/login?audience=clinician");
   await page.locator('[name="email"]').fill(credential(role, "EMAIL"));
   await page.locator('[name="password"]').fill(credential(role, "PASSWORD"));
+  if (role === "DOCTOR") await page.locator('input[name="remember"]').check();
   await page.getByRole("button", { name: "Se connecter", exact: true }).click();
   await expect(page).toHaveURL(
     parent ? /\/parent$/ : /\/(dashboard|account|provisional)$/,
   );
+  await page.reload();
+  const retained = (await page.context().cookies()).filter((c) =>
+    /^sb-.+-auth-token(?:\.\d+)?$/.test(c.name),
+  );
+  expect(retained.length > 0).toBe(true);
+  expect(
+    retained.every((c) => c.httpOnly && c.secure && c.sameSite === "Lax"),
+  ).toBe(true);
+  expect(
+    retained.every((c) =>
+      role === "DOCTOR"
+        ? c.expires > Date.now() / 1000 &&
+          c.expires <= Date.now() / 1000 + 30 * 86400 + 60
+        : c.expires === -1,
+    ),
+  ).toBe(true);
 }
 async function rpc(
   context: BrowserContext,
