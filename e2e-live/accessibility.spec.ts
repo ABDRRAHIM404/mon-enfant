@@ -66,9 +66,9 @@ test("approved workspace supports accessible pages and keyboard-only account and
     proofs.push(await scanAccessibility(page, "login-pending", info));
   } finally {
     releaseLogin();
-    await page.unroute("**/login");
   }
   await expect(page).toHaveURL(/\/account$/);
+  await page.unrouteAll({ behavior: "wait" });
   proofs.push(await scanAccessibility(page, "account", info));
   await tabTo(
     page,
