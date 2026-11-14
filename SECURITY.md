@@ -61,3 +61,6 @@ Accessibility reports use the pinned axe engine in cloud browsers and a classifi
 
 
 General-workspace acceptance `43545476340` passed fifty-four scans (eighteen per desktop/tablet/phone) with zero automatic violations/incomplete results and zero page errors. Actual keyboard login, pending-state naming, bypass, fictional practice creation and logout/denial passed. Independent readback proved three practice memberships and zero clinical scope; final retirement removed the account's sessions/permissions and two temporary secrets. The detailed clinical/evidence/vaccine forms and manual/inclusive accessibility acceptance remain open.
+
+
+Detailed clinical baseline `43547800020` passed all three devices with 114 scans, zero automatic violations/page errors and preserved full authorization/ledger assertions. Added H2 section headings fixed reproduced heading-order issues without changing clinical writes, reads or permissions. Native bypass and consultation keyboard entry passed; independent readback again confirmed thirty immutable revisions with no unrelated author. All four actors/eight temporary secrets were retired. Seven incomplete growth contrast results remain explicit review items; full accessibility/performance and the rest of Phase 6 are still open.
