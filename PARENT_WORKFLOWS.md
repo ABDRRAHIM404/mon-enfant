@@ -33,3 +33,11 @@ QR symbols are encoded inside the application using pinned node-qrcode; no exter
 The in-app feed derives new clinical revisions, appointment events, own request replies and access decisions from existing immutable records. Active child links are rechecked on every feed read. Revoked/expired links remove all child-specific activity, leaving only generic own-access status. Another guardian's private request replies are not shared. A per-account cursor marks updates through the displayed database snapshot read; it cannot move backward or into the future, so subsequently arriving updates remain unread. No additional clinical payload is copied into a notification table and no email/push/SMS is enabled by this feed.
 
 Encoder reference: [node-qrcode documentation](https://github.com/soldair/node-qrcode). Independent decoder checks use jsQR against rasterized actual SVG output in cloud tests. These tests do not replace the required hosted scanner/guardian acceptance.
+
+## Parent calendar and vaccine references
+
+Each linked child's read-only calendar supports day/week/month, Casablanca dates/times, state filtering and pagination. It includes the appointments of all authorized care providers for that child and uses the established shared effective-state projection, including documented doses at another provider and preserved missed dispositions. Parents cannot schedule, reschedule or document treatment from this view.
+
+The separate vaccine-reference page shows clinician-assigned item/version/source ages, current item decisions, attributed matched administrations and routine dates through the existing reviewed calculation engine. Withdrawn references produce no new date; retired/unreviewed versions, uncertain birth data or eligibility block date calculation. HB1 remains disabled, original weeks/months and birth windows remain visible, no catch-up is generated, and undocumented administrations remain unconfirmed. The original 25-row source stays revision-1 draft until qualified review.
+
+Current-session checks also consult Auth bans directly, so an old professional JWT cannot retain RPC access merely because its session row is still present. This does not broaden parent or general-admin clinical privileges.

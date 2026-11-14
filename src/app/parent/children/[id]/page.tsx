@@ -82,6 +82,10 @@ export default async function ChildBooklet({
         <a href="#visits">Soins et vaccinations</a>
         <a href="#growth">Croissance</a>
         <a href="#appointments">Rendez-vous</a>
+        <Link href={`/parent/children/${id}/appointments`}>Calendrier</Link>
+        <Link href={`/parent/children/${id}/vaccinations`}>
+          Références vaccinales
+        </Link>
         <a href="#access">Mon accès</a>
         <Link href={`/parent/children/${id}/requests`}>
           Demandes et corrections

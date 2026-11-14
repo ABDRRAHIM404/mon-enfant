@@ -17,6 +17,9 @@ type History = {
   since: string;
 };
 const activity: Record<string, string> = {
+  guardian_calendar_read: "Consultation du calendrier parent",
+  guardian_vaccine_references_read:
+    "Consultation des références vaccinales parent",
   child_lookup_read: "Recherche par identifiant autorisée",
   guardian_notifications_read: "Consultation des notifications",
   child_profile_read: "Consultation de l’identité",

@@ -171,3 +171,14 @@ export async function parentUpdatesDatabase() {
   );
   return db;
 }
+
+export async function parentViewsDatabase() {
+  const db = await parentUpdatesDatabase();
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/20261114155159_parent_calendar_references.sql",
+      "utf8",
+    ),
+  );
+  return db;
+}

@@ -7,7 +7,7 @@ import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import assert from "node:assert/strict";
 import {
-  parentUpdatesDatabase,
+  parentViewsDatabase,
   sessionActing,
 } from "../tests/helpers/database.ts";
 
@@ -108,7 +108,7 @@ function verifyBytes(manifest, database, object) {
 
 async function backup() {
   stage = "backup-schema";
-  const db = await parentUpdatesDatabase();
+  const db = await parentViewsDatabase();
   try {
     stage = "backup-fixture";
     const doctor = await actor(db, "DOCTOR"),
