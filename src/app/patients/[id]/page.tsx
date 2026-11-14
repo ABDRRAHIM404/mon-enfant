@@ -52,7 +52,9 @@ export default async function PatientProfile({
       <DoctorNav />
       <div className="page-heading">
         <span className="eyebrow">DOSSIER ENFANT</span>
-        <h1 id="main-content" tabIndex={-1}>{patientName(child)}</h1>
+        <h1 id="main-content" tabIndex={-1}>
+          {patientName(child)}
+        </h1>
         <p className="muted">
           {child.name_status === "provisional" ? "Identité provisoire · " : ""}
           {birthLabel(child)}
@@ -63,6 +65,9 @@ export default async function PatientProfile({
         <Link href={`/patients/${id}/appointments`}>Rendez-vous</Link>
         <Link href={`/patients/${id}/vaccinations`}>Vaccinations</Link>
         <Link href={`/patients/${id}/growth`}>Croissance</Link>
+        {child.can_manage_access && (
+          <Link href={`/patients/${id}/guardians`}>Accès des parents</Link>
+        )}
         <Link href={`/patients/${id}/summary`}>Résumé et impression</Link>
       </div>
       <section className="panel">

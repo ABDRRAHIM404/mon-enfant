@@ -138,3 +138,14 @@ export async function parentDatabase() {
   );
   return db;
 }
+
+export async function guardianDatabase() {
+  const db = await parentDatabase();
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/20261114143454_guardian_invitations.sql",
+      "utf8",
+    ),
+  );
+  return db;
+}

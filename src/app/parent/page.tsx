@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { patientName, birthLabel } from "@/lib/registry/types";
+import type { ParentWorkspaceData } from "@/lib/parents/types";
 import { Brand } from "@/components/brand";
 import { ParentProfileForm } from "@/components/parents/profile-form";
 import { signOut } from "@/app/auth/actions";
@@ -17,7 +19,8 @@ export default async function ParentWorkspace() {
   const { data, error } = await supabase.rpc("parent_workspace");
   if (error?.code === "42501") redirect("/login");
   if (error) throw new Error("Impossible de charger votre espace parent.");
-  const profile = data?.profile as { display_name: string } | null;
+  const workspace = data as ParentWorkspaceData;
+  const { profile, children, claims } = workspace;
   return (
     <main className="account-page wide">
       <header className="workspace-nav">
@@ -42,6 +45,64 @@ export default async function ParentWorkspace() {
           avec eux.
         </p>
       </section>
+      <section className="panel">
+        <h2>Les carnets de mes enfants</h2>
+        {children.length ? (
+          <div className="record-list">
+            {children.map((child) => (
+              <article key={child.id}>
+                <h3>
+                  <Link href={`/parent/children/${child.id}`}>
+                    {patientName(child)}
+                  </Link>
+                </h3>
+                <p>
+                  {birthLabel(child)} · {child.universal_id}
+                </p>
+                <p className="fine">
+                  Accès vérifié jusqu’au{" "}
+                  {new Date(child.expires_at).toLocaleDateString("fr-MA", {
+                    timeZone: "Africa/Casablanca",
+                  })}
+                </p>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p>
+            Aucun carnet relié pour le moment. Une demande en attente ne donne
+            pas encore accès aux informations de l’enfant.
+          </p>
+        )}
+      </section>
+      {claims.length > 0 && (
+        <section className="panel">
+          <h2>Mes demandes d’accès</h2>
+          <div className="record-list">
+            {claims.map((claim) => (
+              <article key={claim.id}>
+                <p>
+                  {
+                    (
+                      {
+                        pending: "En attente de vérification",
+                        approved: "Demande approuvée",
+                        rejected: "Demande refusée",
+                        cancelled: "Demande annulée",
+                      } as Record<string, string>
+                    )[claim.state]
+                  }
+                </p>
+                <p className="fine">
+                  Soumise le{" "}
+                  {new Date(claim.created_at).toLocaleDateString("fr-MA")} ·
+                  Référence {claim.id}
+                </p>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
       <div className="two-columns">
         <section className="panel">
           <h2>Mon profil</h2>
@@ -57,6 +118,9 @@ export default async function ParentWorkspace() {
             personnelle. Votre identité et votre qualité de responsable devront
             être vérifiées avant l’ouverture du carnet.
           </p>
+          <Link className="button secondary" href="/parent/invitation">
+            Utiliser mon invitation
+          </Link>
           <p className="notice">
             Le numéro d’un carnet ou le nom d’un enfant ne suffit pas pour y
             accéder.
