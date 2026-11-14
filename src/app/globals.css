@@ -381,6 +381,9 @@ p {
   border-radius: 50%;
   pointer-events: none;
 }
+.auth-story :focus-visible {
+  outline-color: white;
+}
 .auth-story .brand-icon {
   background: #ffffff15;
 }
