@@ -195,6 +195,7 @@ async function backup() {
       synthetic_only: true,
       engine: "pglite",
       source_commit: process.env.GITHUB_SHA,
+      backup_job: process.env.GITHUB_JOB,
       context: {
         doctor,
         outside,
@@ -240,6 +241,9 @@ async function restore() {
   assert.equal(manifest.engine, "pglite");
   assert.match(manifest.source_commit, /^[a-f0-9]{40}$/);
   assert.equal(manifest.source_commit, process.env.GITHUB_SHA);
+  const freshRunner = manifest.backup_job !== process.env.GITHUB_JOB;
+  if (process.env.MON_ENFANT_REQUIRE_FRESH_RUNNER === "1")
+    assert.equal(freshRunner, true);
   const database = await readFile(join(bundle, "database.tar.gz")),
     object = await readFile(join(bundle, "evidence-fixture.pdf"));
   verifyBytes(manifest, database, object);
@@ -360,7 +364,7 @@ async function restore() {
       status: "passed",
       synthetic_only: true,
       source_commit: manifest.source_commit,
-      fresh_cloud_runner_restore: true,
+      fresh_cloud_runner_restore: freshRunner,
       data_and_acl_integrity: true,
       corrupted_archive_rejected: true,
       missing_object_rejected: true,

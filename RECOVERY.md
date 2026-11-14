@@ -48,6 +48,13 @@ The second runner downloads the bundle and:
    appointment and vaccine draft/source data remains, and separate object bytes
    recover with the expected hash and metadata pointer.
 
+Regular application CI also runs backup and restore in separate Node processes
+within its single checks job, then removes bundle/object files while retaining only
+the classified proof. This verifies the implementation before publishing the manual
+workflow. Its proof reports `fresh_cloud_runner_restore=false`; it cannot substitute
+for the separate-runner drill. The manual restore job requires a distinct job from
+the recorded backup job and fails if that condition is not proven.
+
 Only a fixed-label/numeric proof is retained for three days. A missing proof or
 any failed step prevents acceptance. The bundle contains fictional fixture IDs
 and content; it is not uploaded as a public artifact or committed to Git.

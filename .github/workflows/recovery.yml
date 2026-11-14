@@ -41,6 +41,8 @@ jobs:
           name: isolated-synthetic-recovery-bundle
           path: test-results/recovery/bundle/
       - name: Restore in a fresh runner and verify containment and immutable records
+        env:
+          MON_ENFANT_REQUIRE_FRESH_RUNNER: "1"
         run: node scripts/recovery-drill.mjs restore
       - uses: actions/upload-artifact@v4
         if: always()
