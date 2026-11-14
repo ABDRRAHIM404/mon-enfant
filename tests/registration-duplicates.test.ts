@@ -40,7 +40,10 @@ async function actor(role = "doctor", status = "approved"): Promise<Actor> {
     ]);
   return a;
 }
-function payload(a: Actor, family = randomUUID()): Record<string, unknown> {
+function payload(
+  a: Actor,
+  family: string = randomUUID(),
+): Record<string, unknown> {
   return {
     facility_id: a.facility,
     register_year: 2026,
