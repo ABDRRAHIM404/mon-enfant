@@ -7,3 +7,5 @@ The owner explicitly requested implementation of both files in `updates/`. This 
 3. Resume the complete Phase 8 mobile scope once these updates are verified. Actual email dispatch, deferred operations and qualified clinical/guardian/privacy/hosting gates stay open.
 
 Unresolved provisional promotion policy is not guessed: earlier provisional data remains quarantined until an explicit later policy and workflow are approved. Provisional data must also stay outside global duplicate probes, because Update 2 forbids existence inference by another clinician.
+
+Software acceptance checkpoint: both update scopes passed standard cloud CI, combined desktop/tablet/phone production-runtime checks against hosted Supabase, and independent native persistence/authorization checks. See PROGRESS.md. Canonical Vercel publication/account reassignment remains pending; DEPLOYMENT_HANDOFF.md tracks it. Real-data/clinical/source/credential/guardian/hosting approvals are still open.

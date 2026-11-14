@@ -1,9 +1,9 @@
-> Implementation checkpoint: source/cloud and hosted API checks passed (see PROGRESS.md). Combined authenticated UI acceptance remains pending. Original requirements follow.
+> Implementation checkpoint: source/cloud and hosted API checks passed (see PROGRESS.md). Combined authenticated UI acceptance passed in GitHub production builds against hosted Supabase (43632064585); canonical Vercel release remains separate. Original requirements follow.
 
 # Mon Enfant — Next Update
 
 **Feature:** Child registration duplicate detection  
-**Status:** Planned for the next development update (not yet implemented)
+**Status:** Implemented and synthetically verified; see PROGRESS.md for evidence and deployment scope.
 
 ## Goal
 Reduce accidental creation of duplicate child medical records when different doctors register the same child, **without** allowing global patient searches or exposing existing records.

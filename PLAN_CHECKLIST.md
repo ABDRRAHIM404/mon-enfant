@@ -135,7 +135,8 @@ The complete goal remains active until the full required scope and its approval 
 ## Requested updates before mobile
 
 - [x] Update 1 source and hosted HTTP checkpoint (CI 43626758194 / native afe0033a1b80454a): registration-bound private duplicate checks, secondary identity fields, controlled review, no disclosure/merge/access, rate/audit, race protection and nonunique SMI; verify cloud/source and hosted HTTP behavior.
-- [ ] Update 2: parent-first entry/routing and separate clinician enrollment without visual redesign; verified doctor/nurse feature parity with meaningful role/audit attribution.
-- [ ] Update 2: actual persistent author-only provisional child/care/vaccination/appointment workflows for unverified clinicians; API/QR/export/existence isolation and immutable revisions.
-- [ ] Account approval leaves prior provisional records untrusted and unshareable until an explicit later validation/promotion policy is decided; real-data and credential-checking approvals remain open.
-- [ ] Update cloud acceptance and synchronize the primary main checkout before resuming the full Phase 8 mobile scope.
+- [x] Update 2 (cloud software acceptance 43632064585 / native f660a957f2064606): parent-first entry/routing and separate clinician enrollment without visual redesign; verified doctor/nurse feature parity with meaningful role/audit attribution.
+- [x] Update 2 (cloud software acceptance 43632064585 / native f660a957f2064606): actual persistent author-only provisional child/care/vaccination/appointment workflows for unverified clinicians; API/QR/export/existence isolation and immutable revisions.
+- [x] Account approval leaves prior provisional records untrusted and unshareable until an explicit later validation/promotion policy is decided; real-data and credential-checking approvals remain open.
+- [x] Record combined cloud acceptance and publish/synchronize the primary main checkout (see PROGRESS.md).
+- [ ] Publish and verify the new canonical Vercel deployment after the owner-requested account/address switch. Preserve all external approval gates and complete Phase 8 afterward.

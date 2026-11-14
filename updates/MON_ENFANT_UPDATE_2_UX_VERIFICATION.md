@@ -1,6 +1,6 @@
 # Mon Enfant — Update 2: Onboarding UX and clinician verification workflow
 
-**Status:** Agreed product requirements; visual design not yet decided.
+**Status:** Implemented; synthetic cloud/UI/API acceptance verified (43632064585 / native f660a957f2064606). Canonical Vercel release/account switch remains pending. Visual design was preserved.
 **Scope:** Parent/clinician entry points, terminology, and account/record verification behavior.
 **Separate from:** Update 1 (child duplicate detection).
 
@@ -48,17 +48,17 @@
 
 ## 6. Acceptance criteria for the coding agent
 
-- [ ] Homepage and login offer a clearly primary parent entry and a discoverable secondary **Espace soignant** entry.
-- [ ] Parent accounts never land in clinician-only verification screens.
-- [ ] Clinician screens call users **médecins et infirmier(e)s**, not only doctors or generic professionals.
-- [ ] Doctor and nurse accounts receive the same permitted clinical feature set once verified.
-- [ ] An unverified clinician enters a usable workspace with a prominent **Non vérifié** status.
-- [ ] Unverified clinicians can create **provisional, isolated** new-child, vaccine and appointment records in the intended permitted environment.
-- [ ] A second clinician cannot retrieve, infer, or modify another unverified clinician's provisional records through UI, APIs, QR, exports, or direct database access.
-- [ ] Unverified clinicians cannot access pre-existing children through QR or alternative lookup.
-- [ ] Account approval does not automatically validate or publish earlier provisional records pending explicit policy decisions.
-- [ ] Preserve record provenance and immutable audit of relevant changes.
-- [ ] Existing verified users' authorized workflows remain functional.
+- [x] Homepage and login offer a clearly primary parent entry and a discoverable secondary **Espace soignant** entry.
+- [x] Parent accounts never land in clinician-only verification screens.
+- [x] Clinician screens call users **médecins et infirmier(e)s**, not only doctors or generic professionals.
+- [x] Doctor and nurse accounts receive the same permitted clinical feature set once verified.
+- [x] An unverified clinician enters a usable workspace with a prominent **Non vérifié** status.
+- [x] Unverified clinicians can create **provisional, isolated** new-child, vaccine and appointment records in the intended permitted environment.
+- [x] A second clinician cannot retrieve, infer, or modify another unverified clinician's provisional records through UI, APIs, QR, exports, or direct database access.
+- [x] Unverified clinicians cannot access pre-existing children through QR or alternative lookup.
+- [x] Account approval does not automatically validate or publish earlier provisional records pending explicit policy decisions.
+- [x] Preserve record provenance and immutable audit of relevant changes.
+- [x] Existing verified users' authorized workflows remain functional.
 
 ## 7. Explicitly outside Update 2
 
