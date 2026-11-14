@@ -93,7 +93,8 @@ This checklist preserves PROJECT_PLAN.md's complete Phase 0–8 scope. It is not
 - [ ] Broader keyboard/accessibility and interaction/load performance acceptance.
 - [ ] Full keyboard/accessibility/performance acceptance.
 - [x] Workspace refresh-cookie regression: actual provider refresh-token rotation, persisted secure cookies, public-health isolation and logout denial for vaccine/appointment/follow-up routes on desktop/tablet/phone; see PROGRESS.md.
-- [ ] Account/session, QR, export, RLS/Storage, secret and rate-limit review.
+- [x] Repeatable read-only hosted schema/ACL/Storage baseline: nineteen checks including column grants/private definers; real PostgreSQL regression tests detect introduced drift. See SECURITY_REVIEW.md.
+- [ ] Complete account/session, QR, export, RLS/Storage policy, secret and rate-limit review.
 - [x] Credential-free development readiness monitor, verified scheduled execution and live healthy/failure/recovery reporting drill; owner reports GitHub notifications arriving. See PROGRESS.md.
 - [ ] Backup/recovery and incident/retention drills; pilot monitoring ownership, response targets and scheduled alert-delivery acceptance.
 - [ ] Formal clinical, legal/privacy and regulated hosting approvals before any identifiable-data pilot.
