@@ -66,3 +66,6 @@ Opened the post-fix mobile light/dark parent pairs and web dark clinician pair d
 - Copy/content: actual guardian children, appointments, notifications, current author-only revisions and uncertain/unassigned vaccination history are shown. No 73% coverage, example administrations, fake next dose or inferred healthy/missed status. Explicit private/quarantine and source-review facts remain visible.
 
 Read-layout scope passes with no remaining actionable visual P0/P1/P2 issue in the implemented controls. The functional sharing action itself is still a required next build item, not accepted by this result. Keep P3 icon/spacing/caption refinements and broader diagnostics deferred under the owner's build-first priority.
+
+
+Protected checkpoint is canonically published in READY Vercel dpl_CR1C1asRvsdoFXTMz3THgtJTjaP2, main source 0e0b66d. Live health and anonymous parent/provisional/vaccination/export denial pass. Authenticated browser/paired evidence uses the hosted-Supabase GitHub production runtime noted above; no additional canonical authenticated campaign is claimed. Primary main is synchronized; full Update 3 sharing, Phase 8 and external approvals remain open.

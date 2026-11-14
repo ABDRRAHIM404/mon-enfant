@@ -145,6 +145,7 @@ The complete goal remains active until the full required scope and its approval 
 ## Supplied Update 3 — design and preserved functionality
 
 - [x] Implemented protected read/dashboard layouts, actual permission-scoped summaries and unassigned uncertain vaccination history: source CI 43646114379, hosted cloud 43646708223 / post-fix 43647899263, native persistence/permission proof and direct paired review (design-qa.md). Purpose-bound sharing remains open.
+- [x] Publish protected read/UI checkpoint on canonical Vercel: READY dpl_CR1C1asRvsdoFXTMz3THgtJTjaP2, source 0e0b66d; live health and anonymous parent/provisional/vaccination/export denial pass. Primary main is synchronized.
 - [x] Retire both protected verification fixtures: c833b127ec5544c0 and 1e57ebcee3134c5d, four accounts/nine temporary values each, retirement verified.
 
 - [x] Shared/public foundation implemented and visually accepted: full source CI 43642867793, configured sixteen-screen paired capture 43642889015 and direct review in design-qa.md; earlier three-device authenticated run 43639674164 passed both cookie-retention modes. Protected Update 3 screens remain open.

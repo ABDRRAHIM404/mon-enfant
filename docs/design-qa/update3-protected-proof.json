@@ -60,5 +60,10 @@
       "page_errors": 0
     }
   ],
-  "temporary_sharing_implemented": false
+  "temporary_sharing_implemented": false,
+  "canonical_deployment": "dpl_CR1C1asRvsdoFXTMz3THgtJTjaP2",
+  "canonical_source": "0e0b66d397cb0c21d05472f5ccebb251790da5de",
+  "canonical_ready": true,
+  "canonical_health_and_anonymous_guards_passed": true,
+  "authenticated_browser_runtime": "github-cloud-production-with-hosted-supabase"
 }
