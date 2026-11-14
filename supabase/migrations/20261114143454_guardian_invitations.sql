@@ -244,6 +244,7 @@ begin
  if not private.can_access_child(p_child_id,true) then raise exception 'Child access manager required' using errcode='42501';end if;
  insert into public.audit_events(actor_id,entity_id,entity_type,action) values(auth.uid(),p_child_id,'guardian_management_read','accessed');
  return jsonb_build_object(
+ 'generated_at',now(),'default_expires_on',((now() at time zone 'Africa/Casablanca')::date+30),
  'invitations',coalesce((select jsonb_agg(jsonb_build_object('id',i.id,'recipient_email',i.recipient_email,'created_at',i.created_at,'expires_at',i.expires_at,'revoked_at',i.revoked_at,'consumed_at',i.consumed_at) order by i.created_at desc) from private.guardian_invitations i where i.child_id=p_child_id),'[]'::jsonb),
  'claims',coalesce((select jsonb_agg(jsonb_build_object('id',c.id,'revision',c.revision,'state',c.state,'display_name',p.display_name,'email',c.claimed_email,'declared_relationship',c.declared_relationship,'created_at',c.created_at) order by c.created_at desc) from private.guardian_claims c join private.guardian_invitations i on i.id=c.invitation_id join private.guardian_profiles p on p.user_id=c.guardian_id where i.child_id=p_child_id),'[]'::jsonb),
  'links',coalesce((select jsonb_agg(jsonb_build_object('id',g.id,'display_name',p.display_name,'relationship',g.relationship,'expires_at',g.expires_at,'revoked_at',g.revoked_at,'can_export',g.can_export) order by g.created_at desc) from private.guardian_links g join private.guardian_profiles p on p.user_id=g.guardian_id where g.child_id=p_child_id),'[]'::jsonb));

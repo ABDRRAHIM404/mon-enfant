@@ -11,6 +11,8 @@ import {
 import { uuidPattern } from "@/lib/registry/types";
 export const dynamic = "force-dynamic";
 type Overview = {
+  generated_at: string;
+  default_expires_on: string;
   invitations: {
     id: string;
     recipient_email: string;
@@ -49,9 +51,7 @@ export default async function Guardians({
   if (error?.code === "42501") notFound();
   if (error) throw new Error("Impossible de charger les responsables.");
   const view = data as Overview;
-  const expiresOn = new Date(Date.now() + 30 * 86400000)
-    .toISOString()
-    .slice(0, 10);
+  const expiresOn = view.default_expires_on;
   return (
     <main className="account-page wide">
       <DoctorNav />
@@ -134,7 +134,8 @@ export default async function Guardians({
                   ? "Annulée"
                   : i.consumed_at
                     ? "Utilisée pour une demande"
-                    : new Date(i.expires_at).getTime() <= Date.now()
+                    : new Date(i.expires_at).getTime() <=
+                        new Date(view.generated_at).getTime()
                       ? "Expirée"
                       : "En attente"}{" "}
                 · valable jusqu’au{" "}
