@@ -1,6 +1,14 @@
 import { test, expect, type Page, type BrowserContext } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { writeFileSync } from "node:fs";
+import {
+  scanAccessibility,
+  assertAccessible,
+  tabTo,
+  type AccessibilityProof,
+} from "../e2e-support/accessibility";
+const accessibility =
+  process.env.MON_ENFANT_LIVE_PROBE === "evidence-accessibility";
 const SITE = "https://mon-enfant.vercel.app",
   MIB = 1024 * 1024;
 function credentials(role: string) {
@@ -14,11 +22,17 @@ function credentials(role: string) {
 async function login(page: Page, role: string) {
   const account = credentials(role);
   await page.goto("/login");
-  await page.locator('input[name="email"]').focus();
-  await page.locator('input[name="email"]').fill(account.email);
+  if (accessibility) {
+    await tabTo(page, page.locator('input[name="email"]'));
+    await page.keyboard.type(account.email);
+  } else {
+    await page.locator('input[name="email"]').focus();
+    await page.locator('input[name="email"]').fill(account.email);
+  }
   await page.keyboard.press("Tab");
   await expect(page.locator('input[name="password"]')).toBeFocused();
-  await page.locator('input[name="password"]').fill(account.password);
+  if (accessibility) await page.keyboard.type(account.password);
+  else await page.locator('input[name="password"]').fill(account.password);
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/account$/);
   await page.goto("/account");
@@ -26,7 +40,10 @@ async function login(page: Page, role: string) {
     name: "Activer mon espace professionnel",
   });
   if (await activate.count()) {
-    await activate.click();
+    if (accessibility) {
+      await tabTo(page, activate);
+      await page.keyboard.press("Enter");
+    } else await activate.click();
     await expect(
       page.getByRole("link", { name: "Soumettre mes justificatifs" }),
     ).toBeVisible();
@@ -139,11 +156,17 @@ test("private evidence browser-to-storage boundary and review", async ({
 }, info) => {
   const role = info.project.name,
     run = process.env.MON_ENFANT_QA_RUN!;
+  const proofs: AccessibilityProof[] = [];
+  async function inspect(target: Page, screen: string) {
+    if (accessibility)
+      proofs.push(await scanAccessibility(target, screen, info));
+  }
   let pageErrors = 0;
   page.on("pageerror", () => {
     pageErrors++;
   });
   await login(page, role);
+  await inspect(page, "applicant-account-unverified");
   const cookies = (await page.context().cookies()).filter(
     (cookie) =>
       cookie.name.startsWith("sb-") && cookie.name.includes("auth-token"),
@@ -159,6 +182,18 @@ test("private evidence browser-to-storage boundary and review", async ({
   await expect(
     page.getByRole("heading", { name: "Présentez vos qualifications." }),
   ).toBeVisible();
+  if (accessibility) {
+    await page.keyboard.press("Tab");
+    await expect(
+      page.getByRole("link", {
+        name: "Aller au contenu principal",
+        exact: true,
+      }),
+    ).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(page.getByRole("heading", { level: 1 })).toBeFocused();
+  }
+  await inspect(page, "evidence-empty-form");
   const displayName = `Professionnel fictif ${role} ${run}`,
     registration = `QAR-${run}-${role.toUpperCase()}`;
   const fields = {
@@ -167,14 +202,28 @@ test("private evidence browser-to-storage boundary and review", async ({
     facility: "Centre fictif de test navigateur",
     syntheticOnly: "on",
   };
-  await page.getByLabel("Nom professionnel complet").fill(displayName);
-  await page.keyboard.press("Tab");
-  await expect(page.locator('[name="registration"]')).toBeFocused();
-  await page
-    .getByLabel("Matricule / numéro d’inscription professionnelle")
-    .fill(registration);
-  await page.getByLabel("Établissement d’exercice").fill(fields.facility);
-  await page.locator('[name="syntheticOnly"]').check();
+  if (accessibility) {
+    await tabTo(page, page.getByLabel("Nom professionnel complet"));
+    await page.keyboard.type(displayName);
+    await page.keyboard.press("Tab");
+    await expect(page.locator('[name="registration"]')).toBeFocused();
+    await page.keyboard.type(registration);
+    await tabTo(page, page.getByLabel("Établissement d’exercice"));
+    await page.keyboard.type(fields.facility);
+    await tabTo(page, page.locator('[name="syntheticOnly"]'));
+    await page.keyboard.press("Space");
+    await expect(page.locator('[name="syntheticOnly"]')).toBeChecked();
+  } else {
+    await page.getByLabel("Nom professionnel complet").fill(displayName);
+    await page.keyboard.press("Tab");
+    await expect(page.locator('[name="registration"]')).toBeFocused();
+    await page
+      .getByLabel("Matricule / numéro d’inscription professionnelle")
+      .fill(registration);
+    await page.getByLabel("Établissement d’exercice").fill(fields.facility);
+    await page.locator('[name="syntheticOnly"]').check();
+  }
+  await inspect(page, "evidence-filled-synthetic-form");
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
@@ -236,6 +285,7 @@ test("private evidence browser-to-storage boundary and review", async ({
     page.getByRole("alert").filter({ hasText: "Joignez un PDF" }),
   ).toContainText("4 Mio");
   expect(posts).toBe(0);
+  await inspect(page, "evidence-client-size-error");
   const tooLarge = await rawSubmission(page, pdfOfSize(4 * MIB + 1), fields);
   expect(tooLarge.status()).toBe(200);
   expect(
@@ -250,6 +300,25 @@ test("private evidence browser-to-storage boundary and review", async ({
   );
   expect(spoof.status()).toBe(200);
   expect((await spoof.text()).includes("Le contenu du fichier")).toBe(true);
+  if (accessibility) {
+    await page.locator('[name="evidence"]').setInputFiles({
+      name: "synthetic-spoof.pdf",
+      mimeType: "application/pdf",
+      buffer: Buffer.from("Not a PDF."),
+    });
+    await tabTo(
+      page,
+      page.getByRole("button", {
+        name: "Soumettre pour vérification",
+        exact: true,
+      }),
+    );
+    await page.keyboard.press("Enter");
+    await expect(page.getByRole("alert")).toContainText(
+      "Le contenu du fichier",
+    );
+    await inspect(page, "evidence-server-type-error");
+  }
   const bytes = pdfOfSize(4 * MIB);
   expect(bytes.length).toBe(4 * MIB);
   await page.locator('[name="evidence"]').setInputFiles({
@@ -257,9 +326,46 @@ test("private evidence browser-to-storage boundary and review", async ({
     mimeType: "application/pdf",
     buffer: bytes,
   });
-  await page
-    .getByRole("button", { name: "Soumettre pour vérification" })
-    .click();
+  await inspect(page, "evidence-exact-limit-ready");
+  if (accessibility) {
+    let release = () => {};
+    let held = false;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await page.route(
+      (url) => url.pathname === "/verification",
+      async (route) => {
+        if (route.request().method() === "POST") {
+          held = true;
+          await gate;
+        }
+        await route.continue();
+      },
+    );
+    try {
+      await tabTo(
+        page,
+        page.getByRole("button", {
+          name: "Soumettre pour vérification",
+          exact: true,
+        }),
+      );
+      await page.keyboard.press("Enter");
+      await expect.poll(() => held).toBe(true);
+      await expect(
+        page.getByRole("button", { name: "Envoi en cours…", exact: true }),
+      ).toBeDisabled();
+      await expect(page.locator("fieldset")).toBeDisabled();
+      await inspect(page, "evidence-upload-pending");
+    } finally {
+      release();
+    }
+  } else {
+    await page
+      .getByRole("button", { name: "Soumettre pour vérification" })
+      .click();
+  }
   await expect(
     page
       .getByText(
@@ -267,11 +373,18 @@ test("private evidence browser-to-storage boundary and review", async ({
       )
       .first(),
   ).toBeVisible();
+  if (accessibility) await page.unrouteAll({ behavior: "wait" });
+  await inspect(page, "evidence-submission-confirmation");
   await page.goto("/dashboard");
   await expect(page).toHaveURL(/\/account$/);
+  await inspect(page, "evidence-clinical-access-denial");
   const reviewerContext = await browser.newContext({
     baseURL: SITE,
     viewport: page.viewportSize() ?? undefined,
+    isMobile: info.project.use.isMobile,
+    hasTouch: info.project.use.hasTouch,
+    deviceScaleFactor: info.project.use.deviceScaleFactor,
+    userAgent: info.project.use.userAgent,
   });
   const reviewer = await reviewerContext.newPage();
   let reviewerErrors = 0;
@@ -280,6 +393,7 @@ test("private evidence browser-to-storage boundary and review", async ({
   });
   await login(reviewer, "reviewer");
   await reviewer.goto("/admin/verifications");
+  await inspect(reviewer, "reviewer-synthetic-queue");
   await reviewer
     .getByRole("row")
     .filter({ hasText: registration })
@@ -293,6 +407,7 @@ test("private evidence browser-to-storage boundary and review", async ({
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
+  await inspect(reviewer, "reviewer-private-evidence-and-decision");
   await reviewer.screenshot({
     path: info.outputPath("verification-review.png"),
     fullPage: true,
@@ -342,18 +457,33 @@ test("private evidence browser-to-storage boundary and review", async ({
   );
   expect([400, 401, 403, 404].includes(publicResponse.status())).toBe(true);
   await anonymous.close();
-  await reviewer.locator('[name="decision"]').selectOption("rejected");
-  await reviewer
-    .locator('[name="reason"]')
-    .fill(
-      "Justificatif entièrement fictif : clôture après vérification technique du navigateur.",
+  const rejection =
+    "Justificatif entièrement fictif : clôture après vérification technique du navigateur.";
+  if (accessibility) {
+    await tabTo(reviewer, reviewer.locator('[name="decision"]'));
+    await reviewer.keyboard.press("End");
+    await expect(reviewer.locator('[name="decision"]')).toHaveValue("rejected");
+    await tabTo(reviewer, reviewer.locator('[name="reason"]'));
+    await reviewer.keyboard.type(rejection);
+    await tabTo(
+      reviewer,
+      reviewer.getByRole("button", {
+        name: "Enregistrer la décision",
+        exact: true,
+      }),
     );
-  await reviewer
-    .getByRole("button", { name: "Enregistrer la décision" })
-    .click();
+    await reviewer.keyboard.press("Enter");
+  } else {
+    await reviewer.locator('[name="decision"]').selectOption("rejected");
+    await reviewer.locator('[name="reason"]').fill(rejection);
+    await reviewer
+      .getByRole("button", { name: "Enregistrer la décision" })
+      .click();
+  }
   await expect(
     reviewer.getByRole("heading", { name: "Décision enregistrée" }),
   ).toBeVisible();
+  await inspect(reviewer, "reviewer-rejection-confirmation");
   await page.goto("/verification");
   await expect(
     page.getByText(
@@ -365,6 +495,7 @@ test("private evidence browser-to-storage boundary and review", async ({
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
+  await inspect(page, "applicant-rejected-history");
   await page.screenshot({
     path: info.outputPath("verification-history.png"),
     fullPage: true,
@@ -381,7 +512,26 @@ test("private evidence browser-to-storage boundary and review", async ({
     unrelated_download_denied: true,
     page_errors: pageErrors,
     reviewer_page_errors: reviewerErrors,
+    ...(accessibility
+      ? {
+          automatic_accessibility_screens: proofs.length,
+          automatic_violations: proofs.reduce(
+            (n, p) => n + p.violations.length,
+            0,
+          ),
+          incomplete_rules: proofs.reduce((n, p) => n + p.incomplete.length, 0),
+          keyboard_identity_fields_and_submit: true,
+          file_selection_uses_synthetic_driver_fixture: true,
+          named_disabled_upload_pending: true,
+          keyboard_reviewer_rejection: true,
+          manual_review_required: true,
+        }
+      : {}),
   };
   writeFileSync(info.outputPath("evidence-proof.json"), JSON.stringify(proof));
   console.log(JSON.stringify(proof));
+  if (accessibility) {
+    expect(proofs.length).toBe(13);
+    assertAccessible(proofs);
+  }
 });

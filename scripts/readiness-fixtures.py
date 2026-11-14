@@ -135,12 +135,22 @@ def cleanup(run):
         if names:api('/storage/v1/object/'+BUCKET,{'prefixes':names},'DELETE')
         sql(f"begin; update private.staff_permissions set can_review_professionals=false,can_manage_clinical_permissions=false,can_manage_vaccine_catalog=false,can_review_vaccine_catalog=false where user_id in({ids}); update public.professional_capabilities set enabled=false where professional_id in({ids}); update public.professional_profiles set verification_status='suspended' where user_id in({ids}); delete from auth.sessions where user_id in({ids}); commit;")
         for actor in state['actors']:api('/auth/v1/admin/users/'+actor['id'],{'ban_duration':'876000h'},'PUT')
+        remaining=sql(f"""select
+            (select count(*) from auth.sessions where user_id in({ids}))::integer sessions,
+            (select count(*) from auth.users where id in({ids}) and banned_until>now())::integer banned,
+            (select count(*) from public.professional_profiles where user_id in({ids}) and verification_status<>'suspended')::integer active_profiles,
+            (select count(*) from private.staff_permissions where user_id in({ids}) and (can_review_professionals or can_manage_clinical_permissions or can_manage_vaccine_catalog or can_review_vaccine_catalog))::integer active_staff,
+            (select count(*) from public.professional_capabilities where professional_id in({ids}) and enabled)::integer capabilities,
+            (select count(*) from public.access_grants where professional_id in({ids}) and revoked_at is null)::integer active_grants,
+            (select count(*) from storage.objects where bucket_id='{BUCKET}' and split_part(name,'/',1) in(select id::text from auth.users where id in({ids})))::integer objects""")
+        expected=[{'sessions':0,'banned':len(state['actors']),'active_profiles':0,'active_staff':0,'capabilities':0,'active_grants':0,'objects':0}]
+        if remaining!=expected:raise RuntimeError('Evidence fixture retirement readback failed; private state retained')
     present=existing_secrets()
     for name in state['secrets']:
         if name in present:command(['gh','secret','delete',name,'--repo',REPO])
     if set(state['secrets']) & existing_secrets():raise RuntimeError('Temporary readiness secrets remain; do not discard the recorded run')
     state_path(run).with_suffix('.env').unlink();state_path(run).unlink()
-    print(json.dumps({'run':run,'accounts_retired':len(state['actors']),'temporary_secrets_removed':len(state['secrets']),'private_objects_removed':len(names) if state['actors'] else 0,'outgoing_email_sent':False}))
+    print(json.dumps({'run':run,'accounts_retired':len(state['actors']),'temporary_secrets_removed':len(state['secrets']),'private_objects_removed':len(names) if state['actors'] else 0,'outgoing_email_sent':False,'retirement_verified':True}))
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)

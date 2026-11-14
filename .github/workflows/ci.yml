@@ -17,6 +17,7 @@ on:
             none,
             evidence-reproduce,
             evidence-accept,
+            evidence-accessibility,
             clinical-accept,
             clinical-accessibility,
             accessibility-accept,

@@ -4,6 +4,7 @@ if (
   ![
     "evidence-reproduce",
     "evidence-accept",
+    "evidence-accessibility",
     "clinical-accept",
     "clinical-accessibility",
     "accessibility-accept",
@@ -37,21 +38,24 @@ export default defineConfig({
     "accessibility-accept",
     "clinical-accessibility",
     "vaccine-accessibility",
+    "evidence-accessibility",
   ].includes(probe ?? "")
     ? 0
     : 1,
   timeout:
-    probe === "vaccine-accessibility"
-      ? 480000
-      : probe === "clinical-accessibility"
-        ? 360000
-        : probe === "accessibility-accept"
-          ? 180000
-          : probe === "vaccination-accept"
-            ? 360000
-            : probe === "clinical-accept"
-              ? 240000
-              : 120000,
+    probe === "evidence-accessibility"
+      ? 240000
+      : probe === "vaccine-accessibility"
+        ? 480000
+        : probe === "clinical-accessibility"
+          ? 360000
+          : probe === "accessibility-accept"
+            ? 180000
+            : probe === "vaccination-accept"
+              ? 360000
+              : probe === "clinical-accept"
+                ? 240000
+                : 120000,
   expect: { timeout: 20000 },
   outputDir: "test-results/live",
   use: {
