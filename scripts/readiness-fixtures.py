@@ -97,8 +97,10 @@ def prepare():
                 sql(f"begin; insert into public.professional_profiles(user_id,role,verification_status,professional_id) values('{uid}','admin','approved','QAR-{state['run']}-REVIEWER'); insert into private.staff_permissions(user_id,can_review_professionals) values('{uid}',true); commit;")
             for suffix in ('EMAIL','PASSWORD'):
                 key=prefix+'_'+suffix
-                command(['gh','secret','set',key,'--repo',REPO],credentials[key])
+                # Persist intended publication first: a timeout can occur after
+                # GitHub accepted the secret, and cleanup must still track it.
                 state['secrets'].append(key);save(state,credentials)
+                command(['gh','secret','set',key,'--repo',REPO],credentials[key])
     except Exception:
         print(json.dumps({'run':state['run'],'setup_incomplete':True,'cleanup_required':True}),flush=True)
         raise
