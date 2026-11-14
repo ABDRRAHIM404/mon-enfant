@@ -1,6 +1,6 @@
 # Full plan execution and completion audit
 
-Current development focus: **Phase 8 — Parent mobile**, following the verified synthetic Phase 7 web walkthrough, per the user’s feature-first priority. Remaining Phase 6 checks/operations stay open and are deferred until the app is built, except major authentication, access-control, data-integrity and build checks.
+Current development focus: **requested Updates 1–2 before Phase 8 mobile**, following the verified synthetic Phase 7 web walkthrough. See UPDATE_WORK_PLAN.md. Remaining Phase 6 checks/operations stay open and are deferred until the app is built, except major authentication, access-control, data-integrity and build checks.
 
 See [PROGRESS.md](PROGRESS.md) for verification evidence and remaining approval gates.
 
@@ -134,7 +134,7 @@ The complete goal remains active until the full required scope and its approval 
 
 ## Requested updates before mobile
 
-- [ ] Update 1: registration-bound private duplicate checks, secondary identity fields, controlled review, no disclosure/merge/access, rate/audit, race protection and nonunique SMI; verify cloud/source and hosted HTTP behavior.
+- [x] Update 1 source and hosted HTTP checkpoint (CI 43626758194 / native afe0033a1b80454a): registration-bound private duplicate checks, secondary identity fields, controlled review, no disclosure/merge/access, rate/audit, race protection and nonunique SMI; verify cloud/source and hosted HTTP behavior.
 - [ ] Update 2: parent-first entry/routing and separate clinician enrollment without visual redesign; verified doctor/nurse feature parity with meaningful role/audit attribution.
 - [ ] Update 2: actual persistent author-only provisional child/care/vaccination/appointment workflows for unverified clinicians; API/QR/export/existence isolation and immutable revisions.
 - [ ] Account approval leaves prior provisional records untrusted and unshareable until an explicit later validation/promotion policy is decided; real-data and credential-checking approvals remain open.

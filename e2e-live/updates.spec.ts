@@ -126,6 +126,7 @@ test("requested duplicate and provisional onboarding fixes preserve private boun
     await page.locator('[name="given_name"]').fill(family);
     await page.locator('[name="family_name"]').fill(family);
     await page.locator('[name="birth_date"]').fill("2025-01-01");
+    await page.locator('[name="sex"]').selectOption("male");
     await page.locator('[name="syntheticOnly"]').check();
     await page
       .getByRole("button", { name: "Créer le dossier provisoire", exact: true })
@@ -298,7 +299,7 @@ test("requested duplicate and provisional onboarding fixes preserve private boun
       .locator('[name="birthplace"]')
       .fill("Maternité entièrement fictive");
     await outside
-      .getByRole("button", { name: "Créer le dossier et le numéro local" })
+      .getByRole("button", { name: "Compléter et relancer le contrôle" })
       .click();
     await expect(outside.locator("body")).toContainText("QR");
     expect(

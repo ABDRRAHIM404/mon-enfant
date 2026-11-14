@@ -94,6 +94,83 @@ describe("requested clinician update on complete current PostgreSQL schema", () 
       rpc(a, "create_facility", [randomUUID(), "Faux centre", "Rabat"]),
     ).rejects.toMatchObject({ code: "42501" });
   });
+  it("nurses submit private evidence, receive independent review and explicit staff capabilities", async () => {
+    const nurse = await actor("nurse"),
+      reviewer = await actor("admin", "approved"),
+      c = await child(nurse),
+      application = randomUUID();
+    await db.query(
+      "insert into private.staff_permissions(user_id,can_review_professionals,can_manage_clinical_permissions) values($1,true,true)",
+      [reviewer.id],
+    );
+    const path = `${nurse.id}/${application}/evidence.pdf`;
+    await sessionActing(
+      db,
+      nurse.id,
+      nurse.session,
+      "insert into storage.objects(bucket_id,name) values('professional-evidence',$1)",
+      [path],
+    );
+    expect(
+      await rpc(nurse, "submit_verification", [
+        application,
+        "Infirmier entièrement fictif",
+        "QA-NURSE-123",
+        "Centre entièrement fictif",
+        path,
+      ]),
+    ).toBe(application);
+    await rpc(reviewer, "review_verification", [
+      application,
+      "approved",
+      "Qualifications entièrement fictives vérifiées pour le test",
+      true,
+      true,
+    ]);
+    expect(
+      (
+        await db.query(
+          "select role,verification_status from public.professional_profiles where user_id=$1",
+          [nurse.id],
+        )
+      ).rows,
+    ).toEqual([{ role: "nurse", verification_status: "approved" }]);
+    await rpc(reviewer, "set_clinical_capability", [
+      randomUUID(),
+      nurse.id,
+      "vaccination",
+      true,
+      null,
+      "Source de qualification entièrement fictive",
+      "Habilitation de test entièrement fictive",
+      true,
+    ]);
+    expect(
+      (
+        await db.query(
+          "select capability,enabled from public.professional_capabilities where professional_id=$1",
+          [nurse.id],
+        )
+      ).rows,
+    ).toEqual([{ capability: "vaccination", enabled: true }]);
+    expect(
+      (
+        await rpc<{ child: { validation_state: string } }>(
+          nurse,
+          "provisional_booklet",
+          [c],
+        )
+      ).child.validation_state,
+    ).toBe("unverified");
+    await rpc(reviewer, "set_professional_suspension", [
+      nurse.id,
+      true,
+      "Suspension de test entièrement fictive",
+    ]);
+    await expect(rpc(nurse, "provisional_booklet", [c])).rejects.toMatchObject({
+      code: "42501",
+    });
+  });
   it("persists all six core workflows with nonverified role, source and date provenance", async () => {
     const a = await actor("nurse"),
       c = await child(a);

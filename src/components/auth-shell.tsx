@@ -90,7 +90,9 @@ export function AuthShell({
               href={
                 (mode === "login" ? "/signup" : "/login") +
                 (parent
-                  ? `?audience=parent${invitation ? "&next=invitation" : ""}`
+                  ? invitation
+                    ? "?audience=parent&next=invitation"
+                    : ""
                   : "?audience=clinician")
               }
             >
