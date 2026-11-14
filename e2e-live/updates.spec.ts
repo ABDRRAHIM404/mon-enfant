@@ -1,5 +1,7 @@
 import { test, expect, type Page, type BrowserContext } from "@playwright/test";
 import { writeFileSync } from "node:fs";
+import { randomBytes, createHash } from "node:crypto";
+import { captureProtectedDesign } from "./protected-design-capture";
 import { observeBrowserErrors } from "./browser-errors";
 const SITE =
     process.env.MON_ENFANT_LIVE_PROBE === "updates-cloud-accept"
@@ -71,7 +73,8 @@ async function rpc(
     },
     data: args,
   });
-  return { status: response.status(), body: await response.json() };
+  const text = await response.text();
+  return { status: response.status(), body: JSON.parse(text || "null") };
 }
 async function practice(page: Page, name: string) {
   await page.goto("/practices");
@@ -294,6 +297,7 @@ test("requested duplicate and provisional onboarding fixes preserve private boun
     const place = `Centre fictif ${family}`;
     await practice(doctor, place);
     await trustedForm(doctor, place, family, info.project.name);
+    const facility = await doctor.locator('[name="facility_id"]').inputValue();
     await doctor
       .locator("summary")
       .filter({ hasText: "Informations de naissance" })
@@ -336,6 +340,204 @@ test("requested duplicate and provisional onboarding fixes preserve private boun
         .status,
     ).toBe(403);
     proof.duplicate_private_warning_secondary_no_access = true;
+    stage = "protected-parent-dashboard";
+    const parentContext = await browser.newContext({
+      baseURL: SITE,
+      ignoreHTTPSErrors: SITE === "https://localhost:3443",
+      viewport: info.project.use.viewport,
+      isMobile: info.project.use.isMobile,
+      hasTouch: info.project.use.hasTouch,
+      userAgent: info.project.use.userAgent,
+      deviceScaleFactor: info.project.use.deviceScaleFactor,
+    });
+    contexts.push(parentContext);
+    const parent = await parentContext.newPage();
+    observeBrowserErrors(parent, "parent-dashboard", () => errors++);
+    await login(parent, "PARENT", true);
+    expect([200, 204]).toContain(
+      (
+        await rpc(parentContext, "save_parent_profile", {
+          p_display_name: "Responsable fictif",
+        })
+      ).status,
+    );
+    const operation = crypto.randomUUID();
+    const siblingPayload = {
+      facility_id: facility,
+      register_year: 2026,
+      register_book: info.project.name + "-FRATRIE",
+      local_number: "126",
+      given_name: "Enfant fictif",
+      family_name: family + "-fratrie",
+      birth_date: "2024-01-01",
+      birth_date_precision: "exact",
+      sex: "unknown",
+    };
+    expect(
+      (
+        await rpc(doctorContext, "prepare_child_registration", {
+          p_operation_id: operation,
+          p_payload: siblingPayload,
+        })
+      ).status,
+    ).toBe(200);
+    const sibling = await rpc(doctorContext, "register_child", {
+      p_operation_id: operation,
+      p_payload: siblingPayload,
+    });
+    expect(sibling.status).toBe(200);
+    const links: string[] = [];
+    for (const childId of [trusted, sibling.body as string]) {
+      const token = randomBytes(32).toString("base64url");
+      const invitation = await rpc(
+        doctorContext,
+        "create_guardian_invitation",
+        {
+          p_child_id: childId,
+          p_recipient_email: credential("PARENT", "EMAIL"),
+          p_token_hash: createHash("sha256").update(token).digest("hex"),
+          p_reason: "Invitation entièrement fictive pour le tableau de bord.",
+        },
+      );
+      expect(invitation.status).toBe(200);
+      const claim = await rpc(parentContext, "claim_guardian_invitation", {
+        p_operation_id: crypto.randomUUID(),
+        p_token: token,
+        p_relationship: "mother",
+        p_consent: true,
+      });
+      expect(claim.status).toBe(200);
+      const decision = await rpc(doctorContext, "review_guardian_claim", {
+        p_operation_id: crypto.randomUUID(),
+        p_claim_id: claim.body,
+        p_expected_revision: 1,
+        p_decision: "approved",
+        p_relationship: "mother",
+        p_authority_reference: "Contrôle synthétique uniquement",
+        p_reason: "Identité et lien entièrement fictifs pour ce test.",
+        p_identity_checked: true,
+        p_guardianship_checked: true,
+        p_expires_on: new Date(Date.now() + 7 * 86400000)
+          .toISOString()
+          .slice(0, 10),
+        p_can_export: true,
+      });
+      expect(decision.status).toBe(200);
+      links.push(decision.body as string);
+    }
+    const vaccine = await rpc(doctorContext, "write_clinical_entry", {
+      p_operation_id: crypto.randomUUID(),
+      p_child_id: trusted,
+      p_kind: "vaccination",
+      p_facility_id: facility,
+      p_occurred_on: null,
+      p_occurrence_precision: "unknown",
+      p_source_type: "paper_transcription",
+      p_source_reference: "Papier entièrement fictif",
+      p_source_verified: false,
+      p_payload: {
+        vaccine_code: "UNKNOWN",
+        vaccine_label: "Vaccin transcrit fictif",
+        dose_label: "Dose inconnue",
+        lot_status: "unknown",
+        site_status: "unknown",
+        provider_status: "unknown",
+        administration_facility_status: "unknown",
+        matching_status: "unmatched",
+      },
+    });
+    expect(vaccine.status).toBe(200);
+    const visit = await rpc(doctorContext, "create_appointment", {
+      p_operation_id: crypto.randomUUID(),
+      p_child_id: trusted,
+      p_facility_id: facility,
+      p_purpose: "consultation",
+      p_purpose_label: "Consultation fictive",
+      p_vaccine_item_id: null,
+      p_starts_at: new Date(Date.now() + 2 * 86400000).toISOString(),
+      p_ends_at: new Date(Date.now() + 2 * 86400000 + 1800000).toISOString(),
+      p_reason: "Rendez-vous entièrement fictif.",
+      p_reviewed: true,
+    });
+    expect(visit.status).toBe(200);
+    const summary = await rpc(parentContext, "parent_home_summary", {});
+    expect(summary.status).toBe(200);
+    expect(summary.body.children.length).toBe(2);
+    expect(summary.body.next_appointment.child_id).toBe(trusted);
+    const history = await rpc(parentContext, "parent_vaccination_history", {
+      p_child_id: trusted,
+      p_page: 1,
+    });
+    expect(history.status).toBe(200);
+    expect(history.body.total).toBe(1);
+    expect(history.body.items[0].source_verified).toBe(false);
+    expect(history.body.items[0].occurrence_precision).toBe("unknown");
+    expect(
+      (
+        await rpc(outsideContext, "parent_vaccination_history", {
+          p_child_id: trusted,
+          p_page: 1,
+        })
+      ).status,
+    ).toBe(403);
+    await parent.goto("/parent");
+    await expect(
+      parent.getByRole("heading", {
+        name: "Bonjour, Responsable fictif",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await parent.goto(`/parent/children/${trusted}/vaccinations`);
+    await expect(
+      parent.getByRole("heading", {
+        name: "Historique des vaccinations",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(
+      parent.getByText("Aucune référence assignée.", { exact: false }),
+    ).toBeVisible();
+    let comparisons = 0;
+    comparisons += await captureProtectedDesign(
+      parent,
+      "/parent",
+      "parent",
+      info,
+    );
+    comparisons += await captureProtectedDesign(
+      parent,
+      `/parent/children/${trusted}/vaccinations`,
+      "vaccination",
+      info,
+    );
+    comparisons += await captureProtectedDesign(
+      page,
+      "/provisional",
+      "clinician",
+      info,
+    );
+    for (const link of links)
+      expect([200, 204]).toContain(
+        (
+          await rpc(parentContext, "revoke_guardian_link", {
+            p_id: link,
+            p_reason: "Fermeture du partage entièrement fictif après le test.",
+          })
+        ).status,
+      );
+    expect(
+      (await rpc(parentContext, "parent_home_summary", {})).body.children,
+    ).toEqual([]);
+    expect(
+      (
+        await rpc(parentContext, "parent_vaccination_history", {
+          p_child_id: trusted,
+          p_page: 1,
+        })
+      ).status,
+    ).toBe(403);
+    proof.protected_dashboard_current_data_and_revocation = true;
+    proof.protected_design_comparisons = comparisons;
     expect(errors).toBe(0);
     proof.page_errors = errors;
     proof.passed = true;
