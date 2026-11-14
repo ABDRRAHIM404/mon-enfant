@@ -1,7 +1,7 @@
 {
   "name": "mon-enfant",
   "version": "0.1.0",
-  "description": "Mon Enfant \u2014 digital Moroccan child health booklet",
+  "description": "Mon Enfant — digital Moroccan child health booklet",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -24,6 +24,7 @@
     "server-only": "0.0.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
     "@electric-sql/pglite": "0.5.16",
     "@playwright/test": "1.65.0",
     "@tailwindcss/postcss": "4.3.5",
