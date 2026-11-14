@@ -20,6 +20,7 @@ on:
             evidence-accessibility,
             clinical-accept,
             clinical-accessibility,
+            clinical-performance,
             accessibility-accept,
             vaccination-accept,
             vaccine-accessibility,
@@ -89,7 +90,7 @@ jobs:
   live-browser:
     if: github.event_name == 'workflow_dispatch' && inputs.live_probe != 'none' && inputs.live_probe != ''
     runs-on: ubuntu-latest
-    timeout-minutes: ${{ inputs.live_probe == 'vaccine-accessibility' && 30 || (inputs.live_probe == 'vaccination-accept' || inputs.live_probe == 'clinical-accessibility') && 22 || 18 }}
+    timeout-minutes: ${{ (inputs.live_probe == 'vaccine-accessibility' || inputs.live_probe == 'clinical-performance') && 30 || (inputs.live_probe == 'vaccination-accept' || inputs.live_probe == 'clinical-accessibility') && 22 || 18 }}
     env:
       NEXT_TELEMETRY_DISABLED: 1
       MON_ENFANT_LIVE_PROBE: ${{ inputs.live_probe }}
@@ -123,7 +124,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: ${{ inputs.live_probe == 'accessibility-accept' && 'synthetic-live-accessibility-results' || (inputs.live_probe == 'vaccination-accept' || inputs.live_probe == 'vaccine-accessibility') && 'synthetic-live-vaccination-results' || startsWith(inputs.live_probe, 'session-') && 'synthetic-live-session-results' || (inputs.live_probe == 'clinical-accept' || inputs.live_probe == 'clinical-accessibility') && 'synthetic-live-clinical-results' || 'synthetic-live-evidence-results' }}
+          name: ${{ inputs.live_probe == 'accessibility-accept' && 'synthetic-live-accessibility-results' || (inputs.live_probe == 'vaccination-accept' || inputs.live_probe == 'vaccine-accessibility') && 'synthetic-live-vaccination-results' || startsWith(inputs.live_probe, 'session-') && 'synthetic-live-session-results' || (inputs.live_probe == 'clinical-accept' || inputs.live_probe == 'clinical-accessibility' || inputs.live_probe == 'clinical-performance') && 'synthetic-live-clinical-results' || 'synthetic-live-evidence-results' }}
           path: |
             test-results/live/**/verification-form.png
             test-results/live/**/verification-history.png
@@ -136,6 +137,7 @@ jobs:
             test-results/live/**/clinical-proof.json
             test-results/live/**/session-proof.json
             test-results/live/**/vaccination-proof.json
+            test-results/live/**/performance-*.json
             test-results/live/**/contrast-*.json
             test-results/live/**/a11y-*.json
             test-results/live/**/accessibility-proof.json

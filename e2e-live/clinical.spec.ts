@@ -8,6 +8,10 @@ import {
   type AccessibilityProof,
 } from "../e2e-support/accessibility";
 import { reviewGrowthContrast } from "../e2e-support/growth-contrast";
+import {
+  measureClinicalRead,
+  type PerformanceProof,
+} from "../e2e-support/performance";
 import type { ClinicalEntry } from "../src/lib/clinical/types";
 
 const SITE = "https://mon-enfant.vercel.app";
@@ -154,6 +158,17 @@ test("two doctors preserve identity, amendments, appointments and private access
   const accessibility =
     process.env.MON_ENFANT_LIVE_PROBE === "clinical-accessibility";
   const accessibilityProofs: AccessibilityProof[] = [];
+  const performanceMode =
+    process.env.MON_ENFANT_LIVE_PROBE === "clinical-performance";
+  const performanceProofs: PerformanceProof[] = [];
+  const measuredScreens = new Set([
+    "registration",
+    "consultation-form",
+    "growth-chart",
+    "clinical-timeline",
+    "appointment-form",
+    "clinical-summary",
+  ]);
   async function inspect(target: Page, label: string) {
     if (accessibility)
       accessibilityProofs.push(await scanAccessibility(target, label, info));
@@ -165,7 +180,11 @@ test("two doctors preserve identity, amendments, appointments and private access
     label: string,
   ) {
     const start = Date.now();
-    await target.goto(path);
+    if (performanceMode && measuredScreens.has(label))
+      performanceProofs.push(
+        ...(await measureClinicalRead(target, path, heading, label, info)),
+      );
+    else await target.goto(path);
     await expect(
       target.getByRole("heading", { name: heading, exact: true }),
     ).toBeVisible();
@@ -850,6 +869,13 @@ test("two doctors preserve identity, amendments, appointments and private access
             manual_review_required: true,
           }
         : {}),
+      ...(performanceMode
+        ? {
+            performance_observations: performanceProofs.length,
+            measured_screen_count: measuredScreens.size,
+            performance_acceptance_claimed: false,
+          }
+        : {}),
       timings,
     };
     writeFileSync(
@@ -857,6 +883,7 @@ test("two doctors preserve identity, amendments, appointments and private access
       JSON.stringify(proof),
     );
     console.log(JSON.stringify(proof));
+    if (performanceMode) expect(performanceProofs.length).toBe(12);
     if (accessibility) {
       expect(accessibilityProofs.length).toBeGreaterThanOrEqual(30);
       assertAccessible(accessibilityProofs);
