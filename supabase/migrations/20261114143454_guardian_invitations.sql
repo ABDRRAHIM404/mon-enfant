@@ -298,7 +298,7 @@ begin
  select jsonb_build_object(
  'child',(select jsonb_build_object('id',c.id,'universal_id',c.universal_id,'given_name',c.given_name,'family_name',c.family_name,'name_status',c.name_status,'birth_date',c.birth_date,'birth_date_precision',c.birth_date_precision,'sex',c.sex,'history_status',c.history_status) from public.children c where c.id=p_child_id),
  'link',(select jsonb_build_object('id',g.id,'relationship',g.relationship,'expires_at',g.expires_at,'can_export',g.can_export) from private.guardian_links g where g.child_id=p_child_id and g.guardian_id=actor and g.revoked_at is null and g.expires_at>now()),
- 'entries',coalesce((select jsonb_agg(to_jsonb(e) order by e.recorded_at desc,e.id) from entries e),'[]'::jsonb),
+ 'entries',coalesce((select jsonb_agg(to_jsonb(e)||private.vaccination_metadata(e.id) order by e.recorded_at desc,e.id) from entries e),'[]'::jsonb),
  'growth',coalesce((select jsonb_agg(to_jsonb(g) order by g.occurred_on,g.recorded_at) from growth g),'[]'::jsonb),
  'appointments',coalesce((select jsonb_agg(data order by (data->>'starts_at')::timestamptz desc,data->>'id') from slots),'[]'::jsonb),
  'entry_total',(select count(*) from current_entries),'appointment_total',(select count(*) from appointments),'page',p_page) into result;
@@ -312,15 +312,16 @@ declare actor uuid;result jsonb;
 begin
  actor:=private.assert_parent_account();
  if not private.can_access_as_guardian(p_child_id,true) then raise exception 'Child export denied' using errcode='42501';end if;
- if (select count(*) from public.clinical_entries where child_id=p_child_id)>5000
+ if (select count(*) from public.child_vaccine_items where child_id=p_child_id)>5000
+  or (select count(*) from public.clinical_entries where child_id=p_child_id)>5000
   or (select count(*) from public.appointment_events e join public.appointments a on a.id=e.appointment_id where a.child_id=p_child_id)>5000
   or (select count(*) from public.vaccine_item_changes v join public.child_vaccine_items i on i.id=v.item_id where i.child_id=p_child_id)>5000
  then raise exception 'Parent export exceeds interactive limit' using errcode='54000';end if;
  select jsonb_build_object('format','mon-enfant-parent-booklet-v1','generated_at',now(),'synthetic_environment',true,
  'child',(select jsonb_build_object('id',c.id,'universal_id',c.universal_id,'given_name',c.given_name,'family_name',c.family_name,'name_status',c.name_status,'birth_date',c.birth_date,'birth_date_precision',c.birth_date_precision,'sex',c.sex,'history_status',c.history_status) from public.children c where c.id=p_child_id),
- 'clinical_entries',coalesce((select jsonb_agg(to_jsonb(e)||jsonb_build_object('facility_name',f.name) order by e.recorded_at,e.id) from public.clinical_entries e join public.facilities f on f.id=e.facility_id where e.child_id=p_child_id),'[]'::jsonb),
+ 'clinical_entries',coalesce((select jsonb_agg(to_jsonb(e)||jsonb_build_object('facility_name',f.name)||private.vaccination_metadata(e.id) order by e.recorded_at,e.id) from public.clinical_entries e join public.facilities f on f.id=e.facility_id where e.child_id=p_child_id),'[]'::jsonb),
  'appointments',coalesce((select jsonb_agg(to_jsonb(a)||jsonb_build_object('events',coalesce((select jsonb_agg(to_jsonb(e) order by e.revision) from public.appointment_events e where e.appointment_id=a.id),'[]'::jsonb)) order by a.created_at,a.id) from public.appointments a where a.child_id=p_child_id),'[]'::jsonb),
- 'vaccine_items',coalesce((select jsonb_agg(to_jsonb(i)||jsonb_build_object('decisions',coalesce((select jsonb_agg(to_jsonb(v) order by v.revision) from public.vaccine_item_changes v where v.item_id=i.id),'[]'::jsonb)) order by i.created_at,i.id) from public.child_vaccine_items i where i.child_id=p_child_id),'[]'::jsonb)) into result;
+ 'vaccine_items',coalesce((select jsonb_agg(to_jsonb(i)||jsonb_build_object('version_label',v.label,'version_status',v.status,'review_verified',v.review_verified,'rule',to_jsonb(r),'decisions',coalesce((select jsonb_agg(to_jsonb(v) order by v.revision) from public.vaccine_item_changes v where v.item_id=i.id),'[]'::jsonb)) order by i.created_at,i.id) from public.child_vaccine_items i join public.vaccine_versions v on v.id=i.version_id join public.vaccine_rules r on r.version_id=i.version_id and r.dose_code=i.dose_code where i.child_id=p_child_id),'[]'::jsonb)) into result;
  insert into public.audit_events(actor_id,entity_id,entity_type,action) values(actor,p_child_id,'guardian_booklet_export','accessed');
  return result;
 end;$$;

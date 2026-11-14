@@ -61,6 +61,7 @@ async function setup() {
       register_book: "A",
       local_number: "1",
       given_name: "Enfant fictif",
+      family_name: "Test synthétique",
       birth_date: "2025-01-01",
       birth_date_precision: "exact",
       sex: "unknown",
