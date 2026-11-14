@@ -1,1 +1,108 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mon Enfant — Update 3 Design Gallery</title><style>body{font-family:Arial,sans-serif;background:#FAF8F1;color:#12392F;margin:0;padding:28px}h1{margin:0 0 8px}p{color:#56695e}section{margin:26px 0 42px}h2{border-bottom:2px solid #087F5B;padding-bottom:9px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}.item{background:white;border:1px solid #d7e1da;border-radius:14px;padding:12px;overflow:hidden}.item img{width:100%;height:300px;object-fit:contain;background:#e9efec;border-radius:10px}.item a{color:#087F5B;font-weight:700;text-decoration:none}.item small{display:block;margin-top:6px;color:#61766b}a:hover{text-decoration:underline}</style></head><body><h1>Mon Enfant — Update 3</h1><p>Separate web and mobile screens, light and dark mode. Click an image label to view full size. These are concept mockups, not the live application.</p><div id="root"></div><script>let names=['landing','login','parent','vaccination','clinician_login','clinician_register','clinician'];let labels=['Welcome','Parent login','Parent dashboard','Vaccination detail','Clinician login','Clinician signup','Unverified clinician dashboard'];let root=document.getElementById('root');for(let p of ['mobile','web'])for(let t of ['light','dark']){let section=document.createElement('section');section.innerHTML='<h2>'+p.toUpperCase()+' — '+t.toUpperCase()+'</h2>';let grid=document.createElement('div');grid.className='grid';names.forEach((s,i)=>{let path=`mockups/${p}/${t}/${s}.png`;let card=document.createElement('div');card.className='item';card.innerHTML=`<a href="${path}" target="_blank"><img loading="lazy" src="${path}" alt="${labels[i]} screen"></a><small>${i+1}. <a href="${path}" target="_blank">${labels[i]}</a></small>`;grid.appendChild(card)});section.appendChild(grid);root.appendChild(section)}</script></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Mon Enfant — Update 3 Design Gallery</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #faf8f1;
+        color: #12392f;
+        margin: 0;
+        padding: 28px;
+      }
+      h1 {
+        margin: 0 0 8px;
+      }
+      p {
+        color: #56695e;
+      }
+      section {
+        margin: 26px 0 42px;
+      }
+      h2 {
+        border-bottom: 2px solid #087f5b;
+        padding-bottom: 9px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 18px;
+      }
+      .item {
+        background: white;
+        border: 1px solid #d7e1da;
+        border-radius: 14px;
+        padding: 12px;
+        overflow: hidden;
+      }
+      .item img {
+        width: 100%;
+        height: 300px;
+        object-fit: contain;
+        background: #e9efec;
+        border-radius: 10px;
+      }
+      .item a {
+        color: #087f5b;
+        font-weight: 700;
+        text-decoration: none;
+      }
+      .item small {
+        display: block;
+        margin-top: 6px;
+        color: #61766b;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Mon Enfant — Update 3</h1>
+    <p>
+      Separate web and mobile screens, light and dark mode. Click an image label
+      to view full size. These are concept mockups, not the live application.
+    </p>
+    <div id="root"></div>
+    <script>
+      let names = [
+        "landing",
+        "login",
+        "parent",
+        "vaccination",
+        "clinician_login",
+        "clinician_register",
+        "clinician",
+      ];
+      let labels = [
+        "Welcome",
+        "Parent login",
+        "Parent dashboard",
+        "Vaccination detail",
+        "Clinician login",
+        "Clinician signup",
+        "Unverified clinician dashboard",
+      ];
+      let root = document.getElementById("root");
+      for (let p of ["mobile", "web"])
+        for (let t of ["light", "dark"]) {
+          let section = document.createElement("section");
+          section.innerHTML =
+            "<h2>" + p.toUpperCase() + " — " + t.toUpperCase() + "</h2>";
+          let grid = document.createElement("div");
+          grid.className = "grid";
+          names.forEach((s, i) => {
+            let path = `mockups/${p}/${t}/${s}.png`;
+            let card = document.createElement("div");
+            card.className = "item";
+            card.innerHTML = `<a href="${path}" target="_blank"><img loading="lazy" src="${path}" alt="${labels[i]} screen"></a><small>${i + 1}. <a href="${path}" target="_blank">${labels[i]}</a></small>`;
+            grid.appendChild(card);
+          });
+          section.appendChild(grid);
+          root.appendChild(section);
+        }
+    </script>
+  </body>
+</html>
