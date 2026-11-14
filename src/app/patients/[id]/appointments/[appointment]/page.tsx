@@ -41,7 +41,9 @@ export default async function History({
     <main className="account-page wide">
       <DoctorNav />
       <div className="page-heading">
-        <h1 id="main-content" tabIndex={-1}>Historique du rendez-vous</h1>
+        <h1 id="main-content" tabIndex={-1}>
+          Historique du rendez-vous
+        </h1>
         <p className="muted">
           Chaque décision conserve son auteur, son motif et l’ancien créneau.
         </p>
@@ -49,6 +51,7 @@ export default async function History({
       <Link className="text-link" href={`/patients/${id}/appointments`}>
         Rendez-vous de l’enfant
       </Link>
+      <h2>Rendez-vous actuel</h2>
       <AppointmentCard appointment={data.appointment} link={false} />
       {data.events.map((event) => (
         <article className="panel" key={event.id}>

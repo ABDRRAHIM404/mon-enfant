@@ -87,7 +87,7 @@ jobs:
   live-browser:
     if: github.event_name == 'workflow_dispatch' && inputs.live_probe != 'none' && inputs.live_probe != ''
     runs-on: ubuntu-latest
-    timeout-minutes: ${{ inputs.live_probe == 'vaccination-accept' && 22 || 18 }}
+    timeout-minutes: ${{ (inputs.live_probe == 'vaccination-accept' || inputs.live_probe == 'clinical-accessibility') && 22 || 18 }}
     env:
       NEXT_TELEMETRY_DISABLED: 1
       MON_ENFANT_LIVE_PROBE: ${{ inputs.live_probe }}

@@ -42,7 +42,9 @@ export default async function ClinicalHistory({
     <main className="account-page wide">
       <DoctorNav />
       <div className="page-heading">
-        <h1 id="main-content" tabIndex={-1}>Historique de la saisie</h1>
+        <h1 id="main-content" tabIndex={-1}>
+          Historique de la saisie
+        </h1>
         <p className="muted">
           L’original et chaque correction restent attribués à leur auteur.
           Dernière version : {latest.revision}.
@@ -51,6 +53,7 @@ export default async function ClinicalHistory({
       <Link className="text-link" href={`/patients/${id}/records`}>
         Retour au dossier clinique
       </Link>
+      <h2>Versions conservées</h2>
       {entries.map((entry) => (
         <EntryCard key={entry.id} entry={entry} link={false} />
       ))}

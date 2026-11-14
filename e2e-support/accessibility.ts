@@ -51,7 +51,11 @@ export type AccessibilityProof = {
       }[];
     }[];
   }[];
-  incomplete: { rule: string; nodes: number }[];
+  incomplete: {
+    rule: string;
+    nodes: number;
+    elements: { tag: string; classes: string[] }[];
+  }[];
 };
 
 export async function scanAccessibility(
@@ -98,6 +102,12 @@ export async function scanAccessibility(
     incomplete: results.incomplete.map((result) => ({
       rule: result.id,
       nodes: result.nodes.length,
+      elements: result.nodes.map((node) => ({
+        tag: node.html.match(/^<([a-z0-9-]+)/i)?.[1] ?? "element",
+        classes: (node.html.match(/\bclass="([^"]*)"/)?.[1] ?? "")
+          .split(/\s+/)
+          .filter((value) => safeClasses.has(value)),
+      })),
     })),
   };
   // Raw results contain DOM/HTML, selectors and potentially entered values.
