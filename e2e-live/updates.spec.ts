@@ -2,6 +2,11 @@ import { test, expect, type Page, type BrowserContext } from "@playwright/test";
 import { writeFileSync } from "node:fs";
 import { randomBytes, createHash } from "node:crypto";
 import { captureProtectedDesign } from "./protected-design-capture";
+import {
+  localAppointmentInput,
+  localAppointmentOffset,
+  resolveAppointmentTime,
+} from "../src/lib/appointments/calendar";
 import { observeBrowserErrors } from "./browser-errors";
 const SITE =
     process.env.MON_ENFANT_LIVE_PROBE === "updates-cloud-accept"
@@ -447,6 +452,15 @@ test("requested duplicate and provisional onboarding fixes preserve private boun
       },
     });
     expect(vaccine.status).toBe(200);
+    const start = new Date(Date.now() + 2 * 86400000);
+    start.setUTCSeconds(0, 0);
+    const explicit = (date: Date) => {
+      const instant = date.toISOString();
+      return resolveAppointmentTime(
+        localAppointmentInput(instant),
+        localAppointmentOffset(instant),
+      );
+    };
     const visit = await rpc(doctorContext, "create_appointment", {
       p_operation_id: crypto.randomUUID(),
       p_child_id: trusted,
@@ -454,8 +468,8 @@ test("requested duplicate and provisional onboarding fixes preserve private boun
       p_purpose: "consultation",
       p_purpose_label: "Consultation fictive",
       p_vaccine_item_id: null,
-      p_starts_at: new Date(Date.now() + 2 * 86400000).toISOString(),
-      p_ends_at: new Date(Date.now() + 2 * 86400000 + 1800000).toISOString(),
+      p_starts_at: explicit(start),
+      p_ends_at: explicit(new Date(start.getTime() + 1800000)),
       p_reason: "Rendez-vous entièrement fictif.",
       p_reviewed: true,
     });

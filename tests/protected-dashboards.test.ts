@@ -2,6 +2,11 @@ import { beforeAll, afterAll, describe, it, expect } from "vitest";
 import { randomUUID, randomBytes, createHash } from "node:crypto";
 import type { PGlite } from "@electric-sql/pglite";
 import { protectedDashboardDatabase, sessionActing } from "./helpers/database";
+import {
+  localAppointmentInput,
+  localAppointmentOffset,
+  resolveAppointmentTime,
+} from "../src/lib/appointments/calendar";
 let db: PGlite;
 type Actor = { id: string; session: string; email: string };
 const reason = "Décision entièrement fictive du test de permissions.";
@@ -113,12 +118,17 @@ async function appointment(
     "insert into public.professional_capabilities(professional_id,capability,enabled,granted_by) values($1,'appointment',true,$1) on conflict(professional_id,capability) do update set enabled=true",
     [f.doctor.id],
   );
-  const times = (
-    await db.query<{ starts: string; ends: string }>(
-      "select (now()+($1::integer||' days')::interval)::text starts,(now()+($1::integer||' days')::interval+interval '30 minutes')::text ends",
-      [days],
-    )
-  ).rows[0];
+  const start = new Date(Date.now() + days * 86400000);
+  start.setUTCSeconds(0, 0);
+  const end = new Date(start.getTime() + 1800000);
+  const explicit = (date: Date) => {
+    const instant = date.toISOString();
+    return resolveAppointmentTime(
+      localAppointmentInput(instant),
+      localAppointmentOffset(instant),
+    );
+  };
+  const times = { starts: explicit(start), ends: explicit(end) };
   return rpc<string>(f.doctor, "create_appointment", [
     randomUUID(),
     f.child,
