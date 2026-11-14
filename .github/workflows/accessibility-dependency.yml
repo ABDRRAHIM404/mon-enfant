@@ -1,5 +1,8 @@
 name: Prepare accessibility dependency lock
 on:
+  push:
+    branches: [feature/accessibility-checks]
+    paths: [.github/workflows/accessibility-dependency.yml]
   workflow_dispatch:
 permissions:
   contents: read
