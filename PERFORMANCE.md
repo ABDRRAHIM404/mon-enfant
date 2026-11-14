@@ -50,7 +50,9 @@ measurements also fail. Browser measurement success alone cannot make this gate 
 
 For the archived first baseline only, pass `--samples-per-case 1` to validate its
 36 observations without pretending it meets the repeated-sample requirement.
-The default checker rejects that smaller archive.
+The default checker rejects that smaller archive. The downloaded artifact may include
+a root `performance-targets.json`; the analyzer excludes only this exact aggregate
+and recomputes from all observation files. Nested or unknown extra files still fail.
 
 Representative repeated measurements, response to any misses, interaction/load
 coverage and agreed pilot operating targets remain required before broader

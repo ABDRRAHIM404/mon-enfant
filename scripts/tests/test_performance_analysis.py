@@ -101,3 +101,19 @@ class PerformanceAnalysisTests(unittest.TestCase):
     def test_repeated_sample_identifiers_must_prove_each_distinct_observation(self):
         self.mutate(lambda data: data[1].update(sample=1))
         with self.assertRaises(ValueError): analysis.analyze(self.root)
+
+    def test_downloaded_aggregate_report_does_not_replace_measurements(self):
+        (self.root / 'performance-targets.json').write_text('{"status":"targets_missed"}')
+        result = analysis.analyze(self.root)
+        self.assertEqual(result['status'], 'targets_met')
+        self.assertEqual(result['observations'], 108)
+        self.paths[-1].unlink()
+        with self.assertRaises(ValueError): analysis.analyze(self.root)
+
+    def test_nested_or_unknown_reports_are_not_silently_excluded(self):
+        for path in (self.paths[0].parent / 'performance-targets.json',
+                     self.root / 'performance-unknown.json'):
+            with self.subTest(kind=path.name):
+                path.write_text('[]')
+                with self.assertRaises(ValueError): analysis.analyze(self.root)
+                path.unlink()

@@ -21,6 +21,31 @@ afterAll(async () => {
 });
 
 describe("read-only catalog review against actual migrated PostgreSQL", () => {
+  it("detects a private definer with inherited PUBLIC execution", async () => {
+    await db.exec(
+      "begin; create function private.unsafe_fixture() returns boolean language sql security definer as $$ select true $$;",
+    );
+    try {
+      const row = await inspect();
+      expect(row.public_default_execute_functions).toBe(1);
+      expect(row.definer_functions_without_search_path).toBe(1);
+      expect(row.unexpected_anonymous_functions).toBe(0);
+    } finally {
+      await db.exec("rollback");
+    }
+  });
+  it("detects private column privileges and client schema creation", async () => {
+    await db.exec(
+      "begin; grant select(can_review_professionals) on private.staff_permissions to authenticated; grant create on schema public to authenticated;",
+    );
+    try {
+      const row = await inspect();
+      expect(row.private_table_or_column_grants).toBe(1);
+      expect(row.client_schema_create).toBe(true);
+    } finally {
+      await db.exec("rollback");
+    }
+  });
   it("recognizes the intentional profile column grant and constant anonymous beacon", async () => {
     const row = await inspect();
     expect(row.public_table_count).toBe(24);

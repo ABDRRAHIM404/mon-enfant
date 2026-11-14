@@ -89,7 +89,8 @@ This checklist preserves PROJECT_PLAN.md's complete Phase 0–8 scope. It is not
 - [x] Vaccine/catalog automatic accessibility and targeted keyboard baseline on desktop/tablet/phone: 141 scans, zero violations/incomplete results/page errors, named-navigation bypass, reasoned duplicate override by keyboard and independent database/source proof. See PROGRESS.md.
 - [x] Private-evidence automatic/targeted keyboard baseline: 39 scans, zero automatic violations/page errors, pending locks, exact-limit private upload/review/denials, three queue contrast/Arrow-key reports and independent Storage/database proof. See PROGRESS.md.
 - [x] Defined development TTFB/FCP/LCP/CLS targets and first controlled six-view baseline on desktop/tablet/phone: thirty-six complete observations meet all targets; independent ledger proof in PROGRESS.md.
-- [ ] Broader keyboard/accessibility acceptance, repeated representative performance and authenticated automated target-step acceptance.
+- [x] Repeated controlled performance and authenticated automated target step: 108 observations across six views/two profiles/three devices, three samples per case, all defined targets met; independent persistence and cleanup in PROGRESS.md.
+- [ ] Broader keyboard/accessibility and interaction/load performance acceptance.
 - [ ] Full keyboard/accessibility/performance acceptance.
 - [x] Workspace refresh-cookie regression: actual provider refresh-token rotation, persisted secure cookies, public-health isolation and logout denial for vaccine/appointment/follow-up routes on desktop/tablet/phone; see PROGRESS.md.
 - [ ] Account/session, QR, export, RLS/Storage, secret and rate-limit review.

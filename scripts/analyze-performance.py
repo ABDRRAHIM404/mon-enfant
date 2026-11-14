@@ -32,7 +32,11 @@ def analyze(root, samples=3):
     if type(samples) is not int or samples not in (1, 3):
         raise ValueError("Only explicit legacy or repeated sample coverage is supported.")
     observations = {}
-    files = list(Path(root).rglob('performance-*.json'))
+    root = Path(root)
+    # The downloaded artifact also contains this fixed aggregate report at its
+    # root. Recompute from observations; never count that report as a sample.
+    files = [path for path in root.rglob('performance-*.json')
+             if path != root / 'performance-targets.json']
     if len(files) != len(SCREENS) * len(DEVICES):
         raise ValueError('Expected exactly eighteen classified performance files.')
     for path in files:
