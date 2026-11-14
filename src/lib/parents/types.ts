@@ -84,3 +84,22 @@ export const correctionOutcomes: Record<string, string> = {
   corrected: "Amendement clinique enregistré",
   withdrawn: "Demande retirée par son auteur",
 };
+
+export type ParentUpdates = {
+  items: {
+    id: string;
+    kind: string;
+    child_id: string | null;
+    given_name: string | null;
+    family_name: string | null;
+    occurred_at: string;
+    clinical_kind: string | null;
+    revision: number | null;
+    unread: boolean;
+  }[];
+  total: number;
+  unread_total: number;
+  page: number;
+  generated_at: string;
+  read_through: string | null;
+};

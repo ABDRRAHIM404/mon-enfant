@@ -17,6 +17,8 @@ type History = {
   since: string;
 };
 const activity: Record<string, string> = {
+  child_lookup_read: "Recherche par identifiant autorisée",
+  guardian_notifications_read: "Consultation des notifications",
   child_profile_read: "Consultation de l’identité",
   clinical_timeline_read: "Consultation du dossier clinique",
   clinical_history_read: "Consultation des révisions cliniques",

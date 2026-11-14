@@ -176,7 +176,10 @@ export function CorrectionResponseForm({
               {corrections.map((entry) => (
                 <option key={entry.id} value={entry.id}>
                   Version {entry.revision} ·{" "}
-                  {new Date(entry.recorded_at).toLocaleString("fr-MA")} ·{" "}
+                  {new Date(entry.recorded_at).toLocaleString("fr-MA", {
+                    timeZone: "Africa/Casablanca",
+                  })}{" "}
+                  ·{" "}
                   {entry.entry_state === "withdrawn"
                     ? "entrée retirée"
                     : "entrée corrigée"}

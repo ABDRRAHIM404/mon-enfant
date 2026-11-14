@@ -160,3 +160,14 @@ export async function parentPrivacyDatabase() {
   );
   return db;
 }
+
+export async function parentUpdatesDatabase() {
+  const db = await parentPrivacyDatabase();
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/20261114153322_parent_updates_lookup.sql",
+      "utf8",
+    ),
+  );
+  return db;
+}

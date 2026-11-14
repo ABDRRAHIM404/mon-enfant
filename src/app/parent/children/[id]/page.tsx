@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { QrCode } from "@/components/qr/code";
+import { clinicianLookupUrl } from "@/lib/qr/symbol";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { Brand } from "@/components/brand";
@@ -212,6 +214,20 @@ export default async function ChildBooklet({
           </Link>
         )}
       </nav>
+      <section className="panel">
+        <h2>Présenter le carnet à un professionnel</h2>
+        <p>
+          Le professionnel doit se connecter avant de scanner. Ce QR ne contient
+          que l’identifiant du dossier et ne donne aucun accès aux soins.
+        </p>
+        <QrCode
+          value={clinicianLookupUrl(
+            process.env.NEXT_PUBLIC_SITE_URL ?? "https://mon-enfant.vercel.app",
+            child.universal_id,
+          )}
+          label="Identification du dossier — accès professionnel vérifié à l’ouverture"
+        />
+      </section>
       <section id="access" className="panel no-print">
         <h2>Mon accès à ce carnet</h2>
         <p>

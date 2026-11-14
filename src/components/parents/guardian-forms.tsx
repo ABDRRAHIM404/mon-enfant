@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { QrCode } from "@/components/qr/code";
 import { useActionState, useEffect, useRef } from "react";
 import {
   createGuardianInvitation,
@@ -46,6 +47,10 @@ export function GuardianInviteForm({ childId }: { childId: string }) {
             Invitation créée. Transmettez ce lien au destinataire par un canal
             approprié.
           </p>
+          <QrCode
+            value={state.invitationUrl}
+            label="Invitation personnelle du responsable — valable 24 heures"
+          />
           <label htmlFor="invitation-url">Lien personnel</label>
           <input
             id="invitation-url"

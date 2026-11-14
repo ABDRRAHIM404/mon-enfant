@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { QrCode } from "@/components/qr/code";
+import { clinicianLookupUrl } from "@/lib/qr/symbol";
 import { appointmentTime } from "@/lib/appointments/calendar";
 import { notFound } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
@@ -151,6 +153,21 @@ export default async function PatientProfile({
           </p>
         </section>
       </div>
+      <section className="panel">
+        <h2>QR d’identification pour un professionnel</h2>
+        <p>
+          Connectez-vous à votre compte professionnel avant de scanner. Ce QR
+          contient uniquement un identifiant de dossier ; il ne remplace aucune
+          autorisation et ne contient aucun soin.
+        </p>
+        <QrCode
+          value={clinicianLookupUrl(
+            process.env.NEXT_PUBLIC_SITE_URL ?? "https://mon-enfant.vercel.app",
+            child.universal_id,
+          )}
+          label="Identification du dossier — accès professionnel vérifié à l’ouverture"
+        />
+      </section>
       {child.can_manage_access && (
         <section className="panel">
           <h2>Autorisations du dossier</h2>

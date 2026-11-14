@@ -273,3 +273,18 @@ export async function respondParentCorrection(
   revalidatePath("/parent-requests");
   return { success: true };
 }
+
+export async function markParentUpdatesRead(
+  _: ParentState,
+  form: FormData,
+): Promise<ParentState> {
+  const { supabase } = await requireUser();
+  const through = String(form.get("readThrough") ?? "");
+  if (!Number.isFinite(Date.parse(through))) return failure("22023");
+  const { error } = await supabase.rpc("mark_parent_updates_read", {
+    p_read_through: through,
+  });
+  if (error) return failure(error.code);
+  revalidatePath("/parent/notifications");
+  return { success: true };
+}

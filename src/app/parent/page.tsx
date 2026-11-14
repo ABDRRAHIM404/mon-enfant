@@ -27,6 +27,7 @@ export default async function ParentWorkspace() {
         <Brand />
         <nav aria-label="Navigation parent">
           <Link href="/parent">Espace parent</Link>
+          <Link href="/parent/notifications">Notifications</Link>
           <Link href="/parent/requests">Mes demandes</Link>
           <Link href="/parent/settings">Préférences</Link>
           <Link href="/account">Mon compte</Link>
