@@ -51,7 +51,7 @@ export default async function VaccineVersion({
         <Link href="/vaccines" className="text-link">
           Toutes les versions
         </Link>
-        <h1>{v.label}</h1>
+        <h1 id="main-content" tabIndex={-1}>{v.label}</h1>
         <p>
           {catalogStatus[v.status]} · révision {v.revision}
         </p>

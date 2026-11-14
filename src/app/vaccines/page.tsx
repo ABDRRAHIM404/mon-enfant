@@ -27,7 +27,7 @@ export default async function Vaccines({
     <main className="account-page wide">
       {profile?.role === "admin" ? <AdminNav /> : <DoctorNav />}
       <div className="page-heading">
-        <h1>Catalogue vaccinal</h1>
+        <h1 id="main-content" tabIndex={-1}>Catalogue vaccinal</h1>
         <p className="muted">
           Versions de référence de routine et historique des revues.
         </p>

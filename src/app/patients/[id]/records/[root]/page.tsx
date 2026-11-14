@@ -42,7 +42,7 @@ export default async function ClinicalHistory({
     <main className="account-page wide">
       <DoctorNav />
       <div className="page-heading">
-        <h1>Historique de la saisie</h1>
+        <h1 id="main-content" tabIndex={-1}>Historique de la saisie</h1>
         <p className="muted">
           L’original et chaque correction restent attribués à leur auteur.
           Dernière version : {latest.revision}.

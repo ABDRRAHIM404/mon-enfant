@@ -44,7 +44,7 @@ export default async function NewAppointment({
     <main className="account-page wide">
       <DoctorNav />
       <div className="page-heading">
-        <h1>Planifier — {patientName(profile.data as ChildProfile)}</h1>
+        <h1 id="main-content" tabIndex={-1}>Planifier — {patientName(profile.data as ChildProfile)}</h1>
         <p className="muted">
           Choisissez le créneau après examen du dossier. Aucun rattrapage n’est
           calculé.

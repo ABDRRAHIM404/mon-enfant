@@ -49,7 +49,7 @@ export default async function Summary({
       <main className="account-page wide">
         <DoctorNav />
         <section className="panel">
-          <h1>Résumé volumineux</h1>
+          <h1 id="main-content" tabIndex={-1}>Résumé volumineux</h1>
           <p>
             La limite interactive de 5 000 révisions est dépassée. Utilisez une
             procédure d’export autorisée avec un périmètre convenu. Aucun résumé
@@ -67,7 +67,7 @@ export default async function Summary({
       <DoctorNav />
       <div className="page-heading">
         <span className="eyebrow">RÉSUMÉ CLINIQUE — DONNÉES FICTIVES</span>
-        <h1>{patientName(child)}</h1>
+        <h1 id="main-content" tabIndex={-1}>{patientName(child)}</h1>
         <p>
           {birthLabel(child)} · {child.universal_id}
         </p>

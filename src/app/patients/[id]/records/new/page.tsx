@@ -50,7 +50,7 @@ export default async function NewEntry({
     <main className="account-page wide">
       <DoctorNav />
       <div className="page-heading">
-        <h1>{clinicalLabels[kind]}</h1>
+        <h1 id="main-content" tabIndex={-1}>{clinicalLabels[kind]}</h1>
         <p className="muted">
           L’auteur, le lieu, la provenance et les dates seront conservés. Aucune
           écriture ne remplace silencieusement un soin.

@@ -50,7 +50,7 @@ export default async function Patients({
       <DoctorNav />
       <div className="page-heading">
         <span className="eyebrow">MON REGISTRE</span>
-        <h1>Patients</h1>
+        <h1 id="main-content" tabIndex={-1}>Patients</h1>
         <p className="muted">Recherche limitée à vos dossiers autorisés.</p>
       </div>
       <div className="tabs">

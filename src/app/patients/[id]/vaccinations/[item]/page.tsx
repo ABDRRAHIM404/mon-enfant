@@ -33,7 +33,7 @@ export default async function ItemHistory({
     <main className="account-page wide">
       <DoctorNav />
       <div className="page-heading">
-        <h1>Historique de la référence vaccinale</h1>
+        <h1 id="main-content" tabIndex={-1}>Historique de la référence vaccinale</h1>
         <p className="fine">
           Référence {item}. Les décisions ne modifient aucune administration.
         </p>

@@ -41,7 +41,7 @@ export default async function ClinicalPermissions({
     <main className="account-page wide">
       <AdminNav />
       <div className="page-heading">
-        <h1>Habilitations cliniques</h1>
+        <h1 id="main-content" tabIndex={-1}>Habilitations cliniques</h1>
         <p className="muted">
           Permission d’administration distincte de la revue d’identité. Aucune
           habilitation ne donne un accès aux dossiers d’enfants.

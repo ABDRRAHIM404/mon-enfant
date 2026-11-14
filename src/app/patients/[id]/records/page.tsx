@@ -49,7 +49,7 @@ export default async function Records({
     <main className="account-page wide">
       <DoctorNav />
       <div className="page-heading">
-        <h1>Dossier clinique</h1>
+        <h1 id="main-content" tabIndex={-1}>Dossier clinique</h1>
         <p className="muted">
           Dernière révision de chaque saisie, avec accès à l’original et aux
           corrections.

@@ -41,7 +41,7 @@ export default async function History({
     <main className="account-page wide">
       <DoctorNav />
       <div className="page-heading">
-        <h1>Historique du rendez-vous</h1>
+        <h1 id="main-content" tabIndex={-1}>Historique du rendez-vous</h1>
         <p className="muted">
           Chaque décision conserve son auteur, son motif et l’ancien créneau.
         </p>

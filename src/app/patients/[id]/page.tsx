@@ -52,7 +52,7 @@ export default async function PatientProfile({
       <DoctorNav />
       <div className="page-heading">
         <span className="eyebrow">DOSSIER ENFANT</span>
-        <h1>{patientName(child)}</h1>
+        <h1 id="main-content" tabIndex={-1}>{patientName(child)}</h1>
         <p className="muted">
           {child.name_status === "provisional" ? "Identité provisoire · " : ""}
           {birthLabel(child)}

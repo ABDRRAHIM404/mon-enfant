@@ -5,6 +5,29 @@ import {
   tabTo,
 } from "../e2e-support/accessibility";
 
+test("skip navigation reaches the visible primary page heading", async ({
+  page,
+}) => {
+  for (const path of [
+    "/",
+    "/login",
+    "/signup",
+    "/forgot-password",
+    "/missing-page",
+  ]) {
+    await page.goto(path);
+    await page.keyboard.press("Tab");
+    const skip = page.getByRole("link", {
+      name: "Aller au contenu principal",
+      exact: true,
+    });
+    await expect(skip).toBeFocused();
+    await expect(skip).toBeInViewport();
+    await page.keyboard.press("Enter");
+    await expect(page.getByRole("heading", { level: 1 })).toBeFocused();
+  }
+});
+
 test("public pages and feedback have no automatic WCAG A/AA or best-practice violations", async ({
   page,
 }, info) => {

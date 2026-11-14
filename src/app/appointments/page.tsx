@@ -56,7 +56,7 @@ export default async function Calendar({
     <main className="account-page wide">
       <DoctorNav />
       <div className="page-heading">
-        <h1>Mes rendez-vous</h1>
+        <h1 id="main-content" tabIndex={-1}>Mes rendez-vous</h1>
         <p className="muted">
           Heures locales Africa/Casablanca. Vue limitée aux dossiers encore
           autorisés.

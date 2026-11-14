@@ -37,7 +37,7 @@ export default async function PatientAppointments({
     <main className="account-page wide">
       <DoctorNav />
       <div className="page-heading">
-        <h1>Rendez-vous — {patientName(profile.data as ChildProfile)}</h1>
+        <h1 id="main-content" tabIndex={-1}>Rendez-vous — {patientName(profile.data as ChildProfile)}</h1>
         <p className="muted">
           Les rendez-vous des professionnels autorisés restent attribués à leur
           responsable.

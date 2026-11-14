@@ -113,7 +113,7 @@ export default async function Vaccinations({
     <main className="account-page wide">
       <DoctorNav />
       <div className="page-heading">
-        <h1>Vaccinations — {patientName(child)}</h1>
+        <h1 id="main-content" tabIndex={-1}>Vaccinations — {patientName(child)}</h1>
         <p className="muted">
           Références prévues et administrations documentées conservent leur
           propre historique.

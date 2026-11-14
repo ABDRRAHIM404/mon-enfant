@@ -27,7 +27,7 @@ export default function Home() {
             <span className="eyebrow">
               <span className="dot" /> CARNET DE SANTÉ NUMÉRIQUE · MAROC
             </span>
-            <h1>
+            <h1 id="main-content" tabIndex={-1}>
               Grandir en confiance.
               <br />
               <em>Soigner en continuité.</em>
@@ -47,10 +47,7 @@ export default function Home() {
               uniquement
             </div>
           </div>
-          <div
-            className="booklet"
-            aria-label="Illustration d’un carnet de santé"
-          >
+          <div className="booklet">
             <div className="booklet-top">
               <HeartPulse size={22} />
               <span>MON ENFANT</span>

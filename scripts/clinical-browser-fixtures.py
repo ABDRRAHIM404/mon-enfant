@@ -100,11 +100,12 @@ def validate(state):
     return ids
 
 
-def prepare(session_only=False, vaccine_browser=False):
+def prepare(session_only=False, vaccine_browser=False, accessibility_only=False):
+    minimal = session_only or accessibility_only
     if any(name.startswith(PREFIX) for name in secret_names()):
         raise RuntimeError('Finish the recorded clinical fixture run first')
-    state = {'run': uuid.uuid4().hex[:16], 'actors': [], 'secrets': [], 'purpose': 'session' if session_only else 'vaccination' if vaccine_browser else 'clinical'}
-    if not session_only and not vaccine_browser:
+    state = {'run': uuid.uuid4().hex[:16], 'actors': [], 'secrets': [], 'purpose': 'accessibility' if accessibility_only else 'session' if session_only else 'vaccination' if vaccine_browser else 'clinical'}
+    if not minimal and not vaccine_browser:
         state['clinical_story_version'] = 2
     credentials = {}
     save(state, credentials)
@@ -117,7 +118,7 @@ def prepare(session_only=False, vaccine_browser=False):
             state['vaccine_seed_id'] = str(uuid.UUID(seeds[0]['id']))
             state['vaccine_source_sha256'] = source_hash
             save(state, credentials)
-        for role in (('A',) if session_only else ROLES):
+        for role in (('A',) if minimal else ROLES):
             email = f"qa-cbrowser-{state['run']}-{role.lower()}@example.invalid"
             password = secrets.token_urlsafe(32)
             user = api('/auth/v1/admin/users', {'email': email, 'password': password, 'email_confirm': True, 'app_metadata': {'synthetic_fixture': True, 'fixture_run': state['run'], 'fixture_kind': 'clinical_browser'}})
@@ -149,11 +150,17 @@ def prepare(session_only=False, vaccine_browser=False):
 def inspect(run):
     state = load(run)
     ids = validate(state)
-    if state.get('purpose') == 'session':
+    if state.get('purpose') in ('session', 'accessibility'):
         rows = sql(f"select (select count(*) from public.children where created_by in({ids}))::integer children,(select count(*) from public.clinical_entries where author_id in({ids}))::integer clinical_entries,(select count(*) from public.access_grants where professional_id in({ids}))::integer grants,(select count(*) from public.professional_capabilities where professional_id in({ids}))::integer capabilities,(select count(*) from private.staff_permissions where user_id in({ids}))::integer staff_permissions")
         if len(state['actors']) != 1 or rows != [{'children': 0, 'clinical_entries': 0, 'grants': 0, 'capabilities': 0, 'staff_permissions': 0}]:
             raise RuntimeError('Session-only fixture scope was not proven')
-        print(json.dumps({'run': run, 'session_only_scope_verified': True, **rows[0]}), flush=True)
+        if state.get('purpose') == 'accessibility':
+            facilities = sql(f"select count(*)::integer n from public.professional_facilities where professional_id in({ids}) and revoked_at is null")[0]['n']
+            if facilities != 3:
+                raise RuntimeError('Three keyboard-created fictional practice memberships were not proven')
+            print(json.dumps({'run': run, 'accessibility_scope_verified': True, 'fictional_facilities': facilities, **rows[0]}), flush=True)
+        else:
+            print(json.dumps({'run': run, 'session_only_scope_verified': True, **rows[0]}), flush=True)
         return
     if state.get('purpose') == 'vaccination':
         inspect_vaccination(state)
@@ -308,14 +315,17 @@ if __name__ == '__main__':
     parser.add_argument('--run')
     parser.add_argument('--session-only', action='store_true', help='Prepare only one fictional doctor, without capabilities, grants or staff permissions')
     parser.add_argument('--vaccine-browser', action='store_true', help='Prepare isolated catalog editor/reviewer appointments for the fictional vaccine browser story')
+    parser.add_argument('--accessibility-only', action='store_true', help='Prepare one fictional doctor for keyboard and accessibility checks, without clinical permissions')
     args = parser.parse_args()
+    if args.accessibility_only and (not args.prepare or args.session_only or args.vaccine_browser):
+        parser.error('--accessibility-only requires --prepare and cannot combine with other fixture scopes')
     if args.vaccine_browser and (not args.prepare or args.session_only):
         parser.error('--vaccine-browser requires --prepare and cannot combine with --session-only')
     if args.session_only and not args.prepare:
         parser.error('--session-only requires --prepare')
     try:
         if args.prepare:
-            prepare(args.session_only, args.vaccine_browser)
+            prepare(args.session_only, args.vaccine_browser, args.accessibility_only)
         elif args.check:
             inspect(args.run)
         else:

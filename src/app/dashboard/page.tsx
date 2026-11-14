@@ -60,7 +60,7 @@ export default async function Dashboard() {
       <DoctorNav />
       <div className="page-heading">
         <span className="eyebrow">ESPACE MÉDECIN</span>
-        <h1>Votre registre de soins.</h1>
+        <h1 id="main-content" tabIndex={-1}>Votre registre de soins.</h1>
         <p className="muted">
           Vos dossiers autorisés, rendez-vous et suivis actualisés.
         </p>

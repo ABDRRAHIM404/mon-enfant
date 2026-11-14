@@ -1,7 +1,7 @@
 @import "tailwindcss";
 :root {
   --ink: #173d3b;
-  --muted: #6c7f7b;
+  --muted: #526b65;
   --teal: #126b5c;
   --pale: #eaf3ee;
   --line: #e0e8e3;
@@ -393,7 +393,11 @@ p {
   position: relative;
   z-index: 1;
 }
-.story-copy h1 {
+.story-copy .story-title {
+  color: inherit;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.045em;
   font-size: clamp(35px, 3.3vw, 50px);
   margin: 25px 0;
 }
@@ -436,7 +440,7 @@ p {
   max-width: 410px;
   margin: 60px auto;
 }
-.auth-card h2 {
+.auth-card h1 {
   font-size: 34px;
   margin: 17px 0 12px;
 }
@@ -596,7 +600,7 @@ p {
   .auth-main {
     padding: 35px 9%;
   }
-  .auth-card h2 {
+  .auth-card h1 {
     font-size: 29px;
   }
 }
@@ -679,7 +683,7 @@ p {
   .auth-card {
     margin: 40px auto;
   }
-  .auth-card h2 {
+  .auth-card h1 {
     font-size: 31px;
   }
   .account-page header {
@@ -1016,4 +1020,29 @@ th {
 .appointment-calendar small {
   font-size: 0.7rem;
   overflow-wrap: anywhere;
+}
+
+/* Keyboard users can bypass repeated headers and focus the actual page title. */
+.skip-link {
+  position: fixed;
+  z-index: 100;
+  top: 12px;
+  left: 12px;
+  max-width: calc(100vw - 24px);
+  padding: 10px 16px;
+  color: white;
+  background: var(--teal);
+  border-radius: 6px;
+  transform: translateY(-180%);
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+#main-content {
+  scroll-margin-top: 20px;
+}
+@media print {
+  .skip-link {
+    display: none;
+  }
 }

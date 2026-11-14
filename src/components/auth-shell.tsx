@@ -11,11 +11,11 @@ export function AuthShell({ mode }: { mode: "login" | "signup" }) {
         <Brand />
         <div className="story-copy">
           <span className="eyebrow light">ESPACE PROFESSIONNEL</span>
-          <h1>
+          <p className="story-title">
             Une histoire de santé.
             <br />
             Toute une enfance.
-          </h1>
+          </p>
           <p>
             Un carnet de santé continu, pour accompagner chaque enfant et
             faciliter le suivi des professionnels.
@@ -39,11 +39,11 @@ export function AuthShell({ mode }: { mode: "login" | "signup" }) {
         </Link>
         <div className="auth-card">
           <span className="eyebrow">MON ENFANT · PROFESSIONNELS</span>
-          <h2>
+          <h1 id="main-content" tabIndex={-1}>
             {mode === "login"
               ? "Heureux de vous retrouver."
               : "Votre espace commence ici."}
-          </h2>
+          </h1>
           <p className="muted">
             {mode === "login"
               ? "Connectez-vous à votre espace sécurisé."

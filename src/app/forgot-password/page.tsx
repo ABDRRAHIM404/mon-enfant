@@ -14,7 +14,7 @@ export default async function ForgotPassword({
       <Brand />
       <section className="account-card">
         <span className="eyebrow">ACCÈS À MON COMPTE</span>
-        <h1>Mot de passe oublié ?</h1>
+        <h1 id="main-content" tabIndex={-1}>Mot de passe oublié ?</h1>
         <p className="muted">
           Demandez un lien de récupération et ouvrez-le dans ce même navigateur.
         </p>

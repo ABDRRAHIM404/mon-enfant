@@ -55,7 +55,7 @@ export default async function FollowUp({
     <main className="account-page wide">
       <DoctorNav />
       <div className="page-heading">
-        <h1>Suivis et alertes</h1>
+        <h1 id="main-content" tabIndex={-1}>Suivis et alertes</h1>
         <p className="muted">
           Les rendez-vous passés et les administrations non confirmées restent
           des états distincts.

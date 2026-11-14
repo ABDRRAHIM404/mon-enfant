@@ -30,7 +30,7 @@ export default async function MyClinicalPermissions() {
     <main className="account-page wide">
       <DoctorNav />
       <div className="page-heading">
-        <h1>Mes habilitations cliniques</h1>
+        <h1 id="main-content" tabIndex={-1}>Mes habilitations cliniques</h1>
         <p className="muted">
           L’approbation du compte et l’autorisation de chaque activité sont
           distinctes. Une habilitation ne donne pas accès à un enfant sans
