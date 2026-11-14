@@ -1,6 +1,6 @@
 # Full plan execution and completion audit
 
-Current development focus: **requested Updates 1–2 before Phase 8 mobile**, following the verified synthetic Phase 7 web walkthrough. See UPDATE_WORK_PLAN.md. Remaining Phase 6 checks/operations stay open and are deferred until the app is built, except major authentication, access-control, data-integrity and build checks.
+Current development focus: **supplied Update 3 before Phase 8 mobile; Updates 1–2 and the canonical account switch technically verified**, following the verified synthetic Phase 7 web walkthrough. See UPDATE_WORK_PLAN.md. Remaining Phase 6 checks/operations stay open and are deferred until the app is built, except major authentication, access-control, data-integrity and build checks.
 
 See [PROGRESS.md](PROGRESS.md) for verification evidence and remaining approval gates.
 
@@ -142,6 +142,9 @@ The complete goal remains active until the full required scope and its approval 
 - [x] Publish and verify the new canonical Vercel deployment after the owner-requested account/address switch (43635401242 / native e95b68ad4f284f34). Preserve all external approval gates and complete Phase 8 afterward.
 
 ## Supplied Update 3 — design and preserved functionality
+
+- [x] Shared/public foundation implemented and visually accepted: full source CI 43642867793, configured sixteen-screen paired capture 43642889015 and direct review in design-qa.md; earlier three-device authenticated run 43639674164 passed both cookie-retention modes. Protected Update 3 screens remain open.
+- [x] Retire the four synthetic actors and nine temporary values after acceptance; 07e082b6e45f4e2b retirement verified. Layout-only iterations use public configuration without account provisioning.
 
 - [ ] Review the supplied mockups/current screens and implement the chosen shared brand, light/dark/system themes, persisted override, responsive public/parent/clinician screens and accessible contrast/keyboard/touch behavior.
 - [ ] Keep verified Updates 1–2, clinical/vaccine/grant/audit controls, deferred verification and synthetic-only boundaries intact; no fabricated patient/calendar data from mockups.

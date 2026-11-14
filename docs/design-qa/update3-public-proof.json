@@ -1,0 +1,22 @@
+{
+  "source_runtime": "github-cloud-production",
+  "screens": 16,
+  "comparisons": 16,
+  "page_errors": 0,
+  "source_commit": "48ba0de02713e3eb938c2f7053759509ebbdf238",
+  "standard_ci": "43642867793",
+  "capture_run": "43642889015",
+  "scope": "configured anonymous public landing and parent/clinician authentication; protected Update 3 screens excluded",
+  "web_css_viewport": [
+    1440,
+    900
+  ],
+  "mobile_css_viewport": [
+    430,
+    940
+  ],
+  "capture_scale": "css",
+  "comparison_device_scale_factor": 1,
+  "emails_sent": false,
+  "authenticated_fixtures_used": false
+}
