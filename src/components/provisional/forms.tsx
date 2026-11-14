@@ -74,12 +74,16 @@ export function ProvisionalEntryForm({
   childId,
   operationId,
   entry,
+  initialKind,
 }: {
   childId: string;
   operationId: string;
   entry?: ProvisionalEntry;
+  initialKind?: keyof typeof provisionalKinds;
 }) {
-  const [kind, setKind] = useState(entry?.kind ?? "consultation");
+  const [kind, setKind] = useState(
+    entry?.kind ?? initialKind ?? "consultation",
+  );
   const [state, action, pending] = useActionState(writeProvisional, {});
   return (
     <form action={action} className="form-grid" aria-busy={pending}>

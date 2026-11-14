@@ -1,13 +1,67 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import {
+  UsersRound,
+  Plus,
+  ChevronRight,
+  Syringe,
+  ChartNoAxesCombined,
+  CalendarDays,
+  FileText,
+  Bell,
+} from "lucide-react";
 import { patientName, birthLabel } from "@/lib/registry/types";
 import type { ParentWorkspaceData } from "@/lib/parents/types";
-import { Brand } from "@/components/brand";
+import type { AppointmentRow } from "@/lib/appointments/types";
+import { appointmentTime } from "@/lib/appointments/calendar";
+import { WorkspaceShell } from "@/components/workspace-shell";
 import { ParentProfileForm } from "@/components/parents/profile-form";
-import { signOut } from "@/app/auth/actions";
 import { createClient } from "@/lib/supabase/server";
 import { supabaseConfig } from "@/lib/supabase/config";
 export const dynamic = "force-dynamic";
+const destinations: Record<string, { label: string; suffix: string }> = {
+  children: { label: "Les carnets de mes enfants", suffix: "" },
+  vaccinations: {
+    label: "Les vaccinations de mes enfants",
+    suffix: "/vaccinations",
+  },
+  growth: { label: "La croissance de mes enfants", suffix: "#growth" },
+  appointments: {
+    label: "Les rendez-vous de mes enfants",
+    suffix: "/appointments",
+  },
+  documents: { label: "Les documents de mes enfants", suffix: "#documents" },
+  access: {
+    label: "Le partage et les accès de mes enfants",
+    suffix: "/privacy",
+  },
+};
+const quickLinks = [
+  {
+    view: "vaccinations",
+    title: "Vaccinations",
+    description: "Références et doses documentées",
+    Icon: Syringe,
+  },
+  {
+    view: "growth",
+    title: "Croissance",
+    description: "Poids et taille",
+    Icon: ChartNoAxesCombined,
+  },
+  {
+    view: "appointments",
+    title: "Rendez-vous",
+    description: "Suivi des consultations",
+    Icon: CalendarDays,
+  },
+  {
+    view: "documents",
+    title: "Documents",
+    description: "Historique et carnet",
+    Icon: FileText,
+  },
+];
 export default async function ParentWorkspace({
   searchParams,
 }: {
@@ -15,11 +69,7 @@ export default async function ParentWorkspace({
 }) {
   const { view } = await searchParams;
   const focus =
-    view === "appointments"
-      ? "appointments"
-      : view === "documents"
-        ? "documents"
-        : null;
+    view && Object.hasOwn(destinations, view) ? destinations[view] : null;
   if (!supabaseConfig()) redirect("/login");
   const supabase = await createClient();
   const {
@@ -27,86 +77,171 @@ export default async function ParentWorkspace({
     error: authError,
   } = await supabase.auth.getUser();
   if (authError || !user || user.is_anonymous) redirect("/login");
-  const { data, error } = await supabase.rpc("parent_workspace");
+  const { data, error } = await supabase.rpc("parent_home_summary");
   if (error?.code === "42501") redirect("/login");
   if (error) throw new Error("Impossible de charger votre espace parent.");
-  const workspace = data as ParentWorkspaceData;
-  const { profile, children, claims } = workspace;
+  const {
+    profile,
+    children,
+    claims,
+    next_appointment: next,
+    unread_total: unread,
+  } = data as ParentWorkspaceData & {
+    next_appointment: AppointmentRow | null;
+    unread_total: number;
+  };
   return (
-    <main className="account-page wide">
-      <header className="workspace-nav">
-        <Brand />
-        <nav aria-label="Navigation parent">
-          <Link href="/parent">Espace parent</Link>
-          <Link href="/parent/notifications">Notifications</Link>
-          <Link href="/parent/requests">Mes demandes</Link>
-          <Link href="/parent/settings">Préférences</Link>
-          <Link href="/parent/account">Mon compte</Link>
-          <form action={signOut}>
-            <button className="text-link">Se déconnecter</button>
-          </form>
-        </nav>
-      </header>
-      <section className="page-heading">
+    <WorkspaceShell
+      area="parent"
+      active={focus ? view : "home"}
+      unread={unread}
+    >
+      <section className="workspace-heading">
         <span className="eyebrow">ESPACE PARENT</span>
         <h1 id="main-content" tabIndex={-1}>
-          {profile
-            ? `Bienvenue, ${profile.display_name}`
-            : "Bienvenue dans votre espace parent"}
+          {profile ? `Bonjour, ${profile.display_name}` : "Bonjour"}
         </h1>
-        <p className="muted">
-          Retrouvez le carnet de vos enfants après vérification de votre lien
-          avec eux.
-        </p>
+        <p className="muted">Retrouvez l’essentiel du suivi de vos enfants.</p>
       </section>
-      <section className="panel">
-        <h2>
-          {focus === "appointments"
-            ? "Les rendez-vous de mes enfants"
-            : focus === "documents"
-              ? "Les documents de mes enfants"
-              : "Les carnets de mes enfants"}
-        </h2>
+      <section className="workspace-section" id="children">
+        <div className="workspace-section-heading">
+          <h2>{focus?.label ?? "Mes enfants"}</h2>
+          <Link href="/parent?view=children">Gérer mes enfants →</Link>
+        </div>
         {focus && (
-          <p className="muted">
-            Choisissez un enfant dont le carnet vous est relié pour consulter{" "}
-            {focus === "appointments"
-              ? "ses rendez-vous."
-              : "son carnet et ses documents."}
+          <p className="muted workspace-selection-help">
+            Choisissez un enfant dont le carnet vous est relié.
           </p>
         )}
-        {children.length ? (
-          <div className="record-list">
-            {children.map((child) => (
-              <article key={child.id}>
+        <div className="workspace-child-grid">
+          {children.map((child) => (
+            <article className="workspace-child-card" key={child.id}>
+              <UsersRound
+                className="workspace-avatar"
+                size={54}
+                aria-hidden="true"
+              />
+              <div>
                 <h3>
                   <Link
-                    href={`/parent/children/${child.id}${focus === "appointments" ? "/appointments" : focus === "documents" ? "#documents" : ""}`}
+                    href={`/parent/children/${child.id}${focus?.suffix ?? ""}`}
                   >
                     {patientName(child)}
                   </Link>
                 </h3>
-                <p>
-                  {birthLabel(child)} · {child.universal_id}
-                </p>
-                <p className="fine">
-                  Accès vérifié jusqu’au{" "}
+                <p className="muted">{birthLabel(child)}</p>
+                <span className="workspace-chip">Accès vérifié</span>
+                <p className="sr-only">
+                  {child.universal_id} · Accès jusqu’au{" "}
                   {new Date(child.expires_at).toLocaleDateString("fr-MA", {
                     timeZone: "Africa/Casablanca",
                   })}
                 </p>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <p>
+              </div>
+              <ChevronRight size={17} aria-hidden="true" />
+            </article>
+          ))}
+          <article className="workspace-child-card workspace-add-child">
+            <div>
+              <Plus className="workspace-avatar" size={44} aria-hidden="true" />
+              <h3>
+                <Link href="/parent/invitation">Ajouter un enfant</Link>
+              </h3>
+              <p className="muted">À partir d’une invitation sécurisée.</p>
+            </div>
+          </article>
+        </div>
+        {!children.length && (
+          <p className="workspace-empty">
             Aucun carnet relié pour le moment. Une demande en attente ne donne
             pas encore accès aux informations de l’enfant.
           </p>
         )}
       </section>
+      {!focus && (
+        <>
+          <div className="workspace-overview-grid">
+            <section className="workspace-surface workspace-next-appointment">
+              <span className="eyebrow">PROCHAIN RENDEZ-VOUS</span>
+              {next ? (
+                <>
+                  <h3>{next.purpose_label}</h3>
+                  <p className="muted">
+                    {[next.child_given_name, next.child_family_name]
+                      .filter(Boolean)
+                      .join(" ") || "Enfant au nom inconnu"}{" "}
+                    · {appointmentTime(next.starts_at)}
+                  </p>
+                  <Link
+                    className="workspace-chip"
+                    href={`/parent/children/${next.child_id}/appointments`}
+                  >
+                    <CalendarDays size={14} aria-hidden="true" />
+                    Voir le détail →
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <h3>Aucun rendez-vous à venir enregistré</h3>
+                  <p className="muted">
+                    Consultez le carnet de l’enfant ou contactez son soignant
+                    pour confirmer le prochain suivi.
+                  </p>
+                </>
+              )}
+            </section>
+            <section
+              className={
+                unread
+                  ? "workspace-surface workspace-attention"
+                  : "workspace-surface"
+              }
+            >
+              <span className="eyebrow">
+                {unread ? "NOUVELLES DU CARNET" : "VOTRE SUIVI"}
+              </span>
+              <h3>
+                {unread
+                  ? `${unread} mise${unread > 1 ? "s" : ""} à jour non lue${unread > 1 ? "s" : ""}`
+                  : "Vos informations restent à jour dans le carnet"}
+              </h3>
+              <p className="muted">
+                Les notifications concernent les dossiers qui vous sont
+                autorisés. Aucune vaccination n’est déduite d’une information
+                absente.
+              </p>
+              <Link className="text-link" href="/parent/notifications">
+                <Bell size={15} aria-hidden="true" />
+                Consulter les notifications →
+              </Link>
+            </section>
+          </div>
+          <section className="workspace-section">
+            <div className="workspace-section-heading">
+              <h2>Accès rapide</h2>
+            </div>
+            <div className="workspace-quick-grid">
+              {quickLinks.map(({ view, title, description, Icon }) => (
+                <Link
+                  href={`/parent?view=${view}`}
+                  className="workspace-surface workspace-quick-card"
+                  key={view}
+                >
+                  <Icon
+                    className="workspace-avatar"
+                    size={44}
+                    aria-hidden="true"
+                  />
+                  <h3>{title}</h3>
+                  <p className="muted">{description}</p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        </>
+      )}
       {claims.length > 0 && (
-        <section className="panel">
+        <section className="workspace-surface workspace-secondary">
           <h2>Mes demandes d’accès</h2>
           <div className="record-list">
             {claims.map((claim) => (
@@ -133,33 +268,36 @@ export default async function ParentWorkspace({
           </div>
         </section>
       )}
-      <div className="two-columns">
-        <section className="panel">
-          <h2>Mon profil</h2>
-          <ParentProfileForm name={profile?.display_name} />
-          <p className="fine">
-            Renseigner votre nom n’accorde aucun accès à un dossier médical.
-          </p>
-        </section>
-        <section className="panel">
-          <h2>Relier le carnet d’un enfant</h2>
-          <p>
-            Le professionnel qui suit votre enfant vous remettra une invitation
-            personnelle. Votre identité et votre qualité de responsable devront
-            être vérifiées avant l’ouverture du carnet.
-          </p>
-          <Link className="button secondary" href="/parent/invitation">
-            Utiliser mon invitation
-          </Link>
-          <p className="notice">
-            Le numéro d’un carnet ou le nom d’un enfant ne suffit pas pour y
-            accéder.
-          </p>
-        </section>
-      </div>
-      <p className="fine">
-        Environnement de développement · Données fictives uniquement
-      </p>
-    </main>
+      <details
+        className="workspace-surface workspace-secondary"
+        open={!profile}
+      >
+        <summary>Mon profil et relier un carnet</summary>
+        <div className="two-columns">
+          <section>
+            <h2>Mon profil</h2>
+            <ParentProfileForm name={profile?.display_name} />
+            <p className="fine">
+              Renseigner votre nom n’accorde aucun accès à un dossier médical.
+            </p>
+          </section>
+          <section>
+            <h2>Relier le carnet d’un enfant</h2>
+            <p>
+              Le professionnel qui suit votre enfant vous remettra une
+              invitation personnelle. Votre identité et votre qualité de
+              responsable devront être vérifiées avant l’ouverture du carnet.
+            </p>
+            <Link className="button secondary" href="/parent/invitation">
+              Utiliser mon invitation
+            </Link>
+            <p className="fine">
+              Le numéro d’un carnet ou le nom d’un enfant ne suffit pas pour y
+              accéder.
+            </p>
+          </section>
+        </div>
+      </details>
+    </WorkspaceShell>
   );
 }

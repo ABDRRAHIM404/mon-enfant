@@ -1,8 +1,8 @@
 # Update 3 design comparison
 
-Final result: passed
+Final result: blocked
 
-Scope: public landing, parent login, clinician login and clinician signup. Protected dashboards, vaccinations and parent sharing QR remain separate open implementation items in UPDATE_3_IMPLEMENTATION.md.
+Current scope: protected parent overview, provisional clinician dashboard and selected-child vaccination screen. The earlier public landing/Auth/theme comparison below passed and remains historical evidence. Protected source is implemented, but rendered paired evidence is pending; the real sharing QR remains a separate open functional item in UPDATE_3_IMPLEMENTATION.md.
 
 Source visual truth: updates/Mon_Enfant_Design_Update_3_Fresh_Copy/mockups/{web,mobile}/{light,dark}/*.png.
 Implementation: GitHub cloud production runtime, final public source 48ba0de, Actions 43642889015. Final private captures: ~/.local/state/mon-enfant/design-qa/43642889015/synthetic-live-evidence-results/live/design-capture-configured--54a69--paired-selected-references-desktop/. Earlier iterations remain privately retained under run IDs 43639674164 / 43642141713. Classified proof: docs/design-qa/update3-public-proof.json.
@@ -43,3 +43,8 @@ Source 0286f7d passed all build/data checks and 28 browser tests in 43641612275;
 P3: minute icon/letter-weight/action offsets, final vector/adaptive icon master and tighter decorative crop alignment may be refined later. The supplied family illustration is byte-identical in public/brand/family.png and the original reference asset; real branding was not recreated with CSS/SVG. Empty login fields intentionally show the real password-length guidance instead of the mock's decorative masked placeholder. The app retains real email-confirmation copy, larger touch targets, additional utility navigation and a development/synthetic-data notice.
 
 The visual harness measures page errors, overflow and successful image decoding; it does not claim a comprehensive console/network diagnostic capture. Further minor diagnostics are deferred under the owner's build-first priority. Existing major Auth/data/integrity and accessibility checks passed. This result applies only to the four public routes and shared theme foundation; it does not accept protected dashboard/vaccination layouts, a new sharing authorization flow or Phase 8.
+
+
+## Protected iteration — current blocker
+
+Source truth: mockups/web/light/{parent,clinician,vaccination}.png and their mobile/dark counterparts. Opened and inspected the three desktop light targets before implementation. The new shell follows the 76px header, 235px sidebar, 34px/42px content padding, rounded real-data cards, coral attention and emerald actions. Original example counts, people and 73% vaccination coverage are not implementation data. Current rendered captures and paired comparison are pending cloud source/hosted schema verification. Do not claim protected visual acceptance from source or build status.

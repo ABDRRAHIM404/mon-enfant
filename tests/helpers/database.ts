@@ -203,3 +203,14 @@ export async function clinicianUpdatesDatabase() {
     await db.exec(readFileSync(`supabase/migrations/${file}`, "utf8"));
   return db;
 }
+
+export async function protectedDashboardDatabase() {
+  const db = await clinicianUpdatesDatabase();
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/20261114224234_protected_dashboard_projections.sql",
+      "utf8",
+    ),
+  );
+  return db;
+}

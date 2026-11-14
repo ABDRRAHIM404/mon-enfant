@@ -147,6 +147,9 @@ test("requested duplicate and provisional onboarding fixes preserve private boun
     await expect(page).toHaveURL(/\/provisional$/);
     await expect(page.getByText(/Compte : Non vérifié/)).toBeVisible();
     const family = `${process.env.MON_ENFANT_QA_RUN}-${info.project.name}`;
+    await page
+      .getByRole("link", { name: "Nouveau dossier", exact: true })
+      .click();
     await page.locator('[name="given_name"]').fill(family);
     await page.locator('[name="family_name"]').fill(family);
     await page.locator('[name="birth_date"]').fill("2025-01-01");

@@ -16,7 +16,7 @@ export default async function ProvisionalBooklet({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ page?: string; edit?: string }>;
+  searchParams: Promise<{ page?: string; edit?: string; kind?: string }>;
 }) {
   const { id } = await params;
   const q = await searchParams;
@@ -79,6 +79,11 @@ export default async function ProvisionalBooklet({
           childId={id}
           operationId={randomUUID()}
           entry={editing}
+          initialKind={
+            q.kind && Object.hasOwn(provisionalKinds, q.kind)
+              ? (q.kind as keyof typeof provisionalKinds)
+              : undefined
+          }
         />
       </section>
       <section className="panel">

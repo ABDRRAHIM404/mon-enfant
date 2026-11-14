@@ -15,12 +15,19 @@ export function ParentMobileNav() {
     return null;
   const view = params.get("view");
   const items = [
-    { href: "/", label: "Accueil", Icon: Home, active: pathname === "/" },
     {
-      href: "/parent",
+      href: pathname.startsWith("/parent") ? "/parent" : "/",
+      label: "Accueil",
+      Icon: Home,
+      active: pathname === "/" || (pathname === "/parent" && !view),
+    },
+    {
+      href: "/parent?view=children",
       label: "Enfants",
       Icon: Heart,
-      active: pathname.startsWith("/parent") && !view,
+      active:
+        pathname.startsWith("/parent") &&
+        (view === "children" || (pathname !== "/parent" && !view)),
     },
     {
       href: "/parent?view=appointments",

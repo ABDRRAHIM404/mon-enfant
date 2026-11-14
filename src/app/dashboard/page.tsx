@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { DoctorNav } from "@/components/registry/doctor-nav";
+import { WorkspaceShell } from "@/components/workspace-shell";
 import { AppointmentCard } from "@/components/appointments/card";
 import { LiveRefresh } from "@/components/appointments/live-refresh";
 import type { AppointmentPage } from "@/lib/appointments/types";
@@ -56,11 +56,12 @@ export default async function Dashboard() {
     ],
   ];
   return (
-    <main className="account-page wide">
-      <DoctorNav />
+    <WorkspaceShell area="clinician">
       <div className="page-heading">
-        <span className="eyebrow">ESPACE MÉDECIN</span>
-        <h1 id="main-content" tabIndex={-1}>Votre registre de soins.</h1>
+        <span className="eyebrow">ESPACE MÉDECIN / INFIRMIER(ÈRE)</span>
+        <h1 id="main-content" tabIndex={-1}>
+          Votre registre de soins.
+        </h1>
         <p className="muted">
           Vos dossiers autorisés, rendez-vous et suivis actualisés.
         </p>
@@ -108,6 +109,6 @@ export default async function Dashboard() {
           clinique.
         </p>
       </section>
-    </main>
+    </WorkspaceShell>
   );
 }
