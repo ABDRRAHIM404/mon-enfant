@@ -144,6 +144,7 @@ The complete goal remains active until the full required scope and its approval 
 ## Supplied Update 3 — design and preserved functionality
 
 - [x] Shared/public foundation implemented and visually accepted: full source CI 43642867793, configured sixteen-screen paired capture 43642889015 and direct review in design-qa.md; earlier three-device authenticated run 43639674164 passed both cookie-retention modes. Protected Update 3 screens remain open.
+- [x] Publish the public foundation on canonical Vercel (READY dpl_3U36g4ViF3NS4mhCtsEF7wuvmJBP, source 6b0e2a9); live health/page markers and anonymous export denial pass. Synchronize clean primary main with origin/main.
 - [x] Retire the four synthetic actors and nine temporary values after acceptance; 07e082b6e45f4e2b retirement verified. Layout-only iterations use public configuration without account provisioning.
 
 - [ ] Review the supplied mockups/current screens and implement the chosen shared brand, light/dark/system themes, persisted override, responsive public/parent/clinician screens and accessible contrast/keyboard/touch behavior.

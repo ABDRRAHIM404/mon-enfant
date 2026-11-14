@@ -16,3 +16,5 @@ The owner explicitly requested that the current account use a replacement URL an
 - The primary checkout has an ignored, owner-readable .vercel/project.json pointing to the new project/team. Source remains on main and must be synchronized after checkpoints.
 
 Both update requirement scopes have synthetic software acceptance. Every real credential/guardian/clinical/source/privacy/hosting approval and Phase 8 mobile remains open. See PROGRESS.md and PLAN_CHECKLIST.md.
+
+Update 3 public checkpoint: READY deployment dpl_3U36g4ViF3NS4mhCtsEF7wuvmJBP, exact main source 6b0e2a9d407344c88e01c1cec36dcd1aa8fc8949, canonical alias retained on bounga. Live public landing/signup markers, health and anonymous export denial passed at 22:40 UTC. Final source CI 43642867793 and configured cloud visual capture/review 43642889015 pass; this is public/theme acceptance only. Parent/clinician/vaccination protected design and purpose-bound sharing remain open. Later documentation-only commits have identical application code and may create another automatic production build.

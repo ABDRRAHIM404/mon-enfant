@@ -34,7 +34,7 @@ Source 0286f7d passed all build/data checks and 28 browser tests in 43641612275;
 
 - Completed revised public captures using credential-free design-cloud-accept in GitHub Actions; no local browser/build or repeated account provisioning.
 - Completed direct paired review and retained every iteration. No actionable public P0/P1/P2 differences remain.
-- Publish the verified public checkpoint and synchronize primary main.
+- Published the verified public checkpoint on canonical Vercel (READY dpl_3U36g4ViF3NS4mhCtsEF7wuvmJBP, main source 6b0e2a9); primary main synchronized. Live health/new public markers and anonymous export denial pass.
 - Complete protected screens and actual purpose-bound parent sharing before marking Update 3 complete.
 
 
