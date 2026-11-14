@@ -38,7 +38,7 @@ async function login(page: Page, role: string) {
   await expect(page).toHaveURL(/\/(account|dashboard|provisional)$/);
   await page.goto("/account");
   const activate = page.getByRole("button", {
-    name: "Activer mon espace professionnel",
+    name: "Activer mon espace soignant",
   });
   if (await activate.count()) {
     if (accessibility) {

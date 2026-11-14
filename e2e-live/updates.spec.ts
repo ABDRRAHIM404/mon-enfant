@@ -164,7 +164,7 @@ test("requested duplicate and provisional onboarding fixes preserve private boun
     for (const [kind, fields] of cases) {
       await page.locator('[name="kind"]').selectOption(kind);
       for (const [k, v] of Object.entries(fields))
-        await page.locator(`[name="${k}"]`).fill(v);
+        await page.locator(`input[name="${k}"]`).fill(v);
       await page.locator('[name="occurred_on"]').fill("2026-01-02");
       await page
         .getByRole("button", {
