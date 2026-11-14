@@ -41,7 +41,33 @@ test("approved workspace supports accessible pages and keyboard-only account and
     page,
     page.getByRole("button", { name: "Se connecter", exact: true }),
   );
-  await page.keyboard.press("Enter");
+  let releaseLogin = () => {};
+  let requestHeld = false;
+  const loginGate = new Promise<void>((resolve) => {
+    releaseLogin = resolve;
+  });
+  await page.route("**/login", async (route) => {
+    if (route.request().method() === "POST") {
+      requestHeld = true;
+      await loginGate;
+    }
+    await route.continue();
+  });
+  try {
+    await page.keyboard.press("Enter");
+    await expect.poll(() => requestHeld).toBe(true);
+    await expect(page.locator("form.auth-form")).toHaveAttribute(
+      "aria-busy",
+      "true",
+    );
+    await expect(page.locator('button[type="submit"]')).toHaveAccessibleName(
+      "Connexion en cours…",
+    );
+    proofs.push(await scanAccessibility(page, "login-pending", info));
+  } finally {
+    releaseLogin();
+    await page.unroute("**/login");
+  }
   await expect(page).toHaveURL(/\/account$/);
   proofs.push(await scanAccessibility(page, "account", info));
   await tabTo(
@@ -121,6 +147,7 @@ test("approved workspace supports accessible pages and keyboard-only account and
       viewport: info.project.name,
       screens: proofs.length,
       keyboard_login: true,
+      pending_login_named: true,
       keyboard_practice_creation: true,
       keyboard_logout: true,
       protected_navigation_denied: true,

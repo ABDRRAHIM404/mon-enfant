@@ -15,7 +15,7 @@ export function AuthForm({
     {},
   );
   return (
-    <form action={action} className="auth-form">
+    <form action={action} className="auth-form" aria-busy={pending}>
       <label htmlFor="email">Adresse e-mail professionnelle</label>
       <input
         id="email"
@@ -55,7 +55,10 @@ export function AuthForm({
         disabled={pending || !configured || !!state.message}
       >
         {pending ? (
-          <LoaderCircle className="spin" size={18} />
+          <>
+            <LoaderCircle className="spin" size={18} aria-hidden="true" />
+            {mode === "login" ? "Connexion en cours…" : "Création en cours…"}
+          </>
         ) : (
           <>
             {mode === "login" ? "Se connecter" : "Créer mon compte"}
@@ -63,7 +66,11 @@ export function AuthForm({
           </>
         )}
       </button>
-      {mode === "login" && <Link className="text-link" href="/forgot-password">Mot de passe oublié ?</Link>}
+      {mode === "login" && (
+        <Link className="text-link" href="/forgot-password">
+          Mot de passe oublié ?
+        </Link>
+      )}
       <p className="fine">
         {mode === "signup"
           ? "Votre compte sera non vérifié. L’accès clinique nécessite une validation professionnelle."
