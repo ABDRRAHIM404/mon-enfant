@@ -107,9 +107,10 @@ The user explicitly requested that minor checks/hardening wait until the app fea
 
 ## Phase 7 — parent web
 
-Verified feature checkpoint: parent profile plus guardian invitations, independent verification, child booklet/appointments/export and revocation passed cloud CI; both migrations are hosted. The remaining acceptance below includes live guardian/browser/HTTP-conflict proof and external verification sources. Invitation email/QR, correction requests, settings/access history and remaining phase requirements stay open.
+Verified feature checkpoint: parent profile plus guardian invitations, independent verification, child booklet/appointments/export and revocation passed cloud CI; both migrations are hosted. The remaining acceptance below includes live guardian/browser/HTTP-conflict proof and external verification sources. Correction requests, contact/preferences and scoped access history also have a cloud-verified technical checkpoint. Invitation email/QR, in-app notifications and remaining phase requirements stay open.
 
 - [x] Parent profile foundation: own confirmed/current account, independent from professional authority; cloud CI and hosted migration.
+- [x] Parent correction requests, doctor replies tied to real clinical amendments, private preferences and scoped access history; cloud security/data-integrity/build/browser CI and hosted migration.
 - [x] Guardian/booklet technical slice: hashed recipient-bound one-use invitations, independent child-manager approval, scoped multiple-guardian reads/export/revocation; cloud access/integrity/build/browser CI and hosted migration.
 
 - [ ] Parent account and recorded guardianship verification.
