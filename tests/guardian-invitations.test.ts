@@ -96,10 +96,10 @@ async function approve(
   guardianship = true,
 ) {
   const expiry = (
-    await db.query<{ day: string }>(
-      "select ((now() at time zone 'Africa/Casablanca')::date+30)::text day",
+    await db.query<{ expires_on: string }>(
+      "select ((now() at time zone 'Africa/Casablanca')::date+30)::text as expires_on",
     )
-  ).rows[0].day;
+  ).rows[0].expires_on;
   return rpc<string>(doctor, "review_guardian_claim", [
     randomUUID(),
     claimId,
