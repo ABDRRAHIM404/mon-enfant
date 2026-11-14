@@ -156,7 +156,8 @@ test("approved workspace supports accessible pages and keyboard-only account and
         (count, proof) => count + proof.violations.length,
         0,
       ),
-      manual_review_required: proofs.some(
+      manual_review_required: true,
+      incomplete_results_present: proofs.some(
         (proof) => proof.incomplete.length > 0,
       ),
     }),
