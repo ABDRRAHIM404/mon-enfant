@@ -107,6 +107,18 @@ export async function reviewGrowthContrast(
   expect(measured.every((sample) => sample.ratio >= 4.5)).toBe(true);
 
   const history = page.locator(".table-scroll a");
+  const before = await history.evaluate((element) => {
+    const scroller = element.closest(".table-scroll") as HTMLElement | null;
+    if (!scroller) return null;
+    const link = element.getBoundingClientRect(),
+      box = scroller.getBoundingClientRect();
+    return {
+      link_clipped: link.left < box.left - 1 || link.right > box.right + 1,
+      container_overflow: scroller.scrollWidth > scroller.clientWidth + 1,
+      scroll_left: scroller.scrollLeft,
+    };
+  });
+  expect(before !== null).toBe(true);
   await tabTo(page, history);
   await expect(history).toBeFocused();
   await expect(history).toBeInViewport({ ratio: 1 });
@@ -123,8 +135,7 @@ export async function reviewGrowthContrast(
       outline_rgb: outline
         ? [Number(outline[1]), Number(outline[2]), Number(outline[3])]
         : null,
-      horizontal_scroll_required:
-        scroller.scrollWidth > scroller.clientWidth + 1,
+      container_overflow: scroller.scrollWidth > scroller.clientWidth + 1,
       scroll_advanced: scroller.scrollLeft > 0,
       link_within_scroller:
         link.left >= box.left - 1 && link.right <= box.right + 1,
@@ -132,11 +143,21 @@ export async function reviewGrowthContrast(
         style.outlineStyle !== "none" && parseFloat(style.outlineWidth) >= 2,
     };
   });
+  console.log(
+    JSON.stringify({
+      event: "growth_keyboard_geometry",
+      viewport: info.project.name,
+      screen,
+      before,
+      after: keyboard,
+    }),
+  );
   expect(
-    keyboard !== null &&
+    before !== null &&
+      keyboard !== null &&
       keyboard.link_within_scroller &&
       keyboard.focus_visible &&
-      (!keyboard.horizontal_scroll_required || keyboard.scroll_advanced),
+      (!before.link_clipped || keyboard.scroll_advanced),
   ).toBe(true);
   if (!keyboard?.outline_rgb)
     throw new Error("The rendered keyboard focus color was not proven.");
@@ -161,6 +182,8 @@ export async function reviewGrowthContrast(
     ],
     focus_contrast_ratio: focusRatio,
     keyboard_history_visible: true,
+    horizontal_scroll_required: before?.link_clipped ?? null,
+    initial_geometry: before,
     ...keyboard,
     scope: "opaque-solid-srgb-growth-text-and-table-only",
     axe_incomplete_results_retained: true,
