@@ -56,7 +56,9 @@ export default async function Calendar({
     <main className="account-page wide">
       <DoctorNav />
       <div className="page-heading">
-        <h1 id="main-content" tabIndex={-1}>Mes rendez-vous</h1>
+        <h1 id="main-content" tabIndex={-1}>
+          Mes rendez-vous
+        </h1>
         <p className="muted">
           Heures locales Africa/Casablanca. Vue limitée aux dossiers encore
           autorisés.
@@ -103,6 +105,7 @@ export default async function Calendar({
         </nav>
         <div
           className={`appointment-calendar ${view}`}
+          role="group"
           aria-label="Jours et nombre de rendez-vous"
         >
           {view !== "day" &&
@@ -118,7 +121,7 @@ export default async function Calendar({
                   ? "muted"
                   : ""
               }
-              aria-label={`${day} : ${counts.get(day) || 0} rendez-vous`}
+              aria-label={`${day.slice(8)} ${counts.get(day) || 0} RDV — ${day}`}
             >
               <span>{day.slice(8)}</span>
               <small>{counts.get(day) || 0} RDV</small>
