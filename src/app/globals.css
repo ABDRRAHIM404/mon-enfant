@@ -2330,7 +2330,9 @@ th {
   .workspace-section-heading {
     flex-wrap: wrap;
   }
-  .workspace-overview-grid,
+  .workspace-overview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .workspace-vaccine-grid {
     grid-template-columns: 1fr;
   }
