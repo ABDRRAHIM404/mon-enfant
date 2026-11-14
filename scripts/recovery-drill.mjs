@@ -65,11 +65,26 @@ async function fingerprint(db) {
   return hashes;
 }
 async function security(db) {
-  return (
+  const row = (
     await db.query(
       await readFile("supabase/checks/security-baseline.sql", "utf8"),
     )
   ).rows[0];
+  const positive = {
+    public_table_count: 24,
+    anonymous_function_count: 1,
+    self_profile_id_insert: true,
+    storage_objects_rls: true,
+    evidence_bucket_count: 1,
+    evidence_bucket_contract: true,
+  };
+  assert.equal(Object.keys(row).length, 19);
+  for (const [key, value] of Object.entries(positive))
+    assert.equal(row[key], value);
+  for (const [key, value] of Object.entries(row))
+    if (!Object.hasOwn(positive, key))
+      assert.ok(value === 0 || value === false);
+  return row;
 }
 function verifyBytes(manifest, database, object) {
   assert.equal(digest(database), manifest.database_sha256);
