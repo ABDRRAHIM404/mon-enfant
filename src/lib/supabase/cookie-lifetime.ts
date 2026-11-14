@@ -16,7 +16,7 @@ export function authCookieLifetime<
   if (
     !/^sb-.+-auth-token(?:\.\d+)?$/.test(name) ||
     remembered === undefined ||
-    options.maxAge === 0 ||
+    (options.maxAge !== undefined && options.maxAge <= 0) ||
     (options.expires && options.expires.getTime() <= Date.now())
   )
     return options;
@@ -24,6 +24,12 @@ export function authCookieLifetime<
   if (remembered) {
     result.maxAge = Math.min(
       options.maxAge ?? rememberedSeconds,
+      options.expires
+        ? Math.max(
+            0,
+            Math.floor((options.expires.getTime() - Date.now()) / 1000),
+          )
+        : rememberedSeconds,
       rememberedSeconds,
     );
     delete result.expires;

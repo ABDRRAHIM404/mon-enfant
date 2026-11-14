@@ -47,11 +47,26 @@ it("PKCE verifiers, legacy preferences and expired/deletion cookies retain the p
   expect(authCookieLifetime("sb-project-auth-token", options, undefined)).toBe(
     options,
   );
-  for (const cookie of [{ maxAge: 0 }, { expires: new Date(0) }])
+  for (const cookie of [
+    { maxAge: 0 },
+    { maxAge: -1 },
+    { expires: new Date(0) },
+  ])
     expect(authCookieLifetime("sb-project-auth-token.1", cookie, false)).toBe(
       cookie,
     );
   expect(rememberedPreference("session")).toBe(false);
   expect(rememberedPreference("persistent")).toBe(true);
   expect(rememberedPreference("invalid")).toBeUndefined();
+});
+
+it("does not lengthen an explicit short expiration supplied without maxAge", () => {
+  const options: { expires: Date; httpOnly: boolean; maxAge?: number } = {
+    expires: new Date(Date.now() + 120_000),
+    httpOnly: true,
+  };
+  const result = authCookieLifetime("sb-project-auth-token", options, true);
+  expect(result.maxAge).toBeGreaterThan(0);
+  expect(result.maxAge).toBeLessThanOrEqual(120);
+  expect(result.httpOnly).toBe(true);
 });
