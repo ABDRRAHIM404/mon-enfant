@@ -181,3 +181,6 @@ Development performance targets and the strict credential-free downloaded-artifa
 
 
 The repeatable read-only schema/ACL/Storage configuration review is documented in [SECURITY_REVIEW.md](SECURITY_REVIEW.md). It inspects both column and table privileges, retains the explicit self-profile exception, reports drift without automatic repair and does not replace functional authorization or full security acceptance.
+
+
+[RECOVERY.md](RECOVERY.md) records the observed zero-backup inventory, separate database/object recovery requirements and the cloud-only isolated two-runner recovery mechanics. A PGlite drill archive is not a hosted Supabase restore image; full hosted recovery/incident/retention and approved operating targets remain open.

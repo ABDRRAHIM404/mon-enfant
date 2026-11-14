@@ -1,0 +1,50 @@
+name: Synthetic recovery mechanics
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: synthetic-recovery-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Snapshot only isolated fictional data and separate object bytes
+        run: node scripts/recovery-drill.mjs backup
+      - uses: actions/upload-artifact@v4
+        with:
+          name: isolated-synthetic-recovery-bundle
+          path: test-results/recovery/bundle/
+          retention-days: 1
+          if-no-files-found: error
+  restore:
+    needs: backup
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: isolated-synthetic-recovery-bundle
+          path: test-results/recovery/bundle/
+      - name: Restore in a fresh runner and verify containment and immutable records
+        run: node scripts/recovery-drill.mjs restore
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: isolated-synthetic-recovery-proof
+          path: test-results/recovery/proof.json
+          retention-days: 3
