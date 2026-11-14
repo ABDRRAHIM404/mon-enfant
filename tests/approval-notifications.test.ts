@@ -27,21 +27,21 @@ async function actor(
   const id = randomUUID(),
     session = randomUUID(),
     email = `notification-${id}@example.invalid`;
-  await db.query(
+  await db.query<Record<string, unknown>>(
     "insert into auth.users(id,email,email_confirmed_at) values($1,$2,$3)",
     [id, email, confirmed ? "2026-01-01T00:00:00Z" : null],
   );
-  await db.query("insert into auth.sessions(id,user_id) values($1,$2)", [
-    session,
-    id,
-  ]);
+  await db.query<Record<string, unknown>>(
+    "insert into auth.sessions(id,user_id) values($1,$2)",
+    [session, id],
+  );
   if (kind === "worker")
-    await db.query(
+    await db.query<Record<string, unknown>>(
       "insert into private.notification_workers(user_id,enabled) values($1,true)",
       [id],
     );
   else {
-    await db.query(
+    await db.query<Record<string, unknown>>(
       "insert into public.professional_profiles(user_id,role,verification_status,professional_id) values($1,$2,$3,$4)",
       [
         id,
@@ -51,7 +51,7 @@ async function actor(
       ],
     );
     if (kind === "reviewer")
-      await db.query(
+      await db.query<Record<string, unknown>>(
         "insert into private.staff_permissions(user_id,can_review_professionals) values($1,true)",
         [id],
       );
@@ -62,12 +62,12 @@ async function as<T>(a: Actor, sql: string, args: unknown[] = []): Promise<T> {
   // Savepoints keep expected Postgres errors from aborting the isolated test.
   await db.exec("savepoint notification_rpc");
   try {
-    await db.query(
+    await db.query<Record<string, unknown>>(
       "select set_config('request.jwt.claim.sub',$1,false),set_config('request.jwt.claim.session_id',$2,false)",
       [a.id, a.session],
     );
     await db.exec("set role authenticated");
-    const result = await db.query(sql, args);
+    const result = await db.query<Record<string, unknown>>(sql, args);
     await db.exec("reset role; release savepoint notification_rpc");
     return result.rows[0] as T;
   } catch (error) {
@@ -93,7 +93,7 @@ async function rpc<T>(
 async function request(doctor: Actor) {
   const id = randomUUID(),
     path = `${doctor.id}/${id}/evidence.pdf`;
-  await db.query(
+  await db.query<Record<string, unknown>>(
     "insert into storage.objects(bucket_id,name) values('professional-evidence',$1)",
     [path],
   );
@@ -163,7 +163,7 @@ describe("transactional approval notifications and isolated sender authority", (
       doctor = await actor("doctor");
     const id = await approve(reviewer, doctor);
     const row = (
-      await db.query(
+      await db.query<Record<string, unknown>>(
         "select id,state,recipient_id,attempts from private.approval_notifications where request_id=$1",
         [id],
       )
@@ -184,7 +184,7 @@ describe("transactional approval notifications and isolated sender authority", (
     ).rejects.toThrow(/no longer pending/);
     expect(
       (
-        await db.query(
+        await db.query<Record<string, unknown>>(
           "select count(*)::integer n from private.approval_notifications",
         )
       ).rows[0].n,
@@ -200,7 +200,7 @@ describe("transactional approval notifications and isolated sender authority", (
     ]);
     expect(
       (
-        await db.query(
+        await db.query<Record<string, unknown>>(
           "select count(*)::integer n from private.approval_notifications",
         )
       ).rows[0].n,
@@ -223,14 +223,14 @@ describe("transactional approval notifications and isolated sender authority", (
     );
     expect(
       (
-        await db.query(
+        await db.query<Record<string, unknown>>(
           "select count(*)::integer n from private.approval_notifications",
         )
       ).rows[0].n,
     ).toBe(0);
     expect(
       (
-        await db.query(
+        await db.query<Record<string, unknown>>(
           "select verification_status from public.professional_profiles where user_id=$1",
           [doctor.id],
         )
@@ -256,7 +256,7 @@ describe("transactional approval notifications and isolated sender authority", (
       "approval_notification_status",
       [
         (
-          await db.query(
+          await db.query<Record<string, unknown>>(
             "select request_id from private.approval_notifications",
           )
         ).rows[0].request_id,
@@ -294,7 +294,7 @@ describe("transactional approval notifications and isolated sender authority", (
       id = await approve(reviewer, doctor);
     const [first] = await claim(worker, id);
     expect(await claim(worker, id)).toEqual([]);
-    await db.query(
+    await db.query<Record<string, unknown>>(
       "update private.approval_notifications set lease_until=now()-interval '1 second' where id=$1",
       [first.id],
     );
@@ -317,7 +317,7 @@ describe("transactional approval notifications and isolated sender authority", (
     expect(await claim(worker, id)).toEqual([]);
     expect(
       (
-        await db.query(
+        await db.query<Record<string, unknown>>(
           "select attempts,state from private.approval_notifications where id=$1",
           [first.id],
         )
@@ -333,21 +333,21 @@ describe("transactional approval notifications and isolated sender authority", (
     await finish(worker, job, "retry", null);
     expect(
       (
-        await db.query(
+        await db.query<Record<string, unknown>>(
           "select verification_status from public.professional_profiles where user_id=$1",
           [doctor.id],
         )
       ).rows[0].verification_status,
     ).toBe("approved");
     expect(await claim(worker, id)).toEqual([]);
-    await db.query(
+    await db.query<Record<string, unknown>>(
       "update private.approval_notifications set first_attempt_at=now()-interval '21 hours',next_attempt_at=now()-interval '1 minute' where id=$1",
       [job.id],
     );
     expect(await claim(worker, id)).toEqual([]);
     expect(
       (
-        await db.query(
+        await db.query<Record<string, unknown>>(
           "select state from private.approval_notifications where id=$1",
           [job.id],
         )
@@ -361,18 +361,18 @@ describe("transactional approval notifications and isolated sender authority", (
       id = await approve(reviewer, doctor);
     const [job] = await claim(worker, id);
     await finish(worker, job, "retry", null);
-    await db.query(
+    await db.query<Record<string, unknown>>(
       "update private.approval_notifications set next_attempt_at=now()-interval '1 minute' where id=$1",
       [job.id],
     );
-    await db.query(
+    await db.query<Record<string, unknown>>(
       "update auth.users set email='changed@example.invalid' where id=$1",
       [doctor.id],
     );
     expect(await claim(worker, id)).toEqual([]);
     expect(
       (
-        await db.query(
+        await db.query<Record<string, unknown>>(
           "select state from private.approval_notifications where id=$1",
           [job.id],
         )
@@ -386,7 +386,7 @@ describe("transactional approval notifications and isolated sender authority", (
       "Suspension entièrement fictive documentée.",
     ]);
     expect(await claim(worker, otherId)).toEqual([]);
-    await db.query(
+    await db.query<Record<string, unknown>>(
       "update private.notification_workers set enabled=false where user_id=$1",
       [worker.id],
     );
@@ -402,15 +402,19 @@ describe("transactional approval notifications and isolated sender authority", (
         [admin.id],
       ),
     ).rejects.toThrow(/permission denied/);
-    await db.query(
+    await db.query<Record<string, unknown>>(
       "update auth.users set banned_until=now()+interval '1 hour' where id=$1",
       [worker.id],
     );
     await expect(claim(worker)).rejects.toMatchObject({ code: "42501" });
-    await db.query("update auth.users set banned_until=null where id=$1", [
-      worker.id,
-    ]);
-    await db.query("delete from auth.sessions where id=$1", [worker.session]);
+    await db.query<Record<string, unknown>>(
+      "update auth.users set banned_until=null where id=$1",
+      [worker.id],
+    );
+    await db.query<Record<string, unknown>>(
+      "delete from auth.sessions where id=$1",
+      [worker.session],
+    );
     await expect(claim(worker)).rejects.toMatchObject({ code: "42501" });
   });
   it("caps claims at ten per hour without granting a wider batch", async () => {
@@ -429,7 +433,9 @@ describe("transactional approval notifications and isolated sender authority", (
       doctor = await actor("doctor");
     await approve(reviewer, doctor);
     await expect(
-      db.query("delete from private.notification_events"),
+      db.query<Record<string, unknown>>(
+        "delete from private.notification_events",
+      ),
     ).rejects.toThrow(/Append-only/);
   });
 });
