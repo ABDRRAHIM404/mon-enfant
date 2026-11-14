@@ -84,6 +84,7 @@ This checklist preserves PROJECT_PLAN.md's complete Phase 0–8 scope. It is not
 - [x] Vaccination/catalog and appointment-continuity browser story on desktop/tablet/phone: QA review/source preservation, HB1 rejection, uncertain transcription, duplicate review, amendments/withdrawal, second-doctor resolution/reopening, preserved unrelated appointments, export and denial; independent database proof in PROGRESS.md.
 - [x] Public-page automated accessibility and keyboard baseline on desktop/mobile: fourteen scans, zero violations/incomplete results and native bypass/auth-navigation checks; see PROGRESS.md.
 - [x] General workspace automated accessibility and keyboard baseline on desktop/tablet/phone: fifty-four scans, zero violations/incomplete results, named pending login, bypass, practice creation, logout/denial and independent zero-clinical-scope proof; see PROGRESS.md.
+- [ ] Detailed clinical automated accessibility and targeted keyboard acceptance: initial 114 scans completed functional/persistence checks but found skipped headings; corrections and growth contrast review under verification.
 - [ ] Full keyboard/accessibility/performance acceptance.
 - [x] Workspace refresh-cookie regression: actual provider refresh-token rotation, persisted secure cookies, public-health isolation and logout denial for vaccine/appointment/follow-up routes on desktop/tablet/phone; see PROGRESS.md.
 - [ ] Account/session, QR, export, RLS/Storage, secret and rate-limit review.
