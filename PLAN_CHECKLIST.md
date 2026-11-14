@@ -97,9 +97,20 @@ This checklist preserves PROJECT_PLAN.md's complete Phase 0–8 scope. It is not
 - [ ] Complete account/session, QR, export, RLS/Storage policy, secret and rate-limit review.
 - [x] Credential-free development readiness monitor, verified scheduled execution and live healthy/failure/recovery reporting drill; owner reports GitHub notifications arriving. See PROGRESS.md.
 - [x] Isolated recovery implementation in cloud: real migrated PostgreSQL model snapshot/restore, full row/ACL hashes, restored-session containment, ledger/denial/immutability/source checks and separate fictional object bytes; see RECOVERY.md.
-- [ ] Distinct-runner synthetic artifact-transfer/recovery drill.
+- [x] Distinct-runner synthetic artifact-transfer/recovery drill: verified private transfer, complete row/ACL integrity, restored-session containment, immutable history and separate object bytes; run 43594753650.
 - [ ] Hosted backup/recovery and incident/retention drills; pilot monitoring ownership, response targets and scheduled alert-delivery acceptance.
 - [ ] Formal clinical, legal/privacy and regulated hosting approvals before any identifiable-data pilot.
+
+### Phase 6 closeout work
+
+Reuse the accepted evidence above. Additional checks must address a remaining plan requirement, a changed behavior or a reproduced failure; repeated passing benchmarks and new certification targets are not prerequisites for parent development.
+
+1. Complete the scoped account/session, export, RLS/Storage, secret and rate-limit review; fix concrete gaps found. Verify future QR/invitation permissions when those Phase 7 features are implemented.
+2. Finish the required development backup/recovery, incident and retention work, recording the specific hosted/configuration prerequisites and unresolved operating approvals. The embedded drill does not close hosted recovery.
+3. Implement the earlier outstanding transactional doctor-approval notification workflow with retry/duplicate controls. Keep recipient/domain restrictions and actual broader delivery acceptance explicit.
+4. Reconcile doctor/admin accessibility, keyboard, responsive/form/error acceptance against existing evidence and resolve uncovered failures, then publish/sync the technical checkpoint before Phase 7.
+
+Qualified clinical/source, legal/privacy, hosting and operating approvals remain open before any real-data pilot. No technical checkpoint silently grants those approvals. The full Phase 7/8 scope below remains required.
 
 ## Phase 7 — parent web
 
