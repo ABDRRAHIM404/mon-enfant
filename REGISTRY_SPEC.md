@@ -1,3 +1,5 @@
+> Update 1 supersedes the previous authorized-only duplicate warning: a rate-limited, registration-bound private check may return a generic possible-match warning for trusted records, never a global search result or an access grant. Update 2 will add isolated author-only provisional records, excluded from cross-clinician probes and sharing. No automatic promotion on account approval. See `UPDATE_WORK_PLAN.md` and the original supplied requirements in `updates/`.
+
 # Phase 3 implementation contract
 
 This is the implemented registry contract. It implements the registry scope in PROJECT_PLAN.md; it does not close the clinical/legal/hosting gates or add a catch-up protocol. See USER_STORIES.md D03–D05 and CLINICAL_MODEL.md.

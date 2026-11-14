@@ -130,3 +130,12 @@ Synthetic web technical acceptance is verified: full hosted desktop/tablet/phone
 - [ ] Cloud compilation/tests and feasible Android/iOS runtime verification without burdening the owner's PC.
 
 The complete goal remains active until the full required scope and its approval gates have authoritative evidence. Implemented milestones do not close the complete goal.
+
+
+## Requested updates before mobile
+
+- [ ] Update 1: registration-bound private duplicate checks, secondary identity fields, controlled review, no disclosure/merge/access, rate/audit, race protection and nonunique SMI; verify cloud/source and hosted HTTP behavior.
+- [ ] Update 2: parent-first entry/routing and separate clinician enrollment without visual redesign; verified doctor/nurse feature parity with meaningful role/audit attribution.
+- [ ] Update 2: actual persistent author-only provisional child/care/vaccination/appointment workflows for unverified clinicians; API/QR/export/existence isolation and immutable revisions.
+- [ ] Account approval leaves prior provisional records untrusted and unshareable until an explicit later validation/promotion policy is decided; real-data and credential-checking approvals remain open.
+- [ ] Update cloud acceptance and synchronize the primary main checkout before resuming the full Phase 8 mobile scope.

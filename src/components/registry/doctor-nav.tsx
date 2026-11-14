@@ -11,6 +11,7 @@ export function DoctorNav() {
         <Link href="/appointments">Calendrier</Link>
         <Link href="/follow-up">Suivis</Link>
         <Link href="/access-requests">Demandes d’accès</Link>
+        <Link href="/registration-reviews">Revues d’inscription</Link>
         <Link href="/parent-requests">Demandes des parents</Link>
         <Link href="/practices">Lieux d’exercice</Link>
         <Link href="/account">Mon compte</Link>

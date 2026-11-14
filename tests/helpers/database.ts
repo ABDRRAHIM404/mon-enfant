@@ -182,3 +182,14 @@ export async function parentViewsDatabase() {
   );
   return db;
 }
+
+export async function registrationUpdatesDatabase() {
+  const db = await parentViewsDatabase();
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/20261114190451_registration_duplicate_workflow.sql",
+      "utf8",
+    ),
+  );
+  return db;
+}

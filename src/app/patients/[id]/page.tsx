@@ -139,6 +139,9 @@ export default async function PatientProfile({
             <p key={i}>
               <strong>{r.number}</strong> · {r.year} / {r.book} ·{" "}
               {r.facility_name}
+              {r.smi_reference && (
+                <span> · Référence SMI locale : {r.smi_reference}</span>
+              )}
             </p>
           ))}
           <dl className="details">

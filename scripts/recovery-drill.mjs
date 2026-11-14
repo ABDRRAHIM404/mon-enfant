@@ -7,7 +7,7 @@ import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import assert from "node:assert/strict";
 import {
-  parentViewsDatabase,
+  registrationUpdatesDatabase,
   sessionActing,
 } from "../tests/helpers/database.ts";
 
@@ -19,6 +19,10 @@ const knownBusinessErrors = new Set();
 const digest = (bytes) => createHash("sha256").update(bytes).digest("hex");
 async function rpc(db, actor, name, args = []) {
   assert.match(name, /^[a-z_]+$/);
+  if (name === "register_child") {
+    const prepared = await rpc(db, actor, "prepare_child_registration", args);
+    assert.equal(prepared.state, "ready");
+  }
   stage = `${mode}-rpc-${name}`;
   const result = await sessionActing(
     db,
@@ -108,7 +112,7 @@ function verifyBytes(manifest, database, object) {
 
 async function backup() {
   stage = "backup-schema";
-  const db = await parentViewsDatabase();
+  const db = await registrationUpdatesDatabase();
   try {
     stage = "backup-fixture";
     const doctor = await actor(db, "DOCTOR"),

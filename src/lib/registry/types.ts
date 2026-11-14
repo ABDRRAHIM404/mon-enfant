@@ -5,6 +5,7 @@ export type Register = {
   year: number;
   book: string;
   number: string;
+  smi_reference?: string | null;
 };
 export type Patient = {
   id: string;
