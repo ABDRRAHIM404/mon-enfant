@@ -83,33 +83,45 @@ test("authentication keyboard focus contrasts with light and dark panels", async
       throw new Error("The targeted opaque sRGB focus colors were not proven.");
     return [Number(match[1]), Number(match[2]), Number(match[3])];
   };
-  for (const path of ["/login", "/signup"]) {
-    await page.goto(path);
-    const brand = page.locator(".auth-story .brand");
-    const targets = [page.locator(".auth-main .back-link")];
-    if (await brand.isVisible()) targets.unshift(brand);
-    for (const target of targets) {
-      await tabTo(page, target);
-      await expect(target).toBeFocused();
-      await expect(target).toBeInViewport();
-      const colors = await target.evaluate((element) => {
-        const surface = element.closest(".auth-story") ?? document.body;
-        const focus = getComputedStyle(element),
-          background = getComputedStyle(surface);
-        return {
-          outline: focus.outlineColor,
-          background: background.backgroundColor,
-          solid:
-            focus.outlineStyle === "solid" &&
-            parseFloat(focus.outlineWidth) >= 2 &&
-            background.backgroundImage === "none" &&
-            Number(background.opacity) === 1,
-        };
-      });
-      expect(colors.solid).toBe(true);
-      expect(
-        contrastRatio(rgb(colors.outline), rgb(colors.background)),
-      ).toBeGreaterThanOrEqual(3);
+  await page.goto("/login");
+  for (const theme of ["light", "dark"]) {
+    await page.evaluate(
+      (value) => localStorage.setItem("mon-enfant-theme", value),
+      theme,
+    );
+    for (const path of ["/login", "/signup"]) {
+      await page.goto(path);
+      await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+      const targets = [
+        page.locator(".public-header .brand"),
+        page.locator(".auth-main .auth-switch a").first(),
+      ];
+      for (const target of targets) {
+        await tabTo(page, target);
+        await expect(target).toBeFocused();
+        await expect(target).toBeInViewport();
+        const colors = await target.evaluate((element) => {
+          const surface =
+            element.closest(".public-header") ??
+            element.closest(".auth-layout") ??
+            document.body;
+          const focus = getComputedStyle(element),
+            background = getComputedStyle(surface);
+          return {
+            outline: focus.outlineColor,
+            background: background.backgroundColor,
+            solid:
+              focus.outlineStyle === "solid" &&
+              parseFloat(focus.outlineWidth) >= 2 &&
+              background.backgroundImage === "none" &&
+              Number(background.opacity) === 1,
+          };
+        });
+        expect(colors.solid).toBe(true);
+        expect(
+          contrastRatio(rgb(colors.outline), rgb(colors.background)),
+        ).toBeGreaterThanOrEqual(3);
+      }
     }
   }
 });
