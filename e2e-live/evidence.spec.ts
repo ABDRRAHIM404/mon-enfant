@@ -314,9 +314,9 @@ test("private evidence browser-to-storage boundary and review", async ({
       }),
     );
     await page.keyboard.press("Enter");
-    await expect(page.getByRole("alert")).toContainText(
-      "Le contenu du fichier",
-    );
+    await expect(
+      page.locator("form.auth-form").getByRole("alert"),
+    ).toContainText("Le contenu du fichier");
     await inspect(page, "evidence-server-type-error");
   }
   const bytes = pdfOfSize(4 * MIB);
