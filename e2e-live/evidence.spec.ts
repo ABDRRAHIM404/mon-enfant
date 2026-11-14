@@ -356,7 +356,15 @@ test("private evidence browser-to-storage boundary and review", async ({
       await expect(
         page.getByRole("button", { name: "Envoi en cours…", exact: true }),
       ).toBeDisabled();
-      await expect(page.locator("fieldset")).toBeDisabled();
+      await expect(page.locator("fieldset")).toHaveAttribute("disabled", "");
+      for (const name of [
+        "displayName",
+        "registration",
+        "facility",
+        "evidence",
+        "syntheticOnly",
+      ])
+        await expect(page.locator(`input[name="${name}"]`)).toBeDisabled();
       await inspect(page, "evidence-upload-pending");
     } finally {
       release();
