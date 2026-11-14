@@ -44,6 +44,11 @@ exit 1 means a target was missed; exit 2 means artifacts were invalid or incompl
 All reports explicitly retain `performance_acceptance_claimed=false` and
 `field_compliance_claimed=false`.
 
+The manual `clinical-performance` workflow runs this comparison after successful
+browser measurement and retains `performance-targets.json` with the classified
+artifact. A missed target fails that distinct workflow step; invalid or incomplete
+measurements also fail. Browser measurement success alone cannot make this gate green.
+
 Repeated representative measurements, response to any misses, interaction/load
 coverage and agreed pilot operating targets remain required before broader
 performance/readiness acceptance. The independent clinical-ledger readback and

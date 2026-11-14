@@ -121,11 +121,15 @@ jobs:
       - run: npx playwright install --with-deps chromium --only-shell
       - name: Verify the selected deployed workflow in cloud browsers
         run: npx playwright test --config=playwright.live.config.ts
+      - name: Check defined clinical performance targets
+        if: success() && inputs.live_probe == 'clinical-performance'
+        run: python3 scripts/analyze-performance.py --input-dir test-results/live | tee test-results/performance-targets.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: ${{ inputs.live_probe == 'accessibility-accept' && 'synthetic-live-accessibility-results' || (inputs.live_probe == 'vaccination-accept' || inputs.live_probe == 'vaccine-accessibility') && 'synthetic-live-vaccination-results' || startsWith(inputs.live_probe, 'session-') && 'synthetic-live-session-results' || (inputs.live_probe == 'clinical-accept' || inputs.live_probe == 'clinical-accessibility' || inputs.live_probe == 'clinical-performance') && 'synthetic-live-clinical-results' || 'synthetic-live-evidence-results' }}
           path: |
+            test-results/performance-targets.json
             test-results/live/**/verification-form.png
             test-results/live/**/verification-history.png
             test-results/live/**/verification-review.png
