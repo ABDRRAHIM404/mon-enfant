@@ -79,11 +79,17 @@ def login(remember):
     find('Mes enfants')
 
 emulator = None
+emulator_log = Path(os.environ['RUNNER_TEMP'])/'mon-enfant-emulator-startup.log'
 try:
-    emulator = subprocess.Popen([str(sdk/'emulator/emulator'), '-avd', 'mon-enfant-qa', '-no-window', '-no-audio', '-no-boot-anim', '-no-snapshot', '-gpu', 'swiftshader_indirect', '-memory', '3072', '-cores', '2'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    command([adb, 'wait-for-device'], timeout=180)
-    until = time.monotonic() + 180
-    while shell('getprop', 'sys.boot_completed').strip() != '1':
+    emulator = subprocess.Popen([str(sdk/'emulator/emulator'), '-avd', 'mon-enfant-qa', '-no-window', '-no-audio', '-no-boot-anim', '-no-snapshot', '-gpu', 'swiftshader_indirect', '-memory', '3072', '-cores', '2'], stdout=emulator_log.open('wb'), stderr=subprocess.STDOUT)
+    command([adb, 'start-server'])
+    until = time.monotonic() + 240
+    while True:
+        if emulator.poll() is not None: raise RuntimeError('Emulator exited before boot')
+        try:
+            if shell('getprop', 'sys.boot_completed').strip() == '1': break
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+            pass
         if time.monotonic() > until: raise RuntimeError('Emulator boot timed out')
         time.sleep(2)
     shell('settings', 'put', 'global', 'window_animation_scale', '0')
@@ -142,8 +148,11 @@ try:
     result = {'fixture_run': run, 'runtime_commit': os.environ['GITHUB_SHA'], 'binary_commit': proof['commit'], 'apk_sha256': proof['sha256'], 'platform': 'Android API 34 emulator', 'checks': checks, 'passed': True, 'store_distribution': False, 'synthetic_only': True, 'fixture_retirement_required': True}
     (output/'runtime-proof.json').write_text(json.dumps(result, indent=2)+'\n')
     print(json.dumps(result))
-except Exception:
-    print(json.dumps({'passed': False, 'failed_stage': stage, 'checks_completed': checks, 'details_withheld': True, 'fixture_retirement_required': True}))
+except Exception as error:
+    if stage == 'emulator-start' and emulator_log.exists():
+        # Emulator startup happens before installing/logging into the app. No Auth/UI data.
+        print(emulator_log.read_text(errors='replace')[-8000:])
+    print(json.dumps({'error_type': type(error).__name__, 'passed': False, 'failed_stage': stage, 'checks_completed': checks, 'details_withheld': True, 'fixture_retirement_required': True}))
     raise SystemExit(1) from None
 finally:
     if emulator is not None:
