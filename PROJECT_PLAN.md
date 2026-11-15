@@ -1,6 +1,6 @@
 # Mon Enfant — Development Plan
 
-**Status:** Implementation in progress — foundation/verification/registry workflows verified; Phase 5 appointment/continuity technical acceptance complete, Phase 7 synthetic parent web technical walkthrough verified, Updates 1–2 canonically verified; Update 3 public/protected read UI published; purpose-bound parent sharing canonically published and software-accepted; Phase 8 mobile is next; actual application mail and remaining Phase 6/external readiness stay open; see [PROGRESS.md](PROGRESS.md) and [PLAN_CHECKLIST.md](PLAN_CHECKLIST.md)
+**Status:** Implementation in progress — foundation/verification/registry workflows verified; Phase 5 appointment/continuity technical acceptance complete, Phase 7 synthetic parent web technical walkthrough verified, Updates 1–2 canonically verified; Update 3 public/protected read UI published; purpose-bound parent sharing canonically published and software-accepted; Phase 8 mobile source and first Android/iOS compilation implemented, runtime acceptance in progress; actual application mail and remaining Phase 6/external readiness stay open; see [PROGRESS.md](PROGRESS.md) and [PLAN_CHECKLIST.md](PLAN_CHECKLIST.md)
 **Working name:** Mon Enfant (temporary)
 **Primary objective:** Launch a secure, responsive doctor/admin web application, then introduce the parent experience.
 **Last updated:** 15 November 2026
@@ -27,22 +27,23 @@ The user prioritized completing the remaining application features, including pa
 
 ## 2. Scope by release
 
-| Stage | Deliverable | Required functionality |
-|---|---|---|
-| 0 — Discovery & validation | Reviewed requirements and real vaccine source dataset | Confirm workflow assumptions and critical safety/legal constraints |
-| 1 — Foundation | Next.js project + Supabase schema + authorization | Accounts, database relationships, role model, audit infrastructure |
-| 2 — Admin & professional onboarding | Usable admin dashboard | Professional applications, document review, approve/reject/suspend |
-| 3 — Doctor patient registry | Usable doctor dashboard | Register new/import old children, search, doctor-specific register linkage |
-| 4 — Medical records & vaccinations | Clinical record workflow | Visits, measurements, vaccine entries, author attribution, schedule rules |
-| 5 — Appointments & cross-doctor tracking | Doctor V1 MVP | Due dates, follow-ups, missed alerts, vaccination recorded at another provider |
-| 6 — Hardening & pilot readiness | Tested doctor/admin web app | Access control tests, backups, audit review, performance, legal/security gating |
-| 7 — Parent portal | Parent web experience | Guardian verification, linking existing child, health view, notifications |
-| 8 — Mobile app | Android/iOS app | Parent-focused mobile interface on the same backend |
-| Later enhancements | Deferred items | Offline sync, paper scanning/AI extraction, SMS/WhatsApp and integrations |
+| Stage                                    | Deliverable                                           | Required functionality                                                          |
+| ---------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------- |
+| 0 — Discovery & validation               | Reviewed requirements and real vaccine source dataset | Confirm workflow assumptions and critical safety/legal constraints              |
+| 1 — Foundation                           | Next.js project + Supabase schema + authorization     | Accounts, database relationships, role model, audit infrastructure              |
+| 2 — Admin & professional onboarding      | Usable admin dashboard                                | Professional applications, document review, approve/reject/suspend              |
+| 3 — Doctor patient registry              | Usable doctor dashboard                               | Register new/import old children, search, doctor-specific register linkage      |
+| 4 — Medical records & vaccinations       | Clinical record workflow                              | Visits, measurements, vaccine entries, author attribution, schedule rules       |
+| 5 — Appointments & cross-doctor tracking | Doctor V1 MVP                                         | Due dates, follow-ups, missed alerts, vaccination recorded at another provider  |
+| 6 — Hardening & pilot readiness          | Tested doctor/admin web app                           | Access control tests, backups, audit review, performance, legal/security gating |
+| 7 — Parent portal                        | Parent web experience                                 | Guardian verification, linking existing child, health view, notifications       |
+| 8 — Mobile app                           | Android/iOS app                                       | Parent-focused mobile interface on the same backend                             |
+| Later enhancements                       | Deferred items                                        | Offline sync, paper scanning/AI extraction, SMS/WhatsApp and integrations       |
 
 ## 3. Phase 0 — Requirements and source validation
 
 **Tasks**
+
 1. Translate product decisions into user stories, screens, roles and clinical edge cases.
 2. Use the hospital-provided `PNI cours.pptx` (2025 schedule on slide 67) and the extracted `MON_ENFANT_PNI_DATA.json` / `MON_ENFANT_PNI_SCHEDULE.csv`; retain original source ages, corrections and decision provenance.
 3. Confirm routine schedule calculations and unresolved edge cases with a qualified clinician. VPO0 wording and PCV labels have been resolved; rotavirus uses calendar months; HPV is girls-only. Hepatitis B special-case logic is deferred. **Catch-up is not automated in V1.**
@@ -57,6 +58,7 @@ The user prioritized completing the remaining application features, including pa
 ## 4. Phase 1 — Technical foundation
 
 **Tasks**
+
 - Initialize Next.js with TypeScript, Tailwind CSS, linting, type checking and testing framework.
 - Set up development and staging configuration with synthetic data only.
 - Design normalized PostgreSQL tables and migrations.
@@ -73,6 +75,7 @@ The user prioritized completing the remaining application features, including pa
 ## 5. Phase 2 — Admin dashboard and doctor verification
 
 **Screens**
+
 - Doctor sign-up/status page.
 - Matricule and identity evidence submission page.
 - Admin review queue and application detail.
@@ -80,6 +83,7 @@ The user prioritized completing the remaining application features, including pa
 - Account and role management.
 
 **Tasks**
+
 - Limit evidence access to approved verification administrators.
 - Record submission metadata and review decisions in audit log.
 - Add duplicate professional-account checks and suspension controls.
@@ -91,6 +95,7 @@ The user prioritized completing the remaining application features, including pa
 ## 6. Phase 3 — Doctor dashboard and patient registry
 
 **Screens**
+
 - Doctor home: patients, today, upcoming, overdue, recent updates.
 - Patient list: filters, search, local register number and last/next visit.
 - New child registration form.
@@ -99,6 +104,7 @@ The user prioritized completing the remaining application features, including pa
 - Child profile overview.
 
 **Tasks**
+
 - Generate permanent universal child ID on record creation.
 - Add doctor-register relationship without changing universal child ID.
 - Search by proper authorization, not global unrestricted patient lookup.
@@ -111,6 +117,7 @@ The user prioritized completing the remaining application features, including pa
 ## 7. Phase 4 — Clinical records and vaccine tracking
 
 **Screens**
+
 - Child overview and medical timeline.
 - Vaccination history and `Record vaccine` form.
 - Consultation entry and history.
@@ -119,6 +126,7 @@ The user prioritized completing the remaining application features, including pa
 - Admin vaccine catalog and schedule version editor.
 
 **Tasks**
+
 - Import the 2025 PNI vaccine catalog and dose entries, keeping original source age alongside the configured scheduling age.
 - Apply confirmed corrections: PCV1–PCV4 labels; rotavirus 2/3/4 calendar months; HPV at 11 years for girls; VPO0 timing wording accepted as compatible.
 - Leave hepatitis B birth-dose exception automation disabled pending a later database update. **The separate HBn birth-dose row is not yet in the 25-dose dataset; HB1 is conditional reference-only and must not auto-schedule.**
@@ -134,12 +142,14 @@ The user prioritized completing the remaining application features, including pa
 ## 8. Phase 5 — Appointments, reminders and cross-doctor update logic
 
 **Screens**
+
 - Doctor calendar (day/week/month).
 - Follow-up worklist: due soon, today, missed and overdue, including a dedicated **Missed Vaccinations** view with an easy `Reschedule` action.
 - Appointment creation/reschedule form.
 - Child's appointment timeline and vaccine schedule status.
 
 **Tasks**
+
 - Allow manual appointments and doctor alerts inside the web app.
 - Suggest **routine** next vaccine due dates using reviewed, versioned rules; do not generate a catch-up schedule for a missed dose.
 - Flag missed vaccination appointments and potentially overdue/unconfirmed doses as **different states**. Missing historical documentation alone must not trigger a confirmed-missed classification; let the doctor review and select a replacement date according to vaccine-specific procedures.
@@ -151,6 +161,7 @@ The user prioritized completing the remaining application features, including pa
 - Add retry-safe server operations and duplicate event protection.
 
 **Acceptance scenario**
+
 1. Doctor A registers child CH-00001245 with local number 125.
 2. Doctor A has a scheduled vaccination follow-up.
 3. Authorized Doctor B links CH-00001245 to local number 78 and records a relevant dose.
@@ -166,6 +177,7 @@ The user prioritized completing the remaining application features, including pa
 ## 9. Phase 6 — Doctor/admin V1 readiness
 
 **Quality and security checks**
+
 - Automated tests for access boundaries (approved vs unverified vs suspended, doctor vs admin).
 - Multi-doctor ID and duplicate-patient cases.
 - Routine vaccine age calculations (including rotavirus calendar months), HPV eligibility, corrected PCV labels, missed appointment vs overdue/unconfirmed dose vs unknown history, manual doctor rescheduling, and different-doctor dose logic.
@@ -183,6 +195,7 @@ The user prioritized completing the remaining application features, including pa
 ## 10. Phase 7 — Parent web app and onboarding QR
 
 **Implementation order**
+
 1. Parent account and guardian verification workflow.
 2. Doctor-created, one-use, short-lived invitation token/QR (not a clinical-data QR).
 3. Parent scans, signs in/up, completes guardianship verification and links existing child ID.
@@ -195,7 +208,7 @@ The user prioritized completing the remaining application features, including pa
 
 ## 11. Phase 8 — Mobile app
 
-- Choose mobile approach at implementation time (React Native + Expo proposed).
+- Chosen implementation: React Native 0.88.1 / Expo 58.0.25, independent pinned package under mobile/; source and first Android/iOS binaries verified. See MOBILE_PLAN.md and PROGRESS.md; native runtime acceptance remains open.
 - Reuse the server-side permission model and existing backend.
 - Prioritize parent navigation, notifications and child booklet experience.
 - Support Android/iOS as feasible without weakening patient-data controls.
@@ -214,14 +227,17 @@ The user prioritized completing the remaining application features, including pa
 ## 13. Suggested initial information architecture
 
 ### Doctor navigation
+
 `Dashboard` · `Patients` · `Vaccinations` · `Appointments` · `Follow-ups` · `Reports` · `Profile`
 
 Patient profile tabs: `Overview` · `Vaccinations` · `Consultations` · `Growth` · `Appointments` · `History`.
 
 ### Admin navigation
+
 `Overview` · `Verification Queue` · `Professionals` · `Vaccination Rules` · `Audit & Security` · `Settings`.
 
 ### Parent navigation (later)
+
 `Home` · `My Children` · `Vaccines` · `Appointments` · `Booklet` · `Account`.
 
 ## 14. Provisional visual design plan
@@ -238,23 +254,24 @@ The design is **not yet approved** and should remain easy to revise without chan
 
 ## 15. Testing checklist by feature
 
-| Feature | Critical tests |
-|---|---|
-| Doctor verification | Unverified denied; approval audited; ID evidence private |
-| Universal child ID | Unique and permanent across doctors |
-| Register numbers | Scoped uniqueness, correct doctor/facility association |
-| Duplicate detection | No automatic wrong merges |
-| Clinical records | Every entry records professional author and timestamp |
-| Corrections | Original record retained and traceable |
-| Vaccine tracking | Recompute when a dose is given by a different doctor |
-| Appointments | Missed appointment != missed vaccine |
-| Admin | No unrestricted patient-record access by default |
-| Parent QR | Expiring token; identity/guardianship verification required |
-| Authorization | Direct API and database access cannot bypass permissions |
+| Feature             | Critical tests                                              |
+| ------------------- | ----------------------------------------------------------- |
+| Doctor verification | Unverified denied; approval audited; ID evidence private    |
+| Universal child ID  | Unique and permanent across doctors                         |
+| Register numbers    | Scoped uniqueness, correct doctor/facility association      |
+| Duplicate detection | No automatic wrong merges                                   |
+| Clinical records    | Every entry records professional author and timestamp       |
+| Corrections         | Original record retained and traceable                      |
+| Vaccine tracking    | Recompute when a dose is given by a different doctor        |
+| Appointments        | Missed appointment != missed vaccine                        |
+| Admin               | No unrestricted patient-record access by default            |
+| Parent QR           | Expiring token; identity/guardianship verification required |
+| Authorization       | Direct API and database access cannot bypass permissions    |
 
 ## 16. Working documents and development workflow
 
 Recommended repository files:
+
 - `README.md` — setup, purpose and local development.
 - `PROJECT_INFO.md` — requirements and confirmed decisions (companion file).
 - `PROJECT_PLAN.md` — this plan.
@@ -282,6 +299,7 @@ Workflow: implement one milestone at a time → run lint/type checks/tests → r
 ## 18. Remaining decisions to resolve during build
 
 These are not blockers for the present plan:
+
 - Final brand/logo, fonts, colors and design details.
 - Exact format of universal child ID shown to users.
 - Whether a paper register number is scoped by doctor, clinic, year and/or book.

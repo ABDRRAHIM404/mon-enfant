@@ -22,3 +22,11 @@ Use React Native 0.88 / Expo SDK 58 and Expo Router, with an independent pinned 
 ## Primary implementation references
 
 [Expo SDK 58](https://expo.dev/changelog/sdk-58), [Expo Router](https://docs.expo.dev/router/installation/), [SecureStore limits and persistence](https://docs.expo.dev/versions/latest/sdk/securestore/), [Supabase native Auth](https://supabase.com/docs/guides/auth/quickstarts/react-native). SDK 58 needs supported Node 22.13+/24.3+/26; cloud uses Node 24. Pinned Supabase JS 2.119.0 keeps the existing backend contract. No CLI v3 upgrade, new backend, EAS account, paid dependency, push service or identifiable data is introduced.
+
+## Verified development checkpoint and pending runtime
+
+The native client source now implements the required navigation and existing guarded workflows. Root CI 43670556470 passes 275 cases; mobile 43671670888 passes dependency compatibility, types, nine tests and all three platform JS exports. Android APK and unsigned iOS simulator compilation both pass 43669991631 at source 581133d. These binaries precede the correction selector and initiating-session header fix; updated source/binary checks are explicitly pending in PROGRESS.md.
+
+Applied native read projection 20261115034112 has actual authenticated hosted HTTP acceptance: five views, other-parent denial, provider Casablanca appointment/time parity and genuine Auth logout/old-token/session-row denial. It does not add clinical rights or replace the existing audited read functions. The original twenty-five-rule draft remains unchanged. Four synthetic actors under fixture c3ffab76351e4355 are active only for native runtime verification and require retirement.
+
+Cloud Android/iOS UI automation is implemented, with secrets and raw automation traces confined to temporary private runner paths; only classified proofs and selected synthetic renders can be uploaded after success. Actual runtime, visual review and latest-source native acceptance remain open. No native app distribution or qualified approval is claimed.

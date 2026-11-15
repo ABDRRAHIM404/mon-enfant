@@ -126,12 +126,13 @@ Synthetic web technical acceptance is verified: full hosted desktop/tablet/phone
 
 ## Phase 8 — mobile
 
-- [ ] Choose/document mobile approach and implement Android/iOS parent-focused client.
+- [x] Choose/document and implement the native Android/iOS parent client in source: pinned React Native/Expo, MOBILE_PLAN.md; mobile cloud 43671670888, root/backend 43670556470. Runtime acceptance is separate below.
 - [ ] Reuse server authorization, secure sessions, child/booklet/appointments and notification experience.
-- [ ] Cloud compilation/tests and feasible Android/iOS runtime verification without burdening the owner's PC.
+- [x] First real Android APK and iOS Simulator compilation: cloud 43669991631, source 581133d; no distribution credentials. Later source changes require updated native evidence.
+- [ ] Complete latest-source native compilation and feasible Android/iOS runtime verification, inspect actual renders and retire all synthetic fixtures without burdening the owner's PC.
+- [ ] Native hardware-camera walkthrough, production vector/adaptive master and owner-approved signing/store distribution arrangements.
 
 The complete goal remains active until the full required scope and its approval gates have authoritative evidence. Implemented milestones do not close the complete goal.
-
 
 ## Requested updates before mobile
 
