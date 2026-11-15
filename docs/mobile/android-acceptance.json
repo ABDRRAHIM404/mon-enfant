@@ -1,0 +1,62 @@
+{
+  "fixture_run": "c3ffab76351e4355",
+  "runtime_commit": "a7487c4c5d724b24eedc27878b4faa94d12001a2",
+  "binary_commit": "9d808ecacc02625f14613692d6c08deda0ed3a8f",
+  "apk_sha256": "535e3328b8276190bc4af6fcc03815121d431645b8f13ede3b161920510c2a77",
+  "platform": "Android API 34 emulator",
+  "maestro_version": "cli-2.12.1",
+  "checks": [
+    "native_login_render",
+    "real_password_login_and_guarded_home",
+    "session_only_auth_not_restored_after_process_death",
+    "remembered_auth_restored_after_process_death",
+    "guardian_child_and_booklet_render",
+    "native_raw_growth_render",
+    "native_vaccination_view",
+    "native_qr_decoded_and_scoped_recipient_read",
+    "native_share_revocation_denies_existing_recipient_session",
+    "native_guardian_appointment_render",
+    "in_app_notifications_render",
+    "native_logout_survives_process_restart"
+  ],
+  "passed": true,
+  "store_distribution": false,
+  "synthetic_only": true,
+  "fixture_retirement_required": false,
+  "build_run": 43694870085,
+  "runtime_run": 43696384719,
+  "source_check_run": 43694866651,
+  "fixture_retired": true,
+  "retirement": {
+    "accounts_retired": 4,
+    "temporary_secrets_removed": 9,
+    "retirement_verified": true
+  },
+  "persistence": {
+    "fixture_run": "c3ffab76351e4355",
+    "persistence_verified": true,
+    "active_links": 1,
+    "active_shares": 0,
+    "children": 1,
+    "clinical_revisions": 3,
+    "recipient_capabilities": 0,
+    "recipient_grants": 0,
+    "original_draft_preserved": true
+  },
+  "visual_review": [
+    "native-login.png",
+    "native-home.png",
+    "native-booklet.png"
+  ],
+  "iphone_deferred": true,
+  "external_gates_open": [
+    "physical-device camera acceptance",
+    "final icon master",
+    "production signing and store distribution",
+    "qualified clinical and source review",
+    "credential and guardian approvals",
+    "privacy and hosting approvals",
+    "remaining Phase 6 operations",
+    "wider application email delivery"
+  ]
+}

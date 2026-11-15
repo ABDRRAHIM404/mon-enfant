@@ -129,10 +129,12 @@ Synthetic web technical acceptance is verified: full hosted desktop/tablet/phone
 Owner steering (15 November): prioritize the Android APK and website. iPhone/iOS remains deferred, with prior source/compilation/partial runtime evidence retained and unfinished gates open.
 
 - [x] Choose/document and implement the native Android/iOS parent client in source: pinned React Native/Expo, MOBILE_PLAN.md; mobile cloud 43671670888, root/backend 43670556470. Runtime acceptance is separate below.
-- [ ] Reuse server authorization, secure sessions, child/booklet/appointments and notification experience.
+- [x] Android reuses server authorization, encrypted optional remembered sessions, child/booklet/appointments and in-app notifications; full native runtime 43696384719. iPhone acceptance remains deferred.
 - [x] Updated Android APK compilation 43676070830 / b6f6c24, SHA-256 73695914953d67c2e5ba6bfcf546fedf0db991715ae69d32e95448f6bc0ceb43; mobile source checks 43675671068. Corrected iOS simulator packaging 43690462621 is retained as deferred evidence, not iPhone runtime/distribution acceptance.
 - [x] Android native sign-in/session modes, guarded child/booklet/growth/vaccination and real QR redemption/revocation were exercised successfully before the final logout assertion failed in 43692763997. Overall runtime acceptance remains open below.
-- [ ] Complete latest-source native compilation and feasible Android/iOS runtime verification, inspect actual renders and retire all synthetic fixtures without burdening the owner's PC.
+- [x] Android latest-source build 43694870085 / 9d808ec and full native runtime 43696384719, inspected renders and verified synthetic fixture retirement; exact SHA/proof in docs/mobile/android-acceptance.json.
+- [ ] Resume full iOS runtime/visual acceptance when requested by the owner; prior partial evidence does not close this gate.
+- [ ] Publish the exact accepted Android development APK as a private GitHub prerelease (cloud publication prepared).
 - [ ] Native hardware-camera walkthrough, production vector/adaptive master and owner-approved signing/store distribution arrangements.
 
 The complete goal remains active until the full required scope and its approval gates have authoritative evidence. Implemented milestones do not close the complete goal.
@@ -162,7 +164,6 @@ The complete goal remains active until the full required scope and its approval 
 - [ ] Treat the PNG emblem honestly as a raster reference; production vector master/adaptive icon approval remains open.
 - [x] Resolve/implement the specified parent-issued short-lived, purpose-bound clinician QR under an explicit authorization contract; identification alone never grants access. This is a functional extension, not a cosmetic button.
 - [x] Verify design changes in cloud and publish/synchronize the complete primary main checkout (sharing: 43663059538 / 43664056898 / native ac450cb72ff44993; READY dpl_FYkVBUrNCptht4Qz7xc1pAquTWno, source 9ae8a80). Full Phase 8 scope remains open above.
-
 
 ## Reported child-form layout correction — 15 November
 

@@ -4,7 +4,7 @@ The Android app uses the same Supabase accounts, sessions and recorded guardian 
 
 ## Current status
 
-The APK compiles for arm64-v8a and x86_64. Cloud native tests have exercised sign-in, memory-only sessions, encrypted remembered sessions, linked children, booklet, raw growth charts and vaccination history. Complete QR/redemption/revocation, appointment/notification/logout acceptance and publication are still in progress. See PROGRESS.md for exact evidence; this document does not declare the APK ready before those checks pass.
+The exact arm64-v8a/x86_64 APK from build 43694870085 passed full native Android runtime 43696384719: real sign-in, memory-only and encrypted remembered sessions across process restart, linked booklet/growth/vaccinations, scoped QR redemption/revocation, appointments, in-app updates and logout surviving restart. The four synthetic accounts and nine temporary encrypted values are retired. Exact source, hash and classified acceptance are recorded in docs/mobile/android-acceptance.json. Private cloud publication is the next step.
 
 The owner explicitly deferred iPhone work. Preserve its implementation and evidence, but do not run iOS builds/tests until the owner resumes it.
 
