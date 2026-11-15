@@ -162,3 +162,10 @@ The complete goal remains active until the full required scope and its approval 
 - [ ] Treat the PNG emblem honestly as a raster reference; production vector master/adaptive icon approval remains open.
 - [x] Resolve/implement the specified parent-issued short-lived, purpose-bound clinician QR under an explicit authorization contract; identification alone never grants access. This is a functional extension, not a cosmetic button.
 - [x] Verify design changes in cloud and publish/synchronize the complete primary main checkout (sharing: 43663059538 / 43664056898 / native ac450cb72ff44993; READY dpl_FYkVBUrNCptht4Qz7xc1pAquTWno, source 9ae8a80). Full Phase 8 scope remains open above.
+
+
+## Reported child-form layout correction — 15 November
+
+- [x] Restore missing shared form-grid layout and controls for provisional child/care forms and vaccination subfields; preserve all data/permission behavior.
+- [x] Actual desktop and Android Chrome light/dark form checks: 43695413773, no overflow/page errors, visible borders and separated fields; full 275-case regression 43695416835. Native Android uses separately reviewed native form styles.
+- [ ] Canonical publication/readback of this CSS correction and primary main synchronization.

@@ -1,0 +1,49 @@
+{
+  "run": 43695413773,
+  "source_commit": "67b8442",
+  "passed": true,
+  "root_ci": 43695416835,
+  "scope": "Actual provisional child form on desktop and Android Chrome; CSS shared with provisional care and vaccine subfields",
+  "proofs": [
+    {
+      "passed": true,
+      "device": "android",
+      "synthetic_only": true,
+      "fixture_run": "c3ffab76351e4355",
+      "actual_provisional_form": true,
+      "border_and_label_geometry": true,
+      "horizontal_overflow": false,
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "created_children": 0,
+      "page_errors": 0,
+      "captures": [
+        "form-layout-android-light.png",
+        "form-layout-android-dark.png"
+      ]
+    },
+    {
+      "passed": true,
+      "device": "desktop",
+      "synthetic_only": true,
+      "fixture_run": "c3ffab76351e4355",
+      "actual_provisional_form": true,
+      "border_and_label_geometry": true,
+      "horizontal_overflow": false,
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "created_children": 0,
+      "page_errors": 0,
+      "captures": [
+        "form-layout-desktop-light.png",
+        "form-layout-desktop-dark.png"
+      ]
+    }
+  ],
+  "native_android": "Separate native Field styles reviewed; no web CSS class reuse. APK logout fix/rebuild remains in progress.",
+  "external_approvals_unchanged": true
+}
