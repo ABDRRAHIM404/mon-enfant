@@ -1,0 +1,31 @@
+{
+  "run": "5d4ec565b0864dce",
+  "migration_sha256": "5b72f6cbaa70829912269a617a55da10fee5176554e149e6dd716fc3854eee8b",
+  "checks": [
+    {
+      "case": "anonymous_denied",
+      "http": 401
+    },
+    {
+      "case": "approved_author_empty_private_workspace",
+      "http": 200
+    },
+    {
+      "case": "trusted_child_not_promoted_or_read_as_provisional",
+      "http": 403
+    },
+    {
+      "case": "A_logged_out_session_denied",
+      "http": 403
+    },
+    {
+      "case": "administrator_role_alone_denied",
+      "http": 403
+    },
+    {
+      "case": "MANAGER_logged_out_session_denied",
+      "http": 403
+    }
+  ],
+  "passed": true
+}

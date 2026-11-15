@@ -3137,3 +3137,20 @@ select:focus-visible,
 .soignant-main > .soignant-heading-actions {
   margin-bottom: 22px;
 }
+.soignant-main > .page-heading h1 {
+  font-size: 34px;
+  letter-spacing: -1px;
+  line-height: 1.2;
+  margin: 2px 0 10px;
+}
+.soignant-workspace .soignant-coming-soon {
+  margin: 48px auto;
+}
+@media (max-width: 760px) {
+  .soignant-main > .page-heading h1 {
+    font-size: 29px;
+  }
+  .soignant-workspace .soignant-coming-soon {
+    margin: 24px auto;
+  }
+}

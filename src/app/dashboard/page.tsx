@@ -6,7 +6,7 @@ import { LiveRefresh } from "@/components/appointments/live-refresh";
 import type { AppointmentPage } from "@/lib/appointments/types";
 export const dynamic = "force-dynamic";
 export default async function Dashboard() {
-  const { supabase } = await requireApprovedDoctor();
+  const { profile, supabase } = await requireApprovedDoctor();
   const [registry, appointments, vaccines] = await Promise.all([
     supabase.rpc("registry_summary"),
     supabase.rpc("appointment_worklist", { p_bucket: "today" }),
@@ -56,7 +56,7 @@ export default async function Dashboard() {
     ],
   ];
   return (
-    <ClinicianShell active="home">
+    <ClinicianShell active="home" profile={profile}>
       <div className="page-heading">
         <span className="eyebrow">ESPACE MÉDECIN / INFIRMIER(ÈRE)</span>
         <h1 id="main-content" tabIndex={-1}>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { appointmentTime } from "@/lib/appointments/calendar";
 import { GrowthChart } from "@/components/clinical/growth-chart";
 import { notFound, redirect } from "next/navigation";
 import { UsersRound, Plus, FileClock } from "lucide-react";
@@ -308,19 +309,34 @@ export async function ProvisionalSection({
                                   k}
                               </dt>
                               <dd>
-                                {["category", "severity", "status"].includes(k)
-                                  ? (
-                                      {
-                                        planned: "Planifié",
-                                        completed: "Terminé",
-                                        missed: "Manqué déclaré",
-                                        cancelled: "Annulé",
-                                        rescheduled: "Replanifié",
-                                      } as Record<string, string>
-                                    )[String(v)] ||
-                                    clinicalValueLabels[String(v)] ||
-                                    String(v)
-                                  : String(v)}
+                                {k === "scheduled_for"
+                                  ? appointmentTime(String(v))
+                                  : k === "catalog_status"
+                                    ? (
+                                        {
+                                          draft: "Brouillon — non validé",
+                                          approved:
+                                            "Catalogue approuvé — entrée toujours non vérifiée",
+                                          retired: "Version retirée",
+                                        } as Record<string, string>
+                                      )[String(v)] || String(v)
+                                    : [
+                                          "category",
+                                          "severity",
+                                          "status",
+                                        ].includes(k)
+                                      ? (
+                                          {
+                                            planned: "Planifié",
+                                            completed: "Terminé",
+                                            missed: "Manqué déclaré",
+                                            cancelled: "Annulé",
+                                            rescheduled: "Replanifié",
+                                          } as Record<string, string>
+                                        )[String(v)] ||
+                                        clinicalValueLabels[String(v)] ||
+                                        String(v)
+                                      : String(v)}
                               </dd>
                             </div>
                           ))}

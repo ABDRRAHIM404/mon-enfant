@@ -7,7 +7,7 @@ import { canAccessClinicalWorkspace, statusLabels } from "@/lib/authorization";
 import { initializeProfile, signOut } from "@/app/auth/actions";
 export const dynamic = "force-dynamic";
 export default async function Account() {
-  const { profile, supabase } = await getProfessional();
+  const { user, profile, supabase } = await getProfessional();
   const [reviewPermission, clinicalPermission] =
     profile?.role === "admin" && profile.verification_status === "approved"
       ? await Promise.all([
@@ -40,6 +40,35 @@ export default async function Account() {
           L’accès à l’espace clinique dépend de la validation de vos
           qualifications et de vos autorisations.
         </p>
+        {profile && ["doctor", "nurse"].includes(profile.role) && (
+          <section className="panel">
+            <h2>Mon profil soignant</h2>
+            <dl className="details">
+              <div>
+                <dt>Adresse e-mail du compte</dt>
+                <dd>{user.email || "Non disponible"}</dd>
+              </div>
+              <div>
+                <dt>Métier déclaré</dt>
+                <dd>{profile.role === "nurse" ? "Infirmier(e)" : "Médecin"}</dd>
+              </div>
+              <div>
+                <dt>Identifiant professionnel de la plateforme</dt>
+                <dd>{profile.professional_id || "Non attribué"}</dd>
+              </div>
+            </dl>
+            <p>
+              La vérification professionnelle et les habilitations cliniques
+              sont examinées séparément.
+            </p>
+            <Link
+              className="text-link"
+              href="/forgot-password?audience=clinician"
+            >
+              Changer ou récupérer mon mot de passe
+            </Link>
+          </section>
+        )}
         <p className="status">
           <Clock3 size={16} />
           {profile

@@ -1,0 +1,19 @@
+{
+  "version": "20261115161000",
+  "sha256": "5b72f6cbaa70829912269a617a55da10fee5176554e149e6dd716fc3854eee8b",
+  "source_md5": "9eddee28196158f70e743e940705b22a",
+  "project": "zkkasbxvdvecnafgjpxd",
+  "applied": true,
+  "transport": "Supabase linked HTTPS database query; direct PostgreSQL dry run timed out without applying changes",
+  "atomic_migration_and_ledger": true,
+  "pending_source_migrations_before_apply": [
+    "20261115161000"
+  ],
+  "remote_only_migrations": [],
+  "anonymous_execute": false,
+  "authenticated_execute": true,
+  "preview": "dpl_7wVvSn884p7JZkC3nFRM1MEr27zR",
+  "preview_source": "dc86c4bd86567ef747e477705ee1af4fdb6083b6",
+  "focused_security_tests_passed": 4,
+  "hosted_ui_acceptance": false
+}

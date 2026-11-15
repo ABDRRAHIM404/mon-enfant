@@ -1,0 +1,12 @@
+{
+  "fixture_run": "5d4ec565b0864dce",
+  "device": "desktop",
+  "child_path": "/patients/37bea915-aaf1-40f8-9145-c18f03c8dc0e",
+  "stage": "before",
+  "HB1_history_cards": 0,
+  "HB1_specific_next_state": false,
+  "measurement_scope": "clinical-entry cards, excludes child heading",
+  "rendered_theme": "light",
+  "canonical_source": "f077749bfc69d3e7354b7482db542d4f5d923985",
+  "canonical_deployment": "dpl_6pgZjqesivoAVwRxvubqBWbjvFrP"
+}

@@ -23,7 +23,7 @@ export default async function Calendar({
     page?: string;
   }>;
 }) {
-  const { supabase } = await requireApprovedDoctor();
+  const { profile, supabase } = await requireApprovedDoctor();
   const q = await searchParams;
   const view: CalendarView = ["day", "week", "month"].includes(q.view ?? "")
     ? (q.view as CalendarView)
@@ -53,7 +53,7 @@ export default async function Calendar({
   const href = (date: string, mode: CalendarView = view, n = 1) =>
     `/appointments?${new URLSearchParams({ date, view: mode, state, page: String(n) })}`;
   return (
-    <ClinicianShell active="appointments">
+    <ClinicianShell active="appointments" profile={profile}>
       <div className="page-heading">
         <h1 id="main-content" tabIndex={-1}>
           Mes rendez-vous
@@ -65,7 +65,9 @@ export default async function Calendar({
       </div>
       <div className="tabs">
         <Link href="/follow-up">Suivis et alertes</Link>
-        <Link href="/patients">Choisir un enfant pour planifier</Link>
+        <Link className="button primary" href="/appointments/new">
+          Nouveau rendez-vous
+        </Link>
       </div>
       <LiveRefresh />
       <section className="panel">

@@ -19,7 +19,7 @@ export default async function Patients({
     page?: string;
   }>;
 }) {
-  const { supabase } = await requireApprovedDoctor();
+  const { profile, supabase } = await requireApprovedDoctor();
   const params = await searchParams;
   const q = (params.q ?? "").slice(0, 100);
   const history = ["unknown", "partial", "reviewed"].includes(
@@ -46,7 +46,7 @@ export default async function Patients({
     return `/patients?${new URLSearchParams({ q, history, age, page: String(n) })}`;
   }
   return (
-    <ClinicianShell active="children">
+    <ClinicianShell active="children" profile={profile}>
       <div className="page-heading">
         <span className="eyebrow">MON REGISTRE</span>
         <h1 id="main-content" tabIndex={-1}>

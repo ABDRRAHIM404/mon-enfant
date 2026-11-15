@@ -12,6 +12,7 @@ if (
     "stabilization-repro",
     "stabilization-accept",
     "stabilization-clinical",
+    "clinician-pages",
     "forms-cloud-accept",
     "smart-forms-cloud-accept",
     "sharing-cloud-accept",
@@ -39,36 +40,39 @@ if (!/^[a-f0-9]{16}$/.test(process.env.MON_ENFANT_QA_RUN ?? ""))
 export default defineConfig({
   testDir: "./e2e-live",
   testMatch:
-    probe === "stabilization-clinical"
-      ? "stabilization-clinical.spec.ts"
-      : probe === "stabilization-repro" || probe === "stabilization-accept"
-        ? "stabilization-repro.spec.ts"
-        : probe === "smart-forms-cloud-accept"
-          ? "smart-forms.spec.ts"
-          : probe === "forms-cloud-accept"
-            ? "form-layout.spec.ts"
-            : probe === "sharing-cloud-accept"
-              ? "sharing.spec.ts"
-              : probe === "design-cloud-accept"
-                ? "design.spec.ts"
-                : probe === "updates-accept" || probe === "updates-cloud-accept"
-                  ? ["updates.spec.ts", "design.spec.ts"]
-                  : probe === "parent-accept"
-                    ? "parent.spec.ts"
-                    : probe?.startsWith("session-")
-                      ? "session.spec.ts"
-                      : probe === "accessibility-accept"
-                        ? "accessibility.spec.ts"
-                        : probe === "vaccination-accept" ||
-                            probe === "vaccine-accessibility"
-                          ? "vaccination.spec.ts"
-                          : probe === "clinical-inspect"
-                            ? "clinical-inspect.spec.ts"
-                            : probe === "clinical-accept" ||
-                                probe === "clinical-accessibility" ||
-                                probe === "clinical-performance"
-                              ? "clinical.spec.ts"
-                              : "evidence.spec.ts",
+    probe === "clinician-pages"
+      ? "clinician-pages.spec.ts"
+      : probe === "stabilization-clinical"
+        ? "stabilization-clinical.spec.ts"
+        : probe === "stabilization-repro" || probe === "stabilization-accept"
+          ? "stabilization-repro.spec.ts"
+          : probe === "smart-forms-cloud-accept"
+            ? "smart-forms.spec.ts"
+            : probe === "forms-cloud-accept"
+              ? "form-layout.spec.ts"
+              : probe === "sharing-cloud-accept"
+                ? "sharing.spec.ts"
+                : probe === "design-cloud-accept"
+                  ? "design.spec.ts"
+                  : probe === "updates-accept" ||
+                      probe === "updates-cloud-accept"
+                    ? ["updates.spec.ts", "design.spec.ts"]
+                    : probe === "parent-accept"
+                      ? "parent.spec.ts"
+                      : probe?.startsWith("session-")
+                        ? "session.spec.ts"
+                        : probe === "accessibility-accept"
+                          ? "accessibility.spec.ts"
+                          : probe === "vaccination-accept" ||
+                              probe === "vaccine-accessibility"
+                            ? "vaccination.spec.ts"
+                            : probe === "clinical-inspect"
+                              ? "clinical-inspect.spec.ts"
+                              : probe === "clinical-accept" ||
+                                  probe === "clinical-accessibility" ||
+                                  probe === "clinical-performance"
+                                ? "clinical.spec.ts"
+                                : "evidence.spec.ts",
   webServer: cloudRuntime
     ? [
         {
@@ -140,49 +144,71 @@ export default defineConfig({
     screenshot: "off",
   },
   reporter: [["list"]],
-  projects: [
-    "forms-cloud-accept",
-    "smart-forms-cloud-accept",
-    "stabilization-repro",
-    "stabilization-accept",
-    "stabilization-clinical",
-  ].includes(probe ?? "")
-    ? [
-        {
-          name: "desktop",
-          use: {
-            ...devices["Desktop Chrome"],
-            viewport: { width: 1366, height: 900 },
-          },
-        },
-        { name: "android", use: { ...devices["Pixel 7"] } },
-      ]
-    : ["evidence-reproduce", "clinical-inspect", "session-reproduce"].includes(
-          probe ?? "",
-        )
-      ? [{ name: "desktop", use: { ...devices["Desktop Chrome"] } }]
-      : [
+  projects:
+    probe === "clinician-pages"
+      ? [
           {
             name: "desktop",
             use: {
               ...devices["Desktop Chrome"],
-              ...(probe === "sharing-cloud-accept"
-                ? { viewport: { width: 1440, height: 900 } }
-                : {}),
+              viewport: { width: 1672, height: 941 },
             },
           },
           {
             name: "tablet",
             use: { ...devices["iPad Mini"], defaultBrowserType: "chromium" },
           },
-          {
-            name: "mobile",
-            use: {
-              ...devices["Pixel 7"],
-              ...(probe === "sharing-cloud-accept"
-                ? { viewport: { width: 430, height: 940 } }
-                : {}),
+          { name: "android", use: { ...devices["Pixel 7"] } },
+        ]
+      : [
+            "forms-cloud-accept",
+            "smart-forms-cloud-accept",
+            "stabilization-repro",
+            "stabilization-accept",
+            "stabilization-clinical",
+            "clinician-pages",
+          ].includes(probe ?? "")
+        ? [
+            {
+              name: "desktop",
+              use: {
+                ...devices["Desktop Chrome"],
+                viewport: { width: 1366, height: 900 },
+              },
             },
-          },
-        ],
+            { name: "android", use: { ...devices["Pixel 7"] } },
+          ]
+        : [
+              "evidence-reproduce",
+              "clinical-inspect",
+              "session-reproduce",
+            ].includes(probe ?? "")
+          ? [{ name: "desktop", use: { ...devices["Desktop Chrome"] } }]
+          : [
+              {
+                name: "desktop",
+                use: {
+                  ...devices["Desktop Chrome"],
+                  ...(probe === "sharing-cloud-accept"
+                    ? { viewport: { width: 1440, height: 900 } }
+                    : {}),
+                },
+              },
+              {
+                name: "tablet",
+                use: {
+                  ...devices["iPad Mini"],
+                  defaultBrowserType: "chromium",
+                },
+              },
+              {
+                name: "mobile",
+                use: {
+                  ...devices["Pixel 7"],
+                  ...(probe === "sharing-cloud-accept"
+                    ? { viewport: { width: 430, height: 940 } }
+                    : {}),
+                },
+              },
+            ],
 });

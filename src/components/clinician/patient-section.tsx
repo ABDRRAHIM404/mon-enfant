@@ -90,24 +90,31 @@ export async function PatientSection({
     total: number;
   } = { items: [], total: 0 };
   if (child) {
-    const timeline = await supabase.rpc("clinical_timeline", {
-      p_child_id: child.id,
-      p_page: page,
-      p_kind: config.kind,
-    });
-    if (timeline.error?.code === "42501") notFound();
-    if (timeline.error) throw new Error("Impossible de charger l’historique.");
-    history = timeline.data;
-    if (section === "vaccinations") {
-      const result = await supabase.rpc("patient_vaccine_items", {
+    const [timeline, referenceResult] = await Promise.all([
+      supabase.rpc("clinical_timeline", {
         p_child_id: child.id,
-        p_page: 1,
-      });
-      if (result.error?.code === "42501") notFound();
-      if (result.error) throw new Error("Références vaccinales indisponibles.");
-      references = result.data;
-    }
+        p_page: page,
+        p_kind: config.kind,
+      }),
+      section === "vaccinations"
+        ? supabase.rpc("patient_vaccine_items", {
+            p_child_id: child.id,
+            p_page: 1,
+          })
+        : Promise.resolve(null),
+    ]);
+    if (
+      timeline.error?.code === "42501" ||
+      referenceResult?.error?.code === "42501"
+    )
+      notFound();
+    if (timeline.error) throw new Error("Impossible de charger l’historique.");
+    if (referenceResult?.error)
+      throw new Error("Références vaccinales indisponibles.");
+    history = timeline.data;
+    if (referenceResult) references = referenceResult.data;
   }
+
   const allowed = (capabilities.data as string[]).includes(config.kind),
     appointmentAllowed = (capabilities.data as string[]).includes(
       "appointment",
