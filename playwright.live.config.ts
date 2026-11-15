@@ -129,11 +129,27 @@ export default defineConfig({
   ].includes(probe ?? "")
     ? [{ name: "desktop", use: { ...devices["Desktop Chrome"] } }]
     : [
-        { name: "desktop", use: { ...devices["Desktop Chrome"] } },
+        {
+          name: "desktop",
+          use: {
+            ...devices["Desktop Chrome"],
+            ...(probe === "sharing-cloud-accept"
+              ? { viewport: { width: 1440, height: 900 } }
+              : {}),
+          },
+        },
         {
           name: "tablet",
           use: { ...devices["iPad Mini"], defaultBrowserType: "chromium" },
         },
-        { name: "mobile", use: { ...devices["Pixel 7"] } },
+        {
+          name: "mobile",
+          use: {
+            ...devices["Pixel 7"],
+            ...(probe === "sharing-cloud-accept"
+              ? { viewport: { width: 430, height: 940 } }
+              : {}),
+          },
+        },
       ],
 });

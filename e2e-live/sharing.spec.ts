@@ -312,6 +312,11 @@ test("parent purpose-bound sharing, live concurrent claim and revocation", async
     await expect(
       reader.getByRole("heading", { name: "Rendez-vous partagés" }),
     ).toHaveCount(0);
+    expect(
+      await reader.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
     await reader.screenshot({
       path: info.outputPath("sharing-vaccination.png"),
       fullPage: true,
@@ -351,6 +356,15 @@ test("parent purpose-bound sharing, live concurrent claim and revocation", async
     await expect(
       reader.getByRole("heading", { name: "Historique vaccinal partagé" }),
     ).toHaveCount(0);
+    expect(
+      await parent.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await parent.screenshot({
+      path: info.outputPath("sharing-parent-retired.png"),
+      fullPage: true,
+    });
     await panel.locator('[name="scope"]').selectOption("booklet_read");
     await panel.locator('[name="consent"]').check();
     await panel
@@ -389,6 +403,11 @@ test("parent purpose-bound sharing, live concurrent claim and revocation", async
     await expect(
       winner.getByRole("heading", { name: "Consultation fictive partagée" }),
     ).toBeVisible();
+    expect(
+      await winner.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
     await winner.screenshot({
       path: info.outputPath("sharing-booklet.png"),
       fullPage: true,
