@@ -73,6 +73,7 @@ try:
             scroll('Rester connecté sur cet appareil personnel')
             add('tapOn', 'Rester connecté sur cet appareil personnel')
         scroll({'id': 'login-submit'}); add('tapOn', {'id': 'login-submit'})
+        add('tapOn', {'text': 'Not Now', 'optional': True})
         visible('Mes enfants')
     add('launchApp')
     visible({'id': 'login-email'})
