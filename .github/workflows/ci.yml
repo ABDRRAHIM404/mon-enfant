@@ -326,8 +326,8 @@ jobs:
       contents: read
       actions: read
     env:
-      ANDROID_AVD_HOME: ${{ runner.temp }}/mon-enfant-android/avd
-      ANDROID_USER_HOME: ${{ runner.temp }}/mon-enfant-android
+      ANDROID_AVD_HOME: /tmp/mon-enfant-android/avd
+      ANDROID_USER_HOME: /tmp/mon-enfant-android
       MON_ENFANT_QA_RUN: ${{ inputs.fixture_run }}
       MON_ENFANT_PARENT_BROWSER_OUTSIDE_EMAIL: ${{ secrets.MON_ENFANT_PARENT_BROWSER_OUTSIDE_EMAIL }}
       MON_ENFANT_PARENT_BROWSER_OUTSIDE_PASSWORD: ${{ secrets.MON_ENFANT_PARENT_BROWSER_OUTSIDE_PASSWORD }}
