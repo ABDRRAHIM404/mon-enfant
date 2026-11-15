@@ -20,15 +20,15 @@ let db: PGlite;
 type Actor = { id: string; session: string };
 async function actor(role = "doctor", status = "unverified") {
   const a = { id: randomUUID(), session: randomUUID() };
-  await db.query(
+  await db.query<Record<string, unknown>>(
     "insert into auth.users(id,email,email_confirmed_at) values($1,$2,now())",
     [a.id, `qa-${a.id}@example.invalid`],
   );
-  await db.query("insert into auth.sessions(id,user_id) values($1,$2)", [
-    a.session,
-    a.id,
-  ]);
-  await db.query(
+  await db.query<Record<string, unknown>>(
+    "insert into auth.sessions(id,user_id) values($1,$2)",
+    [a.session, a.id],
+  );
+  await db.query<Record<string, unknown>>(
     "insert into public.professional_profiles(user_id,role,verification_status,professional_id) values($1,$2,$3,$4)",
     [a.id, role, status, status === "approved" ? `QA-${a.id}` : null],
   );
@@ -41,12 +41,12 @@ async function rpc<T = unknown>(
 ): Promise<T> {
   await db.exec("savepoint smart_form_rpc");
   try {
-    await db.query(
+    await db.query<Record<string, unknown>>(
       "select set_config('request.jwt.claim.sub',$1,false),set_config('request.jwt.claim.session_id',$2,false)",
       [a.id, a.session],
     );
     await db.exec("set role authenticated");
-    const result = await db.query(
+    const result = await db.query<Record<string, unknown>>(
       `select public.${name}(${args.map((_, i) => `$${i + 1}`).join(",")}) value`,
       args,
     );
@@ -130,7 +130,10 @@ describe("smart vaccine vocabulary and quarantined recording on the complete sch
         code: "42501",
       });
     const stale = await actor();
-    await db.query("delete from auth.sessions where id=$1", [stale.session]);
+    await db.query<Record<string, unknown>>(
+      "delete from auth.sessions where id=$1",
+      [stale.session],
+    );
     await expect(rpc(stale, "vaccine_form_choices")).rejects.toMatchObject({
       code: "42501",
     });
@@ -152,7 +155,7 @@ describe("smart vaccine vocabulary and quarantined recording on the complete sch
     const entry = await write(a, child, selection, operation);
     expect(await write(a, child, selection, operation)).toBe(entry);
     const row = (
-      await db.query(
+      await db.query<Record<string, unknown>>(
         "select payload,validation_state,revision from private.provisional_entries where id=$1",
         [entry],
       )
@@ -164,7 +167,7 @@ describe("smart vaccine vocabulary and quarantined recording on the complete sch
     });
     expect(
       (
-        await db.query(
+        await db.query<Record<string, unknown>>(
           "select count(*)::integer n from public.clinical_entries where child_id=$1",
           [child],
         )
@@ -185,11 +188,14 @@ describe("smart vaccine vocabulary and quarantined recording on the complete sch
     form.set("vaccine_label", "Vaccin privé fictif — libellé ORIGINAL");
     form.set("dose_choice", "unknown");
     const selection = readVaccineSelection(form, []);
-    const payload = { vaccine_label: selection.vaccine_label, dose_label: selection.dose_label };
+    const payload = {
+      vaccine_label: selection.vaccine_label,
+      dose_label: selection.dose_label,
+    };
     const entry = await write(a, child, payload);
     expect(
       (
-        await db.query(
+        await db.query<Record<string, unknown>>(
           "select payload from private.provisional_entries where id=$1",
           [entry],
         )
@@ -200,7 +206,7 @@ describe("smart vaccine vocabulary and quarantined recording on the complete sch
     });
     expect(
       (
-        await db.query(
+        await db.query<Record<string, unknown>>(
           "select count(*)::integer n from public.child_vaccine_items where child_id=$1",
           [child],
         )
@@ -250,7 +256,7 @@ describe("smart vaccine vocabulary and quarantined recording on the complete sch
     ]);
     expect(
       (
-        await db.query(
+        await db.query<Record<string, unknown>>(
           "select revision from private.provisional_entries where child_id=$1 order by revision",
           [child],
         )
@@ -258,7 +264,7 @@ describe("smart vaccine vocabulary and quarantined recording on the complete sch
     ).toEqual([{ revision: 1 }, { revision: 2 }]);
     expect(
       (
-        await db.query(
+        await db.query<Record<string, unknown>>(
           "select previous_id from private.provisional_entries where id=$1",
           [next],
         )
@@ -282,7 +288,7 @@ describe("smart vaccine vocabulary and quarantined recording on the complete sch
     ).rejects.toMatchObject({ code: "PT409" });
     expect(
       (
-        await db.query(
+        await db.query<Record<string, unknown>>(
           "select status,revision,(select count(*)::integer from public.vaccine_rules r where r.version_id=v.id) rules from public.vaccine_versions v where parent_id is null",
         )
       ).rows,

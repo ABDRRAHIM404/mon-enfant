@@ -24,6 +24,7 @@ on:
             mobile-android,
             mobile-ios,
             forms-cloud-accept,
+            smart-forms-cloud-accept,
             sharing-cloud-accept,
             design-cloud-accept,
             updates-cloud-accept,
@@ -166,10 +167,10 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium --only-shell
       - name: Build current application for explicit GitHub-hosted update acceptance
-        if: inputs.live_probe == 'forms-cloud-accept' || inputs.live_probe == 'updates-cloud-accept' || inputs.live_probe == 'design-cloud-accept' || inputs.live_probe == 'sharing-cloud-accept'
+        if: inputs.live_probe == 'smart-forms-cloud-accept' || inputs.live_probe == 'forms-cloud-accept' || inputs.live_probe == 'updates-cloud-accept' || inputs.live_probe == 'design-cloud-accept' || inputs.live_probe == 'sharing-cloud-accept'
         run: npm run build
       - name: Prepare ephemeral runner TLS for production Secure cookies
-        if: inputs.live_probe == 'forms-cloud-accept' || inputs.live_probe == 'updates-cloud-accept' || inputs.live_probe == 'design-cloud-accept' || inputs.live_probe == 'sharing-cloud-accept'
+        if: inputs.live_probe == 'smart-forms-cloud-accept' || inputs.live_probe == 'forms-cloud-accept' || inputs.live_probe == 'updates-cloud-accept' || inputs.live_probe == 'design-cloud-accept' || inputs.live_probe == 'sharing-cloud-accept'
         run: openssl req -x509 -newkey rsa:2048 -sha256 -nodes -keyout "$RUNNER_TEMP/updates-key.pem" -out "$RUNNER_TEMP/updates-cert.pem" -days 1 -subj /CN=localhost 2>/dev/null
       - name: Verify the selected deployed workflow in cloud browsers
         run: npx playwright test --config=playwright.live.config.ts
@@ -182,6 +183,8 @@ jobs:
           name: ${{ inputs.live_probe == 'accessibility-accept' && 'synthetic-live-accessibility-results' || (inputs.live_probe == 'vaccination-accept' || inputs.live_probe == 'vaccine-accessibility') && 'synthetic-live-vaccination-results' || startsWith(inputs.live_probe, 'session-') && 'synthetic-live-session-results' || (inputs.live_probe == 'clinical-accept' || inputs.live_probe == 'clinical-accessibility' || inputs.live_probe == 'clinical-performance') && 'synthetic-live-clinical-results' || 'synthetic-live-evidence-results' }}
           path: |
             test-results/performance-targets.json
+            test-results/live/**/smart-forms-proof.json
+            test-results/live/**/smart-forms-*.png
             test-results/live/**/forms-proof.json
             test-results/live/**/form-layout-*.png
             test-results/live/**/updates-proof.json
