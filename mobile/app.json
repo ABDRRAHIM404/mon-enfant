@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "Mon Enfant — développement",
+    "slug": "mon-enfant-parent",
+    "version": "0.1.0",
+    "scheme": "monenfant-parent",
+    "orientation": "default",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "app.monenfant.parent"
+    },
+    "android": { "package": "app.monenfant.parent", "allowBackup": false },
+    "plugins": [
+      "expo-router",
+      ["expo-secure-store", { "configureAndroidBackup": true }],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Lire le QR d’invitation transmis par votre professionnel.",
+          "recordAudioAndroid": false,
+          "barcodeScannerEnabled": true
+        }
+      ]
+    ],
+    "experiments": { "typedRoutes": true },
+    "web": { "bundler": "metro", "output": "single" }
+  }
+}

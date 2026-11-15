@@ -210,3 +210,33 @@ jobs:
           name: mobile-pinned-manifests
           path: test-results/mobile-manifests/
           retention-days: 3
+
+  mobile-check:
+    if: github.event_name == 'workflow_dispatch' && inputs.live_probe == 'mobile-check'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: mobile
+    env:
+      CI: 1
+      EXPO_NO_TELEMETRY: 1
+      EXPO_PUBLIC_SUPABASE_URL: https://zkkasbxvdvecnafgjpxd.supabase.co
+      EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.MON_ENFANT_PUBLIC_BROWSER_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - run: npm ci
+      - run: npm run checkdeps
+      - run: npm run typecheck
+      - run: npm test
+      - run: npx expo export --platform all
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mobile-platform-bundles
+          path: mobile/dist/
+          retention-days: 3

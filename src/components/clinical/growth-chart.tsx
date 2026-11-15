@@ -1,3 +1,4 @@
+import { growthPoints } from "@/lib/clinical/growth";
 import type { ClinicalEntry } from "@/lib/clinical/types";
 export function GrowthChart({
   entries,
@@ -10,20 +11,7 @@ export function GrowthChart({
   label: string;
   unit: string;
 }) {
-  const points = entries
-    .filter(
-      (e) =>
-        e.entry_state === "active" &&
-        e.occurrence_precision === "exact" &&
-        e.occurred_on &&
-        typeof e.payload[field] === "number",
-    )
-    .map((e) => ({
-      date: e.occurred_on!,
-      value: Number(e.payload[field]),
-      confirmed: e.source_verified,
-    }))
-    .sort((a, b) => a.date.localeCompare(b.date));
+  const points = growthPoints(entries, field);
   if (!points.length)
     return (
       <section className="panel">

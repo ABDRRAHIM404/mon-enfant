@@ -1,5 +1,5 @@
-import type { ClinicalEntry } from "@/lib/clinical/types";
-import type { AppointmentRow } from "@/lib/appointments/types";
+import type { ClinicalEntry } from "../clinical/types";
+import type { AppointmentRow } from "../appointments/types";
 export type ParentChild = {
   id: string;
   universal_id: string;

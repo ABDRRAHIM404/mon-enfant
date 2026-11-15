@@ -61,6 +61,7 @@ run("npm", [
   "--save-exact",
   "@supabase/supabase-js@2.119.0",
   "react-native-qrcode-svg@6.3.54",
+  "lucide-react-native@1.72.0",
 ]);
 run("npm", [
   "install",
