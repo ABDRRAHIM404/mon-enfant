@@ -1,6 +1,6 @@
 # Full plan execution and completion audit
 
-Current development focus: **supplied Update 3 before Phase 8 mobile; Updates 1–2 and the canonical account switch technically verified**, following the verified synthetic Phase 7 web walkthrough. See UPDATE_WORK_PLAN.md. Remaining Phase 6 checks/operations stay open and are deferred until the app is built, except major authentication, access-control, data-integrity and build checks.
+Current development focus: **full Phase 8 mobile; Updates 1–3 including real temporary sharing and the canonical account switch have software acceptance**, following the verified synthetic Phase 7 web walkthrough. See UPDATE_WORK_PLAN.md. Remaining Phase 6 checks/operations stay open and are deferred until the app is built, except major authentication, access-control, data-integrity and build checks.
 
 See [PROGRESS.md](PROGRESS.md) for verification evidence and remaining approval gates.
 
@@ -144,8 +144,8 @@ The complete goal remains active until the full required scope and its approval 
 
 ## Supplied Update 3 — design and preserved functionality
 
-- [x] Sharing source/backend: full CI 43663059538 (272 cases), immutable migration 20261114234132 with exact-source history; real QR/consent/read-only ticket implemented. Hosted three-device/native/visual software acceptance 43664056898 is complete; canonical publication remains below.
-- [x] Implemented protected read/dashboard layouts, actual permission-scoped summaries and unassigned uncertain vaccination history: source CI 43646114379, hosted cloud 43646708223 / post-fix 43647899263, native persistence/permission proof and direct paired review (design-qa.md). Purpose-bound sharing remains open.
+- [x] Sharing source/backend: full CI 43663059538 (272 cases), immutable migration 20261114234132 with exact-source history; real QR/consent/read-only ticket implemented. Hosted three-device/native/visual software acceptance 43664056898 is complete; canonical release dpl_FYkVBUrNCptht4Qz7xc1pAquTWno / source 9ae8a80 and primary synchronization are verified.
+- [x] Implemented protected read/dashboard layouts, actual permission-scoped summaries and unassigned uncertain vaccination history: source CI 43646114379, hosted cloud 43646708223 / post-fix 43647899263, native persistence/permission proof and direct paired review (design-qa.md). Purpose-bound sharing has separate acceptance below.
 - [x] Publish protected read/UI checkpoint on canonical Vercel: READY dpl_CR1C1asRvsdoFXTMz3THgtJTjaP2, source 0e0b66d; live health and anonymous parent/provisional/vaccination/export denial pass. Primary main is synchronized.
 - [x] Retire both protected verification fixtures: c833b127ec5544c0 and 1e57ebcee3134c5d, four accounts/nine temporary values each, retirement verified.
 
@@ -157,4 +157,4 @@ The complete goal remains active until the full required scope and its approval 
 - [x] Keep verified Updates 1–2, clinical/vaccine/grant/audit controls, deferred verification and synthetic-only boundaries intact; no fabricated patient/calendar data from mockups.
 - [ ] Treat the PNG emblem honestly as a raster reference; production vector master/adaptive icon approval remains open.
 - [x] Resolve/implement the specified parent-issued short-lived, purpose-bound clinician QR under an explicit authorization contract; identification alone never grants access. This is a functional extension, not a cosmetic button.
-- [ ] Verify design changes in cloud, publish/synchronize the complete primary main checkout, then continue full Phase 8 scope.
+- [x] Verify design changes in cloud and publish/synchronize the complete primary main checkout (sharing: 43663059538 / 43664056898 / native ac450cb72ff44993; READY dpl_FYkVBUrNCptht4Qz7xc1pAquTWno, source 9ae8a80). Full Phase 8 scope remains open above.

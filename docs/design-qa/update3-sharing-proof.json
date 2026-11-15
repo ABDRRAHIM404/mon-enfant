@@ -92,5 +92,15 @@
     }
   ],
   "synthetic_only": true,
-  "canonical_publication": "pending"
+  "canonical_publication": {
+    "deployment": "dpl_FYkVBUrNCptht4Qz7xc1pAquTWno",
+    "state": "READY",
+    "source_commit": "9ae8a808afdae8e26280351a18255b4d04d8258a",
+    "url": "https://mon-enfant.vercel.app",
+    "live_checked_at": "2026-11-15T02:46:30Z",
+    "health_ok": true,
+    "public_share_entry": true,
+    "no_store_no_referrer": true,
+    "anonymous_share_view_and_export_denied": true
+  }
 }

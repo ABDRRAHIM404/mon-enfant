@@ -1,6 +1,6 @@
 # Update 3 temporary parent-to-clinician sharing
 
-Implementation contract; source and hosted migration implemented and source-verified (CI 43663059538). Hosted browser/native/visual software acceptance passed (43664056898 / native ac450cb72ff44993); canonical publication is the next release step. See PROGRESS.md and docs/design-qa/update3-sharing-proof.json. Synthetic records only. This is separate from the permanent identification QR, professional registry associations, clinical grants and provisional workspaces. No real-data or clinical/privacy approval is implied.
+Implementation contract; source and hosted migration implemented and source-verified (CI 43663059538). Hosted browser/native/visual software acceptance passed (43664056898 / native ac450cb72ff44993); canonical publication is verified in READY dpl_FYkVBUrNCptht4Qz7xc1pAquTWno, main 9ae8a80, and primary main is synchronized. See PROGRESS.md and docs/design-qa/update3-sharing-proof.json. Synthetic records only. This is separate from the permanent identification QR, professional registry associations, clinical grants and provisional workspaces. No real-data or clinical/privacy approval is implied.
 
 ## Parent consent and authority
 

@@ -1,6 +1,6 @@
 # Mon Enfant — Development Plan
 
-**Status:** Implementation in progress — foundation/verification/registry workflows verified; Phase 5 appointment/continuity technical acceptance complete, Phase 7 synthetic parent web technical walkthrough verified, Updates 1–2 canonically verified; Update 3 public/protected read UI published; purpose-bound parent sharing software acceptance passed; canonical publication remains before Phase 8 mobile; actual application mail and remaining Phase 6/external readiness stay open; see [PROGRESS.md](PROGRESS.md) and [PLAN_CHECKLIST.md](PLAN_CHECKLIST.md)
+**Status:** Implementation in progress — foundation/verification/registry workflows verified; Phase 5 appointment/continuity technical acceptance complete, Phase 7 synthetic parent web technical walkthrough verified, Updates 1–2 canonically verified; Update 3 public/protected read UI published; purpose-bound parent sharing canonically published and software-accepted; Phase 8 mobile is next; actual application mail and remaining Phase 6/external readiness stay open; see [PROGRESS.md](PROGRESS.md) and [PLAN_CHECKLIST.md](PLAN_CHECKLIST.md)
 **Working name:** Mon Enfant (temporary)
 **Primary objective:** Launch a secure, responsive doctor/admin web application, then introduce the parent experience.
 **Last updated:** 15 November 2026
@@ -9,7 +9,7 @@
 
 ## Execution priority — 14 November 2026
 
-Updates 1–2 have canonical technical acceptance: private duplicate handling, parent-first onboarding, verified doctor/nurse parity under explicit permissions and isolated provisional workflows. Implement the newly supplied Update 3 visual design and its separately tracked purpose-bound parent sharing extension before mobile. See UPDATE_WORK_PLAN.md and UPDATE_3_IMPLEMENTATION.md. Automatic provisional promotion remains forbidden.
+Updates 1–2 have canonical technical acceptance: private duplicate handling, parent-first onboarding, verified doctor/nurse parity under explicit permissions and isolated provisional workflows. Update 3 public/protected design and real purpose-bound sharing now have canonical software acceptance (PROGRESS.md). Continue the complete Phase 8 mobile client using this selected product system. See UPDATE_WORK_PLAN.md and UPDATE_3_IMPLEMENTATION.md. Automatic provisional promotion remains forbidden.
 
 The user prioritized completing the remaining application features, including parent web and mobile, before minor hardening and repeated checks. Continue the original full scope below; keep the major authentication, access-control, data-integrity and build checks with feature work. Carry unfinished Phase 6 hardening/operations and external approvals forward as explicit open items. This changes development priority, not completion criteria or permission to use identifiable patients.
 
