@@ -65,10 +65,43 @@ test("reproduce canonical clinician navigation and saved provisional HB1 history
               href: el.getAttribute("href")!,
             })),
         );
-      expect(links.length).toBeGreaterThan(2);
       const first = `stabilization-${info.project.name}-${role}-${mode}-01-home.png`;
       await page.screenshot({ path: info.outputPath(first) });
       captures.push(first);
+      if (links.length < 3) {
+        const observation = {
+          role,
+          theme: mode,
+          current_route: new URL(page.url()).pathname,
+          heading: homeHeading,
+          visible_workspace_links: links.length,
+          page_errors: errors,
+        };
+        writeFileSync(
+          info.outputPath("stabilization-repro.json"),
+          JSON.stringify(
+            {
+              fixture_run: run,
+              device: info.project.name,
+              status: "navigation_missing_observed",
+              observation,
+              findings,
+              captures,
+            },
+            null,
+            2,
+          ),
+        );
+        console.log(
+          JSON.stringify({
+            event: "canonical_navigation_missing",
+            ...observation,
+          }),
+        );
+        throw new Error(
+          "Canonical workspace navigation missing; classified capture saved",
+        );
+      }
       for (let i = 0; i < links.length; i++) {
         const link = links[i];
         await page.goto(home);
