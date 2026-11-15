@@ -1,4 +1,5 @@
 "use client";
+import type { VaccineChoice } from "@/lib/vaccines/choices";
 import Link from "next/link";
 import { VaccinationFields } from "@/components/vaccines/vaccination-fields";
 import type { VaccineItemExport } from "@/lib/vaccines/patient-types";
@@ -13,6 +14,7 @@ export function ClinicalForm({
   facilities,
   previous,
   vaccineItems = [],
+  vaccineChoices = [],
 }: {
   childId: string;
   operationId: string;
@@ -20,6 +22,7 @@ export function ClinicalForm({
   facilities: Facility[];
   previous?: ClinicalEntry;
   vaccineItems?: VaccineItemExport[];
+  vaccineChoices?: VaccineChoice[];
 }) {
   const [state, action, pending] = useActionState(recordClinical, {});
   const data = previous?.payload;
@@ -135,7 +138,11 @@ export function ClinicalForm({
           à sa provenance.
         </label>
         {kind === "vaccination" && (
-          <VaccinationFields previous={previous} items={vaccineItems} />
+          <VaccinationFields
+            previous={previous}
+            items={vaccineItems}
+            choices={vaccineChoices}
+          />
         )}
         {kind === "consultation" && [
           input("reason", "Motif de consultation", 1000, true),

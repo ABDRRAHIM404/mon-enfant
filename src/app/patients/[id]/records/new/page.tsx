@@ -1,3 +1,4 @@
+import type { VaccineChoice } from "@/lib/vaccines/choices";
 import Link from "next/link";
 import type { VaccineItemExport } from "@/lib/vaccines/patient-types";
 import { notFound } from "next/navigation";
@@ -46,11 +47,18 @@ export default async function NewEntry({
     throw new Error(
       "Impossible de charger toutes les références vaccinales. La limite interactive peut être dépassée.",
     );
+  const vocabulary =
+    kind === "vaccination"
+      ? await supabase.rpc("vaccine_form_choices")
+      : { data: [], error: null };
+  if (vocabulary.error) throw new Error("Choix vaccinaux indisponibles.");
   return (
     <main className="account-page wide">
       <DoctorNav />
       <div className="page-heading">
-        <h1 id="main-content" tabIndex={-1}>{clinicalLabels[kind]}</h1>
+        <h1 id="main-content" tabIndex={-1}>
+          {clinicalLabels[kind]}
+        </h1>
         <p className="muted">
           L’auteur, le lieu, la provenance et les dates seront conservés. Aucune
           écriture ne remplace silencieusement un soin.
@@ -72,6 +80,7 @@ export default async function NewEntry({
             kind={kind}
             facilities={places}
             vaccineItems={vaccineItems.data as VaccineItemExport[]}
+            vaccineChoices={vocabulary.data as VaccineChoice[]}
           />
         ) : (
           <p>

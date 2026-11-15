@@ -1,7 +1,12 @@
 "use server";
+import { resolveAppointmentTime } from "@/lib/appointments/calendar";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getProfessional } from "@/lib/auth";
+import {
+  readVaccineSelection,
+  type VaccineChoice,
+} from "@/lib/vaccines/choices";
 import { provisionalFields } from "@/lib/provisional";
 const isUuid = (value: unknown): value is string =>
   typeof value === "string" &&
@@ -67,11 +72,50 @@ export async function writeProvisional(
     if (value)
       payload[field.key] = field.type === "number" ? Number(value) : value;
   }
+  if (kind === "vaccination" && form.has("vaccine_choice")) {
+    const vocabulary = await supabase.rpc("vaccine_form_choices");
+    if (vocabulary.error)
+      return {
+        error:
+          "Le catalogue est indisponible. Rechargez la page avant d’enregistrer.",
+      };
+    try {
+      const selected = readVaccineSelection(
+        form,
+        vocabulary.data as VaccineChoice[],
+      );
+      Object.assign(payload, selected);
+      // Uncatalogued names carry no asserted official code or mapping.
+      if (!selected.catalog_version_id) delete payload.vaccine_code;
+    } catch (error) {
+      return {
+        error:
+          error instanceof Error ? error.message : "Choix vaccinaux invalides.",
+      };
+    }
+  }
   if (kind === "risk") {
     payload.category = text(form, "category");
     payload.severity = text(form, "severity");
   }
-  if (kind === "appointment") payload.status = text(form, "status");
+  if (kind === "appointment") {
+    payload.status = text(form, "status");
+    if (form.has("scheduled_local")) {
+      try {
+        payload.scheduled_for = resolveAppointmentTime(
+          text(form, "scheduled_local"),
+          text(form, "scheduled_offset") || "auto",
+        );
+      } catch (error) {
+        return {
+          error:
+            error instanceof RangeError
+              ? error.message
+              : "Vérifiez l’heure du rendez-vous.",
+        };
+      }
+    }
+  }
   const { error } = await supabase.rpc("write_provisional_entry", {
     p_operation_id: operation,
     p_child_id: child,

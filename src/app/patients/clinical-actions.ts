@@ -1,4 +1,8 @@
 "use server";
+import {
+  readVaccineSelection,
+  type VaccineChoice,
+} from "@/lib/vaccines/choices";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import {
@@ -52,6 +56,37 @@ export async function recordClinical(
     if (kind === "growth") {
       if (text(key)) payload[key] = Number(text(key));
     } else payload[key] = text(key);
+  if (
+    kind === "vaccination" &&
+    form.has("vaccine_choice") &&
+    !(root && text("entry_state") === "withdrawn")
+  ) {
+    const vocabulary = await supabase.rpc("vaccine_form_choices");
+    if (vocabulary.error)
+      return { error: "Le catalogue est indisponible. Rechargez le dossier." };
+    try {
+      const selected = readVaccineSelection(
+        form,
+        vocabulary.data as VaccineChoice[],
+      );
+      payload.vaccine_code = selected.vaccine_code;
+      payload.vaccine_label = selected.vaccine_label;
+      payload.dose_label =
+        selected.dose_label === "Dose inconnue / non précisée"
+          ? ""
+          : selected.dose_label;
+      if (
+        !selected.catalog_version_id &&
+        payload.matching_status !== "unmatched"
+      )
+        return { error: "Un vaccin non catalogué doit rester non rapproché." };
+    } catch (error) {
+      return {
+        error:
+          error instanceof Error ? error.message : "Choix vaccinaux invalides.",
+      };
+    }
+  }
   const input = {
     p_operation_id: operation,
     p_child_id: child,

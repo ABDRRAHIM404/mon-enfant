@@ -1,13 +1,36 @@
+"use client";
+import { useState } from "react";
+import { VaccineSelection } from "./selection";
+import type { VaccineChoice } from "@/lib/vaccines/choices";
 import type { ClinicalEntry } from "@/lib/clinical/types";
 import type { VaccineItemExport } from "@/lib/vaccines/patient-types";
 export function VaccinationFields({
   previous,
   items,
+  choices,
 }: {
   previous?: ClinicalEntry;
   items: VaccineItemExport[];
+  choices: VaccineChoice[];
 }) {
   const data = previous?.payload;
+  const [matching, setMatching] = useState(
+    String(data?.matching_status ?? "unmatched"),
+  );
+  const [itemId, setItemId] = useState(String(data?.schedule_item_id ?? ""));
+  const [selected, setSelected] = useState<{
+    choice: VaccineChoice | null;
+    dose: string;
+  } | null>(null);
+  const eligibleItems = selected
+    ? items.filter(
+        (item) =>
+          selected.choice &&
+          item.version_id === selected.choice.version_id &&
+          item.rule.vaccine_code === selected.choice.vaccine_code &&
+          item.dose_code === selected.dose,
+      )
+    : items;
   function text(
     name: string,
     label: string,
@@ -48,14 +71,15 @@ export function VaccinationFields({
   return (
     <>
       <h2>Administration documentée</h2>
-      {text(
-        "vaccine_code",
-        "Code vaccin (ex. VPO, Penta, PCV, Rota)",
-        true,
-        32,
-      )}
-      {text("vaccine_label", "Nom du vaccin tel que documenté", true)}
-      {text("dose_label", "Dose déclarée dans la source (si connue)")}
+      <VaccineSelection
+        choices={choices}
+        previous={data}
+        onSelectionChange={(choice, dose) => {
+          setSelected({ choice, dose });
+          setMatching("unmatched");
+          setItemId("");
+        }}
+      />
       {known("lot_status", "lot_number", "Numéro du lot", true)}
       {known("site_status", "site", "Site d’administration")}
       {known(
@@ -77,7 +101,11 @@ export function VaccinationFields({
         Décision de rapprochement
         <select
           name="matching_status"
-          defaultValue={data?.matching_status ?? "unmatched"}
+          value={matching}
+          onChange={(event) => {
+            setMatching(event.target.value);
+            if (event.target.value === "unmatched") setItemId("");
+          }}
         >
           <option value="unmatched">
             Non rapprochée — aucune référence validée
@@ -91,10 +119,11 @@ export function VaccinationFields({
         Référence prévue pour cet enfant
         <select
           name="schedule_item_id"
-          defaultValue={data?.schedule_item_id ?? ""}
+          value={itemId}
+          onChange={(event) => setItemId(event.target.value)}
         >
           <option value="">Aucune — conserver non rapprochée</option>
-          {items.map((item) => (
+          {eligibleItems.map((item) => (
             <option key={item.id} value={item.id}>
               {item.dose_code} · {item.rule.vaccine_code} · {item.version_label}{" "}
               ·{" "}

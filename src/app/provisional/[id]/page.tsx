@@ -1,3 +1,4 @@
+import type { VaccineChoice } from "@/lib/vaccines/choices";
 import Link from "next/link";
 import { randomUUID } from "node:crypto";
 import { redirect, notFound } from "next/navigation";
@@ -46,6 +47,9 @@ export default async function ProvisionalBooklet({
     editing = (current.data as { entries: ProvisionalEntry[] }).entries[0];
     if (!editing) notFound();
   }
+  const vocabulary = await supabase.rpc("vaccine_form_choices");
+  if (vocabulary.error)
+    throw new Error("Choix vaccinaux indisponibles. Rechargez la page.");
   return (
     <main className="workspace">
       <ProvisionalHeader profile={profile} />
@@ -79,6 +83,7 @@ export default async function ProvisionalBooklet({
           childId={id}
           operationId={randomUUID()}
           entry={editing}
+          vaccineChoices={vocabulary.data as VaccineChoice[]}
           initialKind={
             q.kind && Object.hasOwn(provisionalKinds, q.kind)
               ? (q.kind as keyof typeof provisionalKinds)

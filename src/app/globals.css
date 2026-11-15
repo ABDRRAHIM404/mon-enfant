@@ -2620,3 +2620,109 @@ th {
     font-size: 16px;
   }
 }
+
+/* Update 4: shared choice controls; native small lists retain platform semantics. */
+select {
+  min-height: 48px;
+  max-width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 36px 12px 14px;
+  color: var(--ink);
+  background-color: var(--card);
+  font: inherit;
+  color-scheme: inherit;
+}
+select option,
+select optgroup {
+  color: var(--ink);
+  background: var(--card);
+}
+select:focus-visible,
+.smart-input-wrap input:focus-visible {
+  outline: 3px solid var(--teal);
+  outline-offset: 3px;
+}
+.smart-field {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+.smart-field > label {
+  display: block;
+  margin: 0;
+}
+.smart-field .fine {
+  margin: 0;
+}
+.smart-input-wrap {
+  position: relative;
+  min-width: 0;
+}
+.smart-input-wrap input {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding-right: 34px;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font: inherit;
+}
+.smart-chevron {
+  position: absolute;
+  right: 14px;
+  top: 12px;
+  pointer-events: none;
+  color: var(--muted);
+}
+.smart-options {
+  z-index: 10000;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 4px;
+  color: var(--ink);
+  background: var(--card);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 18%);
+}
+.smart-options > p {
+  padding: 12px;
+}
+.smart-option {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 48px;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.smart-option strong {
+  font-size: 15px;
+  font-weight: 600;
+}
+.smart-option small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.smart-option:hover,
+.smart-option.is-focused {
+  background: var(--surface);
+  outline: 2px solid var(--teal);
+  outline-offset: -2px;
+}
+.smart-option[aria-selected="true"] {
+  border-left: 3px solid var(--teal);
+}
+@media (max-width: 700px) {
+  select,
+  .smart-input-wrap input {
+    font-size: 16px;
+  }
+}

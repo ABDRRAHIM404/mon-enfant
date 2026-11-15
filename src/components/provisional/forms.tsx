@@ -1,5 +1,11 @@
 "use client";
+import {
+  localAppointmentInput,
+  localAppointmentOffset,
+} from "@/lib/appointments/calendar";
 import { useActionState, useState } from "react";
+import { VaccineSelection } from "@/components/vaccines/selection";
+import type { VaccineChoice } from "@/lib/vaccines/choices";
 import { createProvisional, writeProvisional } from "@/app/provisional/actions";
 import {
   provisionalKinds,
@@ -9,7 +15,12 @@ import {
 export function ProvisionalChildForm({ operationId }: { operationId: string }) {
   const [state, action, pending] = useActionState(createProvisional, {});
   return (
-    <form action={action} className="form-grid" aria-busy={pending}>
+    <form
+      action={action}
+      className="form-grid"
+      aria-busy={pending}
+      onReset={(event) => event.preventDefault()}
+    >
       <input type="hidden" name="operationId" value={operationId} />
       <label>
         Certitude du nom
@@ -75,18 +86,25 @@ export function ProvisionalEntryForm({
   operationId,
   entry,
   initialKind,
+  vaccineChoices = [],
 }: {
   childId: string;
   operationId: string;
   entry?: ProvisionalEntry;
   initialKind?: keyof typeof provisionalKinds;
+  vaccineChoices?: VaccineChoice[];
 }) {
   const [kind, setKind] = useState(
     entry?.kind ?? initialKind ?? "consultation",
   );
   const [state, action, pending] = useActionState(writeProvisional, {});
   return (
-    <form action={action} className="form-grid" aria-busy={pending}>
+    <form
+      action={action}
+      className="form-grid"
+      aria-busy={pending}
+      onReset={(event) => event.preventDefault()}
+    >
       <input type="hidden" name="operationId" value={operationId} />
       <input type="hidden" name="childId" value={childId} />
       {entry && (
@@ -115,19 +133,51 @@ export function ProvisionalEntryForm({
       </label>
       {entry && <input type="hidden" name="kind" value={kind} />}
       <div key={kind} className="form-grid">
-        {provisionalFields[kind].map((field) => (
-          <label key={field.key}>
-            {field.label}
-            <input
-              name={field.key}
-              type={field.type ?? "text"}
-              step={field.type === "number" ? "any" : undefined}
-              required={field.required}
-              maxLength={2000}
-              defaultValue={entry?.payload[field.key] ?? ""}
-            />
-          </label>
-        ))}
+        {kind === "vaccination" && (
+          <VaccineSelection
+            choices={vaccineChoices}
+            previous={entry?.payload}
+          />
+        )}
+        {provisionalFields[kind]
+          .filter(
+            (field) =>
+              field.key !== "scheduled_for" &&
+              (kind !== "vaccination" ||
+                !["vaccine_label", "dose_label"].includes(field.key)),
+          )
+          .map((field) => (
+            <label key={field.key}>
+              {field.label}
+              {!field.type &&
+              [
+                "reason",
+                "findings",
+                "assessment",
+                "plan",
+                "instructions",
+                "description",
+                "notes",
+              ].includes(field.key) ? (
+                <textarea
+                  name={field.key}
+                  required={field.required}
+                  maxLength={2000}
+                  rows={3}
+                  defaultValue={entry?.payload[field.key] ?? ""}
+                />
+              ) : (
+                <input
+                  name={field.key}
+                  type={field.type ?? "text"}
+                  step={field.type === "number" ? "any" : undefined}
+                  required={field.required}
+                  maxLength={2000}
+                  defaultValue={entry?.payload[field.key] ?? ""}
+                />
+              )}
+            </label>
+          ))}
         {kind === "risk" && (
           <>
             <label>
@@ -136,8 +186,15 @@ export function ProvisionalEntryForm({
                 name="category"
                 defaultValue={entry?.payload.category ?? "other"}
               >
-                {["allergy", "medical", "social", "other"].map((v) => (
-                  <option key={v}>{v}</option>
+                {Object.entries({
+                  allergy: "Allergie",
+                  medical: "Médical",
+                  social: "Social",
+                  other: "Autre (préciser dans la description)",
+                }).map(([v, label]) => (
+                  <option key={v} value={v}>
+                    {label}
+                  </option>
                 ))}
               </select>
             </label>
@@ -147,9 +204,51 @@ export function ProvisionalEntryForm({
                 name="severity"
                 defaultValue={entry?.payload.severity ?? "unknown"}
               >
-                {["unknown", "low", "moderate", "high"].map((v) => (
-                  <option key={v}>{v}</option>
+                {Object.entries({
+                  unknown: "Inconnue",
+                  low: "Faible",
+                  moderate: "Modérée",
+                  high: "Élevée",
+                }).map(([v, label]) => (
+                  <option key={v} value={v}>
+                    {label}
+                  </option>
                 ))}
+              </select>
+            </label>
+          </>
+        )}
+        {kind === "appointment" && (
+          <>
+            <label>
+              Date et heure du rendez-vous (Casablanca)
+              <input
+                name="scheduled_local"
+                type="datetime-local"
+                step="60"
+                required
+                defaultValue={
+                  entry?.payload.scheduled_for
+                    ? localAppointmentInput(String(entry.payload.scheduled_for))
+                    : ""
+                }
+              />
+            </label>
+            <label>
+              Décalage si l’heure est répétée
+              <select
+                name="scheduled_offset"
+                defaultValue={
+                  entry?.payload.scheduled_for
+                    ? localAppointmentOffset(
+                        String(entry.payload.scheduled_for),
+                      )
+                    : "auto"
+                }
+              >
+                <option value="auto">Automatique si l’heure est unique</option>
+                <option value="+01:00">UTC+1</option>
+                <option value="+00:00">UTC+0</option>
               </select>
             </label>
           </>
