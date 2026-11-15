@@ -126,6 +126,8 @@ Synthetic web technical acceptance is verified: full hosted desktop/tablet/phone
 
 ## Phase 8 — mobile
 
+Owner steering (15 November): prioritize the Android APK and website. iPhone/iOS remains deferred, with prior source/compilation/partial runtime evidence retained and unfinished gates open.
+
 - [x] Choose/document and implement the native Android/iOS parent client in source: pinned React Native/Expo, MOBILE_PLAN.md; mobile cloud 43671670888, root/backend 43670556470. Runtime acceptance is separate below.
 - [ ] Reuse server authorization, secure sessions, child/booklet/appointments and notification experience.
 - [x] First real Android APK and iOS Simulator compilation: cloud 43669991631, source 581133d; no distribution credentials. Later source changes require updated native evidence.

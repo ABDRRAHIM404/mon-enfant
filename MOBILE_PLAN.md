@@ -1,6 +1,6 @@
 # Phase 8 — Android/iOS parent client
 
-15 November 2026. M01 in USER_STORIES.md and the complete PROJECT_PLAN.md remain the acceptance scope. The previous turn was progress: real sharing was applied, tested, published and primary main synchronized. This turn starts the native client; it does not close clinical, legal, credential/guardian, hosting, email or remaining Phase 6 gates.
+15 November 2026. Owner steering: finish Android APK and website now; defer all iPhone/iOS work until the owner resumes it. M01 in USER_STORIES.md and the complete PROJECT_PLAN.md remain the acceptance scope. The previous turn was progress: real sharing was applied, tested, published and primary main synchronized. This turn starts the native client; it does not close clinical, legal, credential/guardian, hosting, email or remaining Phase 6 gates.
 
 Use React Native 0.88 / Expo SDK 58 and Expo Router, with an independent pinned package/lockfile under mobile/. This is native UI on the same Supabase project, not a webview. The first cloud dependency bootstrap 43665401106 passed; a follow-up adds the same Lucide icon family as web. No local installation, Metro server, emulator, native build or browser is permitted on the owner's PC.
 

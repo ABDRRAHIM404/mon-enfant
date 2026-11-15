@@ -208,6 +208,8 @@ The user prioritized completing the remaining application features, including pa
 
 ## 11. Phase 8 — Mobile app
 
+Owner priority (15 November 2026): finish the Android APK and website now. iPhone/iOS work is deferred until the owner resumes it; its unfinished acceptance/distribution gates remain open.
+
 - Chosen implementation: React Native 0.88.1 / Expo 58.0.25, independent pinned package under mobile/; source and first Android/iOS binaries verified. See MOBILE_PLAN.md and PROGRESS.md; native runtime acceptance remains open.
 - Reuse the server-side permission model and existing backend.
 - Prioritize parent navigation, notifications and child booklet experience.

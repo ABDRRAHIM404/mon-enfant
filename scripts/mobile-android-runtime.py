@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-"""Cloud-only native UI journey. Credentials and UI dumps never enter logs/artifacts."""
+"""Cloud Android journey. Active QR images, credentials and automation traces stay runner-private."""
 import hashlib
 import json
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import time
-import xml.etree.ElementTree as ET
+import urllib.request
 
 if os.environ.get('GITHUB_ACTIONS') != 'true':
     raise SystemExit('Native runtime belongs in GitHub Actions')
@@ -17,119 +18,85 @@ email = os.environ['MON_ENFANT_PARENT_BROWSER_PARENT_EMAIL']
 password = os.environ['MON_ENFANT_PARENT_BROWSER_PARENT_PASSWORD']
 assert email == f'qa-parent-{run}-parent@example.invalid'
 assert re.fullmatch('[A-Za-z0-9_-]+', password)
-app = 'app.monenfant.parent'
 sdk = Path(os.environ['ANDROID_HOME'])
-adb = str(sdk / 'platform-tools/adb')
+adb = str(sdk/'platform-tools/adb')
+temp = Path(os.environ['RUNNER_TEMP'])/'mon-enfant-android-runtime'
+temp.mkdir(mode=0o700)
 output = Path('test-results/mobile-runtime')
 output.mkdir(parents=True, exist_ok=True)
 proof = json.loads(Path('native-build/build-proof.json').read_text())
 apk = Path('native-build/mon-enfant-parent-development.apk')
 assert proof['platform'] == 'android' and proof['compiled'] and proof['synthetic_only']
 assert hashlib.sha256(apk.read_bytes()).hexdigest() == proof['sha256']
-stage = 'emulator-start'
+app = 'app.monenfant.parent'
+stage = 'toolchain'
 checks = []
-expected_control = None
-screen_width, screen_height = 1080, 2400
+emulator = None
+safe_images = {name+'.png' for name in ('native-login', 'native-home', 'native-booklet', 'native-growth', 'native-vaccinations', 'native-sharing-revoked', 'native-appointments', 'native-notifications')}
 
-def command(args, timeout=30):
+def command(args, timeout=60):
     return subprocess.run(args, capture_output=True, text=True, timeout=timeout, check=True).stdout
 
 def shell(*args):
     return command([adb, '-s', 'emulator-5554', 'shell', *args])
 
-def nodes():
-    shell('uiautomator', 'dump', '/sdcard/mon-enfant-window.xml')
-    xml = shell('cat', '/sdcard/mon-enfant-window.xml')
-    return list(ET.fromstring(xml).iter('node'))
+def add(flow, name, value=None):
+    flow.append('- '+name+('' if value is None else ': '+json.dumps(value, ensure_ascii=False)))
 
-def scroll_view(direction):
-    shell('input', 'swipe', str(screen_width//2), str(int(screen_height*(0.3 if direction == 'up' else 0.75))), str(screen_width//2), str(int(screen_height*(0.75 if direction == 'up' else 0.3))), '350')
+def visible(flow, selector):
+    add(flow, 'extendedWaitUntil', {'visible': selector, 'timeout': 60000})
 
-def find(label, by_id=False, timeout=45, scroll=False):
-    global expected_control
-    expected_control = label
-    until = time.monotonic() + timeout
-    while time.monotonic() < until:
-        try:
-            current_nodes = nodes()
-        except (subprocess.CalledProcessError, subprocess.TimeoutExpired, ET.ParseError):
-            time.sleep(1)
-            continue
-        # Only dismiss a known first-boot SYSTEM launcher ANR, never an app-under-test ANR.
-        system_launcher_dialog = any(n.get('resource-id') == 'android:id/alertTitle' and n.get('text') in {"Pixel Launcher isn't responding", "Launcher3 isn't responding", "Quickstep isn't responding"} for n in current_nodes)
-        if system_launcher_dialog:
-            close = next((n for n in current_nodes if n.get('resource-id') == 'android:id/aerr_close'), None)
-            if close is not None:
-                bounds = [int(v) for v in re.findall(r'\d+', close.get('bounds', ''))]
-                assert len(bounds) == 4
-                shell('input', 'tap', str((bounds[0]+bounds[2])//2), str((bounds[1]+bounds[3])//2))
-                if 'system_launcher_first_boot_dialog_closed' not in checks:
-                    checks.append('system_launcher_first_boot_dialog_closed')
-                time.sleep(2)
-                continue
-        adjusted = False
-        for node in current_nodes:
-            value = node.get('resource-id', '') if by_id else node.get('text', '')
-            matches = value == label or (by_id and value.endswith('/' + label)) or (not by_id and node.get('content-desc', '') == label)
-            if matches and node.get('enabled') == 'true':
-                bounds = [int(v) for v in re.findall(r'\d+', node.get('bounds', ''))]
-                if scroll and len(bounds) == 4 and (bounds[1] < screen_height*0.1 or bounds[3] > screen_height*0.85):
-                    scroll_view('up' if bounds[1] < screen_height*0.1 else 'down')
-                    adjusted = True
-                    break
-                return node
-        if adjusted:
-            time.sleep(0.5)
-            continue
-        if scroll:
-            scroll_view('up' if scroll == 'up' else 'down')
-        time.sleep(1)
-    raise RuntimeError('Expected native control unavailable')
+def scroll(flow, selector, direction='DOWN'):
+    add(flow, 'scrollUntilVisible', {'element': selector, 'direction': direction, 'timeout': 30000, 'visibilityPercentage': 100, 'centerElement': True})
 
-def tap(label, by_id=False, scroll=False):
-    node = find(label, by_id, scroll=scroll)
-    bounds = [int(v) for v in re.findall(r'\d+', node.get('bounds', ''))]
-    assert len(bounds) == 4
-    shell('input', 'tap', str((bounds[0]+bounds[2])//2), str((bounds[1]+bounds[3])//2))
+def tap(flow, selector):
+    add(flow, 'tapOn', selector)
 
-def capture(name):
-    with (output / (name + '.png')).open('wb') as handle:
-        subprocess.run([adb, '-s', 'emulator-5554', 'exec-out', 'screencap', '-p'], stdout=handle, stderr=subprocess.DEVNULL, check=True)
-
-def launch():
-    shell('monkey', '-p', app, '-c', 'android.intent.category.LAUNCHER', '1')
-
-def hide_keyboard():
-    state = shell('dumpsys', 'input_method')
-    if re.search(r'mInputShown=true|mIsInputViewShown=true', state):
-        shell('input', 'keyevent', '4')
-
-def type_text(value):
-    # ADB bulk key injection can outrun controlled RN inputs on a cold emulator.
-    # Use normal paced key events; do not add any production credential bridge.
-    for character in value:
-        shell('input', 'text', character)
-        time.sleep(0.1)
-
-def login(remember):
-    tap('login-email', True)
-    type_text(email)
-    hide_keyboard()
-    assert find('login-email', True).get('text') == email
-    tap('login-password', True, scroll=True)
-    type_text(password)
-    hide_keyboard()
+def login(flow, remember):
+    scroll(flow, {'id': 'login-email'})
+    tap(flow, {'id': 'login-email'}); add(flow, 'inputText', email); add(flow, 'hideKeyboard')
+    scroll(flow, {'id': 'login-password'})
+    tap(flow, {'id': 'login-password'}); add(flow, 'inputText', password); add(flow, 'hideKeyboard')
     if remember:
-        tap('Rester connecté sur cet appareil personnel', scroll=True)
-    tap('login-submit', True, scroll=True)
-    find('Mes enfants')
+        scroll(flow, 'Rester connecté sur cet appareil personnel')
+        tap(flow, 'Rester connecté sur cet appareil personnel')
+    scroll(flow, {'id': 'login-submit'}); tap(flow, {'id': 'login-submit'})
+    visible(flow, 'Mes enfants')
 
-emulator = None
-emulator_log = Path(os.environ['RUNNER_TEMP'])/'mon-enfant-emulator-startup.log'
+def execute(cli, name, flow):
+    target = temp/(name+'.yaml')
+    target.write_text('appId: '+app+'\n---\n'+'\n'.join(flow)+'\n')
+    target.chmod(0o600)
+    artifacts = temp/(name+'-artifacts')
+    env = os.environ.copy(); env['MAESTRO_CLI_NO_ANALYTICS'] = '1'
+    with (temp/(name+'.log')).open('wb') as log:
+        result = subprocess.run([str(cli), '--device', 'emulator-5554', 'test', '--test-output-dir', str(artifacts), '--debug-output', str(temp/(name+'-debug')), str(target)], stdout=log, stderr=subprocess.STDOUT, env=env, timeout=660)
+    for image in artifacts.glob('**/*.png'):
+        if image.name in safe_images:
+            shutil.copyfile(image, output/image.name)
+    if result.returncode != 0:
+        diagnostic = (temp/(name+'.log')).read_text(errors='replace').replace(email, '[synthetic-email]').replace(password, '[redacted]')
+        diagnostic = re.sub(r'(?<![A-Za-z0-9_-])[A-Za-z0-9_-]{43}(?![A-Za-z0-9_-])', '[token-redacted]', diagnostic)
+        print(json.dumps({'native_automation_phase': name, 'sanitized_automation_tail': diagnostic[-5000:]}), flush=True)
+        raise RuntimeError('Native UI journey failed')
+    return artifacts
+
 try:
-    emulator = subprocess.Popen([str(sdk/'emulator/emulator'), '-avd', 'mon-enfant-qa', '-no-window', '-no-audio', '-no-boot-anim', '-no-snapshot', '-gpu', 'swiftshader_indirect', '-memory', '3072', '-cores', '2'], stdout=emulator_log.open('wb'), stderr=subprocess.STDOUT)
+    base = 'https://github.com/mobile-dev-inc/Maestro/releases/download/cli-2.12.1/'
+    checksum = urllib.request.urlopen(base+'checksums_sha256.txt', timeout=40).read().decode()
+    archive = temp/'maestro.zip'
+    urllib.request.urlretrieve(base+'maestro.zip', archive)
+    digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+    assert any(line.split()[0] == digest and line.split()[-1].lstrip('*').endswith('maestro.zip') for line in checksum.splitlines() if line.strip())
+    command(['unzip', '-q', str(archive), '-d', str(temp/'maestro')])
+    candidates = list((temp/'maestro').glob('**/bin/maestro'))
+    assert len(candidates) == 1
+    cli = candidates[0]; cli.chmod(0o700)
+    stage = 'emulator-start'
+    startup = (temp/'emulator.log').open('wb')
+    emulator = subprocess.Popen([str(sdk/'emulator/emulator'), '-avd', 'mon-enfant-qa', '-no-window', '-no-audio', '-no-boot-anim', '-no-snapshot', '-gpu', 'swiftshader_indirect', '-memory', '3072', '-cores', '2'], stdout=startup, stderr=subprocess.STDOUT)
     command([adb, 'start-server'])
-    until = time.monotonic() + 240
+    until = time.monotonic()+240
     while True:
         if emulator.poll() is not None: raise RuntimeError('Emulator exited before boot')
         try:
@@ -138,116 +105,74 @@ try:
             pass
         if time.monotonic() > until: raise RuntimeError('Emulator boot timed out')
         time.sleep(2)
-    shell('wm', 'size', '720x1600')
-    shell('wm', 'density', '280')
-    screen_width, screen_height = map(int, re.findall(r'(\d+)x(\d+)', shell('wm', 'size'))[-1])
-    shell('settings', 'put', 'global', 'window_animation_scale', '0')
-    shell('settings', 'put', 'global', 'transition_animation_scale', '0')
-    shell('settings', 'put', 'global', 'animator_duration_scale', '0')
+    shell('wm', 'size', '720x1600'); shell('wm', 'density', '280')
+    for scale in ('window_animation_scale', 'transition_animation_scale', 'animator_duration_scale'):
+        shell('settings', 'put', 'global', scale, '0')
     shell('input', 'keyevent', '82')
     shell('settings', 'put', 'secure', 'show_ime_with_hard_keyboard', '1')
     command([adb, '-s', 'emulator-5554', 'install', '-r', str(apk)], timeout=90)
-    stage = 'native-launch'
-    launch()
-    time.sleep(3)
-    capture('native-initial-launch')
-    find('login-email', True, timeout=90)
-    capture('native-login')
-    checks.append('native_login_render')
-    stage = 'session-only-login'
-    login(False)
-    capture('native-home')
-    checks.append('real_password_login_and_guarded_home')
-    stage = 'session-only-process-death'
-    shell('am', 'force-stop', app)
-    launch()
-    find('login-email', True)
-    checks.append('session_only_auth_not_restored_after_process_death')
-    stage = 'remembered-login'
-    login(True)
-    shell('am', 'force-stop', app)
-    launch()
-    find('Mes enfants')
-    checks.append('remembered_auth_restored_after_process_death')
-    stage = 'children-booklet'
-    tap('Enfants')
-    find('Mes enfants')
-    tap('Consulter le carnet')
-    find('Vaccinations et partage temporaire')
-    capture('native-booklet')
-    checks.append('guardian_child_and_booklet_render')
-    stage = 'growth'
-    tap('Croissance', scroll=True)
-    find('Poids (kg)', scroll=True)
-    capture('native-growth')
-    checks.append('native_raw_growth_render')
-    stage = 'vaccination-history'
-    tap('Vaccinations et partage temporaire', scroll='up')
-    find('Historique des vaccinations')
-    find('Vaccin transcrit fictif', scroll=True)
-    capture('native-vaccinations')
-    checks.append('native_vaccination_view')
-    stage = 'native-qr'
-    tap('J’autorise un soignant vérifié à lire ces informations pendant cinq minutes maximum.', scroll=True)
-    tap('sharing-create', True, scroll=True)
-    find('Révoquer ce code', scroll=True)
-    # Active QR bytes flow directly to the decoder, never an uploaded artifact.
-    image = subprocess.run([adb, '-s', 'emulator-5554', 'exec-out', 'screencap', '-p'], capture_output=True, check=True).stdout
-    decoded = subprocess.run(['node', 'scripts/mobile-qr-runtime.mjs', 'redeem'], input=image, capture_output=True, timeout=50)
-    assert decoded.returncode == 0
+    stage = 'native-login-records-qr'
+    flow = []
+    add(flow, 'launchApp')
+    add(flow, 'runFlow', {'when': {'visible': "(Quickstep|Pixel Launcher|Launcher3) isn't responding"}, 'commands': [{'tapOn': 'Close app'}]})
+    visible(flow, {'id': 'login-email'})
+    add(flow, 'takeScreenshot', 'native-login')
+    login(flow, False)
+    add(flow, 'takeScreenshot', 'native-home')
+    add(flow, 'stopApp'); add(flow, 'launchApp'); visible(flow, {'id': 'login-email'})
+    login(flow, True)
+    add(flow, 'stopApp'); add(flow, 'launchApp'); visible(flow, 'Mes enfants')
+    tap(flow, 'Enfants.*'); visible(flow, 'Mes enfants')
+    tap(flow, 'Consulter le carnet'); visible(flow, 'Vaccinations et partage temporaire')
+    add(flow, 'takeScreenshot', 'native-booklet')
+    scroll(flow, 'Croissance'); tap(flow, 'Croissance')
+    scroll(flow, 'Poids \\(kg\\)'); add(flow, 'takeScreenshot', 'native-growth')
+    scroll(flow, 'Vaccinations et partage temporaire', 'UP'); tap(flow, 'Vaccinations et partage temporaire')
+    visible(flow, 'Historique des vaccinations')
+    scroll(flow, 'Vaccin transcrit fictif'); add(flow, 'takeScreenshot', 'native-vaccinations')
+    consent = 'J’autorise un soignant vérifié à lire ces informations pendant cinq minutes maximum.'
+    scroll(flow, consent); tap(flow, consent)
+    scroll(flow, {'id': 'sharing-create'}); tap(flow, {'id': 'sharing-create'})
+    scroll(flow, 'Révoquer ce code')
+    add(flow, 'takeScreenshot', 'qr-private')
+    private_artifacts = execute(cli, 'records-and-qr', flow)
+    checks.extend(['native_login_render', 'real_password_login_and_guarded_home', 'session_only_auth_not_restored_after_process_death', 'remembered_auth_restored_after_process_death', 'guardian_child_and_booklet_render', 'native_raw_growth_render', 'native_vaccination_view'])
+    stage = 'private-native-qr-redemption'
+    images = list(private_artifacts.glob('**/qr-private.png'))
+    assert len(images) == 1
+    with images[0].open('rb') as image:
+        result = subprocess.run(['node', 'scripts/mobile-qr-runtime.mjs', 'redeem'], stdin=image, capture_output=True, timeout=50)
+    images[0].unlink()
+    assert result.returncode == 0
     checks.append('native_qr_decoded_and_scoped_recipient_read')
-    tap('Révoquer ce code')
-    find('Afficher mon QR sécurisé', scroll=True)
+    stage = 'native-share-revocation'
+    flow = []
+    scroll(flow, 'Révoquer ce (code|partage)'); tap(flow, 'Révoquer ce (code|partage)')
+    visible(flow, 'Partage révoqué.*')
+    add(flow, 'takeScreenshot', 'native-sharing-revoked')
+    execute(cli, 'share-revocation', flow)
     command(['node', 'scripts/mobile-qr-runtime.mjs', 'revoked'], timeout=40)
     checks.append('native_share_revocation_denies_existing_recipient_session')
-    # Return buttons are explicit and independent of Android gesture navigation.
-    shell('input', 'keyevent', '4')
-    shell('input', 'keyevent', '4')
-    stage = 'calendar'
-    tap('Rendez-vous')
-    find('Mes rendez-vous')
-    find('Consultation fictive mobile', scroll=True)
-    capture('native-appointments')
-    checks.append('native_guardian_appointment_render')
-    stage = 'notifications'
-    tap('Messages')
-    find('Mes notifications')
-    capture('native-notifications')
-    checks.append('in_app_notifications_render')
-    stage = 'logout'
-    tap('Compte')
-    tap('logout', True, scroll=True)
-    tap('Se déconnecter')
-    find('login-email', True)
-    shell('am', 'force-stop', app)
-    launch()
-    find('login-email', True)
-    checks.append('native_logout_survives_process_restart')
-    result = {'fixture_run': run, 'runtime_commit': os.environ['GITHUB_SHA'], 'binary_commit': proof['commit'], 'apk_sha256': proof['sha256'], 'platform': 'Android API 34 emulator', 'checks': checks, 'passed': True, 'store_distribution': False, 'synthetic_only': True, 'fixture_retirement_required': True}
+    stage = 'calendar-notifications-logout'
+    flow = []
+    scroll(flow, 'Retour', 'UP'); tap(flow, 'Retour')
+    visible(flow, 'Vaccinations et partage temporaire')
+    scroll(flow, 'Retour', 'UP'); tap(flow, 'Retour'); visible(flow, 'Mes enfants')
+    tap(flow, 'Rendez-vous.*'); visible(flow, 'Mes rendez-vous')
+    scroll(flow, 'Consultation fictive mobile'); add(flow, 'takeScreenshot', 'native-appointments')
+    tap(flow, 'Messages.*'); visible(flow, 'Mes notifications')
+    add(flow, 'takeScreenshot', 'native-notifications')
+    tap(flow, 'Compte.*'); scroll(flow, {'id': 'logout'}); tap(flow, {'id': 'logout'})
+    tap(flow, {'id': 'android:id/button1'})
+    visible(flow, {'id': 'login-email'})
+    add(flow, 'stopApp'); add(flow, 'launchApp'); visible(flow, {'id': 'login-email'})
+    execute(cli, 'calendar-and-logout', flow)
+    checks.extend(['native_guardian_appointment_render', 'in_app_notifications_render', 'native_logout_survives_process_restart'])
+    result = {'fixture_run': run, 'runtime_commit': os.environ['GITHUB_SHA'], 'binary_commit': proof['commit'], 'apk_sha256': proof['sha256'], 'platform': 'Android API 34 emulator', 'maestro_version': 'cli-2.12.1', 'checks': checks, 'passed': True, 'store_distribution': False, 'synthetic_only': True, 'fixture_retirement_required': True}
     (output/'runtime-proof.json').write_text(json.dumps(result, indent=2)+'\n')
-    print(json.dumps(result))
+    print(json.dumps(result), flush=True)
 except Exception as error:
-    if stage not in ('native-launch', 'emulator-start'):
-        try:
-            if stage != 'native-qr': capture('native-journey-stop')
-            labels = [{'text': '[input omitted]' if n.get('class') == 'android.widget.EditText' else n.get('text'), 'id': n.get('resource-id'), 'description': n.get('content-desc'), 'enabled': n.get('enabled'), 'checked': n.get('checked'), 'bounds': n.get('bounds')} for n in nodes() if n.get('text') or n.get('resource-id') or n.get('content-desc')]
-            diagnostic = json.dumps({'synthetic_native_labels': labels[-35:]}).replace(password, '[redacted]').replace(email, '[synthetic-email]')
-            print(re.sub(r'(?<![A-Za-z0-9_-])[A-Za-z0-9_-]{43}(?![A-Za-z0-9_-])', '[token-redacted]', diagnostic))
-        except Exception:
-            pass
-    if stage == 'native-launch':
-        # Fresh installation, before entering either credential: safe public render/crash diagnostics.
-        try:
-            capture('native-initial-launch')
-            print(json.dumps({'initial_native_labels': [{'text': n.get('text'), 'id': n.get('resource-id'), 'description': n.get('content-desc'), 'enabled': n.get('enabled'), 'checked': n.get('checked'), 'bounds': n.get('bounds')} for n in nodes() if n.get('text') or n.get('resource-id') or n.get('content-desc')][-20:]}))
-            print(command([adb, '-s', 'emulator-5554', 'logcat', '-d', '-s', 'AndroidRuntime', 'ReactNativeJS'])[-8000:])
-        except Exception:
-            pass
-    if stage == 'emulator-start' and emulator_log.exists():
-        # Emulator startup happens before installing/logging into the app. No Auth/UI data.
-        print(emulator_log.read_text(errors='replace')[-8000:])
-    print(json.dumps({'expected_control': expected_control, 'error_type': type(error).__name__, 'passed': False, 'failed_stage': stage, 'checks_completed': checks, 'details_withheld': True, 'fixture_retirement_required': True}))
+    print(json.dumps({'passed': False, 'failed_stage': stage, 'error_type': type(error).__name__, 'checks_completed': checks, 'details_withheld': True, 'fixture_retirement_required': True}), flush=True)
     raise SystemExit(1) from None
 finally:
-    if emulator is not None:
-        emulator.terminate()
+    if emulator is not None: emulator.terminate()
