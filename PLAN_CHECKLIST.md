@@ -135,7 +135,9 @@ Owner steering (15 November): prioritize the Android APK and website. iPhone/iOS
 - [x] Android latest-source build 43694870085 / 9d808ec and full native runtime 43696384719, inspected renders and verified synthetic fixture retirement; exact SHA/proof in docs/mobile/android-acceptance.json.
 - [ ] Resume full iOS runtime/visual acceptance when requested by the owner; prior partial evidence does not close this gate.
 - [x] Publish the exact accepted Android development APK as a [private GitHub prerelease](https://github.com/ABDRRAHIM404/mon-enfant/releases/tag/android-v0.1.0-preview.1); cloud 43697474627, uploaded asset SHA matches accepted binary.
-- [ ] Native hardware-camera walkthrough, production vector/adaptive master and owner-approved signing/store distribution arrangements.
+- [x] Owner reports actual Android camera recognition and invitation-field handoff using the format-only QR; access denial for that nonexistent invitation is expected.
+- [ ] Complete the genuine recipient-bound invitation/independent-review/booklet/logout phone walkthrough and retire active synthetic fixture 18fd1a08ce97474b.
+- [ ] Production vector/adaptive master and owner-approved signing/store distribution arrangements.
 
 The complete goal remains active until the full required scope and its approval gates have authoritative evidence. Implemented milestones do not close the complete goal.
 

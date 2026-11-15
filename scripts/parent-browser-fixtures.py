@@ -102,6 +102,12 @@ def cleanup(run):
     for name in state['secrets']:
         if name in present:op.command(['gh','secret','delete',name,'--repo',op.REPO])
     if set(state['secrets'])&op.secret_names():raise RuntimeError('Temporary secrets remain')
+    # Owner-visible hardware handoffs contain a live invitation or temporary login.
+    # Remove only these fixed names after the actors have been fully retired.
+    for suffix in ('-hardware-qr.png','-hardware-invitation.html','-hardware-parent.txt'):
+        handoff=STATE/(run+suffix)
+        handoff.unlink(missing_ok=True)
+        if handoff.exists():raise RuntimeError('Hardware handoff retirement failed')
     path(run).with_suffix('.env').unlink(missing_ok=True);path(run).unlink()
     print(json.dumps({'run':run,'accounts_retired':len(state['actors']),'temporary_secrets_removed':len(state['secrets']),'retirement_verified':True}),flush=True)
 
