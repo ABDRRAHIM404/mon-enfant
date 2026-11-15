@@ -9,6 +9,7 @@ import shutil
 import subprocess
 import time
 import urllib.request
+import xml.etree.ElementTree as ET
 
 if os.environ.get('GITHUB_ACTIONS') != 'true':
     raise SystemExit('Native runtime belongs in GitHub Actions')
@@ -78,6 +79,18 @@ def execute(cli, name, flow):
         diagnostic = (temp/(name+'.log')).read_text(errors='replace').replace(email, '[synthetic-email]').replace(password, '[redacted]')
         diagnostic = re.sub(r'(?<![A-Za-z0-9_-])[A-Za-z0-9_-]{43}(?![A-Za-z0-9_-])', '[token-redacted]', diagnostic)
         print(json.dumps({'native_automation_phase': name, 'sanitized_automation_tail': diagnostic[-5000:]}), flush=True)
+        if name == 'calendar-and-logout':
+            # This phase starts only after native QR revocation and recipient denial.
+            # The current screen cannot contain a live sharing bearer.
+            with (output/'native-journey-stop.png').open('wb') as image:
+                subprocess.run([adb, '-s', 'emulator-5554', 'exec-out', 'screencap', '-p'], stdout=image, stderr=subprocess.DEVNULL, check=True)
+            try:
+                shell('uiautomator', 'dump', '/sdcard/android-logout-state.xml')
+                tree = ET.fromstring(shell('cat', '/sdcard/android-logout-state.xml'))
+                labels = [{'text': '[input omitted]' if n.get('class') == 'android.widget.EditText' else n.get('text'), 'id': n.get('resource-id'), 'description': n.get('content-desc')} for n in tree.iter('node') if n.get('text') or n.get('resource-id') or n.get('content-desc')]
+                print(json.dumps({'logout_native_labels': labels[-25:]}).replace(email, '[synthetic-email]').replace(password, '[redacted]'), flush=True)
+            except (subprocess.CalledProcessError, ET.ParseError):
+                pass
         raise RuntimeError('Native UI journey failed')
     return artifacts
 
@@ -164,7 +177,7 @@ try:
     add(flow, 'takeScreenshot', 'native-notifications')
     tap(flow, 'Compte.*'); scroll(flow, {'id': 'logout'}); tap(flow, {'id': 'logout'})
     tap(flow, {'id': 'android:id/button1'})
-    visible(flow, {'id': 'login-email'})
+    scroll(flow, {'id': 'login-email'}, 'UP'); visible(flow, {'id': 'login-email'})
     add(flow, 'stopApp'); add(flow, 'launchApp'); visible(flow, {'id': 'login-email'})
     execute(cli, 'calendar-and-logout', flow)
     checks.extend(['native_guardian_appointment_render', 'in_app_notifications_render', 'native_logout_survives_process_restart'])
