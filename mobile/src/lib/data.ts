@@ -34,7 +34,9 @@ export function useRpc<T>(name: string, args: Record<string, unknown> = {}) {
         return;
       }
       try {
-        const { data, error } = await client.rpc(name, JSON.parse(key));
+        const { data, error } = await client
+          .rpc(name, JSON.parse(key))
+          .setHeader("Authorization", `Bearer ${session.access_token}`);
         if (attempt !== generation.current) return;
         setState(
           error
@@ -71,7 +73,7 @@ export function useRpc<T>(name: string, args: Record<string, unknown> = {}) {
   };
 }
 export function useAction() {
-  const { client } = useAuth(),
+  const { client, session } = useAuth(),
     lock = useRef(false);
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
@@ -81,13 +83,15 @@ export function useAction() {
     args: Record<string, unknown>,
     success?: string,
   ): Promise<T | null> {
-    if (!client || lock.current) return null;
+    if (!client || !session || lock.current) return null;
     lock.current = true;
     setBusy(true);
     setError("");
     setMessage("");
     try {
-      const { data, error } = await client.rpc(name, args);
+      const { data, error } = await client
+        .rpc(name, args)
+        .setHeader("Authorization", `Bearer ${session.access_token}`);
       if (error) {
         setError(rpcError(error.code));
         return null;
