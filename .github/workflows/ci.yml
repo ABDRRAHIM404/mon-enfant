@@ -326,11 +326,21 @@ jobs:
       contents: read
       actions: read
     env:
+      ANDROID_AVD_HOME: ${{ runner.temp }}/mon-enfant-android/avd
+      ANDROID_USER_HOME: ${{ runner.temp }}/mon-enfant-android
       MON_ENFANT_QA_RUN: ${{ inputs.fixture_run }}
+      MON_ENFANT_PARENT_BROWSER_OUTSIDE_EMAIL: ${{ secrets.MON_ENFANT_PARENT_BROWSER_OUTSIDE_EMAIL }}
+      MON_ENFANT_PARENT_BROWSER_OUTSIDE_PASSWORD: ${{ secrets.MON_ENFANT_PARENT_BROWSER_OUTSIDE_PASSWORD }}
+      MON_ENFANT_PARENT_BROWSER_PUBLIC_KEY: ${{ secrets.MON_ENFANT_PARENT_BROWSER_PUBLIC_KEY }}
       MON_ENFANT_PARENT_BROWSER_PARENT_EMAIL: ${{ secrets.MON_ENFANT_PARENT_BROWSER_PARENT_EMAIL }}
       MON_ENFANT_PARENT_BROWSER_PARENT_PASSWORD: ${{ secrets.MON_ENFANT_PARENT_BROWSER_PARENT_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -343,13 +353,16 @@ jobs:
           github-token: ${{ github.token }}
       - name: Prepare cloud-only Android runtime
         run: |
+          mkdir -p "$ANDROID_AVD_HOME"
           sudo chmod 666 /dev/kvm
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install 'system-images;android-34;google_apis;x86_64' >/dev/null
-          echo no | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd --force --name mon-enfant-qa --package 'system-images;android-34;google_apis;x86_64' --device pixel_6
+          echo no | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd --force --name mon-enfant-qa --package 'system-images;android-34;google_apis;x86_64' --device pixel_6 --path "$ANDROID_AVD_HOME/mon-enfant-qa.avd"
+          "$ANDROID_HOME/emulator/emulator" -list-avds
+          test -f "$ANDROID_AVD_HOME/mon-enfant-qa.ini"
       - name: Exercise actual native UI with fictional accounts only
         run: python3 scripts/mobile-android-runtime.py
       - uses: actions/upload-artifact@v4
-        if: success()
+        if: always()
         with:
           name: mobile-android-runtime
           path: test-results/mobile-runtime/
@@ -381,7 +394,7 @@ jobs:
       - name: Exercise actual native iOS UI with fictional accounts only
         run: python3 scripts/mobile-ios-runtime.py
       - uses: actions/upload-artifact@v4
-        if: success()
+        if: always()
         with:
           name: mobile-ios-runtime
           path: test-results/mobile-ios-runtime/

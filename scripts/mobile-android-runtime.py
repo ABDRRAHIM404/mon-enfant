@@ -75,7 +75,7 @@ def login(remember):
     shell('input', 'keyevent', '111')
     if remember:
         tap('Rester connecté sur cet appareil personnel')
-    tap('login-submit', True)
+    tap('login-submit', True, scroll=True)
     find('Mes enfants')
 
 emulator = None
@@ -126,11 +126,32 @@ try:
     checks.append('guardian_child_and_booklet_render')
     stage = 'vaccination-history'
     tap('Vaccinations et partage temporaire')
-    find('Vaccinations')
+    find('Historique des vaccinations')
+    find('Vaccin transcrit fictif', scroll=True)
     capture('native-vaccinations')
     checks.append('native_vaccination_view')
+    stage = 'native-qr'
+    tap('J’autorise un soignant vérifié à lire ces informations pendant cinq minutes maximum.', scroll=True)
+    tap('sharing-create', True, scroll=True)
+    find('Révoquer ce code', scroll=True)
+    # Active QR bytes flow directly to the decoder, never an uploaded artifact.
+    image = subprocess.run([adb, '-s', 'emulator-5554', 'exec-out', 'screencap', '-p'], capture_output=True, check=True).stdout
+    decoded = subprocess.run(['node', 'scripts/mobile-qr-runtime.mjs', 'redeem'], input=image, capture_output=True, timeout=50)
+    assert decoded.returncode == 0
+    checks.append('native_qr_decoded_and_scoped_recipient_read')
+    tap('Révoquer ce code')
+    find('Afficher mon QR sécurisé', scroll=True)
+    command(['node', 'scripts/mobile-qr-runtime.mjs', 'revoked'], timeout=40)
+    checks.append('native_share_revocation_denies_existing_recipient_session')
+    # Return buttons are explicit and independent of Android gesture navigation.
     shell('input', 'keyevent', '4')
     shell('input', 'keyevent', '4')
+    stage = 'calendar'
+    tap('Rendez-vous')
+    find('Mes rendez-vous')
+    find('Consultation fictive mobile', scroll=True)
+    capture('native-appointments')
+    checks.append('native_guardian_appointment_render')
     stage = 'notifications'
     tap('Messages')
     find('Mes notifications')

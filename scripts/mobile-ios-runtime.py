@@ -94,7 +94,12 @@ try:
     private_env['MAESTRO_CLI_NO_ANALYTICS'] = '1'
     with (temp/'private-maestro.log').open('wb') as log:
         result = subprocess.run([str(cli[0]), '--device', device['udid'], 'test', '--debug-output', str(temp/'debug'), str(target)], stdout=log, stderr=subprocess.STDOUT, env=private_env, timeout=800)
-    assert result.returncode == 0
+    if result.returncode != 0:
+        diagnostic = (temp/'private-maestro.log').read_text(errors='replace')
+        diagnostic = diagnostic.replace(email, '[synthetic-email]').replace(password, '[redacted]')
+        relevant = [line for line in diagnostic.splitlines() if re.search(r'FAIL|Error|Exception|not found|Unable|Assertion|Timed out', line, re.I)]
+        print(json.dumps({'native_automation_diagnostic': relevant[-8:]}))
+        raise RuntimeError('Native journey failed')
     result = {'passed': True, 'binary_commit': proof['commit'], 'runtime_commit': os.environ['GITHUB_SHA'], 'fixture_run': run, 'platform': 'iOS Simulator', 'maestro_version': version, 'checks': ['native_login_render', 'real_password_login_and_guarded_home', 'session_only_auth_not_restored_after_process_death', 'remembered_auth_restored_after_process_death', 'guardian_child_and_booklet_render', 'native_vaccination_view', 'in_app_notifications_render', 'native_logout_survives_process_restart'], 'synthetic_only': True, 'store_distribution': False, 'fixture_retirement_required': True}
     (output/'runtime-proof.json').write_text(json.dumps(result, indent=2)+'\n')
     print(json.dumps(result))
