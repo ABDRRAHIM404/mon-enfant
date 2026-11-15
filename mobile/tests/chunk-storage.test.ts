@@ -72,7 +72,9 @@ describe("encrypted native session storage adapter", () => {
     expect(await s.getItem("session")).toBeNull();
     expect(f.values.size).toBe(0);
     f.values.set("session.index", '{"v":1,"active":"a","a":999999,"b":0}');
+    f.values.set("session.a.3", "encrypted orphan");
     expect(await s.getItem("session")).toBeNull();
+    expect(f.values.size).toBe(0);
   });
   it("bounds remembered sessions without extending the initial deadline on refresh", async () => {
     const f = fixture();

@@ -40,6 +40,14 @@ export function createChunkStorage(
   async function index(key: string): Promise<Index | null> {
     const raw = await native.getItem(key + ".index");
     if (!raw) return null;
+    const invalid: Index = {
+      v: 1,
+      active: "a",
+      a: MAX,
+      b: MAX,
+      length: 0,
+      expires: 0,
+    };
     try {
       const m = JSON.parse(raw);
       if (
@@ -56,10 +64,10 @@ export function createChunkStorage(
         m.length > m[m.active] ||
         !Number.isFinite(m.expires)
       )
-        return null;
+        return invalid;
       return m;
     } catch {
-      return null;
+      return invalid;
     }
   }
   async function clear(key: string, m: Index | null) {

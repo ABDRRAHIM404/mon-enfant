@@ -104,6 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!client) return;
     const active = AppState.currentState === "active";
+    setForeground(active);
     if (active) client.auth.startAutoRefresh();
     else client.auth.stopAutoRefresh();
     const sub = AppState.addEventListener("change", (state) => {

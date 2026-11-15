@@ -24,13 +24,27 @@ describe("mobile input and shared clinical projections", () => {
       expect(invitationToken(value)).toBeNull();
   });
   it("keeps uncertain dates and withdrawn measurements out of plots while retaining source certainty", () => {
-    const base = {
+    const base: ClinicalEntry = {
+      id: "00000000-0000-4000-8000-000000000001",
+      root_id: "00000000-0000-4000-8000-000000000001",
+      previous_id: null,
+      revision: 1,
+      child_id: "00000000-0000-4000-8000-000000000002",
+      kind: "growth",
+      author_id: "00000000-0000-4000-8000-000000000003",
+      professional_id: "QA-ONLY",
+      facility_id: "00000000-0000-4000-8000-000000000004",
+      facility_name: "Centre fictif",
       entry_state: "active",
       occurrence_precision: "exact",
       occurred_on: "2026-01-02",
       source_verified: false,
+      source_type: "observed",
+      source_reference: null,
+      amendment_reason: null,
+      recorded_at: "2026-01-02T12:00:00Z",
       payload: { weight_kg: 6 },
-    } as ClinicalEntry;
+    };
     const points = growthPoints(
       [
         base,
