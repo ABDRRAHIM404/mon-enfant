@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ClinicianShell } from "@/components/clinician/shell";
 import { ShieldCheck, Clock3 } from "lucide-react";
 import { Brand } from "@/components/brand";
 import { getProfessional } from "@/lib/auth";
@@ -17,8 +18,8 @@ export default async function Account() {
   const canReview = reviewPermission?.data === true && !reviewPermission?.error;
   const canManageClinical =
     clinicalPermission?.data === true && !clinicalPermission?.error;
-  return (
-    <main className="account-page">
+  const content = (
+    <section className="account-page">
       <header>
         <Brand />
         <form action={signOut}>
@@ -112,6 +113,18 @@ export default async function Account() {
           uniquement
         </p>
       </section>
-    </main>
+    </section>
   );
+  if (profile && ["doctor", "nurse"].includes(profile.role)) {
+    return (
+      <ClinicianShell
+        active="account"
+        provisional={!canAccessClinicalWorkspace(profile)}
+        profile={profile}
+      >
+        <div className="soignant-account-content">{content}</div>
+      </ClinicianShell>
+    );
+  }
+  return <main>{content}</main>;
 }

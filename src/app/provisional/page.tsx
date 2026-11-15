@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { redirect } from "next/navigation";
 import { Plus, UsersRound, ChevronRight } from "lucide-react";
 import { getProfessional } from "@/lib/auth";
-import { WorkspaceShell } from "@/components/workspace-shell";
+import { ClinicianShell } from "@/components/clinician/shell";
 import { ProvisionalChildForm } from "@/components/provisional/forms";
 import { provisionalKinds, type ProvisionalChild } from "@/lib/provisional";
 import { statusLabels } from "@/lib/authorization";
@@ -16,6 +16,16 @@ export default async function ProvisionalWorkspace({
   const { profile, supabase } = await getProfessional();
   if (!profile) redirect("/account");
   const q = await searchParams;
+  const destinations: Record<string, string> = {
+    children: "children",
+    consultation: "consultations",
+    vaccination: "vaccinations",
+    appointment: "appointments",
+    growth: "growth",
+    documents: "documents",
+  };
+  if (q.view && destinations[q.view])
+    redirect(`/provisional/${destinations[q.view]}`);
   const page = Math.max(1, Math.min(10000, Number(q.page) || 1));
   const kind =
     q.view && Object.hasOwn(provisionalKinds, q.view)
@@ -58,22 +68,6 @@ export default async function ProvisionalWorkspace({
       caption: "À venir · planifiés",
     },
   ];
-  const active = kind
-    ? (
-        {
-          consultation: "consultations",
-          vaccination: "vaccinations",
-          appointment: "appointments",
-          growth: "growth",
-          prescription: "consultations",
-          risk: "consultations",
-        } as Record<string, string>
-      )[kind]
-    : q.view === "children"
-      ? "children"
-      : q.view === "documents"
-        ? "documents"
-        : "home";
   const viewTitle = kind
     ? (
         {
@@ -89,9 +83,9 @@ export default async function ProvisionalWorkspace({
       ? "Mes enfants provisoires"
       : q.view === "documents"
         ? "Documents indisponibles en provisoire"
-        : "Bonjour, soignant";
+        : "Tableau de bord";
   return (
-    <WorkspaceShell area="provisional" active={active}>
+    <ClinicianShell active="home" provisional profile={profile}>
       <section className="workspace-heading">
         <span className="eyebrow">ESPACE MÉDECIN / INFIRMIER(ÈRE)</span>
         <h1 id="main-content" tabIndex={-1}>
@@ -129,7 +123,7 @@ export default async function ProvisionalWorkspace({
         </p>
       )}
       {!kind && q.view !== "documents" && (
-        <div className="workspace-stat-grid">
+        <div className="soignant-stats">
           {tiles.map((tile) => (
             <section
               className="workspace-surface workspace-stat"
@@ -222,6 +216,6 @@ export default async function ProvisionalWorkspace({
         partagé, votre compte doit être vérifié et recevoir une autorisation
         distincte.
       </p>
-    </WorkspaceShell>
+    </ClinicianShell>
   );
 }

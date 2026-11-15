@@ -1,12 +1,11 @@
-import { growthPoints } from "@/lib/clinical/growth";
-import type { ClinicalEntry } from "@/lib/clinical/types";
+import { growthPoints, type GrowthObservation } from "@/lib/clinical/growth";
 export function GrowthChart({
   entries,
   field,
   label,
   unit,
 }: {
-  entries: ClinicalEntry[];
+  entries: GrowthObservation[];
   field: string;
   label: string;
   unit: string;

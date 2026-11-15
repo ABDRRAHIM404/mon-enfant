@@ -1,29 +1,29 @@
-# Update 5 — canonical website stabilization
+# Update 5 — clinician functional redesign and stabilization
 
-Owner appearance override: light only, including dark OS settings and formerly saved dark preferences. Dark-mode deliverables in the original request are superseded; historical captures remain valid for their earlier sources.
+Revised owner requirements: updates/MON_ENFANT_UPDATE_5_WEBSITE_STABILIZATION.md. Eight visual references in updates/new-design-update-5 were opened and inspected. They guide hierarchy, warm cream/emerald/coral colors, sidebar, dense cards and child-selection layouts; they do not authorize copied patient data, counts, diagnoses, dose dates, imports or unsupported settings. Retain the existing mother-and-child logo and icon library. Avoid decorative hero assets; existing supplied brand assets suffice.
 
-Requirements: updates/MON_ENFANT_UPDATE_5_WEBSITE_STABILIZATION.md. Website work supersedes APK development; no Android/iOS feature builds. APK work resumes only after the owner's review and approval.
+## Current milestone
 
-## Execution and evidence
+Only Espace soignant: verified doctors/nurses and author-only provisional workspaces. Parent implementation/redesign is deferred until clinician acceptance. Parent acceptance remains a future gate before APK work; iPhone stays deferred. Light only, including devices with dark preference. Full Phase 0–8 scope and external/Phase 6 approvals remain open.
 
-1. Reproduce the current canonical clinician navigation and provisional HB1 save/reload/history experience in desktop and Android browsers (cloud reproduction; bounded local acceptance authorized after GitHub quota). Capture actual screens, click results, JavaScript errors and independent synthetic database readback before changing application code.
-2. Explain root causes in UPDATE_5_BUG_REPORT.md; fix only demonstrated navigation/history/status/scheduling defects. Preserve PNI source, HB1 disabled automation, authorization and quarantine.
-3. Verify canonical trusted HB1 history and a separate QA-reviewed permitted routine reference, explicit clinician-planned catch-up appointment, reload/persistence/correction and denial. Retire QA versions without changing the original draft.
-4. Walk through every visible clinician, parent and admin feature, including actual clinician→parent updates, recipient-bound QR claim/replay/expiry/approval/additional guardian/revocation, unrelated-user denials and current sessions/logout.
-5. Publish fixes, verify actual canonical deployment and independent persistence; produce UPDATE_5_ACCEPTANCE.md with Pass / Fail / Blocked for every feature, exact environment/source and screenshot/CI/readback evidence. Record genuinely untested email/external gates as Blocked/open.
-6. Synchronize primary main with GitHub and ask the owner to review the concrete report. Keep APK paused until explicit owner approval.
+1. Inventory each of the eight real destinations, backing RPC/table, permission, existing UI and missing functionality. Preserve current canonical before captures, including trusted HB1 save/reload and history inspection.
+2. Build dedicated consultations, patient vaccinations/history, growth, and provisional feature views. Reuse existing writes, revision history, charts, registry, calendars and permission checks. Add a narrowly scoped provisional read projection only where the existing unfiltered booklet cannot correctly paginate a feature.
+3. Apply one clinician shell in the exact requested menu order. Connect the existing register, dashboard, calendar and working account. Documents intentionally shows Bientôt disponible; provisional navigation remains explicitly restricted. Keep real exports in their existing authorized locations. Preserve other clinical tools as secondary workflow links.
+4. Exercise input → save → independent persistence → reload/new session → correction → denial, including HB1 uncertainty, separate QA-reviewed permitted routine and clinician-chosen manual appointment. No HB automatic schedule/catch-up/source edits.
+5. Publish and inspect each page at desktop/tablet/phone sizes, light-only, scoped search, active states and actual actions. Keep local checks bounded/sequential after GitHub quota; use Vercel for full builds. Retire all temporary accounts/secrets/QA versions.
+6. Deliver UPDATE_5_PAGE_INVENTORY.md, UPDATE_5_BUG_REPORT.md and UPDATE_5_ACCEPTANCE.md with per-page functional/visual evidence and remaining gates. Synchronize primary main and ask for clinician milestone review only when concrete results are ready.
 
-| Milestone                                              | Status      | Evidence                                                               |
-| ------------------------------------------------------ | ----------- | ---------------------------------------------------------------------- |
-| Current canonical reproduction                         | Pass        | 43715738089: 48 desktop / 24 Android actions; before captures          |
-| Navigation root cause / correction                     | In progress | Published b94dc28; desktop 46 actions pass; Android capture incomplete |
-| HB1 historical persistence / honest next-state         | Pending     | Desktop save/reload pass; trusted lifecycle pending, no HB catch-up    |
-| Independent reviewed routine / manual appointment      | Pending     | QA-only source clone, separate reviewer                                |
-| Clinician / nurse / provisional lifecycle              | Pending     | Actual clicks, save, reload, correction and denial                     |
-| Parent complete website journeys                       | Pending     | Actual synthetic clinician→parent→clinician flow                       |
-| Admin review / permissions / source histories          | Pending     | Preflight must exclude non-fixture identity data                       |
-| Global desktop / Android, light-only, keyboard / touch | Pending     | New current-run screenshots and interactions                           |
-| Canonical publication / readback / fixture retirement  | Pending     | Keep each fixture scoped and recorded                                  |
-| Owner review / permission to resume APK                | Pending     | Explicit owner decision required by Update 5                           |
+## Milestones
 
-Existing accepted Updates 1–4 and prior test runs remain historical evidence, not a substitute for this new canonical functional walkthrough. SMTP general delivery, qualified clinical/source/credential/guardian/privacy/hosting and unfinished Phase 6 approvals remain open. Deferred physical Android fixture 18fd1a08ce97474b is retired; do not reuse its invitation/accounts. GitHub Actions is blocked by the account limit; the owner authorized bounded sequential local checks, with full compilation offloaded to Vercel. No paid-limit increase.
+| Item                                                | State       | Evidence / next action                                                                                                      |
+| --------------------------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Canonical provisional navigation/HB1 baseline       | Recorded    | 43715738089 and before captures; prior page-title fix is insufficient for revised dedicated-page contract                   |
+| Trusted HB1 baseline                                | Recorded    | Fixture 5d4ec565b0864dce, actual save/export/reload and same-child inspection; feature history absent from vaccination page |
+| Eight-page inventory                                | In progress | UPDATE_5_PAGE_INVENTORY.md                                                                                                  |
+| Dedicated available clinician views                 | In progress | Build before decorative polish                                                                                              |
+| Shared clinician shell and references               | Pending     | Preserve parent components                                                                                                  |
+| Clinical lifecycle and authorization                | Pending     | Actual UI plus database evidence                                                                                            |
+| Desktop/tablet/phone visual acceptance              | Pending     | Current canonical screenshots, bounded CSS-pixel captures                                                                   |
+| Publication, retirement and primary synchronization | Pending     | Active fixture 5d4ec565b0864dce must be retired                                                                             |
+| Clinician owner review                              | Pending     | Explicit owner decision                                                                                                     |
+| Parent website acceptance / APK resume              | Deferred    | Separate later milestone; no implied approval                                                                               |

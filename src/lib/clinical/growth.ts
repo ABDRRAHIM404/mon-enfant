@@ -1,6 +1,14 @@
 import type { ClinicalEntry } from "./types";
+export type GrowthObservation = Pick<
+  ClinicalEntry,
+  | "entry_state"
+  | "occurrence_precision"
+  | "occurred_on"
+  | "payload"
+  | "source_verified"
+>;
 /** Recorded values only. Unknown/estimated dates remain in the ledger, never guessed onto a chart. */
-export function growthPoints(entries: ClinicalEntry[], field: string) {
+export function growthPoints(entries: GrowthObservation[], field: string) {
   return entries
     .filter(
       (e) =>

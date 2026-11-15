@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { DoctorNav } from "@/components/registry/doctor-nav";
+import { ClinicianShell } from "@/components/clinician/shell";
 import { AppointmentCard } from "@/components/appointments/card";
 import { LiveRefresh } from "@/components/appointments/live-refresh";
 import {
@@ -53,8 +53,7 @@ export default async function Calendar({
   const href = (date: string, mode: CalendarView = view, n = 1) =>
     `/appointments?${new URLSearchParams({ date, view: mode, state, page: String(n) })}`;
   return (
-    <main className="account-page wide">
-      <DoctorNav />
+    <ClinicianShell active="appointments">
       <div className="page-heading">
         <h1 id="main-content" tabIndex={-1}>
           Mes rendez-vous
@@ -151,6 +150,6 @@ export default async function Calendar({
           <Link href={href(anchor, view, page + 1)}>Liste suivante</Link>
         )}
       </nav>
-    </main>
+    </ClinicianShell>
   );
 }

@@ -1,3 +1,5 @@
+> Current owner milestone: revised Update 5 Espace soignant only, using the eight supplied design references and real dedicated feature pages. Parent implementation/acceptance is a later stage; APK remains paused until both stages and owner approval. See UPDATE_5_PAGE_INVENTORY.md and UPDATE_5_WORK_PLAN.md.
+
 # Mon Enfant — Development Plan
 
 **Status:** Update 5 canonical website stabilization is the current priority; APK work is paused pending owner acceptance. Implementation in progress — foundation/verification/registry workflows verified; Phase 5 appointment/continuity technical acceptance complete, Phase 7 synthetic parent web technical walkthrough verified, Updates 1–2 canonically verified; Update 3 public/protected read UI published; purpose-bound parent sharing canonically published and software-accepted; Update 4 smart-form software acceptance and canonical publication verified; Phase 8 Android native technical acceptance complete, private development APK published; iPhone deferred; actual application mail and remaining Phase 6/external readiness stay open; see [PROGRESS.md](PROGRESS.md) and [PLAN_CHECKLIST.md](PLAN_CHECKLIST.md)

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { appointmentTime } from "@/lib/appointments/calendar";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { DoctorNav } from "@/components/registry/doctor-nav";
+import { ClinicianShell } from "@/components/clinician/shell";
 import {
   historyLabels,
   patientName,
@@ -46,11 +46,12 @@ export default async function Patients({
     return `/patients?${new URLSearchParams({ q, history, age, page: String(n) })}`;
   }
   return (
-    <main className="account-page wide">
-      <DoctorNav />
+    <ClinicianShell active="children">
       <div className="page-heading">
         <span className="eyebrow">MON REGISTRE</span>
-        <h1 id="main-content" tabIndex={-1}>Patients</h1>
+        <h1 id="main-content" tabIndex={-1}>
+          Enfants
+        </h1>
         <p className="muted">Recherche limitée à vos dossiers autorisés.</p>
       </div>
       <div className="tabs">
@@ -157,6 +158,6 @@ export default async function Patients({
           )}
         </nav>
       </section>
-    </main>
+    </ClinicianShell>
   );
 }

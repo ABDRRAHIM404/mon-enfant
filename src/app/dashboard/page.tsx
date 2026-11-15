@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { WorkspaceShell } from "@/components/workspace-shell";
+import { ClinicianShell } from "@/components/clinician/shell";
 import { AppointmentCard } from "@/components/appointments/card";
 import { LiveRefresh } from "@/components/appointments/live-refresh";
 import type { AppointmentPage } from "@/lib/appointments/types";
@@ -56,18 +56,32 @@ export default async function Dashboard() {
     ],
   ];
   return (
-    <WorkspaceShell area="clinician">
+    <ClinicianShell active="home">
       <div className="page-heading">
         <span className="eyebrow">ESPACE MÉDECIN / INFIRMIER(ÈRE)</span>
         <h1 id="main-content" tabIndex={-1}>
-          Votre registre de soins.
+          Tableau de bord
         </h1>
         <p className="muted">
           Vos dossiers autorisés, rendez-vous et suivis actualisés.
         </p>
       </div>
+      <div className="soignant-heading-actions">
+        <Link className="button primary" href="/patients/new">
+          Ajouter un enfant
+        </Link>
+        <Link className="button secondary" href="/consultations">
+          Nouvelle consultation
+        </Link>
+        <Link className="button secondary" href="/vaccinations">
+          Enregistrer une vaccination
+        </Link>
+        <Link className="button secondary" href="/appointments">
+          Planifier un rendez-vous
+        </Link>
+      </div>
       <LiveRefresh />
-      <div className="stat-grid">
+      <div className="soignant-stats">
         {tiles.map(([count, label, href]) => (
           <Link className="panel stat-card" href={href} key={label}>
             <strong>{count}</strong>
@@ -75,7 +89,7 @@ export default async function Dashboard() {
           </Link>
         ))}
       </div>
-      <p className="notice">
+      <p className="soignant-attention">
         Une référence non confirmée n’est pas un rendez-vous manqué. Les soins
         enregistrés par un autre soignant autorisé recalculent les suivis
         vaccinaux, sans annuler les consultations indépendantes.
@@ -96,12 +110,19 @@ export default async function Dashboard() {
       <section className="panel">
         <h2>Continuer votre travail</h2>
         <div className="tabs">
-          <Link href="/patients/new">Inscrire un enfant</Link>
+          <Link href="/patients/new">Ajouter un enfant</Link>
           <Link href="/patients/new?source=paper">
             Transcrire un dossier papier
           </Link>
           <Link href="/patients/link">Rattacher un dossier existant</Link>
           <Link href="/appointments">Ouvrir le calendrier</Link>
+          <Link href="/vaccines">Référentiel vaccinal et versions</Link>
+          <Link href="/access-requests">Demandes d’accès</Link>
+          <Link href="/registration-reviews">Revues d’inscription</Link>
+          <Link href="/parent-requests">Demandes des parents</Link>
+          <Link href="/practices">Lieux d’exercice</Link>
+          <Link href="/share">Lire un partage parent</Link>
+          <Link href="/provisional">Mes dossiers provisoires</Link>
         </div>
         <p className="fine">
           Aucun statut vaccinal manqué n’est déduit d’un historique absent. Les
@@ -109,6 +130,6 @@ export default async function Dashboard() {
           clinique.
         </p>
       </section>
-    </WorkspaceShell>
+    </ClinicianShell>
   );
 }

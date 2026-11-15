@@ -1,6 +1,6 @@
 # Full plan execution and completion audit
 
-Current development focus: **Update 5 canonical website stabilization before any further APK work; owner review/approval is required to resume APK.** See UPDATE_5_WORK_PLAN.md. Previous development focus: **full Phase 8 mobile; Updates 1–3 including real temporary sharing and the canonical account switch have software acceptance**, following the verified synthetic Phase 7 web walkthrough. See UPDATE_WORK_PLAN.md. Remaining Phase 6 checks/operations stay open and are deferred until the app is built, except major authentication, access-control, data-integrity and build checks.
+Current development focus: **revised Update 5 clinician-only eight-page implementation from updates/new-design-update-5; parent implementation is deferred to a later milestone, and APK remains paused until both website stages and owner approvals.** See UPDATE_5_WORK_PLAN.md. Previous development focus: **full Phase 8 mobile; Updates 1–3 including real temporary sharing and the canonical account switch have software acceptance**, following the verified synthetic Phase 7 web walkthrough. See UPDATE_WORK_PLAN.md. Remaining Phase 6 checks/operations stay open and are deferred until the app is built, except major authentication, access-control, data-integrity and build checks.
 
 See [PROGRESS.md](PROGRESS.md) for verification evidence and remaining approval gates.
 
@@ -181,7 +181,13 @@ The complete goal remains active until the full required scope and its approval 
 - [x] Final source 861d40c / 43699551276 passes 280 cases and 30 standard browsers; actual four desktop/Android web provisional+trusted stories 43699584773 pass light/dark keyboard/touch menus, persistence, duplicate checks and corrections.
 - [x] Independent hosted persistence/permission/source proof, fixture 1d262af083304c3c retirement and scoped visual review; READY dpl_5a3yt7yPeZa8kVtVzVc2Q11W9q1Z / main 65c8f4f canonically published, live health/styles/guard verified and primary synchronized.
 
-## Update 5 — website stabilization
+## Update 5 — clinician functional redesign (revised owner scope)
+
+Current milestone uses the eight pictures in updates/new-design-update-5. Parent redesign/implementation is deferred; its acceptance remains a later prerequisite before APK resumes. Dedicated pages and current deployed functional/visual evidence are required, not merely changed titles.
+
+- [ ] All eight clinician pages have dedicated working UI: dashboard, children, consultations, vaccinations, appointments, growth, intentional Documents coming-soon, working account.
+- [ ] Shared responsive clinician shell matches the supplied direction, exact menu order, scoped search and visible cream/emerald/coral colors; parent screens preserved.
+- [ ] Page inventory maps route/component → RPC/table/permissions, with desktop/tablet/phone captures and lifecycle/denial evidence.
 
 - [x] Owner appearance change: light-only website published and desktop/Android-sized checks pass, including legacy dark preference and dark OS; next Android source updated, native build deferred. See docs/stabilization/update5/light-appearance.json.
 

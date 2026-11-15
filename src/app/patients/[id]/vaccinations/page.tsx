@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { EntryCard } from "@/components/clinical/entry-card";
+import type { ClinicalEntry } from "@/lib/clinical/types";
 import { notFound } from "next/navigation";
 import { randomUUID } from "node:crypto";
 import { requireApprovedDoctor } from "@/lib/auth";
@@ -63,6 +65,7 @@ export default async function Vaccinations({
     page?: string;
     version?: string;
     catalogPage?: string;
+    historyPage?: string;
   }>;
 }) {
   const { supabase } = await requireApprovedDoctor();
@@ -71,22 +74,36 @@ export default async function Vaccinations({
   if (!uuidPattern.test(id)) notFound();
   const page = Math.min(10000, Math.max(1, Number(query.page) || 1)),
     catalogPage = Math.min(10000, Math.max(1, Number(query.catalogPage) || 1));
-  const [profile, result, facilities, capabilities, catalog] =
+  const historyPage = Math.min(
+    10000,
+    Math.max(1, Math.floor(Number(query.historyPage) || 1)),
+  );
+  const [profile, result, facilities, capabilities, catalog, timeline] =
     await Promise.all([
       supabase.rpc("get_child_profile", { p_child_id: id }),
       supabase.rpc("patient_vaccine_items", { p_child_id: id, p_page: page }),
       supabase.rpc("my_facilities"),
       supabase.rpc("my_clinical_capabilities"),
       supabase.rpc("vaccine_catalog", { p_page: catalogPage }),
+      supabase.rpc("clinical_timeline", {
+        p_child_id: id,
+        p_kind: "vaccination",
+        p_page: historyPage,
+      }),
     ]);
-  if (profile.error?.code === "42501" || result.error?.code === "42501")
+  if (
+    profile.error?.code === "42501" ||
+    result.error?.code === "42501" ||
+    timeline.error?.code === "42501"
+  )
     notFound();
   if (
     profile.error ||
     result.error ||
     facilities.error ||
     capabilities.error ||
-    catalog.error
+    catalog.error ||
+    timeline.error
   )
     throw new Error("Impossible de charger les références vaccinales.");
   const child = profile.data as ChildProfile,
@@ -106,6 +123,9 @@ export default async function Vaccinations({
       throw new Error("Impossible de charger la version choisie.");
     selected = (detail.data as { version: CatalogSnapshot }).version;
   }
+  const history = timeline.data as { items: ClinicalEntry[]; total: number };
+  const historyHref = (n: number) =>
+    `?${new URLSearchParams({ historyPage: String(n), page: String(page), catalogPage: String(catalogPage), ...(query.version ? { version: query.version } : {}) })}#vaccination-history`;
   const approved = versions.versions.filter(
     (v) => v.status === "approved" && v.review_verified,
   );
@@ -113,7 +133,9 @@ export default async function Vaccinations({
     <main className="account-page wide">
       <DoctorNav />
       <div className="page-heading">
-        <h1 id="main-content" tabIndex={-1}>Vaccinations — {patientName(child)}</h1>
+        <h1 id="main-content" tabIndex={-1}>
+          Vaccinations — {patientName(child)}
+        </h1>
         <p className="muted">
           Références prévues et administrations documentées conservent leur
           propre historique.
@@ -137,6 +159,46 @@ export default async function Vaccinations({
         ne prouve pas une dose manquée. Les dates affichées sont des références
         de routine ; toute décision de rattrapage reste manuelle.
       </p>
+      <section className="panel" id="vaccination-history">
+        <h2>Historique des vaccinations enregistrées ({history.total})</h2>
+        <p>
+          Une transcription conserve sa date, sa source et son niveau de
+          certitude. Elle ne crée ni référence de routine ni rendez-vous.
+        </p>
+        <p className="soignant-attention">
+          HB1 : aucune prochaine dose ni aucun rattrapage n’est calculé
+          automatiquement. Le professionnel examine l’historique et choisit le
+          suivi nécessaire.
+        </p>
+        {(capabilities.data as string[]).includes("appointment") && (
+          <Link
+            className="button secondary"
+            href={`/patients/${id}/appointments/new`}
+          >
+            Planifier un suivi manuel
+          </Link>
+        )}
+        {!history.items.length && (
+          <p>
+            Aucune vaccination enregistrée sur cette page. Une absence de
+            documentation ne prouve pas une dose manquée.
+          </p>
+        )}
+        {history.items.map((entry) => (
+          <EntryCard key={entry.id} entry={entry} />
+        ))}
+        <nav className="pagination" aria-label="Historique vaccinal">
+          {historyPage > 1 && (
+            <Link href={historyHref(historyPage - 1)}>
+              Historique précédent
+            </Link>
+          )}
+          <span>Page {historyPage} · 30 saisies par page</span>
+          {historyPage * 30 < history.total && (
+            <Link href={historyHref(historyPage + 1)}>Historique suivant</Link>
+          )}
+        </nav>
+      </section>
       <section className="panel">
         <h2>Références de cet enfant ({data.total})</h2>
         {!data.items.length && (
