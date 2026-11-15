@@ -73,7 +73,16 @@ export function VaccinationFields({
       <h2>Administration documentée</h2>
       <VaccineSelection
         choices={choices}
-        previous={data}
+        previous={
+          data
+            ? {
+                ...data,
+                catalog_version_id:
+                  items.find((item) => item.id === data.schedule_item_id)
+                    ?.version_id ?? "",
+              }
+            : undefined
+        }
         onSelectionChange={(choice, dose) => {
           setSelected({ choice, dose });
           setMatching("unmatched");

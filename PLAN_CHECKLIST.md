@@ -170,3 +170,11 @@ The complete goal remains active until the full required scope and its approval 
 - [x] Restore missing shared form-grid layout and controls for provisional child/care forms and vaccination subfields; preserve all data/permission behavior.
 - [x] Actual desktop and Android Chrome light/dark form checks: 43695413773, no overflow/page errors, visible borders and separated fields; full 275-case regression 43695416835. Native Android uses separately reviewed native form styles.
 - [x] Canonical publication/readback: READY dpl_HXU9EF7BeetBkWgWj7VSpWbda3n4 / a7487c4; live CSS desktop/phone rules and health verified, clean primary main synchronized.
+
+## Requested Update 4 — smart forms
+
+- [x] Implement searchable vaccine/version choices, dependent doses, custom/unknown capture, preserved source wording and unverified provisional provenance; source checkpoint 43698844172.
+- [x] Review website data-entry flows and implement shared dropdown styling, multiline provisional narratives, French risk choices and appointment date/time picker; UPDATE_4_FORM_AUDIT.md.
+- [x] Apply/read back immutable vocabulary migration 20261115101145; original source and authorization boundaries retained.
+- [ ] Final source regression and actual desktop/Android web light/dark keyboard/touch form persistence/menu acceptance.
+- [ ] Independent hosted persistence/permission/source readback, synthetic fixture retirement, visual review, canonical publication and primary-main synchronization.

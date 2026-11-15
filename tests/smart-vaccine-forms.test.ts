@@ -13,6 +13,7 @@ import type { PGlite } from "@electric-sql/pglite";
 import { mobileDatabase } from "./helpers/database";
 import {
   readVaccineSelection,
+  choicesWithRecordVersions,
   vaccineKey,
   type VaccineChoice,
 } from "../src/lib/vaccines/choices";
@@ -97,6 +98,45 @@ afterEach(async () => {
 });
 afterAll(async () => {
   await db?.close();
+});
+it("retains a child's reviewed retired catalog dose without making it active or changing its source", () => {
+  const version = randomUUID();
+  const base: VaccineChoice = {
+    version_id: randomUUID(),
+    version_label: "Source brouillon",
+    status: "draft",
+    vaccine_code: "VPO",
+    vaccine_label: "Poliomyélite (Oral)",
+    dose_code: "VPO1",
+  };
+  const items = [
+    {
+      id: randomUUID(),
+      version_id: version,
+      version_label: "Version historique fictive",
+      version_status: "retired",
+      review_verified: true,
+      dose_code: "VPO2",
+      rule: { vaccine_code: "VPO" },
+    },
+  ] as import("../src/lib/vaccines/patient-types").VaccineItemExport[];
+  const choices = choicesWithRecordVersions([base], items);
+  const old = choices.find((choice) => choice.version_id === version)!;
+  expect(old).toMatchObject({
+    status: "retired",
+    dose_code: "VPO2",
+    vaccine_label: base.vaccine_label,
+  });
+  const form = new FormData();
+  form.set("vaccine_choice", vaccineKey(old));
+  form.set("dose_choice", "VPO1");
+  expect(() => readVaccineSelection(form, choices)).toThrow();
+  form.set("dose_choice", "VPO2");
+  expect(readVaccineSelection(form, choices)).toMatchObject({
+    catalog_version_id: version,
+    catalog_status: "retired",
+    dose_label: "VPO2",
+  });
 });
 describe("smart vaccine vocabulary and quarantined recording on the complete schema", () => {
   it("exposes only the 25 source dose names/codes and truthful draft status to current clinicians", async () => {

@@ -189,6 +189,12 @@ export function SearchSelect({
             role="listbox"
             aria-label={label}
           >
+            {query && filtered.every((option) => option.value === "other") && (
+              <p role="status">
+                Aucun résultat dans le catalogue. Vous pouvez préciser une autre
+                valeur.
+              </p>
+            )}
             {!filtered.length && (
               <p role="status">Aucun résultat. Modifiez la recherche.</p>
             )}

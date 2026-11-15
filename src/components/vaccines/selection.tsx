@@ -3,6 +3,7 @@ import { useState } from "react";
 import { SearchSelect } from "@/components/forms/search-select";
 import {
   vaccineKey,
+  doseChoiceLabel,
   vaccineOptions,
   type VaccineChoice,
 } from "@/lib/vaccines/choices";
@@ -18,6 +19,7 @@ export function VaccineSelection({
   // Preserve previously documented wording, even when it differs from today's vocabulary.
   const old = choices.find(
     (c) =>
+      !!previous?.catalog_version_id &&
       c.vaccine_label === previous?.vaccine_label &&
       (!previous?.vaccine_code || c.vaccine_code === previous.vaccine_code) &&
       (!previous?.catalog_version_id ||
@@ -38,7 +40,9 @@ export function VaccineSelection({
         ? "unknown"
         : previous?.dose_label
           ? "other"
-          : "",
+          : previous
+            ? "unknown"
+            : "",
   );
   const current = choices.find((c) => vaccineKey(c) === vaccine);
   return (
@@ -95,7 +99,7 @@ export function VaccineSelection({
                 .filter((c) => vaccineKey(c) === vaccine)
                 .map((c) => ({
                   value: c.dose_code,
-                  label: c.dose_code,
+                  label: doseChoiceLabel(c.dose_code),
                   detail: "Identifiant de dose du catalogue sélectionné",
                 }))
             : []),

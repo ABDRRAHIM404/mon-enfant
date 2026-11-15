@@ -91,3 +91,8 @@ export function choicesWithRecordVersions(
     ).values(),
   );
 }
+
+export function doseChoiceLabel(code: string) {
+  const number = code.match(/(\d+)$/)?.[1];
+  return number ? `Dose ${number} · ${code}` : `Dose du catalogue · ${code}`;
+}

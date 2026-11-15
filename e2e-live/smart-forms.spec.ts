@@ -91,15 +91,23 @@ test("smart vaccine selections preserve uncertainty and provisional isolation", 
   const vaccine = page.getByRole("combobox", { name: /^Vaccin/ });
   await vaccine.fill("VPO");
   await vaccine.press("Enter");
-  await choose(page, "Dose déclarée", "VPO1", /^VPO1/);
+  await choose(page, "Dose déclarée", "VPO1", /VPO1/);
   await expect(page.locator('[name="dose_choice"]')).toHaveValue("VPO1");
   await choose(page, "Vaccin", "PCV", /· PCV/);
   await expect(page.locator('[name="dose_choice"]')).toHaveValue("");
   const dose = page.getByRole("combobox", { name: /^Dose déclarée/ });
   await dose.fill("VPO");
-  await expect(page.getByRole("option", { name: /^VPO1/ })).toHaveCount(0);
+  await expect(page.getByRole("option", { name: /VPO1/ })).toHaveCount(0);
   await dose.press("Escape");
-  await choose(page, "Dose déclarée", "PCV1", /^PCV1/);
+  await page
+    .getByRole("button", {
+      name: "Enregistrer l’entrée provisoire",
+      exact: true,
+    })
+    .click();
+  await expect(page.getByRole("alert")).toContainText("Choisissez une option");
+  await expect(page).toHaveURL(new RegExp(`${path}\\?kind=vaccination$`));
+  await choose(page, "Dose déclarée", "PCV1", /PCV1/);
   await page
     .getByRole("button", {
       name: "Enregistrer l’entrée provisoire",
