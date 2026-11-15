@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useRpc } from "../../src/lib/data";
+import { useNativeView } from "../../src/lib/data";
 import { civilAdd, name } from "../../src/lib/format";
 import {
   civilDay,
@@ -20,10 +20,7 @@ import {
 } from "../../src/components/ui";
 import { Appointment } from "../../src/components/appointment";
 export default function Calendar() {
-  const workspace = useRpc<ParentWorkspaceData & NativeClock>(
-      "parent_mobile_view",
-      { p_kind: "home" },
-    ),
+  const workspace = useNativeView<ParentWorkspaceData & NativeClock>("home"),
     [selected, setSelected] = useState(""),
     [anchor, setAnchor] = useState<string | null>(null),
     [draft, setDraft] = useState<string | null>(null),
@@ -130,10 +127,9 @@ function CalendarItems({
   page: number;
   onPage: (v: number) => void;
 }) {
-  const view = useRpc<{ items: NativeAppointment[]; total: number }>(
-    "parent_mobile_view",
+  const view = useNativeView<{ items: NativeAppointment[]; total: number }>(
+    "calendar",
     {
-      p_kind: "calendar",
       p_child_id: child,
       p_from: from,
       p_to: civilAdd(from, 29),

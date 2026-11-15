@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "expo-router";
-import { useRpc, useAction } from "../../src/lib/data";
+import { useNativeView, useAction } from "../../src/lib/data";
 import type {
   ParentWorkspaceData,
   NativeAppointment,
@@ -22,7 +22,7 @@ type Home = ParentWorkspaceData & {
   server_day: string;
 };
 export default function Home() {
-  const view = useRpc<Home>("parent_mobile_view", { p_kind: "home" }),
+  const view = useNativeView<Home>("home"),
     router = useRouter(),
     action = useAction(),
     [display, setDisplay] = useState("");

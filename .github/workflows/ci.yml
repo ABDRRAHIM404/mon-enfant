@@ -17,6 +17,7 @@ on:
             none,
             mobile-bootstrap,
             mobile-check,
+            mobile-native,
             mobile-android,
             mobile-ios,
             sharing-cloud-accept,
@@ -239,4 +240,72 @@ jobs:
         with:
           name: mobile-platform-bundles
           path: mobile/dist/
+          retention-days: 3
+
+  mobile-android:
+    if: github.event_name == 'workflow_dispatch' && (inputs.live_probe == 'mobile-android' || inputs.live_probe == 'mobile-native')
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      CI: 1
+      EXPO_NO_TELEMETRY: 1
+      EXPO_PUBLIC_SUPABASE_URL: https://zkkasbxvdvecnafgjpxd.supabase.co
+      EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.MON_ENFANT_PUBLIC_BROWSER_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+        working-directory: mobile
+      - run: npx expo prebuild --platform android --no-install
+        working-directory: mobile
+      - name: Compile bundled development APK with template debug signing only
+        run: ./gradlew :app:assembleRelease --no-daemon --max-workers=2 -PreactNativeArchitectures=arm64-v8a,x86_64 '-Dorg.gradle.jvmargs=-Xmx3g -XX:MaxMetaspaceSize=768m'
+        working-directory: mobile/android
+      - name: Verify native archive and publish classified build proof
+        run: python3 scripts/mobile-native-proof.py android
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mobile-android-development
+          path: test-results/mobile-native/android/
+          retention-days: 3
+  mobile-ios:
+    if: github.event_name == 'workflow_dispatch' && (inputs.live_probe == 'mobile-ios' || inputs.live_probe == 'mobile-native')
+    runs-on: macos-latest
+    timeout-minutes: 50
+    env:
+      CI: 1
+      EXPO_NO_TELEMETRY: 1
+      EXPO_PUBLIC_SUPABASE_URL: https://zkkasbxvdvecnafgjpxd.supabase.co
+      EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.MON_ENFANT_PUBLIC_BROWSER_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - name: Inspect available native toolchain
+        run: xcodebuild -version
+      - run: npm ci
+        working-directory: mobile
+      - run: npx expo prebuild --platform ios --no-install
+        working-directory: mobile
+      - run: pod install
+        working-directory: mobile/ios
+      - name: Compile simulator app without a distribution certificate
+        run: python3 scripts/mobile-ios-build.py
+      - name: Verify native archive and publish classified build proof
+        run: python3 scripts/mobile-native-proof.py ios
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mobile-ios-simulator
+          path: test-results/mobile-native/ios/
           retention-days: 3

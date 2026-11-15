@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocalSearchParams } from "expo-router";
-import { useRpc } from "../../../src/lib/data";
+import { useNativeView } from "../../../src/lib/data";
 import type {
   ClinicalEntry,
   ParentChild,
@@ -22,18 +22,17 @@ export default function Vaccinations() {
   const { id } = useLocalSearchParams<{ id: string }>(),
     [page, setPage] = useState(1),
     [historyPage, setHistoryPage] = useState(1),
-    refs = useRpc<{
+    refs = useNativeView<{
       child: ParentChild;
       items: PatientVaccineItem[];
       total: number;
       server_day: string;
-    }>("parent_mobile_view", {
-      p_kind: "vaccine_references",
+    }>("vaccine_references", {
       p_child_id: uuid.test(id ?? "") ? id : null,
       p_page: page,
     }),
-    history = useRpc<{ items: ClinicalEntry[]; total: number }>(
-      "parent_mobile_view",
+    history = useNativeView<{ items: ClinicalEntry[]; total: number }>(
+      "vaccination_history",
       { p_child_id: uuid.test(id ?? "") ? id : null, p_page: historyPage },
     );
   return (

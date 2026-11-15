@@ -113,3 +113,30 @@ export function useAction() {
     },
   };
 }
+
+type NativeKind =
+  | "home"
+  | "booklet"
+  | "calendar"
+  | "vaccine_references"
+  | "vaccination_history";
+type NativeArgs = {
+  p_child_id: string | null;
+  p_page?: number;
+  p_from?: string;
+  p_to?: string;
+};
+export function useNativeView<T>(
+  kind: "home",
+  args?: { p_page?: number },
+): ReturnType<typeof useRpc<T>>;
+export function useNativeView<T>(
+  kind: Exclude<NativeKind, "home">,
+  args: NativeArgs,
+): ReturnType<typeof useRpc<T>>;
+export function useNativeView<T>(
+  kind: NativeKind,
+  args: Record<string, unknown> = {},
+) {
+  return useRpc<T>("parent_mobile_view", { ...args, p_kind: kind });
+}

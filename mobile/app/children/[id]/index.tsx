@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Share, Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useRpc, useAction } from "../../../src/lib/data";
+import { useNativeView, useAction } from "../../../src/lib/data";
 import type { ParentBooklet } from "../../../src/lib/domain";
 import { name, birth, uuid } from "../../../src/lib/format";
 import {
@@ -20,8 +20,7 @@ export default function Booklet() {
   const { id } = useLocalSearchParams<{ id: string }>(),
     [page, setPage] = useState(1),
     [section, setSection] = useState("records"),
-    view = useRpc<ParentBooklet>("parent_mobile_view", {
-      p_kind: "booklet",
+    view = useNativeView<ParentBooklet>("booklet", {
       p_child_id: uuid.test(id ?? "") ? id : null,
       p_page: page,
     }),
