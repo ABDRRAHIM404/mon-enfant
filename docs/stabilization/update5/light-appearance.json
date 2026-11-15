@@ -1,0 +1,45 @@
+{
+  "status": "pass_website_only",
+  "canonical": "https://mon-enfant.vercel.app",
+  "source": "f077749bfc69d3e7354b7482db542d4f5d923985",
+  "preview": "dpl_HmngnXwWbTv8XyCnRCNEkEpU5tdS",
+  "production": "dpl_6pgZjqesivoAVwRxvubqBWbjvFrP",
+  "canonical_alias_verified": true,
+  "vercel_checks": [
+    "compilation",
+    "TypeScript",
+    "production build"
+  ],
+  "bounded_local_browser": {
+    "tests_passed": 2,
+    "projects": [
+      "desktop",
+      "android-sized Chromium"
+    ],
+    "duration_seconds": 24.5,
+    "paths": [
+      "/",
+      "/login",
+      "/forgot-password"
+    ],
+    "assertions": [
+      "dark OS preference remains light",
+      "legacy saved dark preference ignored",
+      "light remains after navigation/reload",
+      "theme control absent",
+      "computed CSS color-scheme light"
+    ],
+    "runner": "isolated exact test extracted from e2e/theme.spec.ts, to avoid unavailable cached axe dependency",
+    "credentials_in_browser": false,
+    "memory_cap_mb": 700,
+    "cpu_quota_percent_of_one_core": 50,
+    "workers": 1
+  },
+  "native": {
+    "source_updated": true,
+    "syntax_transpilation_passed": true,
+    "new_apk_or_native_runtime_accepted": false,
+    "release_gate": "Update 5 website review and owner approval"
+  },
+  "whole_update5_complete": false
+}
