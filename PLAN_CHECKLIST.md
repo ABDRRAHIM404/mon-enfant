@@ -177,4 +177,4 @@ The complete goal remains active until the full required scope and its approval 
 - [x] Review website data-entry flows and implement shared dropdown styling, multiline provisional narratives, French risk choices and appointment date/time picker; UPDATE_4_FORM_AUDIT.md.
 - [x] Apply/read back immutable vocabulary migration 20261115101145; original source and authorization boundaries retained.
 - [x] Final source 861d40c / 43699551276 passes 280 cases and 30 standard browsers; actual four desktop/Android web provisional+trusted stories 43699584773 pass light/dark keyboard/touch menus, persistence, duplicate checks and corrections.
-- [ ] Independent hosted persistence/permission/source readback, synthetic fixture retirement, visual review, canonical publication and primary-main synchronization.
+- [x] Independent hosted persistence/permission/source proof, fixture 1d262af083304c3c retirement and scoped visual review; READY dpl_5a3yt7yPeZa8kVtVzVc2Q11W9q1Z / main 65c8f4f canonically published, live health/styles/guard verified and primary synchronized.
