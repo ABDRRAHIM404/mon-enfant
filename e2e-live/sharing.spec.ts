@@ -287,7 +287,9 @@ test("parent purpose-bound sharing, live concurrent claim and revocation", async
     await reader
       .getByRole("button", { name: "Ouvrir le partage", exact: true })
       .click();
-    await expect(reader.getByRole("alert")).toContainText("autre onglet");
+    await expect(
+      reader.getByRole("alert").filter({ hasText: "autre onglet" }),
+    ).toBeVisible();
     const loginTab = await rc.newPage();
     await login(loginTab, "OUTSIDE");
     await loginTab.close();
@@ -436,6 +438,7 @@ test("parent purpose-bound sharing, live concurrent claim and revocation", async
     await panel
       .getByRole("button", { name: "Révoquer ce code", exact: true })
       .click();
+    await expect(panel.locator("svg")).toHaveCount(0);
     expect(
       (await rpc(pc, "list_clinician_shares", { p_child_id: child })).status,
     ).toBe(403);
