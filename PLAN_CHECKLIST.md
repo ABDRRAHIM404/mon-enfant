@@ -198,3 +198,6 @@ Current milestone uses the eight pictures in updates/new-design-update-5. Parent
 - [ ] Current desktop/Android light/dark mouse/touch/keyboard evidence, source regression and independent ledger readback.
 - [ ] Publish concrete bug/functional acceptance reports, retire website fixtures and synchronize primary main.
 - [ ] Owner reviews the results and explicitly approves resuming APK work; email/external approvals remain separate.
+
+- [x] Update 5 consultation dashboard projection: 13 focused cloud tests including scoped reads/provisional isolation/calendar, explicit TypeScript/build, and live HTTP role/session denial checks; new read-only migration applied with exact stored source.
+- [ ] Update 5 final clinician acceptance: trusted clinical lifecycles/corrections, final desktop/tablet/phone review after latest layout changes, synthetic fixture retirement, canonical publication/synchronization and owner approval. See UPDATE_5_ACCEPTANCE.md. Parent acceptance and APK resume remain separate future gates.

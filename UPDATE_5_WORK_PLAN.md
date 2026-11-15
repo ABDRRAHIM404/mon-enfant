@@ -20,10 +20,12 @@ Only Espace soignant: verified doctors/nurses and author-only provisional worksp
 | Canonical provisional navigation/HB1 baseline       | Recorded    | 43715738089 and before captures; prior page-title fix is insufficient for revised dedicated-page contract                   |
 | Trusted HB1 baseline                                | Recorded    | Fixture 5d4ec565b0864dce, actual save/export/reload and same-child inspection; feature history absent from vaccination page |
 | Eight-page inventory                                | In progress | UPDATE_5_PAGE_INVENTORY.md                                                                                                  |
-| Dedicated available clinician views                 | In progress | Build before decorative polish                                                                                              |
-| Shared clinician shell and references               | Pending     | Preserve parent components                                                                                                  |
+| Dedicated available clinician views                 | Implemented, acceptance pending | Build before decorative polish                                                                                              |
+| Shared clinician shell and references               | Implemented, acceptance pending     | Preserve parent components                                                                                                  |
 | Clinical lifecycle and authorization                | Pending     | Actual UI plus database evidence                                                                                            |
 | Desktop/tablet/phone visual acceptance              | Pending     | Current canonical screenshots, bounded CSS-pixel captures                                                                   |
 | Publication, retirement and primary synchronization | Pending     | Active fixture 5d4ec565b0864dce must be retired                                                                             |
 | Clinician owner review                              | Pending     | Explicit owner decision                                                                                                     |
 | Parent website acceptance / APK resume              | Deferred    | Separate later milestone; no implied approval                                                                               |
+
+Current implementation evidence: canonical 94a0253 desktop 16-destination/two-role walkthrough and four provisional save/reload/independent-readback checks pass. Layout refinements follow the actual screenshot findings. See UPDATE_5_ACCEPTANCE.md; trusted write/correction/routine/appointment and final three-viewport checks remain pending. Applied consultation projection and live denial receipts are recorded in PROGRESS.md. Parent website work stays deferred.
