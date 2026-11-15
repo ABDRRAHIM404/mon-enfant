@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ThemeControl } from "./theme-control";
 export function Brand() {
   return (
     <div className="brand-group">
@@ -13,13 +12,6 @@ export function Brand() {
             height={44}
             alt=""
           />
-          <Image
-            className="emblem-dark"
-            src="/brand/emblem-dark.png"
-            width={44}
-            height={44}
-            alt=""
-          />
         </span>
         <span>
           mon enfant
@@ -27,7 +19,6 @@ export function Brand() {
           <span className="sr-only"> — Accueil</span>
         </span>
       </Link>
-      <ThemeControl />
     </div>
   );
 }

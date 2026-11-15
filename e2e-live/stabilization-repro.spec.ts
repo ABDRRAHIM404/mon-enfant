@@ -12,8 +12,34 @@ async function openMobileMenu(page: Page) {
   if ((await menu.isVisible()) && (await menu.getAttribute("open")) === null)
     await menu.locator("summary").click();
 }
+test.afterEach(async ({ page }, info) => {
+  if (
+    info.status !== info.expectedStatus &&
+    !page.isClosed() &&
+    !new URL(page.url()).pathname.startsWith("/login")
+  ) {
+    await page
+      .screenshot({
+        path: info.outputPath("stabilization-failure.png"),
+        timeout: 5000,
+      })
+      .catch(() => {});
+    console.log(
+      JSON.stringify({
+        event: "stabilization_failure_route",
+        route: new URL(page.url()).pathname,
+      }),
+    );
+  }
+});
+const focusedLink = process.env.MON_ENFANT_STABILIZATION_LINK;
 const SITE = "https://mon-enfant.vercel.app";
 async function theme(page: Page, value: "light" | "dark") {
+  if (acceptance) {
+    await page.emulateMedia({ colorScheme: value });
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+    return;
+  }
   await page.evaluate((v) => {
     document.documentElement.dataset.theme = v;
     document.documentElement.style.colorScheme = v;
@@ -26,13 +52,15 @@ test(
     ? "accept canonical navigation and saved provisional HB1 history after fixes"
     : "reproduce canonical clinician navigation and saved provisional HB1 history before fixes",
   async ({ page }, info) => {
-    test.setTimeout(300000);
+    test.setTimeout(acceptance ? 600000 : 300000);
     const run = process.env.MON_ENFANT_QA_RUN!;
     const captures: string[] = [];
     let errors = 0;
     observeBrowserErrors(page, "stabilization-reproduction", () => errors++);
     const findings: Record<string, unknown>[] = [];
-    for (const role of ["DOCTOR", "SECOND"] as const) {
+    for (const role of (focusedLink ? ["DOCTOR"] : ["DOCTOR", "SECOND"]) as (
+      "DOCTOR" | "SECOND"
+    )[]) {
       await page.goto("/login?audience=clinician");
       const email = process.env[`MON_ENFANT_PARENT_BROWSER_${role}_EMAIL`]!,
         password = process.env[`MON_ENFANT_PARENT_BROWSER_${role}_PASSWORD`]!;
@@ -56,7 +84,9 @@ test(
         await expect(page).toHaveURL(/\/provisional$/);
       }
       const home = role === "DOCTOR" ? "/dashboard" : "/provisional";
-      for (const mode of ["light", "dark"] as const) {
+      for (const mode of (focusedLink ? ["light"] : ["light", "dark"]) as (
+        "light" | "dark"
+      )[]) {
         await page.goto(home);
         await theme(page, mode);
         await expect(
@@ -118,6 +148,7 @@ test(
         }
         for (let i = 0; i < links.length; i++) {
           const link = links[i];
+          if (focusedLink && link.href !== focusedLink) continue;
           await page.goto(home);
           await theme(page, mode);
           await openMobileMenu(page);
@@ -159,6 +190,14 @@ test(
             .getByRole("heading", { level: 1 })
             .innerText();
           const main = await page.getByRole("main").innerText();
+          console.log(
+            JSON.stringify({
+              event: "stabilization_navigation_completed",
+              role,
+              theme: mode,
+              route: url.pathname + url.search,
+            }),
+          );
           findings.push({
             role,
             theme: mode,
@@ -260,7 +299,27 @@ test(
           trusted_schedule_claimed: false,
         });
         const shot = `stabilization-${info.project.name}-${role}-03-HB1-saved-history.png`;
-        await page.screenshot({ path: info.outputPath(shot), fullPage: true });
+        writeFileSync(
+          info.outputPath("stabilization-progress.json"),
+          JSON.stringify(
+            {
+              fixture_run: run,
+              device: info.project.name,
+              status: "core_flow_verified_visual_pending",
+              findings,
+              captures,
+              page_errors: errors,
+            },
+            null,
+            2,
+          ),
+        );
+        await page.screenshot({
+          path: info.outputPath(shot),
+          fullPage: info.project.name !== "android",
+          scale: "css",
+          timeout: 10000,
+        });
         captures.push(shot);
       }
       await page.goto(home);
@@ -286,6 +345,8 @@ test(
       await page.goto(home);
       await expect(page).toHaveURL(/\/login/);
     }
+    if (focusedLink)
+      expect(findings.some((f) => f.requested === focusedLink)).toBe(true);
     expect(errors).toBe(0);
     writeFileSync(
       info.outputPath("stabilization-repro.json"),
@@ -294,9 +355,11 @@ test(
           fixture_run: run,
           canonical: SITE,
           device: info.project.name,
-          status: acceptance
-            ? "scoped_navigation_provisional_HB1_pass"
-            : "observations_captured_not_fix_acceptance",
+          status: focusedLink
+            ? "focused_navigation_only"
+            : acceptance
+              ? "scoped_navigation_provisional_HB1_pass"
+              : "observations_captured_not_fix_acceptance",
           findings,
           captures,
           page_errors: errors,

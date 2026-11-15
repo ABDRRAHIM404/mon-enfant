@@ -3,57 +3,52 @@ import {
   scanAccessibility,
   assertAccessible,
 } from "../e2e-support/accessibility";
-test("system appearance and manual preference survive navigation and reload", async ({
+test("light appearance ignores old dark preference and device appearance", async ({
   page,
 }) => {
   await page.emulateMedia({ colorScheme: "dark" });
   await page.goto("/");
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  await page.getByRole("button", { name: /Thème système/ }).click();
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-  await page.reload();
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-  await page.getByRole("button", { name: /Thème clair/ }).click();
+  await page.evaluate(() => localStorage.setItem("mon-enfant-theme", "dark"));
+  for (const path of ["/", "/login", "/forgot-password"]) {
+    await page.goto(path);
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+    await expect(page.getByRole("button", { name: /Thème/ })).toHaveCount(0);
+    expect(
+      await page
+        .locator("html")
+        .evaluate((el) => getComputedStyle(el).colorScheme),
+    ).toBe("light");
+    await page.reload();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  }
   await page.emulateMedia({ colorScheme: "light" });
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  await page.goto("/login");
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  await page.getByRole("button", { name: /Thème sombre/ }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-  await page.emulateMedia({ colorScheme: "dark" });
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
 });
-test("both themes preserve public accessibility and discoverable clinician entry", async ({
+test("light appearance preserves public accessibility and clinician entry", async ({
   page,
 }, info) => {
   const proofs = [];
-  await page.goto("/");
-  for (const theme of ["light", "dark"]) {
-    await page.evaluate(
-      (t) => localStorage.setItem("mon-enfant-theme", t),
-      theme,
+  await page.emulateMedia({ colorScheme: "dark" });
+  for (const path of [
+    "/",
+    "/login",
+    "/signup?audience=clinician",
+    "/forgot-password",
+  ]) {
+    await page.goto(path);
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+    proofs.push(
+      await scanAccessibility(
+        page,
+        `light-${path.replace(/[^a-z]/g, "") || "home"}`,
+        info,
+      ),
     );
-    for (const path of [
-      "/",
-      "/login",
-      "/signup?audience=clinician",
-      "/forgot-password",
-    ]) {
-      await page.goto(path);
-      await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
-      proofs.push(
-        await scanAccessibility(
-          page,
-          `theme-${theme}-${path.replace(/[^a-z]/g, "") || "home"}`,
-          info,
-        ),
-      );
-      expect(
-        await page.evaluate(
-          () => document.documentElement.scrollWidth <= innerWidth,
-        ),
-      ).toBe(true);
-    }
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
   }
   assertAccessible(proofs);
 });

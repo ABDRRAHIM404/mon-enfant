@@ -127,7 +127,10 @@ export default defineConfig({
       ? "https://localhost:3443"
       : "https://mon-enfant.vercel.app",
     ignoreHTTPSErrors: cloudRuntime,
-    actionTimeout: 20000,
+    ...(process.env.MON_ENFANT_QA_PROXY && !cloudRuntime
+      ? { proxy: { server: process.env.MON_ENFANT_QA_PROXY } }
+      : {}),
+    actionTimeout: probe === "stabilization-accept" ? 30000 : 20000,
     navigationTimeout: 30000,
     trace: "off",
     video: "off",

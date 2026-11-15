@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { themeBootstrap } from "@/lib/theme";
 import { Suspense } from "react";
 import { ParentMobileNav } from "@/components/parent-mobile-nav";
 export const metadata: Metadata = {
@@ -12,10 +11,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="fr" suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
-      </head>
+    <html lang="fr" data-theme="light">
       <body>
         <a className="skip-link" href="#main-content">
           Aller au contenu principal

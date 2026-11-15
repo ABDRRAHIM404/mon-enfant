@@ -183,7 +183,7 @@ The complete goal remains active until the full required scope and its approval 
 
 ## Update 5 — website stabilization
 
-- [ ] Reproduce canonical navigation and HB1/history issues before fixes; exact role/viewport/root-cause evidence.
+- [x] Reproduce canonical navigation and HB1/history issues before fixes; cloud 43715738089, 48 desktop / 24 Android actions, captures and independent provisional readback in UPDATE_5_BUG_REPORT.md.
 - [ ] Fix navigation, saved-history visibility and honest HB1 next-state/manual scheduling without changing clinical rules.
 - [ ] Demonstrate a separate reviewed permitted routine reference and manual catch-up appointment persistence.
 - [ ] Full canonical clinician/nurse/provisional, parent and admin lifecycle walkthroughs and authorization denials.

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Alert, Linking } from "react-native";
 import { useAuth } from "../../src/auth/provider";
-import { useTheme } from "../../src/components/theme";
 import { useAction, useRpc } from "../../src/lib/data";
 import type { ParentWorkspaceData } from "../../src/lib/domain";
 import {
@@ -17,7 +16,6 @@ import {
 import { SITE } from "../../src/lib/format";
 export default function Settings() {
   const auth = useAuth(),
-    theme = useTheme(),
     view = useRpc<ParentWorkspaceData>("parent_workspace"),
     action = useAction(),
     [display, setDisplay] = useState("");
@@ -69,30 +67,11 @@ export default function Settings() {
         </Card>
       )}
       <Card>
-        <Title small>Apparence</Title>
-        {[
-          ["system", "Selon l’appareil"],
-          ["light", "Clair"],
-          ["dark", "Sombre"],
-        ].map(([mode, label]) => (
-          <Button
-            key={mode}
-            secondary={theme.mode !== mode}
-            onPress={() => theme.setMode(mode as "system" | "light" | "dark")}
-          >
-            {label}
-          </Button>
-        ))}
-      </Card>
-      <Card>
         <Title small>Confidentialité</Title>
         <Copy>
           Les informations des carnets sont vérifiées en ligne et ne sont pas
           enregistrées hors ligne sur cet appareil. Une session mémorisée est
           conservée dans le stockage sécurisé de l’appareil.
-        </Copy>
-        <Copy>
-          Les préférences de thème ne contiennent aucune information clinique.
         </Copy>
         <Button
           secondary

@@ -20,42 +20,6 @@
   --border: var(--line);
   --font-sans: Arial, Helvetica, sans-serif;
 }
-:root[data-theme="dark"] {
-  color-scheme: dark;
-  --ink: #faf8f1;
-  --muted: #b2c5bc;
-  --teal: #31bc8c;
-  --pale: #193a30;
-  --line: #315047;
-  --paper: #071c17;
-  --card: #122e26;
-  --nav: #0c241d;
-  --attention: #f38b84;
-  --attention-surface: #48302f;
-  --attention-ink: #f6d4d0;
-  --error-surface: #492822;
-  --error-ink: #ffd2c8;
-  --focus: #f1ce80;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) {
-    color-scheme: dark;
-    --ink: #faf8f1;
-    --muted: #b2c5bc;
-    --teal: #31bc8c;
-    --pale: #193a30;
-    --line: #315047;
-    --paper: #071c17;
-    --card: #122e26;
-    --nav: #0c241d;
-    --attention: #f38b84;
-    --attention-surface: #48302f;
-    --attention-ink: #f6d4d0;
-    --error-surface: #492822;
-    --error-ink: #ffd2c8;
-    --focus: #f1ce80;
-  }
-}
 
 * {
   box-sizing: border-box;
@@ -1148,40 +1112,12 @@ th {
   height: 40px;
   object-fit: contain;
 }
-.emblem-dark {
-  display: none;
-}
-[data-theme="dark"] .emblem-light {
-  display: none;
-}
-[data-theme="dark"] .emblem-dark {
-  display: block;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) .emblem-light {
-    display: none;
-  }
-  :root:not([data-theme]) .emblem-dark {
-    display: block;
-  }
-}
 .brand-sub {
   color: var(--muted);
   font-size: 9px;
   letter-spacing: 0.1px;
   font-weight: 500;
   margin-top: 4px;
-}
-.theme-control {
-  border: 1px solid var(--line);
-  background: var(--card);
-  color: var(--teal);
-  border-radius: 12px;
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  flex-shrink: 0;
 }
 .public-header {
   height: 76px;
