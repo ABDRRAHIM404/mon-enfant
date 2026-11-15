@@ -238,6 +238,7 @@ jobs:
           cache: npm
           cache-dependency-path: mobile/package-lock.json
       - run: npm ci
+      - run: python3 -m compileall -q scripts
       - run: npm run checkdeps
       - run: npm run typecheck
       - run: npm test

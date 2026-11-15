@@ -50,7 +50,18 @@ export default function Login() {
       </Copy>
       <Card>
         <Title small>Connexion parent</Title>
-        {auth.error && <Notice error>{auth.error}</Notice>}
+        {auth.error && (
+          <>
+            <Notice error>{auth.error}</Notice>
+            <Button
+              secondary
+              disabled={auth.loading}
+              onPress={auth.retryInitialization}
+            >
+              Réessayer la connexion sécurisée
+            </Button>
+          </>
+        )}
         {error && <Notice error>{error}</Notice>}
         {auth.loading ? (
           <DataState loading error="" onRetry={() => {}} />

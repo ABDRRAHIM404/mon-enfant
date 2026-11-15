@@ -23,6 +23,7 @@ type Auth = {
   epoch: number;
   error: string;
   logoutPending: boolean;
+  retryInitialization: () => void;
   signIn: (email: string, password: string, remember: boolean) => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -38,13 +39,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [foreground, setForeground] = useState(AppState.currentState === "active"),
     [epoch, setEpoch] = useState(0),
     [error, setError] = useState(""),
-    [logoutPending, setLogoutPending] = useState(false);
+    [logoutPending, setLogoutPending] = useState(false),
+    [initializationAttempt, setInitializationAttempt] = useState(0);
   const controller = useRef<Awaited<
     ReturnType<typeof prepareAuthStorage>
   > | null>(null);
   useEffect(() => {
     let current = true,
+      stage = "storage-prepare",
       cleanup = () => {};
+    setLoading(true);
+    setError("");
+    setClient(null);
+    controller.current = null;
     async function init() {
       if (!configured) {
         setError(
@@ -58,6 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const store = await prepareAuthStorage(key);
       if (!current) return;
       controller.current = store;
+      stage = "client-create";
       const api = createClient(URL, KEY, {
         global: {
           fetch: (input, init) => fetch(input, { ...init, cache: "no-store" }),
@@ -82,13 +90,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         subscription.unsubscribe();
         api.auth.stopAutoRefresh();
       };
+      stage = "session-read";
       const { data, error } = await api.auth.getSession();
       if (!current) return;
       if (error) setError("Session indisponible. Connectez-vous à nouveau.");
       else setSession(data.session);
       setLoading(false);
     }
-    void init().catch(() => {
+    void init().catch((failure: unknown) => {
+      // Static classification only: never log provider messages, keys or session values.
+      const code = (failure as { code?: unknown } | null)?.code;
+      console.warn("NATIVE_AUTH_INIT", {
+        stage,
+        code:
+          typeof code === "string" && /^[A-Z0-9_-]{1,60}$/.test(code)
+            ? code
+            : "INITIALIZATION_FAILED",
+      });
       if (current) {
         setError(
           "Le stockage sécurisé est indisponible. Réessayez avant de vous connecter.",
@@ -100,7 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       current = false;
       cleanup();
     };
-  }, []);
+  }, [initializationAttempt]);
   useEffect(() => {
     if (!client) return;
     const active = AppState.currentState === "active";
@@ -156,6 +174,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         epoch,
         error,
         logoutPending,
+        retryInitialization: () => {
+          if (!session && !loading)
+            setInitializationAttempt((value) => value + 1);
+        },
         signIn,
         signOut,
       }}
