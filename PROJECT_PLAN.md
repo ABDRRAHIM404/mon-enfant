@@ -315,3 +315,5 @@ These are not blockers for the present plan:
 - Suitable paid production infrastructure when actual data volume/legal needs require it.
 
 **Primary V1 success definition:** A verified doctor can register or find a child, maintain that doctor's local register number, record accountable vaccine/clinical entries, schedule follow-ups, and receive accurate updated vaccine status when another authorized doctor vaccinates the same child; administrators can securely verify clinicians and maintain approved schedule rules.
+
+Update 5 clinician checkpoint, 15 November 2026: eight dedicated available views/shared light shell are implemented; current layout refinement passes 13 focused cloud tests, explicit types/build and live consultation role/session denials. Final trusted lifecycle, responsive visual review, fixture retirement and owner approval remain open in UPDATE_5_ACCEPTANCE.md. Parent website acceptance is deferred to its separate later milestone; APK/iOS remain paused. Remaining Phase 6 and external approvals are unchanged.
