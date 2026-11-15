@@ -123,6 +123,18 @@ test("reproduce canonical clinician navigation and saved provisional HB1 history
         await expect(
           page.getByRole("main").getByRole("heading", { level: 1 }),
         ).toBeVisible();
+        await expect(page).toHaveURL(new URL(link.href, SITE).href);
+        if (new URL(link.href, SITE).pathname === home) {
+          await expect(
+            page
+              .locator(`a[href="${link.href}"][aria-current="page"]:visible`)
+              .first(),
+          ).toBeVisible();
+        } else {
+          await expect(
+            page.getByRole("main").getByRole("heading", { level: 1 }),
+          ).not.toHaveText(homeHeading);
+        }
         const url = new URL(page.url());
         expect(url.origin).toBe(SITE);
         const heading = await page
@@ -207,6 +219,21 @@ test("reproduce canonical clinician navigation and saved provisional HB1 history
       captures.push(shot);
     }
     await page.goto(home);
+    const directLogout = page.getByRole("button", {
+      name: "Se déconnecter",
+      exact: true,
+    });
+    if (!(await directLogout.isVisible())) {
+      await page
+        .getByRole("link", { name: "Compte soignant", exact: true })
+        .click();
+      await expect(page).toHaveURL(SITE + "/account");
+      findings.push({
+        role,
+        action: "mobile_logout_via_visible_account_link",
+        home_logout_visible: false,
+      });
+    }
     await page
       .getByRole("button", { name: "Se déconnecter", exact: true })
       .click();
