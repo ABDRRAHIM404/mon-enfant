@@ -99,6 +99,7 @@ try:
         if image.name in {'ios-'+name+'.png' for name in ('login','home','booklet','vaccinations','notifications')}:
             shutil.copyfile(image, output/image.name)
     if result.returncode != 0:
+        command(['xcrun', 'simctl', 'io', device['udid'], 'screenshot', str(output/'ios-journey-stop.png')])
         diagnostic = (temp/'private-maestro.log').read_text(errors='replace')
         diagnostic = diagnostic.replace(email, '[synthetic-email]').replace(password, '[redacted]')
         relevant = [line for line in diagnostic.splitlines() if re.search(r'FAIL|Error|Exception|not found|Unable|Assertion|Timed out', line, re.I)]

@@ -19,6 +19,7 @@ spec.loader.exec_module(fixture)
 op = fixture.op
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--run', required=True)
+parser.add_argument('--add-growth', action='store_true', help='Idempotently add two fictional measurements to the already prepared native fixture')
 args = parser.parse_args()
 state = fixture.load(args.run)
 ids = fixture.validate(state)
@@ -50,6 +51,27 @@ def ok(result):
     status, data = result
     assert status in (200, 204)
     return data
+
+if args.add_growth:
+    try:
+        mobile = state['mobile']
+        child = str(uuid.UUID(mobile['child']))
+        facility = str(uuid.UUID(mobile['facility']))
+        operations = mobile.setdefault('growth_operations', [str(uuid.uuid4()), str(uuid.uuid4())])
+        fixture.save(state, credentials)
+        doctor = session('DOCTOR')
+        for operation, day, weight, height in zip(operations, ('2026-01-02', '2026-02-02'), (8.1, 8.4), (70, 73)):
+            ok(rpc(doctor, 'write_clinical_entry', {'p_operation_id': operation, 'p_child_id': child, 'p_kind': 'growth', 'p_facility_id': facility, 'p_occurred_on': day, 'p_occurrence_precision': 'exact', 'p_source_type': 'paper_transcription', 'p_source_reference': 'Mesures entièrement fictives pour le rendu natif.', 'p_source_verified': False, 'p_payload': {'weight_kg': weight, 'height_cm': height}}))
+        parent = session('PARENT')
+        booklet = ok(rpc(parent, 'parent_mobile_view', {'p_kind': 'booklet', 'p_child_id': child}))
+        assert len(booklet['growth']) == 2
+        mobile['growth_prepared'] = True
+        fixture.save(state, credentials)
+        print(json.dumps({'run': args.run, 'synthetic_growth_points': 2, 'scoped_booklet_readback': True, 'idempotent_operations_retained': True, 'cleanup_required': True}))
+    except Exception:
+        print(json.dumps({'run': args.run, 'failed_stage': 'supplemental-synthetic-growth', 'provider_details_withheld': True, 'cleanup_required': True}))
+        raise SystemExit(1) from None
+    raise SystemExit(0)
 
 try:
     actors = {a['role']: str(uuid.UUID(a['id'])) for a in state['actors']}

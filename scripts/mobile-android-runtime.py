@@ -43,13 +43,18 @@ def nodes():
 def find(label, by_id=False, timeout=45, scroll=False):
     until = time.monotonic() + timeout
     while time.monotonic() < until:
-        for node in nodes():
+        try:
+            current_nodes = nodes()
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired, ET.ParseError):
+            time.sleep(1)
+            continue
+        for node in current_nodes:
             value = node.get('resource-id', '') if by_id else node.get('text', '')
             matches = value == label or (by_id and value.endswith('/' + label)) or (not by_id and node.get('content-desc', '') == label)
             if matches and node.get('enabled') == 'true':
                 return node
         if scroll:
-            shell('input', 'swipe', '540', '1700', '540', '600', '350')
+            shell('input', 'swipe', '540', '600' if scroll == 'up' else '1700', '540', '1700' if scroll == 'up' else '600', '350')
         time.sleep(1)
     raise RuntimeError('Expected native control unavailable')
 
@@ -126,8 +131,13 @@ try:
     find('Vaccinations et partage temporaire')
     capture('native-booklet')
     checks.append('guardian_child_and_booklet_render')
+    stage = 'growth'
+    tap('Croissance', scroll=True)
+    find('Poids (kg)', scroll=True)
+    capture('native-growth')
+    checks.append('native_raw_growth_render')
     stage = 'vaccination-history'
-    tap('Vaccinations et partage temporaire')
+    tap('Vaccinations et partage temporaire', scroll='up')
     find('Historique des vaccinations')
     find('Vaccin transcrit fictif', scroll=True)
     capture('native-vaccinations')
