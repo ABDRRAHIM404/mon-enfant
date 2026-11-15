@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import urllib.request
 import zipfile
@@ -70,20 +71,20 @@ try:
         visible('Mes enfants')
     add('launchApp')
     visible({'id': 'login-email'})
-    add('takeScreenshot', str(output/'ios-login'))
+    add('takeScreenshot', 'ios-login')
     login(False)
-    add('takeScreenshot', str(output/'ios-home'))
+    add('takeScreenshot', 'ios-home')
     add('stopApp'); add('launchApp'); visible({'id': 'login-email'})
     login(True)
     add('stopApp'); add('launchApp'); visible('Mes enfants')
     add('tapOn', 'Ouvrir le carnet'); visible('Vaccinations et partage temporaire')
-    add('takeScreenshot', str(output/'ios-booklet'))
+    add('takeScreenshot', 'ios-booklet')
     add('tapOn', 'Vaccinations et partage temporaire')
     visible('Historique des vaccinations')
-    add('takeScreenshot', str(output/'ios-vaccinations'))
+    add('takeScreenshot', 'ios-vaccinations')
     add('tapOn', 'Retour'); add('tapOn', 'Retour')
     add('tapOn', 'Messages'); visible('Mes notifications')
-    add('takeScreenshot', str(output/'ios-notifications'))
+    add('takeScreenshot', 'ios-notifications')
     add('tapOn', 'Compte'); scroll({'id': 'logout'}); add('tapOn', {'id': 'logout'})
     add('tapOn', 'Se déconnecter'); visible({'id': 'login-email'})
     add('stopApp'); add('launchApp'); visible({'id': 'login-email'})
@@ -93,7 +94,10 @@ try:
     private_env = os.environ.copy()
     private_env['MAESTRO_CLI_NO_ANALYTICS'] = '1'
     with (temp/'private-maestro.log').open('wb') as log:
-        result = subprocess.run([str(cli[0]), '--device', device['udid'], 'test', '--debug-output', str(temp/'debug'), str(target)], stdout=log, stderr=subprocess.STDOUT, env=private_env, timeout=800)
+        result = subprocess.run([str(cli[0]), '--device', device['udid'], 'test', '--debug-output', str(temp/'debug'), '--test-output-dir', str(temp/'artifacts'), str(target)], stdout=log, stderr=subprocess.STDOUT, env=private_env, timeout=800)
+    for image in (temp/'artifacts').glob('**/ios-*.png'):
+        if image.name in {'ios-'+name+'.png' for name in ('login','home','booklet','vaccinations','notifications')}:
+            shutil.copyfile(image, output/image.name)
     if result.returncode != 0:
         diagnostic = (temp/'private-maestro.log').read_text(errors='replace')
         diagnostic = diagnostic.replace(email, '[synthetic-email]').replace(password, '[redacted]')
