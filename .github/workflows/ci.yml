@@ -19,6 +19,7 @@ on:
             mobile-check,
             mobile-native,
             mobile-runtime,
+            mobile-publish,
             mobile-ios-runtime,
             mobile-android,
             mobile-ios,
@@ -49,6 +50,10 @@ on:
         description: Successful mobile native build run for Android runtime verification
         type: string
         default: "43669991631"
+      native_runtime_run:
+        description: Successful accepted Android runtime run (publication only)
+        type: string
+        default: ""
       operation_id:
         description: Retained UUID for the single owner test message (send only)
         type: string
@@ -400,3 +405,33 @@ jobs:
           name: mobile-ios-runtime
           path: test-results/mobile-ios-runtime/
           retention-days: 3
+
+  mobile-publish:
+    if: github.event_name == 'workflow_dispatch' && inputs.live_probe == 'mobile-publish'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      NATIVE_BUILD_RUN: ${{ inputs.native_build_run }}
+      NATIVE_RUNTIME_RUN: ${{ inputs.native_runtime_run }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/download-artifact@v4
+        with:
+          name: mobile-android-development
+          path: native-build
+          run-id: ${{ inputs.native_build_run }}
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: mobile-android-runtime
+          path: native-runtime
+          run-id: ${{ inputs.native_runtime_run }}
+          github-token: ${{ github.token }}
+      - name: Publish only the exact accepted APK after verified fixture retirement
+        run: python3 scripts/publish-android-preview.py
