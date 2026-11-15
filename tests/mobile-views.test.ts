@@ -160,20 +160,28 @@ describe("native parent read projections", () => {
     const native = await rpc<{
       appointments: Record<string, unknown>[];
       child: unknown;
-      server_day: string;
+      server_current_civil_day: string;
       timezone: string;
     }>(f.parent, "parent_mobile_view", ["booklet", f.child, 1]);
     expect(native.child).toEqual(original.child);
     expect(native.timezone).toBe("Africa/Casablanca");
     const expected = (
-      await db.query<{ local: string; day: string; offset: number }>(
-        "select to_char(e.starts_at at time zone 'Africa/Casablanca','DD/MM/YYYY HH24:MI') local,(now() at time zone 'Africa/Casablanca')::date::text day,extract(epoch from((e.starts_at at time zone 'Africa/Casablanca')-(e.starts_at at time zone 'UTC')))::integer offset from public.appointment_events e where e.appointment_id=$1 order by revision desc limit 1",
+      await db.query<{
+        local_stamp: string;
+        current_civil_day: string;
+        offset: number;
+      }>(
+        "select to_char(e.starts_at at time zone 'Africa/Casablanca','DD/MM/YYYY HH24:MI') as local_stamp,(now() at time zone 'Africa/Casablanca')::date::text as current_civil_day,extract(epoch from((e.starts_at at time zone 'Africa/Casablanca')-(e.starts_at at time zone 'UTC')))::integer as zone_offset_seconds from public.appointment_events e where e.appointment_id=$1 order by revision desc limit 1",
         [appointmentId],
       )
     ).rows[0];
-    expect(native.server_day).toBe(expected.day);
-    expect(native.appointments[0].starts_display).toContain(expected.local);
-    expect(native.appointments[0].starts_offset_seconds).toBe(expected.offset);
+    expect(native.server_day).toBe(expected.current_civil_day);
+    expect(native.appointments[0].starts_display).toContain(
+      expected.local_stamp,
+    );
+    expect(native.appointments[0].starts_offset_seconds).toBe(
+      expected.zone_offset_seconds,
+    );
     const strip = (row: Record<string, unknown>) =>
       Object.fromEntries(
         Object.entries(row).filter(
@@ -191,7 +199,7 @@ describe("native parent read projections", () => {
         id: appointmentId,
         starts_display: native.appointments[0].starts_display,
       },
-      server_day: expected.day,
+      server_day: expected.current_civil_day,
     });
     expect(
       await rpc(f.parent, "parent_mobile_view", ["calendar", f.child, 1]),
@@ -209,7 +217,7 @@ describe("native parent read projections", () => {
         f.child,
         1,
       ]),
-    ).toMatchObject({ items: [], server_day: expected.day });
+    ).toMatchObject({ items: [], server_day: expected.current_civil_day });
   });
   it("never substitutes a clinical grant, parent profile or metadata for a current guardian link", async () => {
     const f = await linked(),
