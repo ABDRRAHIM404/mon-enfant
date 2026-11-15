@@ -127,6 +127,12 @@ test("each clinician section has dedicated scoped UI and provisional writes pers
         if ((page.viewportSize()?.width || 1672) <= 760) {
           const picker = page.locator(".soignant-phone-picker");
           await picker.locator("summary").click();
+          const search = picker.locator('input[type="search"]');
+          await expect(search).toHaveCSS("border-top-style", "solid");
+          await expect(search).toHaveCSS("border-top-width", "1px");
+          expect(
+            await search.evaluate((el) => el.getBoundingClientRect().height),
+          ).toBeGreaterThanOrEqual(44);
           await picker.locator('select[name="child"]').selectOption(id);
           await picker
             .getByRole("button", { name: "Afficher cet enfant" })
@@ -136,6 +142,14 @@ test("each clinician section has dedicated scoped UI and provisional writes pers
           );
           expect(new URL(page.url()).searchParams.get("child")).toBe(id);
         } else {
+          const search = page.locator(
+            '.soignant-desktop-picker input[type="search"]',
+          );
+          await expect(search).toHaveCSS("border-top-style", "solid");
+          await expect(search).toHaveCSS("border-top-width", "1px");
+          expect(
+            await search.evaluate((el) => el.getBoundingClientRect().height),
+          ).toBeGreaterThanOrEqual(44);
           await page
             .locator(
               ".soignant-desktop-picker .soignant-child-list a[aria-current=page]",
