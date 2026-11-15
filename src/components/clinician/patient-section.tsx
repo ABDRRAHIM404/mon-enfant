@@ -234,7 +234,7 @@ export async function PatientSection({
                     {!references.items.length ? (
                       <p>
                         Aucune référence assignée. L’historique enregistré
-                        ci-dessous est conservé indépendamment de la revue d’une
+                        ci-dessus est conservé indépendamment de la revue d’une
                         source et de la planification du suivi.
                       </p>
                     ) : (

@@ -124,6 +124,25 @@ test("each clinician section has dedicated scoped UI and provisional writes pers
         const source = `Source fictive ${marker} ${kind}`,
           path = `/provisional/${section}?child=${id}`;
         await page.goto(path);
+        if ((page.viewportSize()?.width || 1672) <= 760) {
+          const picker = page.locator(".soignant-phone-picker");
+          await picker.locator("summary").click();
+          await picker.locator('select[name="child"]').selectOption(id);
+          await picker
+            .getByRole("button", { name: "Afficher cet enfant" })
+            .click();
+          await expect(page).toHaveURL(
+            new RegExp(`/provisional/${section}\\?`),
+          );
+          expect(new URL(page.url()).searchParams.get("child")).toBe(id);
+        } else {
+          await page
+            .locator(
+              ".soignant-desktop-picker .soignant-child-list a[aria-current=page]",
+            )
+            .click();
+          expect(new URL(page.url()).searchParams.get("child")).toBe(id);
+        }
         const already = (await page.getByRole("main").innerText()).includes(
           source,
         );

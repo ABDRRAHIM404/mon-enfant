@@ -39,13 +39,17 @@ export default async function Calendar({
   const state =
       q.state && Object.hasOwn(appointmentStates, q.state) ? q.state : "all",
     page = Math.min(10000, Math.max(1, Math.floor(Number(q.page) || 1)));
-  const response = await supabase.rpc("appointment_calendar", {
-    p_from: range.from,
-    p_to: range.to,
-    p_page: page,
-    p_state: state,
-  });
-  if (response.error) throw new Error("Impossible de charger le calendrier.");
+  const [response, capabilities] = await Promise.all([
+    supabase.rpc("appointment_calendar", {
+      p_from: range.from,
+      p_to: range.to,
+      p_page: page,
+      p_state: state,
+    }),
+    supabase.rpc("my_clinical_capabilities"),
+  ]);
+  if (response.error || capabilities.error)
+    throw new Error("Impossible de charger le calendrier.");
   const data = response.data as AppointmentPage & {
       days: { day: string; count: number }[];
     },
@@ -65,9 +69,11 @@ export default async function Calendar({
       </div>
       <div className="tabs">
         <Link href="/follow-up">Suivis et alertes</Link>
-        <Link className="button primary" href="/appointments/new">
-          Nouveau rendez-vous
-        </Link>
+        {(capabilities.data as string[]).includes("appointment") && (
+          <Link className="button primary" href="/appointments/new">
+            Nouveau rendez-vous
+          </Link>
+        )}
       </div>
       <LiveRefresh />
       <section className="panel">
