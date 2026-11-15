@@ -7,6 +7,7 @@ import { join } from "node:path";
 if (
   process.env.GITHUB_ACTIONS !== "true" ||
   ![
+    "forms-cloud-accept",
     "updates-cloud-accept",
     "design-cloud-accept",
     "sharing-cloud-accept",

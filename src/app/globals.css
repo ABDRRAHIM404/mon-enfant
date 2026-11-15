@@ -2534,3 +2534,89 @@ th {
   margin: 10px 0;
   max-width: 100%;
 }
+
+/* Shared child/care forms need their own layout, including outside auth-form. */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 20px;
+  margin-top: 22px;
+  min-width: 0;
+}
+.form-grid > label {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.form-grid
+  input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
+.form-grid select,
+.form-grid textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 48px;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+  font-size: 15px;
+}
+.form-grid input:disabled,
+.form-grid select:disabled,
+.form-grid textarea:disabled {
+  background: var(--pale);
+}
+.form-grid > .form-grid {
+  grid-column: 1 / -1;
+  margin-top: 0;
+}
+.form-grid > p,
+.form-grid > .notice,
+.form-grid > button {
+  grid-column: 1 / -1;
+}
+.form-grid > button {
+  justify-self: start;
+  max-width: 100%;
+  white-space: normal;
+}
+.form-grid > label.checkbox {
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 48px;
+  padding: 8px 0;
+  font-size: 14px;
+  font-weight: 400;
+}
+.form-grid .checkbox input {
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+  min-height: 20px;
+  margin: 3px 0 0;
+  padding: 0;
+  accent-color: var(--action);
+}
+@media (max-width: 700px) {
+  .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  .form-grid
+    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
+  .form-grid select,
+  .form-grid textarea {
+    font-size: 16px;
+  }
+}
