@@ -217,6 +217,23 @@ export async function protectedDashboardDatabase() {
 
 export async function sharingDatabase() {
   const db = await protectedDashboardDatabase();
+  // Preserve guarded pre-sharing functions in this disposable test DB for exact parent-output regression checks.
+  for (const name of [
+    "parent_child_booklet",
+    "parent_vaccine_items",
+    "parent_vaccination_history",
+  ]) {
+    const row = await db.query<{ definition: string }>(
+      "select pg_get_functiondef(to_regprocedure($1)) definition",
+      [`private.${name}(uuid,integer)`],
+    );
+    await db.exec(
+      row.rows[0].definition.replace(
+        `private.${name}(`,
+        `private.baseline_${name}(`,
+      ),
+    );
+  }
   await db.exec(
     readFileSync(
       "supabase/migrations/20261114234132_parent_clinician_sharing.sql",

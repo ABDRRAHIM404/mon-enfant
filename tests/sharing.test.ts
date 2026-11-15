@@ -233,6 +233,20 @@ describe("temporary sharing on complete schema", () => {
         },
       ],
     });
+    for (const [name, expected] of [
+      ["parent_child_booklet", parentBook],
+      ["parent_vaccination_history", history],
+      ["parent_vaccine_items", references],
+    ] as const) {
+      const result = await sessionActing(
+        db,
+        f.parent.id,
+        f.parent.session,
+        `select private.baseline_${name}($1,1) value`,
+        [f.child],
+      );
+      expect((result.rows[0] as { value: unknown }).value).toEqual(expected);
+    }
     const before = await db.query(
       "select count(*) count from public.access_grants",
     );
@@ -244,9 +258,9 @@ describe("temporary sharing on complete schema", () => {
       data: { history, references },
     });
     expect(view.data as object).not.toHaveProperty("appointments");
-    await expect(rpc(reader, "get_child_profile", [f.child])).rejects.toMatchObject(
-      denied,
-    );
+    await expect(
+      rpc(reader, "get_child_profile", [f.child]),
+    ).rejects.toMatchObject(denied);
     await expect(
       rpc(reader, "write_clinical_entry", [
         randomUUID(),
@@ -477,6 +491,57 @@ describe("temporary sharing on complete schema", () => {
       await rpc(f.parent, "revoke_clinician_share", [r.id]);
     await expect(
       rpc(reader, "read_clinician_share", [r.id, 1]),
+    ).rejects.toMatchObject(denied);
+  });
+  it("denies new redemption and existing reads against historical expired guardianship without changing immutable facts", async () => {
+    const f = await linked(),
+      reader = await actor("nurse");
+    await rpc(f.parent, "revoke_guardian_link", [f.link, reason]);
+    const invitation = randomUUID(),
+      claim = randomUUID(),
+      link = randomUUID();
+    await db.query(
+      `insert into private.guardian_invitations select (jsonb_populate_record(null::private.guardian_invitations,to_jsonb(i)||jsonb_build_object('id',$1::text,'token_hash',$2::text,'created_at',now()-interval '4 days','expires_at',now()-interval '2 days'))).* from private.guardian_invitations i join private.guardian_claims c on c.invitation_id=i.id join private.guardian_links g on g.claim_id=c.id where g.id=$3`,
+      [
+        invitation,
+        createHash("sha256").update(randomBytes(32)).digest("hex"),
+        f.link,
+      ],
+    );
+    await db.query(
+      `insert into private.guardian_claims select (jsonb_populate_record(null::private.guardian_claims,to_jsonb(c)||jsonb_build_object('id',$1::text,'invitation_id',$2::text,'created_at',now()-interval '3 days'))).* from private.guardian_claims c join private.guardian_links g on g.claim_id=c.id where g.id=$3`,
+      [claim, invitation, f.link],
+    );
+    await db.query(
+      `insert into private.guardian_decisions select (jsonb_populate_record(null::private.guardian_decisions,to_jsonb(d)||jsonb_build_object('id',$1::text,'claim_id',$2::text,'expires_on',(now() at time zone 'Africa/Casablanca')::date-2))).* from private.guardian_decisions d where d.id=$3`,
+      [link, claim, f.link],
+    );
+    await db.query(
+      `insert into private.guardian_links select (jsonb_populate_record(null::private.guardian_links,to_jsonb(g)||jsonb_build_object('id',$1::text,'claim_id',$2::text,'created_at',now()-interval '3 days','expires_at',((d.expires_on+1)::timestamp at time zone 'Africa/Casablanca'),'revoked_at',null,'revoked_by',null,'revocation_reason',null))).* from private.guardian_links g join private.guardian_decisions d on d.id=$1::uuid where g.id=$3`,
+      [link, claim, f.link],
+    );
+    const secret = randomBytes(32).toString("base64url"),
+      id = randomUUID();
+    await db.query(
+      "insert into private.clinician_shares(id,child_id,guardian_id,guardian_link_id,issuer_session,token_hash,scope,expires_at) values($1,$2,$3,$4,$5,$6,'vaccination_read',now()+interval '5 minutes')",
+      [
+        id,
+        f.child,
+        f.parent.id,
+        link,
+        f.parent.session,
+        createHash("sha256").update(secret).digest("hex"),
+      ],
+    );
+    expect(await rpc(reader, "redeem_clinician_share", [secret])).toEqual({
+      accepted: false,
+    });
+    await db.query(
+      "update private.clinician_shares set consumed_at=now(),recipient_id=$2,recipient_session=$3,professional_id=$4 where id=$1",
+      [id, reader.id, reader.session, `QA-${reader.id}`],
+    );
+    await expect(
+      rpc(reader, "read_clinician_share", [id, 1]),
     ).rejects.toMatchObject(denied);
   });
   it("denies expired codes/tickets and never shares a provisional workspace", async () => {
