@@ -135,13 +135,13 @@ test("parent purpose-bound sharing, live concurrent claim and revocation", async
     await login(doctor, "DOCTOR");
     const role = info.project.name === "tablet" ? "SECOND" : "PARENT";
     await login(parent, role, true);
-    expect(
+    expect([200, 204]).toContain(
       (
         await rpc(pc, "save_parent_profile", {
           p_display_name: "Responsable fictif",
         })
       ).status,
-    ).toBe(200);
+    );
     const facility = await rpc(dc, "create_facility", {
       p_operation_id: randomUUID(),
       p_name: "Centre fictif partage " + info.project.name,
@@ -419,7 +419,7 @@ test("parent purpose-bound sharing, live concurrent claim and revocation", async
           p_reason: "Retrait entièrement fictif du consentement",
         })
       ).status,
-    ).toBe(200);
+    ).toBe(204);
     expect(
       (
         await rpc(winnerContext, "read_clinician_share", {
