@@ -6,69 +6,14 @@ import { EntryCard } from "@/components/clinical/entry-card";
 import type { ClinicalEntry } from "@/lib/clinical/types";
 import { requireUser } from "@/lib/auth";
 import { uuidPattern, patientName, historyLabels } from "@/lib/registry/types";
-import { routineReference } from "@/lib/vaccines/calendar";
+import { VaccineRoutineReference } from "@/components/sharing/vaccine-reference";
+import { ParentSharePanel } from "@/components/sharing/parent-share-panel";
+import type { ShareList } from "@/lib/sharing/types";
 import { ageLabel, catalogStatus } from "@/lib/vaccines/types";
 import type { PatientVaccineItem } from "@/lib/vaccines/patient-types";
 import type { ParentChild } from "@/lib/parents/types";
 import { todayCasablanca } from "@/lib/appointments/calendar";
 export const dynamic = "force-dynamic";
-const unavailable: Record<string, string> = {
-  unreviewed_version:
-    "Version non approuvée ou retirée : nouvelle date non calculée.",
-  disabled_reference_only:
-    "Calcul automatique désactivé : décision du professionnel nécessaire.",
-  birth_date_uncertain: "Naissance incertaine : date non calculée.",
-  eligibility_unknown: "Éligibilité inconnue : date non calculée.",
-  ineligible:
-    "Éligibilité non établie : réexamen par le professionnel nécessaire.",
-};
-function Reference({
-  item,
-  child,
-  today,
-}: {
-  item: PatientVaccineItem;
-  child: ParentChild;
-  today: string;
-}) {
-  if (item.state === "withdrawn")
-    return <p>Référence retirée : aucune nouvelle date calculée.</p>;
-  const reference = routineReference(
-    {
-      doseCode: item.dose_code,
-      vaccineCode: item.vaccine_code,
-      age: item.age,
-      eligibility: item.eligibility,
-      automaticScheduling: item.automatic_scheduling,
-    },
-    {
-      birthDate: child.birth_date,
-      birthPrecision: child.birth_date_precision as
-        "exact" | "estimated" | "unknown",
-      sex: child.sex as "female" | "male" | "unknown",
-    },
-    { status: item.version_status, reviewVerified: item.review_verified },
-  );
-  if (!reference.startOn)
-    return <p>{unavailable[reference.state] ?? "Date non calculée."}</p>;
-  return (
-    <>
-      <p>
-        {reference.isWindow
-          ? `Fenêtre de routine : ${reference.startOn} au ${reference.endOn} inclus`
-          : `Date de référence de routine : ${reference.startOn}`}
-      </p>
-      {reference.endOn &&
-        reference.endOn >= today &&
-        !item.documented_entries.length && (
-          <p className="notice">
-            Référence à venir ou en cours. Le professionnel confirme les soins
-            et le rendez-vous à prévoir.
-          </p>
-        )}
-    </>
-  );
-}
 export default async function ParentVaccinations({
   params,
   searchParams,
@@ -91,14 +36,18 @@ export default async function ParentVaccinations({
     historyPage > 10000
   )
     notFound();
-  const [references, history] = await Promise.all([
+  const [references, history, shares] = await Promise.all([
     supabase.rpc("parent_vaccine_items", { p_child_id: id, p_page: page }),
     supabase.rpc("parent_vaccination_history", {
       p_child_id: id,
       p_page: historyPage,
     }),
+    supabase.rpc("list_clinician_shares", { p_child_id: id }),
   ]);
   const { data, error } = references;
+  if (shares.error?.code === "42501") notFound();
+  if (shares.error)
+    throw new Error("Impossible de charger les partages autorisés.");
   if (history.error?.code === "42501") notFound();
   if (history.error)
     throw new Error("Impossible de charger l’historique vaccinal.");
@@ -224,7 +173,11 @@ export default async function ParentVaccinations({
                       ? "Administration documentée et rapprochée"
                       : "Administration non confirmée"}
                 </p>
-                <Reference item={item} child={view.child} today={today} />
+                <VaccineRoutineReference
+                  item={item}
+                  child={view.child}
+                  today={today}
+                />
                 <p className="fine">
                   {item.version_label} · {catalogStatus[item.version_status]} ·
                   Âge configuré : {ageLabel(item.age)} · Source conservée :{" "}
@@ -265,22 +218,7 @@ export default async function ParentVaccinations({
               rattrapage. Les dates affichées sont des références de routine.
             </p>
           </section>
-          <section className="workspace-surface">
-            <h2>Partage et accès</h2>
-            <p className="muted">
-              Consultez les autorisations et l’historique d’accès à ce carnet.
-            </p>
-            <Link
-              className="button primary"
-              href={`/parent/children/${id}/privacy`}
-            >
-              Gérer mes accès
-            </Link>
-            <p className="fine">
-              Le QR d’identification ne confère aucune autorisation. Le partage
-              temporaire avec un soignant reste une fonctionnalité distincte.
-            </p>
-          </section>
+          <ParentSharePanel childId={id} list={shares.data as ShareList} />
         </aside>
       </div>
       <div className="actions">

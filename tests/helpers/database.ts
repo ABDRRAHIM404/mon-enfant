@@ -214,3 +214,14 @@ export async function protectedDashboardDatabase() {
   );
   return db;
 }
+
+export async function sharingDatabase() {
+  const db = await protectedDashboardDatabase();
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/20261114234132_parent_clinician_sharing.sql",
+      "utf8",
+    ),
+  );
+  return db;
+}

@@ -2451,3 +2451,86 @@ th {
     gap: 4px;
   }
 }
+
+/* Temporary, consented sharing stays separate from identification and clinical editing. */
+.share-panel .auth-form {
+  margin-top: 16px;
+}
+.share-panel .checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.share-panel .checkbox input {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  margin: 3px 0;
+  padding: 0;
+  flex-shrink: 0;
+}
+.share-panel select,
+.share-panel input[readonly] {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--ink);
+  padding: 12px;
+  min-height: 44px;
+}
+.share-secret {
+  margin-top: 20px;
+}
+.share-secret .qr-code {
+  margin: 16px 0;
+}
+.share-secret .qr-code svg {
+  display: block;
+  margin: auto;
+  max-width: 100%;
+  height: auto;
+}
+.share-status {
+  margin-top: 18px;
+}
+.share-status summary {
+  cursor: pointer;
+  min-height: 44px;
+  font-weight: 700;
+}
+.share-status ul {
+  padding-left: 18px;
+}
+.share-status li {
+  margin-bottom: 18px;
+}
+.share-entry {
+  max-width: 850px;
+}
+.share-entry h1 {
+  font-size: 36px;
+  margin: 18px 0;
+}
+.share-scanner {
+  margin-top: 24px;
+}
+.share-scanner video {
+  max-width: 100%;
+  border-radius: 12px;
+  margin: 16px 0;
+}
+.share-scanner video[hidden] {
+  display: none;
+}
+.share-scanner > label {
+  display: block;
+  font-weight: 600;
+}
+.share-scanner input[type="file"] {
+  display: block;
+  margin: 10px 0;
+  max-width: 100%;
+}

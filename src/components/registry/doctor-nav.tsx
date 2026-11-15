@@ -15,6 +15,7 @@ export function DoctorNav() {
         <Link href="/parent-requests">Demandes des parents</Link>
         <Link href="/practices">Lieux d’exercice</Link>
         <Link href="/provisional">Dossiers provisoires</Link>
+        <Link href="/share">Lire un partage parent</Link>
         <Link href="/account">Mon compte</Link>
       </nav>
     </header>

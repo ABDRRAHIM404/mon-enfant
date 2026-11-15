@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ParentSharePanel } from "@/components/sharing/parent-share-panel";
+import type { ShareList } from "@/lib/sharing/types";
 import { requireUser } from "@/lib/auth";
 import { uuidPattern } from "@/lib/registry/types";
 export const dynamic = "force-dynamic";
@@ -17,6 +19,10 @@ type History = {
   since: string;
 };
 const activity: Record<string, string> = {
+  guardian_share_issued: "Création d’un partage temporaire",
+  guardian_share_redeemed: "Ouverture d’un partage par un soignant",
+  guardian_share_read: "Lecture temporaire autorisée",
+  guardian_share_revoked: "Révocation d’un partage temporaire",
   guardian_calendar_read: "Consultation du calendrier parent",
   guardian_vaccine_references_read:
     "Consultation des références vaccinales parent",
@@ -72,6 +78,10 @@ export default async function Privacy({
   if (error?.code === "42501") notFound();
   if (error) throw new Error("Impossible de charger l’historique des accès.");
   const view = data as History;
+  const shares = await supabase.rpc("list_clinician_shares", {
+    p_child_id: id,
+  });
+  if (shares.error) notFound();
   return (
     <main className="account-page wide">
       <Link href={`/parent/children/${id}`}>← Carnet de mon enfant</Link>
@@ -124,6 +134,7 @@ export default async function Privacy({
           </Link>
         )}
       </nav>
+      <ParentSharePanel childId={id} list={shares.data as ShareList} />
       <p>
         Pour signaler une activité qui vous surprend,{" "}
         <Link href={`/parent/children/${id}/requests`}>

@@ -211,6 +211,12 @@ export function WorkspaceShell({
               </Link>
             );
           })}
+          {!parent && !provisional && (
+            <Link href="/share">
+              <ShieldCheck size={17} aria-hidden="true" />
+              Lire un partage parent
+            </Link>
+          )}
           <form action={signOut}>
             <button className="text-link workspace-signout">
               Se déconnecter
