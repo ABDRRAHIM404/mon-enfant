@@ -173,6 +173,7 @@ create function private.redeem_clinician_share(p_token text) returns jsonb langu
 declare actor uuid;item private.clinician_shares;platform text;
 begin
  actor:=private.assert_doctor();
+ perform private.assert_parent_account(); -- Confirmed active Auth account; this does not confer parent/guardian rights.
  perform pg_advisory_xact_lock(hashtextextended('clinician-share-redeem:'||actor::text,0));
  if (select count(*) from private.clinician_share_attempts where actor_id=actor and created_at>now()-interval '10 minutes')>=10 then return jsonb_build_object('accepted',false);end if;
  insert into private.clinician_share_attempts(actor_id) values(actor);
@@ -189,8 +190,9 @@ create function private.read_clinician_share(p_share_id uuid,p_page integer defa
 declare actor uuid;item private.clinician_shares;data jsonb;
 begin
  actor:=private.assert_doctor();
+ perform private.assert_parent_account(); -- Confirmed active Auth account; this does not confer parent/guardian rights.
  select * into item from private.clinician_shares where id=p_share_id;
- if not found or item.recipient_id is distinct from actor or item.recipient_session is distinct from (auth.jwt()->>'session_id')::uuid or item.consumed_at is null or item.revoked_at is not null or item.expires_at<=now() or not private.share_authority_current(item) then raise exception 'Share unavailable' using errcode='42501';end if;
+ if not found or item.recipient_id is distinct from actor or item.recipient_session is distinct from (auth.jwt()->>'session_id')::uuid or item.consumed_at is null or item.revoked_at is not null or item.expires_at<=now() or not private.share_authority_current(item) or not private.share_recipient_current(item) then raise exception 'Share unavailable' using errcode='42501';end if;
  if p_page is null or p_page not between 1 and 10000 then raise exception 'Invalid share page' using errcode='22023';end if;
  if item.scope='vaccination_read' then data:=jsonb_build_object('references',private.share_reference_projection(item.child_id,p_page),'history',private.share_vaccination_projection(item.child_id,p_page));
  elsif item.scope='booklet_read' then data:=private.share_booklet_projection(item.child_id,null,p_page)-'link';

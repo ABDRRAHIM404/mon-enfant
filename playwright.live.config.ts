@@ -1,10 +1,13 @@
 import { defineConfig, devices } from "@playwright/test";
 const probe = process.env.MON_ENFANT_LIVE_PROBE;
-const cloudRuntime = ["updates-cloud-accept", "design-cloud-accept"].includes(
-  probe ?? "",
-);
+const cloudRuntime = [
+  "updates-cloud-accept",
+  "design-cloud-accept",
+  "sharing-cloud-accept",
+].includes(probe ?? "");
 if (
   ![
+    "sharing-cloud-accept",
     "design-cloud-accept",
     "updates-cloud-accept",
     "updates-accept",
@@ -29,26 +32,28 @@ if (!/^[a-f0-9]{16}$/.test(process.env.MON_ENFANT_QA_RUN ?? ""))
 export default defineConfig({
   testDir: "./e2e-live",
   testMatch:
-    probe === "design-cloud-accept"
-      ? "design.spec.ts"
-      : probe === "updates-accept" || probe === "updates-cloud-accept"
-        ? ["updates.spec.ts", "design.spec.ts"]
-        : probe === "parent-accept"
-          ? "parent.spec.ts"
-          : probe?.startsWith("session-")
-            ? "session.spec.ts"
-            : probe === "accessibility-accept"
-              ? "accessibility.spec.ts"
-              : probe === "vaccination-accept" ||
-                  probe === "vaccine-accessibility"
-                ? "vaccination.spec.ts"
-                : probe === "clinical-inspect"
-                  ? "clinical-inspect.spec.ts"
-                  : probe === "clinical-accept" ||
-                      probe === "clinical-accessibility" ||
-                      probe === "clinical-performance"
-                    ? "clinical.spec.ts"
-                    : "evidence.spec.ts",
+    probe === "sharing-cloud-accept"
+      ? "sharing.spec.ts"
+      : probe === "design-cloud-accept"
+        ? "design.spec.ts"
+        : probe === "updates-accept" || probe === "updates-cloud-accept"
+          ? ["updates.spec.ts", "design.spec.ts"]
+          : probe === "parent-accept"
+            ? "parent.spec.ts"
+            : probe?.startsWith("session-")
+              ? "session.spec.ts"
+              : probe === "accessibility-accept"
+                ? "accessibility.spec.ts"
+                : probe === "vaccination-accept" ||
+                    probe === "vaccine-accessibility"
+                  ? "vaccination.spec.ts"
+                  : probe === "clinical-inspect"
+                    ? "clinical-inspect.spec.ts"
+                    : probe === "clinical-accept" ||
+                        probe === "clinical-accessibility" ||
+                        probe === "clinical-performance"
+                      ? "clinical.spec.ts"
+                      : "evidence.spec.ts",
   webServer: cloudRuntime
     ? [
         {
@@ -83,6 +88,7 @@ export default defineConfig({
     ? 0
     : 1,
   timeout:
+    probe === "sharing-cloud-accept" ||
     probe === "parent-accept" ||
     probe === "updates-accept" ||
     probe === "updates-cloud-accept"

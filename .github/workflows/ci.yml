@@ -15,6 +15,7 @@ on:
         options:
           [
             none,
+            sharing-cloud-accept,
             design-cloud-accept,
             updates-cloud-accept,
             updates-accept,
@@ -148,10 +149,10 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium --only-shell
       - name: Build current application for explicit GitHub-hosted update acceptance
-        if: inputs.live_probe == 'updates-cloud-accept' || inputs.live_probe == 'design-cloud-accept'
+        if: inputs.live_probe == 'updates-cloud-accept' || inputs.live_probe == 'design-cloud-accept' || inputs.live_probe == 'sharing-cloud-accept'
         run: npm run build
       - name: Prepare ephemeral runner TLS for production Secure cookies
-        if: inputs.live_probe == 'updates-cloud-accept' || inputs.live_probe == 'design-cloud-accept'
+        if: inputs.live_probe == 'updates-cloud-accept' || inputs.live_probe == 'design-cloud-accept' || inputs.live_probe == 'sharing-cloud-accept'
         run: openssl req -x509 -newkey rsa:2048 -sha256 -nodes -keyout "$RUNNER_TEMP/updates-key.pem" -out "$RUNNER_TEMP/updates-cert.pem" -days 1 -subj /CN=localhost 2>/dev/null
       - name: Verify the selected deployed workflow in cloud browsers
         run: npx playwright test --config=playwright.live.config.ts
@@ -167,6 +168,8 @@ jobs:
             test-results/live/**/updates-proof.json
             test-results/live/**/design-proof.json
             test-results/live/**/design-*.png
+            test-results/live/**/sharing-proof.json
+            test-results/live/**/sharing-*.png
             test-results/live/**/parent-proof.json
             test-results/live/**/verification-form.png
             test-results/live/**/verification-history.png
