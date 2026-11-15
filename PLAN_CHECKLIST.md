@@ -168,4 +168,4 @@ The complete goal remains active until the full required scope and its approval 
 
 - [x] Restore missing shared form-grid layout and controls for provisional child/care forms and vaccination subfields; preserve all data/permission behavior.
 - [x] Actual desktop and Android Chrome light/dark form checks: 43695413773, no overflow/page errors, visible borders and separated fields; full 275-case regression 43695416835. Native Android uses separately reviewed native form styles.
-- [ ] Canonical publication/readback of this CSS correction and primary main synchronization.
+- [x] Canonical publication/readback: READY dpl_HXU9EF7BeetBkWgWj7VSpWbda3n4 / a7487c4; live CSS desktop/phone rules and health verified, clean primary main synchronized.
