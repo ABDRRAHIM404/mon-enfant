@@ -10,6 +10,7 @@ const cloudRuntime = [
 if (
   ![
     "stabilization-repro",
+    "stabilization-accept",
     "forms-cloud-accept",
     "smart-forms-cloud-accept",
     "sharing-cloud-accept",
@@ -37,7 +38,7 @@ if (!/^[a-f0-9]{16}$/.test(process.env.MON_ENFANT_QA_RUN ?? ""))
 export default defineConfig({
   testDir: "./e2e-live",
   testMatch:
-    probe === "stabilization-repro"
+    probe === "stabilization-repro" || probe === "stabilization-accept"
       ? "stabilization-repro.spec.ts"
       : probe === "smart-forms-cloud-accept"
         ? "smart-forms.spec.ts"
@@ -137,6 +138,7 @@ export default defineConfig({
     "forms-cloud-accept",
     "smart-forms-cloud-accept",
     "stabilization-repro",
+    "stabilization-accept",
   ].includes(probe ?? "")
     ? [
         {
