@@ -79,7 +79,7 @@ export default function Privacy() {
               temporaires sont limités à leur motif et à leur échéance.
             </Copy>
           </Card>
-          <ParentSharing childId={id} />
+          <ParentSharing key={id} childId={id} />
           <Title small>Historique des consultations</Title>
           <Copy small muted>
             Depuis le début de votre lien actuel. Les entrées ne contiennent pas

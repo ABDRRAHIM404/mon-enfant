@@ -91,7 +91,7 @@ export default function Vaccinations() {
             more={page * 20 < refs.data.total}
             onPage={setPage}
           />
-          <ParentSharing childId={id} />
+          <ParentSharing key={id} childId={id} />
         </>
       )}
     </Screen>

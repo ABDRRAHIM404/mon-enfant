@@ -27,7 +27,7 @@ export default function Requests() {
     [message, setMessage] = useState(""),
     operation = useRef<{ payload: string; id: string } | null>(null);
   async function send() {
-    const payload = JSON.stringify({ category, message });
+    const payload = JSON.stringify({ id, category, message });
     if (operation.current?.payload !== payload)
       operation.current = { payload, id: Crypto.randomUUID() };
     const value = await action.run(

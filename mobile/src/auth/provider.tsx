@@ -59,6 +59,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!current) return;
       controller.current = store;
       const api = createClient(URL, KEY, {
+        global: {
+          fetch: (input, init) => fetch(input, { ...init, cache: "no-store" }),
+        },
         auth: {
           storage: store.storage,
           storageKey: key,
