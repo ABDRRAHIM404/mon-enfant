@@ -247,10 +247,10 @@ jobs:
       - run: npm run checkdeps
       - run: npm run typecheck
       - run: npm test
-      - run: npx expo export --platform all
+      - run: npx expo export --platform android
       - uses: actions/upload-artifact@v4
         with:
-          name: mobile-platform-bundles
+          name: mobile-android-bundle
           path: mobile/dist/
           retention-days: 3
 

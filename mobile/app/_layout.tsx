@@ -25,7 +25,7 @@ function Root() {
         >
           <Stack.Screen name="index" />
           <Stack.Screen name="login" />
-          <Stack.Protected guard={!!auth.session}>
+          <Stack.Protected guard={!!auth.session} redirectTo="/login">
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="children" />
             <Stack.Screen name="invitation" />
