@@ -41,6 +41,7 @@ test("reproduce canonical clinician navigation and saved provisional HB1 history
           exact: true,
         })
         .click();
+      await expect(page).toHaveURL(/\/provisional$/);
     }
     const home = role === "DOCTOR" ? "/dashboard" : "/provisional";
     for (const mode of ["light", "dark"] as const) {
@@ -59,11 +60,13 @@ test("reproduce canonical clinician navigation and saved provisional HB1 history
         )
         .evaluateAll((elements) =>
           elements
-            .filter((el) => el.getClientRects().length > 0)
-            .map((el) => ({
+            .map((el, index) => ({
+              index,
+              visible: el.getClientRects().length > 0,
               label: el.textContent?.trim() ?? "",
               href: el.getAttribute("href")!,
-            })),
+            }))
+            .filter((el) => el.visible),
         );
       const first = `stabilization-${info.project.name}-${role}-${mode}-01-home.png`;
       await page.screenshot({ path: info.outputPath(first) });
@@ -107,8 +110,10 @@ test("reproduce canonical clinician navigation and saved provisional HB1 history
         await page.goto(home);
         await theme(page, mode);
         const target = page
-          .locator(`.workspace-site a[href="${link.href}"]:visible`)
-          .first();
+          .locator(
+            ".workspace-sidebar nav > a, .workspace-mobile-nav > a, .workspace-account > a",
+          )
+          .nth(link.index);
         await expect(target).toBeVisible();
         if (info.project.name === "android") await target.tap();
         else if (i % 2 === 0) {
