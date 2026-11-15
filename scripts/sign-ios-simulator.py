@@ -32,6 +32,7 @@ for arch in architectures:
         thin = temp/('executable-'+arch)
         command(['xcrun', 'lipo', str(executable), '-thin', arch, '-output', str(thin)])
     extracted = temp/('simulated-'+arch+'.plist')
+    extracted.unlink(missing_ok=True)
     command(['xcrun', 'segedit', str(thin), '-extract', '__TEXT', '__entitlements', str(extracted)])
     simulated = plistlib.loads(extracted.read_bytes().rstrip(b'\0'))
     assert simulated.get('application-identifier') == identifier
@@ -48,10 +49,12 @@ if '--verify-only' not in sys.argv:
     # iOS Keychain entitlements in an unprovisioned macOS host signature.
     empty = temp/'host-empty.plist'
     empty.write_bytes(plistlib.dumps({}))
+    nested_changed = False
     for nested in sorted((app/'Frameworks').glob('*')):
         if nested.suffix in ('.framework', '.dylib') and restricted & signature_entitlements(nested).keys():
             command(['codesign', '--force', '--sign', '-', '--entitlements', str(empty), str(nested)])
-    if restricted & signature_entitlements(app).keys():
+            nested_changed = True
+    if nested_changed or restricted & signature_entitlements(app).keys():
         command(['codesign', '--force', '--sign', '-', '--entitlements', str(empty), str(app)])
 assert not restricted & signature_entitlements(app).keys()
 command(['codesign', '--verify', '--deep', '--strict', str(app)])

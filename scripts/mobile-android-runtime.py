@@ -29,6 +29,7 @@ assert hashlib.sha256(apk.read_bytes()).hexdigest() == proof['sha256']
 stage = 'emulator-start'
 checks = []
 expected_control = None
+screen_width, screen_height = 1080, 2400
 
 def command(args, timeout=30):
     return subprocess.run(args, capture_output=True, text=True, timeout=timeout, check=True).stdout
@@ -52,7 +53,7 @@ def find(label, by_id=False, timeout=45, scroll=False):
             time.sleep(1)
             continue
         # Only dismiss a known first-boot SYSTEM launcher ANR, never an app-under-test ANR.
-        system_launcher_dialog = any(n.get('resource-id') == 'android:id/alertTitle' and n.get('text') in {"Pixel Launcher isn't responding", "Launcher3 isn't responding"} for n in current_nodes)
+        system_launcher_dialog = any(n.get('resource-id') == 'android:id/alertTitle' and n.get('text') in {"Pixel Launcher isn't responding", "Launcher3 isn't responding", "Quickstep isn't responding"} for n in current_nodes)
         if system_launcher_dialog:
             close = next((n for n in current_nodes if n.get('resource-id') == 'android:id/aerr_close'), None)
             if close is not None:
@@ -69,7 +70,7 @@ def find(label, by_id=False, timeout=45, scroll=False):
             if matches and node.get('enabled') == 'true':
                 return node
         if scroll:
-            shell('input', 'swipe', '540', '600' if scroll == 'up' else '1700', '540', '1700' if scroll == 'up' else '600', '350')
+            shell('input', 'swipe', str(screen_width//2), str(int(screen_height*(0.3 if scroll == 'up' else 0.75))), str(screen_width//2), str(int(screen_height*(0.75 if scroll == 'up' else 0.3))), '350')
         time.sleep(1)
     raise RuntimeError('Expected native control unavailable')
 
@@ -125,6 +126,9 @@ try:
             pass
         if time.monotonic() > until: raise RuntimeError('Emulator boot timed out')
         time.sleep(2)
+    shell('wm', 'size', '720x1600')
+    shell('wm', 'density', '280')
+    screen_width, screen_height = map(int, re.findall(r'(\d+)x(\d+)', shell('wm', 'size'))[-1])
     shell('settings', 'put', 'global', 'window_animation_scale', '0')
     shell('settings', 'put', 'global', 'transition_animation_scale', '0')
     shell('settings', 'put', 'global', 'animator_duration_scale', '0')
