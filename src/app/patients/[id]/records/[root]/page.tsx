@@ -1,4 +1,7 @@
-import type { VaccineChoice } from "@/lib/vaccines/choices";
+import {
+  choicesWithRecordVersions,
+  type VaccineChoice,
+} from "@/lib/vaccines/choices";
 import Link from "next/link";
 import type { VaccineItemExport } from "@/lib/vaccines/patient-types";
 import { randomUUID } from "node:crypto";
@@ -72,7 +75,10 @@ export default async function ClinicalHistory({
             kind={latest.kind}
             facilities={places}
             vaccineItems={vaccineItems.data as VaccineItemExport[]}
-            vaccineChoices={vocabulary.data as VaccineChoice[]}
+            vaccineChoices={choicesWithRecordVersions(
+              vocabulary.data as VaccineChoice[],
+              vaccineItems.data as VaccineItemExport[],
+            )}
             previous={latest}
           />
         ) : (

@@ -1,3 +1,4 @@
+import type { VaccineItemExport } from "./patient-types";
 export type VaccineChoice = {
   version_id: string;
   version_label: string;
@@ -61,4 +62,32 @@ export function readVaccineSelection(form: FormData, choices: VaccineChoice[]) {
         }
       : {}),
   };
+}
+
+// A child's retained, reviewed version remains usable for historical entry even
+// after retirement. This is vocabulary, never a new active schedule assignment.
+export function choicesWithRecordVersions(
+  choices: VaccineChoice[],
+  items: VaccineItemExport[],
+): VaccineChoice[] {
+  return Array.from(
+    new Map(
+      [
+        ...choices,
+        ...items
+          .filter((item) => item.review_verified)
+          .map((item) => ({
+            version_id: item.version_id,
+            version_label: item.version_label,
+            status: item.version_status,
+            vaccine_code: item.rule.vaccine_code,
+            vaccine_label:
+              choices.find(
+                (choice) => choice.vaccine_code === item.rule.vaccine_code,
+              )?.vaccine_label ?? item.rule.vaccine_code,
+            dose_code: item.dose_code,
+          })),
+      ].map((choice) => [`${vaccineKey(choice)}:${choice.dose_code}`, choice]),
+    ).values(),
+  );
 }

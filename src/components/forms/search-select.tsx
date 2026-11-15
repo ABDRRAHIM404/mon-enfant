@@ -27,6 +27,7 @@ export function SearchSelect({
   const id = useId(),
     input = useRef<HTMLInputElement>(null),
     menu = useRef<HTMLDivElement>(null);
+  const [invalid, setInvalid] = useState(false);
   const [open, setOpen] = useState(false),
     [query, setQuery] = useState(""),
     [active, setActive] = useState(0);
@@ -92,6 +93,7 @@ export function SearchSelect({
   }, [open, index, id]);
   const choose = (option: SearchOption) => {
     onChange(option.value);
+    setInvalid(false);
     setQuery("");
     setOpen(false);
     input.current?.focus();
@@ -115,6 +117,8 @@ export function SearchSelect({
           }
           aria-describedby={help ? `${id}-help` : undefined}
           aria-required={required}
+          aria-invalid={invalid || undefined}
+          onInvalid={() => setInvalid(true)}
           autoComplete="off"
           spellCheck={false}
           required={required}
@@ -165,6 +169,11 @@ export function SearchSelect({
         </span>
       </div>
       <input type="hidden" name={name} value={selected?.value ?? ""} />
+      {invalid && (
+        <p className="form-error" role="alert">
+          Choisissez une option dans la liste.
+        </p>
+      )}
       {help && (
         <p id={`${id}-help`} className="fine">
           {help}

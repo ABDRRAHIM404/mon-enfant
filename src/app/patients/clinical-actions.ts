@@ -1,6 +1,7 @@
 "use server";
 import {
   readVaccineSelection,
+  choicesWithRecordVersions,
   type VaccineChoice,
 } from "@/lib/vaccines/choices";
 import { redirect } from "next/navigation";
@@ -14,6 +15,7 @@ import { uuidPattern } from "@/lib/registry/types";
 import {
   vaccinationFields,
   type VaccinationConflict,
+  type VaccineItemExport,
 } from "@/lib/vaccines/patient-types";
 import type { ClinicalEntry } from "@/lib/clinical/types";
 import { clinicalKinds } from "@/lib/clinical/types";
@@ -61,13 +63,19 @@ export async function recordClinical(
     form.has("vaccine_choice") &&
     !(root && text("entry_state") === "withdrawn")
   ) {
-    const vocabulary = await supabase.rpc("vaccine_form_choices");
-    if (vocabulary.error)
+    const [vocabulary, retained] = await Promise.all([
+      supabase.rpc("vaccine_form_choices"),
+      supabase.rpc("vaccine_items_export", { p_child_id: child }),
+    ]);
+    if (vocabulary.error || retained.error)
       return { error: "Le catalogue est indisponible. Rechargez le dossier." };
     try {
       const selected = readVaccineSelection(
         form,
-        vocabulary.data as VaccineChoice[],
+        choicesWithRecordVersions(
+          vocabulary.data as VaccineChoice[],
+          retained.data as VaccineItemExport[],
+        ),
       );
       payload.vaccine_code = selected.vaccine_code;
       payload.vaccine_label = selected.vaccine_label;
