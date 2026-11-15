@@ -89,9 +89,13 @@ try:
     visible('Historique des vaccinations')
     add('takeScreenshot', 'ios-vaccinations')
     add('tapOn', 'Retour'); add('tapOn', 'Retour')
-    add('tapOn', 'Messages'); visible('Mes notifications')
+    visible('Mes enfants')
+    add('tapOn', 'Rendez-vous.*'); visible('Mes rendez-vous')
+    scroll('Consultation fictive mobile')
+    add('takeScreenshot', 'ios-appointments')
+    add('tapOn', 'Messages.*'); visible('Mes notifications')
     add('takeScreenshot', 'ios-notifications')
-    add('tapOn', 'Compte'); scroll({'id': 'logout'}); add('tapOn', {'id': 'logout'})
+    add('tapOn', 'Compte.*'); scroll({'id': 'logout'}); add('tapOn', {'id': 'logout'})
     add('tapOn', 'Se déconnecter'); visible({'id': 'login-email'})
     add('stopApp'); add('launchApp'); visible({'id': 'login-email'})
     target = temp/'journey.yaml'
@@ -102,7 +106,7 @@ try:
     with (temp/'private-maestro.log').open('wb') as log:
         result = subprocess.run([str(cli[0]), '--device', device['udid'], 'test', '--debug-output', str(temp/'debug'), '--test-output-dir', str(temp/'artifacts'), str(target)], stdout=log, stderr=subprocess.STDOUT, env=private_env, timeout=800)
     for image in (temp/'artifacts').glob('**/ios-*.png'):
-        if image.name in {'ios-'+name+'.png' for name in ('login','home','booklet','vaccinations','notifications')}:
+        if image.name in {'ios-'+name+'.png' for name in ('login','home','booklet','vaccinations','appointments','notifications')}:
             shutil.copyfile(image, output/image.name)
     if result.returncode != 0:
         command(['xcrun', 'simctl', 'io', device['udid'], 'screenshot', str(output/'ios-journey-stop.png')])
@@ -128,7 +132,7 @@ try:
                 pass
 
         raise RuntimeError('Native journey failed')
-    result = {'passed': True, 'binary_commit': proof['commit'], 'runtime_commit': os.environ['GITHUB_SHA'], 'fixture_run': run, 'platform': 'iOS Simulator', 'maestro_version': version, 'simulated_keychain_entitlements_verified': True, 'restricted_host_signature_entitlements_absent': True, 'checks': ['native_login_render', 'real_password_login_and_guarded_home', 'session_only_auth_not_restored_after_process_death', 'remembered_auth_restored_after_process_death', 'guardian_child_and_booklet_render', 'native_vaccination_view', 'in_app_notifications_render', 'native_logout_survives_process_restart'], 'synthetic_only': True, 'store_distribution': False, 'fixture_retirement_required': True}
+    result = {'passed': True, 'binary_commit': proof['commit'], 'runtime_commit': os.environ['GITHUB_SHA'], 'fixture_run': run, 'platform': 'iOS Simulator', 'maestro_version': version, 'simulated_keychain_entitlements_verified': True, 'restricted_host_signature_entitlements_absent': True, 'checks': ['native_login_render', 'real_password_login_and_guarded_home', 'session_only_auth_not_restored_after_process_death', 'remembered_auth_restored_after_process_death', 'guardian_child_and_booklet_render', 'native_vaccination_view', 'native_guardian_appointment_render', 'in_app_notifications_render', 'native_logout_survives_process_restart'], 'synthetic_only': True, 'store_distribution': False, 'fixture_retirement_required': True}
     (output/'runtime-proof.json').write_text(json.dumps(result, indent=2)+'\n')
     print(json.dumps(result))
 except Exception:
