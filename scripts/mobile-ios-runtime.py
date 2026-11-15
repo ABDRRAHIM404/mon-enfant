@@ -54,7 +54,7 @@ try:
     apps = list((temp/'app').glob('*.app'))
     assert len(apps) == 1
     stage = 'simulator-local-signature'
-    command(['python3', 'scripts/sign-ios-simulator.py', str(apps[0]), '--verify-only'])
+    command(['python3', 'scripts/sign-ios-simulator.py', str(apps[0])])
     command(['xcrun', 'simctl', 'install', device['udid'], str(apps[0])])
     stage = 'native-ui-journey'
     flow = []
@@ -127,7 +127,7 @@ try:
                 pass
 
         raise RuntimeError('Native journey failed')
-    result = {'passed': True, 'binary_commit': proof['commit'], 'runtime_commit': os.environ['GITHUB_SHA'], 'fixture_run': run, 'platform': 'iOS Simulator', 'maestro_version': version, 'local_simulator_keychain_signature_verified': True, 'checks': ['native_login_render', 'real_password_login_and_guarded_home', 'session_only_auth_not_restored_after_process_death', 'remembered_auth_restored_after_process_death', 'guardian_child_and_booklet_render', 'native_vaccination_view', 'in_app_notifications_render', 'native_logout_survives_process_restart'], 'synthetic_only': True, 'store_distribution': False, 'fixture_retirement_required': True}
+    result = {'passed': True, 'binary_commit': proof['commit'], 'runtime_commit': os.environ['GITHUB_SHA'], 'fixture_run': run, 'platform': 'iOS Simulator', 'maestro_version': version, 'simulated_keychain_entitlements_verified': True, 'restricted_host_signature_entitlements_absent': True, 'checks': ['native_login_render', 'real_password_login_and_guarded_home', 'session_only_auth_not_restored_after_process_death', 'remembered_auth_restored_after_process_death', 'guardian_child_and_booklet_render', 'native_vaccination_view', 'in_app_notifications_render', 'native_logout_survives_process_restart'], 'synthetic_only': True, 'store_distribution': False, 'fixture_retirement_required': True}
     (output/'runtime-proof.json').write_text(json.dumps(result, indent=2)+'\n')
     print(json.dumps(result))
 except Exception:

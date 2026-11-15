@@ -14,11 +14,8 @@ if platform=='android':
 elif platform=='ios':
  apps=list((Path(os.environ['RUNNER_TEMP'])/'mon-enfant-ios-build/Build/Products/Release-iphonesimulator').glob('*.app'));assert len(apps)==1
  app=apps[0];assert (app/'Info.plist').is_file() and (app/'main.jsbundle').is_file()
- signed=subprocess.run(['codesign','-d','--entitlements',':-',str(app)],capture_output=True,check=True)
- entitlements=plistlib.loads(signed.stdout)
- assert entitlements.get('application-identifier','').endswith('app.monenfant.parent')
- subprocess.run(['codesign','--verify','--deep','--strict',str(app)],check=True)
+ subprocess.run(['python3','scripts/sign-ios-simulator.py',str(app),'--verify-only'],check=True)
  subprocess.run(['ditto','-c','-k','--sequesterRsrc','--keepParent',str(app),str(output/'mon-enfant-parent-simulator.zip')],check=True)
- proof.update({'target':'iOS Simulator','distribution_certificate_used':False,'embedded_js':True,'signing':'local simulator ad-hoc identity, no Apple account or certificate','keychain_application_entitlement_verified':True})
+ proof.update({'target':'iOS Simulator','distribution_certificate_used':False,'embedded_js':True,'signing':'local simulator ad-hoc identity, no Apple account or certificate','keychain_application_entitlement_verified':True,'simulated_keychain_entitlements_verified':True,'restricted_host_entitlements_absent':True})
 else:raise RuntimeError('Unsupported native target')
 (output/'build-proof.json').write_text(json.dumps(proof,indent=2)+'\n');print(json.dumps(proof))

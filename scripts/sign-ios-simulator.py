@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Local ad-hoc signing for synthetic iPhoneSimulator artifacts only; never a device/store signature."""
+"""Verify simulated Keychain entitlements and ordinary local ad-hoc signatures.
+Simulator entitlements belong in Mach-O __TEXT,__entitlements, not the host's
+restricted code-signature entitlement blob. Never sign a device/store artifact.
+"""
 import json
 import os
 from pathlib import Path
@@ -8,33 +11,48 @@ import subprocess
 import sys
 
 if os.environ.get('GITHUB_ACTIONS') != 'true':
-    raise SystemExit('Simulator signing belongs in GitHub Actions')
+    raise SystemExit('Simulator verification belongs in GitHub Actions')
 app = Path(sys.argv[1]).resolve()
 info = plistlib.loads((app/'Info.plist').read_bytes())
 assert info['CFBundleIdentifier'] == 'app.monenfant.parent'
 assert info.get('CFBundleSupportedPlatforms') == ['iPhoneSimulator']
-# This unprefixed identifier is confined to a disposable simulator. It does not
-# claim an Apple development team or qualify this app for device distribution.
 identifier = info['CFBundleIdentifier']
-existing = subprocess.run(['codesign', '-d', '--entitlements', ':-', str(app)], capture_output=True)
-try:
-    current = plistlib.loads(existing.stdout) if existing.returncode == 0 else {}
-except plistlib.InvalidFileException:
-    current = {}
-if current.get('application-identifier') == identifier and current.get('keychain-access-groups') == [identifier]:
-    subprocess.run(['codesign', '--verify', '--deep', '--strict', str(app)], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
-    print(json.dumps({'simulator_keychain_entitlement_verified': True, 'existing_xcode_signature_preserved': True, 'distribution_certificate_used': False}))
-    raise SystemExit(0)
-if '--verify-only' in sys.argv:
-    raise SystemExit('Required simulator application/keychain entitlements missing')
-entitlements = Path(os.environ['RUNNER_TEMP'])/'mon-enfant-simulator.entitlements.plist'
-entitlements.write_bytes(plistlib.dumps({'application-identifier': identifier, 'keychain-access-groups': [identifier]}))
-for nested in sorted((app/'Frameworks').glob('*')):
-    if nested.suffix in ('.framework', '.dylib'):
-        subprocess.run(['codesign', '--force', '--sign', '-', str(nested)], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
-subprocess.run(['codesign', '--force', '--sign', '-', '--entitlements', str(entitlements), '--generate-entitlement-der', str(app)], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
-subprocess.run(['codesign', '--verify', '--deep', '--strict', str(app)], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
-result = subprocess.run(['codesign', '-d', '--entitlements', ':-', str(app)], capture_output=True, check=True)
-actual = plistlib.loads(result.stdout)
-assert actual['application-identifier'] == identifier and actual['keychain-access-groups'] == [identifier]
-print(json.dumps({'simulator_keychain_entitlement_verified': True, 'local_ad_hoc_signature': True, 'distribution_certificate_used': False, 'store_distribution': False}))
+executable = app/info['CFBundleExecutable']
+temp = Path(os.environ['RUNNER_TEMP'])/'simulator-entitlement-proof'
+temp.mkdir(exist_ok=True)
+
+def command(args):
+    return subprocess.run(args, capture_output=True, check=True).stdout
+
+architectures = command(['xcrun', 'lipo', '-archs', str(executable)]).decode().split()
+assert architectures and set(architectures) <= {'arm64', 'x86_64'}
+for arch in architectures:
+    thin = executable
+    if len(architectures) > 1:
+        thin = temp/('executable-'+arch)
+        command(['xcrun', 'lipo', str(executable), '-thin', arch, '-output', str(thin)])
+    extracted = temp/('simulated-'+arch+'.plist')
+    command(['xcrun', 'segedit', str(thin), '-extract', '__TEXT', '__entitlements', str(extracted)])
+    simulated = plistlib.loads(extracted.read_bytes().rstrip(b'\0'))
+    assert simulated.get('application-identifier') == identifier
+    assert simulated.get('keychain-access-groups') == [identifier]
+
+restricted = {'application-identifier', 'com.apple.application-identifier', 'keychain-access-groups'}
+def signature_entitlements(target):
+    result = subprocess.run(['codesign', '-d', '--entitlements', ':-', str(target)], capture_output=True)
+    if not result.stdout.strip(): return {}
+    return plistlib.loads(result.stdout)
+
+if '--verify-only' not in sys.argv:
+    # Keep the Mach-O simulated entitlements unchanged, but never place restricted
+    # iOS Keychain entitlements in an unprovisioned macOS host signature.
+    empty = temp/'host-empty.plist'
+    empty.write_bytes(plistlib.dumps({}))
+    for nested in sorted((app/'Frameworks').glob('*')):
+        if nested.suffix in ('.framework', '.dylib') and restricted & signature_entitlements(nested).keys():
+            command(['codesign', '--force', '--sign', '-', '--entitlements', str(empty), str(nested)])
+    if restricted & signature_entitlements(app).keys():
+        command(['codesign', '--force', '--sign', '-', '--entitlements', str(empty), str(app)])
+assert not restricted & signature_entitlements(app).keys()
+command(['codesign', '--verify', '--deep', '--strict', str(app)])
+print(json.dumps({'simulated_keychain_entitlements_verified': True, 'native_architectures': architectures, 'restricted_host_entitlements_absent': True, 'distribution_certificate_used': False, 'store_distribution': False}))
