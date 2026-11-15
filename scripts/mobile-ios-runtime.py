@@ -7,6 +7,8 @@ from pathlib import Path
 import re
 import shutil
 import subprocess
+import time
+import plistlib
 import urllib.request
 import zipfile
 
@@ -107,6 +109,23 @@ try:
         diagnostic = diagnostic.replace(email, '[synthetic-email]').replace(password, '[redacted]')
         relevant = [line for line in diagnostic.splitlines() if re.search(r'FAIL|Error|Exception|not found|Unable|Assertion|Timed out', line, re.I)]
         print(json.dumps({'native_automation_diagnostic': relevant[-8:], 'sanitized_automation_tail': diagnostic[-4500:]}))
+        # Own synthetic app only; classify native launch/loader/signature failures.
+        executable = plistlib.loads((apps[0]/'Info.plist').read_bytes())['CFBundleExecutable']
+        predicate = 'eventMessage CONTAINS[c] "app.monenfant.parent" OR process == '+json.dumps(executable)
+        system = subprocess.run(['xcrun', 'simctl', 'spawn', device['udid'], 'log', 'show', '--last', '3m', '--style', 'compact', '--predicate', predicate], capture_output=True, text=True, timeout=60)
+        lines = [line for line in system.stdout.splitlines() if re.search(r'signature|codesign|entitlement|dyld|denied|termination|Library not loaded|EXC_|launch failed|spawn failed', line, re.I)]
+        print(json.dumps({'native_launch_diagnostic': '\n'.join(lines)[-6500:]}).replace(email, '[synthetic-email]').replace(password, '[redacted]'))
+        reports = Path.home()/'Library/Logs/DiagnosticReports'
+        for crash in sorted(reports.glob(executable+'*.ips'))[-2:]:
+            try:
+                raw = crash.read_text()
+                decoder = json.JSONDecoder()
+                _, end = decoder.raw_decode(raw)
+                body = json.loads(raw[end:].strip())
+                print(json.dumps({'native_crash': {key: body.get(key) for key in ('exception', 'termination', 'asi')}}))
+            except (ValueError, OSError):
+                pass
+
         raise RuntimeError('Native journey failed')
     result = {'passed': True, 'binary_commit': proof['commit'], 'runtime_commit': os.environ['GITHUB_SHA'], 'fixture_run': run, 'platform': 'iOS Simulator', 'maestro_version': version, 'local_simulator_keychain_signature_verified': True, 'checks': ['native_login_render', 'real_password_login_and_guarded_home', 'session_only_auth_not_restored_after_process_death', 'remembered_auth_restored_after_process_death', 'guardian_child_and_booklet_render', 'native_vaccination_view', 'in_app_notifications_render', 'native_logout_survives_process_restart'], 'synthetic_only': True, 'store_distribution': False, 'fixture_retirement_required': True}
     (output/'runtime-proof.json').write_text(json.dumps(result, indent=2)+'\n')
