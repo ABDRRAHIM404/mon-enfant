@@ -316,7 +316,7 @@ test("parent purpose-bound sharing, live concurrent claim and revocation", async
       (await rpc(dc, "redeem_clinician_share", { p_token: secret })).body
         .accepted,
     ).toBe(false);
-    expect((await rpc(rc, "get_child", { p_child_id: child })).status).toBe(
+    expect((await rpc(rc, "get_child_profile", { p_child_id: child })).status).toBe(
       403,
     );
     expect(

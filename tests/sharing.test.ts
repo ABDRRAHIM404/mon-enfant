@@ -244,7 +244,7 @@ describe("temporary sharing on complete schema", () => {
       data: { history, references },
     });
     expect(view.data as object).not.toHaveProperty("appointments");
-    await expect(rpc(reader, "get_child", [f.child])).rejects.toMatchObject(
+    await expect(rpc(reader, "get_child_profile", [f.child])).rejects.toMatchObject(
       denied,
     );
     await expect(
