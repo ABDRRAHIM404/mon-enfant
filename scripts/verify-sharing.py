@@ -103,6 +103,12 @@ try:
     select '{expired_id}','{child}','{actor['SECOND']}','{str(uuid.UUID(link))}','{session_id(parent)}','{hashlib.sha256(expired.encode()).hexdigest()}','vaccination_read',now()-interval '6 minutes',now()-interval '1 minute',now()-interval '5 minutes','{actor['OUTSIDE']}','{session_id(second)}',professional_id from public.professional_profiles where user_id='{actor['OUTSIDE']}'""")
     assert not ok(rpc(second,'redeem_clinician_share',{'p_token':expired}))['accepted']
     assert rpc(second,'read_clinician_share',{'p_share_id':expired_id,'p_page':1})==(403,{'code':'42501'})
+    unused = secrets.token_urlsafe(32)
+    unused_id = str(uuid.uuid4())
+    op.sql(f"""insert into private.clinician_shares(id,child_id,guardian_id,guardian_link_id,issuer_session,token_hash,scope,created_at,expires_at)
+    select '{unused_id}',child_id,guardian_id,guardian_link_id,issuer_session,'{hashlib.sha256(unused.encode()).hexdigest()}',scope,created_at,expires_at from private.clinician_shares where id='{expired_id}'""")
+    assert op.sql(f"select (consumed_at is null and revoked_at is null and expires_at<now() and private.share_authority_current(s)) valid_other_facts from private.clinician_shares s where id='{unused_id}'")==[{'valid_other_facts':True}]
+    assert not ok(rpc(second,'redeem_clinician_share',{'p_token':unused}))['accepted']
     stage = 'original-source-and-no-grants'
     proof = op.sql(f"""select
     (select count(*)::integer from public.access_grants where professional_id='{actor['OUTSIDE']}') recipient_grants,

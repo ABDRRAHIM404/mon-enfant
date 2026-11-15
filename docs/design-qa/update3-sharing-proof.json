@@ -1,0 +1,96 @@
+{
+  "source_ci": "43663059538",
+  "source_commit": "bf1144bc335936daade220aa21c364dc01078564",
+  "unit_database_cases": 272,
+  "cloud_run": "43664056898",
+  "cloud_commit": "3c1b6c3d4bbfae8c178c5d197b05cbd448ade64e",
+  "runtime": "github-cloud-production-with-hosted-supabase",
+  "migration": "20261114234132_parent_clinician_sharing.sql",
+  "migration_sha256": "b2a05eea840ee8a9c8a972007fc35f8089d544028c375628d6d82f13e67c3fac",
+  "fixture": "ac450cb72ff44993",
+  "fixture_retired": true,
+  "prior_failed_fixtures_retired": [
+    "766a0281d7ce4d58",
+    "25891e9892154e42"
+  ],
+  "browser_proofs": [
+    {
+      "schema": 1,
+      "run": "ac450cb72ff44993",
+      "viewport": "desktop",
+      "passed": true,
+      "qr_decoded": true,
+      "local_image_scanner": true,
+      "fragment_cleared": true,
+      "login_other_tab": true,
+      "single_use": true,
+      "http_concurrent_claim": true,
+      "vaccination_scope": true,
+      "booklet_appointments": true,
+      "no_clinical_grant_or_write": true,
+      "parent_revoke_existing_jwt": true,
+      "guardian_revoke_existing_jwt": true,
+      "page_errors": 0
+    },
+    {
+      "schema": 1,
+      "run": "ac450cb72ff44993",
+      "viewport": "mobile",
+      "passed": true,
+      "qr_decoded": true,
+      "local_image_scanner": true,
+      "fragment_cleared": true,
+      "login_other_tab": true,
+      "single_use": true,
+      "http_concurrent_claim": true,
+      "vaccination_scope": true,
+      "booklet_appointments": true,
+      "no_clinical_grant_or_write": true,
+      "parent_revoke_existing_jwt": true,
+      "guardian_revoke_existing_jwt": true,
+      "page_errors": 0
+    },
+    {
+      "schema": 1,
+      "run": "ac450cb72ff44993",
+      "viewport": "tablet",
+      "passed": true,
+      "qr_decoded": true,
+      "local_image_scanner": true,
+      "fragment_cleared": true,
+      "login_other_tab": true,
+      "single_use": true,
+      "http_concurrent_claim": true,
+      "vaccination_scope": true,
+      "booklet_appointments": true,
+      "no_clinical_grant_or_write": true,
+      "parent_revoke_existing_jwt": true,
+      "guardian_revoke_existing_jwt": true,
+      "page_errors": 0
+    }
+  ],
+  "native_proof": {
+    "passed": true,
+    "synthetic_children": 3,
+    "browser_shares": 6,
+    "browser_shares_revoked": 6,
+    "recipient_clinical_grants": 0,
+    "nurse_read_only": true,
+    "recipient_session_bound": true,
+    "recipient_logout_old_jwt_denied": true,
+    "issuer_logout_old_jwt_denied": true,
+    "expired_unused_code_denied": true,
+    "expired_consumed_ticket_denied": true,
+    "original_25_draft_rules_unchanged": true
+  },
+  "visual_review": "Actual desktop/mobile parent controls and reader views inspected; existing selected design acceptance retained. Intentional consent/scope/source precision differences; no active QR secret in saved images.",
+  "security_advisor": [
+    {
+      "name": "auth_leaked_password_protection",
+      "level": "WARN",
+      "existing_phase6_gate": true
+    }
+  ],
+  "synthetic_only": true,
+  "canonical_publication": "pending"
+}

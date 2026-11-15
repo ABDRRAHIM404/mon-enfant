@@ -1,9 +1,9 @@
 # Mon Enfant — Development Plan
 
-**Status:** Implementation in progress — foundation/verification/registry workflows verified; Phase 5 appointment/continuity technical acceptance complete, Phase 7 synthetic parent web technical walkthrough verified, Updates 1–2 canonically verified; Update 3 public/protected read UI published; purpose-bound parent sharing remains before Phase 8 mobile; actual application mail and remaining Phase 6/external readiness stay open; see [PROGRESS.md](PROGRESS.md) and [PLAN_CHECKLIST.md](PLAN_CHECKLIST.md)
+**Status:** Implementation in progress — foundation/verification/registry workflows verified; Phase 5 appointment/continuity technical acceptance complete, Phase 7 synthetic parent web technical walkthrough verified, Updates 1–2 canonically verified; Update 3 public/protected read UI published; purpose-bound parent sharing software acceptance passed; canonical publication remains before Phase 8 mobile; actual application mail and remaining Phase 6/external readiness stay open; see [PROGRESS.md](PROGRESS.md) and [PLAN_CHECKLIST.md](PLAN_CHECKLIST.md)
 **Working name:** Mon Enfant (temporary)
 **Primary objective:** Launch a secure, responsive doctor/admin web application, then introduce the parent experience.
-**Last updated:** 14 November 2026
+**Last updated:** 15 November 2026
 
 > A synthetic-data development deployment is available. No real clinical data is connected. Development and verification must use fictional/synthetic patient information until the external approval gates are met. Timelines are deliberately not promised.
 

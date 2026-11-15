@@ -144,16 +144,17 @@ The complete goal remains active until the full required scope and its approval 
 
 ## Supplied Update 3 — design and preserved functionality
 
+- [x] Sharing source/backend: full CI 43663059538 (272 cases), immutable migration 20261114234132 with exact-source history; real QR/consent/read-only ticket implemented. Hosted three-device/native/visual software acceptance 43664056898 is complete; canonical publication remains below.
 - [x] Implemented protected read/dashboard layouts, actual permission-scoped summaries and unassigned uncertain vaccination history: source CI 43646114379, hosted cloud 43646708223 / post-fix 43647899263, native persistence/permission proof and direct paired review (design-qa.md). Purpose-bound sharing remains open.
 - [x] Publish protected read/UI checkpoint on canonical Vercel: READY dpl_CR1C1asRvsdoFXTMz3THgtJTjaP2, source 0e0b66d; live health and anonymous parent/provisional/vaccination/export denial pass. Primary main is synchronized.
 - [x] Retire both protected verification fixtures: c833b127ec5544c0 and 1e57ebcee3134c5d, four accounts/nine temporary values each, retirement verified.
 
-- [x] Shared/public foundation implemented and visually accepted: full source CI 43642867793, configured sixteen-screen paired capture 43642889015 and direct review in design-qa.md; earlier three-device authenticated run 43639674164 passed both cookie-retention modes. Protected Update 3 screens remain open.
+- [x] Shared/public foundation implemented and visually accepted: full source CI 43642867793, configured sixteen-screen paired capture 43642889015 and direct review in design-qa.md; earlier three-device authenticated run 43639674164 passed both cookie-retention modes. Protected read layouts are accepted below; the functional sharing extension is tracked separately.
 - [x] Publish the public foundation on canonical Vercel (READY dpl_3U36g4ViF3NS4mhCtsEF7wuvmJBP, source 6b0e2a9); live health/page markers and anonymous export denial pass. Synchronize clean primary main with origin/main.
 - [x] Retire the four synthetic actors and nine temporary values after acceptance; 07e082b6e45f4e2b retirement verified. Layout-only iterations use public configuration without account provisioning.
 
-- [ ] Review the supplied mockups/current screens and implement the chosen shared brand, light/dark/system themes, persisted override, responsive public/parent/clinician screens and accessible contrast/keyboard/touch behavior.
-- [ ] Keep verified Updates 1–2, clinical/vaccine/grant/audit controls, deferred verification and synthetic-only boundaries intact; no fabricated patient/calendar data from mockups.
+- [x] Review the supplied mockups/current screens and implement the chosen shared brand, light/dark/system themes, persisted override, responsive public/parent/clinician screens and accessible contrast/keyboard/touch behavior.
+- [x] Keep verified Updates 1–2, clinical/vaccine/grant/audit controls, deferred verification and synthetic-only boundaries intact; no fabricated patient/calendar data from mockups.
 - [ ] Treat the PNG emblem honestly as a raster reference; production vector master/adaptive icon approval remains open.
-- [ ] Resolve/implement the specified parent-issued short-lived, purpose-bound clinician QR under an explicit authorization contract; identification alone never grants access. This is a functional extension, not a cosmetic button.
+- [x] Resolve/implement the specified parent-issued short-lived, purpose-bound clinician QR under an explicit authorization contract; identification alone never grants access. This is a functional extension, not a cosmetic button.
 - [ ] Verify design changes in cloud, publish/synchronize the complete primary main checkout, then continue full Phase 8 scope.
