@@ -99,6 +99,8 @@ try:
     command([adb, '-s', 'emulator-5554', 'install', '-r', str(apk)], timeout=90)
     stage = 'native-launch'
     launch()
+    time.sleep(3)
+    capture('native-initial-launch')
     find('login-email', True)
     capture('native-login')
     checks.append('native_login_render')
@@ -170,6 +172,14 @@ try:
     (output/'runtime-proof.json').write_text(json.dumps(result, indent=2)+'\n')
     print(json.dumps(result))
 except Exception as error:
+    if stage == 'native-launch':
+        # Fresh installation, before entering either credential: safe public render/crash diagnostics.
+        try:
+            capture('native-initial-launch')
+            print(json.dumps({'initial_native_labels': [{'text': n.get('text'), 'id': n.get('resource-id'), 'description': n.get('content-desc')} for n in nodes() if n.get('text') or n.get('resource-id') or n.get('content-desc')][-20:]}))
+            print(command([adb, '-s', 'emulator-5554', 'logcat', '-d', '-s', 'AndroidRuntime', 'ReactNativeJS'])[-8000:])
+        except Exception:
+            pass
     if stage == 'emulator-start' and emulator_log.exists():
         # Emulator startup happens before installing/logging into the app. No Auth/UI data.
         print(emulator_log.read_text(errors='replace')[-8000:])
