@@ -215,18 +215,19 @@ try:
     (output/'runtime-proof.json').write_text(json.dumps(result, indent=2)+'\n')
     print(json.dumps(result))
 except Exception as error:
-    if stage not in ('native-launch', 'emulator-start', 'native-qr'):
+    if stage not in ('native-launch', 'emulator-start'):
         try:
-            capture('native-journey-stop')
-            labels = [{'text': '[input omitted]' if n.get('class') == 'android.widget.EditText' else n.get('text'), 'id': n.get('resource-id'), 'description': n.get('content-desc')} for n in nodes() if n.get('text') or n.get('resource-id') or n.get('content-desc')]
-            print(json.dumps({'synthetic_native_labels': labels[-25:]}).replace(password, '[redacted]').replace(email, '[synthetic-email]'))
+            if stage != 'native-qr': capture('native-journey-stop')
+            labels = [{'text': '[input omitted]' if n.get('class') == 'android.widget.EditText' else n.get('text'), 'id': n.get('resource-id'), 'description': n.get('content-desc'), 'enabled': n.get('enabled'), 'checked': n.get('checked'), 'bounds': n.get('bounds')} for n in nodes() if n.get('text') or n.get('resource-id') or n.get('content-desc')]
+            diagnostic = json.dumps({'synthetic_native_labels': labels[-35:]}).replace(password, '[redacted]').replace(email, '[synthetic-email]')
+            print(re.sub(r'(?<![A-Za-z0-9_-])[A-Za-z0-9_-]{43}(?![A-Za-z0-9_-])', '[token-redacted]', diagnostic))
         except Exception:
             pass
     if stage == 'native-launch':
         # Fresh installation, before entering either credential: safe public render/crash diagnostics.
         try:
             capture('native-initial-launch')
-            print(json.dumps({'initial_native_labels': [{'text': n.get('text'), 'id': n.get('resource-id'), 'description': n.get('content-desc')} for n in nodes() if n.get('text') or n.get('resource-id') or n.get('content-desc')][-20:]}))
+            print(json.dumps({'initial_native_labels': [{'text': n.get('text'), 'id': n.get('resource-id'), 'description': n.get('content-desc'), 'enabled': n.get('enabled'), 'checked': n.get('checked'), 'bounds': n.get('bounds')} for n in nodes() if n.get('text') or n.get('resource-id') or n.get('content-desc')][-20:]}))
             print(command([adb, '-s', 'emulator-5554', 'logcat', '-d', '-s', 'AndroidRuntime', 'ReactNativeJS'])[-8000:])
         except Exception:
             pass
