@@ -58,7 +58,7 @@ export default function Home() {
                 label="Votre nom d’affichage"
                 value={display}
                 onChangeText={setDisplay}
-                maxLength={120}
+                maxLength={150}
               />
               {action.error && <Notice error>{action.error}</Notice>}
               <Button

@@ -39,7 +39,7 @@ export default function Settings() {
             label="Nom d’affichage"
             value={display}
             onChangeText={setDisplay}
-            maxLength={120}
+            maxLength={150}
           />
           {action.error && <Notice error>{action.error}</Notice>}
           {action.message && <Notice>{action.message}</Notice>}

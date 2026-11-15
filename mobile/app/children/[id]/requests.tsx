@@ -1,8 +1,12 @@
 import { useRef, useState } from "react";
 import * as Crypto from "expo-crypto";
 import { useLocalSearchParams } from "expo-router";
-import { useRpc, useAction } from "../../../src/lib/data";
-import type { CorrectionPage } from "../../../src/lib/domain";
+import { useRpc, useAction, useNativeView } from "../../../src/lib/data";
+import {
+  clinicalLabels,
+  type ParentBooklet,
+  type CorrectionPage,
+} from "../../../src/lib/domain";
 import { instant } from "../../../src/lib/format";
 import {
   Screen,
@@ -25,9 +29,10 @@ export default function Requests() {
     action = useAction(),
     [category, setCategory] = useState("clinical"),
     [message, setMessage] = useState(""),
+    [entry, setEntry] = useState<string | null>(null),
     operation = useRef<{ payload: string; id: string } | null>(null);
   async function send() {
-    const payload = JSON.stringify({ id, category, message });
+    const payload = JSON.stringify({ id, category, message, entry });
     if (operation.current?.payload !== payload)
       operation.current = { payload, id: Crypto.randomUUID() };
     const value = await action.run(
@@ -36,7 +41,7 @@ export default function Requests() {
         p_operation_id: operation.current.id,
         p_child_id: id,
         p_category: category,
-        p_entry_id: null,
+        p_entry_id: category === "clinical" ? entry : null,
         p_message: message,
       },
       "Votre demande a été transmise au professionnel.",
@@ -73,22 +78,32 @@ export default function Requests() {
               <Button
                 key={value}
                 secondary={category !== value}
-                onPress={() => setCategory(value)}
+                onPress={() => {
+                  setCategory(value);
+                  setEntry(null);
+                }}
               >
                 {label}
               </Button>
             ))}
+            {category === "clinical" && (
+              <EntryChoices childId={id} selected={entry} onSelect={setEntry} />
+            )}
             <Field
-              label="Votre demande (10 caractères minimum)"
+              label="Votre demande (20 caractères minimum)"
               value={message}
               onChangeText={setMessage}
               multiline
-              maxLength={4000}
+              maxLength={2000}
             />
             {action.error && <Notice error>{action.error}</Notice>}
             {action.message && <Notice>{action.message}</Notice>}
             <Button
-              disabled={action.busy || message.trim().length < 10}
+              disabled={
+                action.busy ||
+                Array.from(message.trim()).length < 20 ||
+                (category === "clinical" && !entry)
+              }
               onPress={() => {
                 void send();
               }}
@@ -128,5 +143,58 @@ export default function Requests() {
         </>
       )}
     </Screen>
+  );
+}
+
+function EntryChoices({
+  childId,
+  selected,
+  onSelect,
+}: {
+  childId: string;
+  selected: string | null;
+  onSelect: (id: string | null) => void;
+}) {
+  const [page, setPage] = useState(1),
+    view = useNativeView<ParentBooklet>("booklet", {
+      p_child_id: childId,
+      p_page: page,
+    });
+  return (
+    <>
+      <Title small>Entrée clinique à vérifier</Title>
+      <DataState
+        loading={view.loading}
+        error={view.error}
+        onRetry={() => {
+          void view.refresh();
+        }}
+      />
+      {view.data && (
+        <>
+          {view.data.entries.map((e) => (
+            <Button
+              key={e.id}
+              secondary={selected !== e.id}
+              onPress={() => onSelect(e.id)}
+            >{`${clinicalLabels[e.kind]} · ${e.occurred_on || "Date inconnue"} · révision ${e.revision} · ${e.professional_id}`}</Button>
+          ))}
+          {!view.data.entries.length && (
+            <Copy muted>
+              Aucune entrée clinique active sur cette page. Pour une question
+              générale, choisissez « Autre question ».
+            </Copy>
+          )}
+          <Pages
+            page={page}
+            more={page * 30 < view.data.entry_total}
+            onPage={(n) => {
+              onSelect(null);
+              setPage(n);
+            }}
+          />
+        </>
+      )}
+    </>
   );
 }
