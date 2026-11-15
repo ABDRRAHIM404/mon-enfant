@@ -28,6 +28,7 @@ assert proof['platform'] == 'android' and proof['compiled'] and proof['synthetic
 assert hashlib.sha256(apk.read_bytes()).hexdigest() == proof['sha256']
 stage = 'emulator-start'
 checks = []
+expected_control = None
 
 def command(args, timeout=30):
     return subprocess.run(args, capture_output=True, text=True, timeout=timeout, check=True).stdout
@@ -41,6 +42,8 @@ def nodes():
     return list(ET.fromstring(xml).iter('node'))
 
 def find(label, by_id=False, timeout=45, scroll=False):
+    global expected_control
+    expected_control = label
     until = time.monotonic() + timeout
     while time.monotonic() < until:
         try:
@@ -83,15 +86,21 @@ def capture(name):
 def launch():
     shell('monkey', '-p', app, '-c', 'android.intent.category.LAUNCHER', '1')
 
+def hide_keyboard():
+    state = shell('dumpsys', 'input_method')
+    if re.search(r'mInputShown=true|mIsInputViewShown=true', state):
+        shell('input', 'keyevent', '4')
+
 def login(remember):
     tap('login-email', True)
     shell('input', 'text', email)
-    shell('input', 'keyevent', '111')
-    tap('login-password', True)
+    hide_keyboard()
+    assert find('login-email', True).get('text') == email
+    tap('login-password', True, scroll=True)
     shell('input', 'text', password)
-    shell('input', 'keyevent', '111')
+    hide_keyboard()
     if remember:
-        tap('Rester connecté sur cet appareil personnel')
+        tap('Rester connecté sur cet appareil personnel', scroll=True)
     tap('login-submit', True, scroll=True)
     find('Mes enfants')
 
@@ -113,6 +122,7 @@ try:
     shell('settings', 'put', 'global', 'transition_animation_scale', '0')
     shell('settings', 'put', 'global', 'animator_duration_scale', '0')
     shell('input', 'keyevent', '82')
+    shell('settings', 'put', 'secure', 'show_ime_with_hard_keyboard', '1')
     command([adb, '-s', 'emulator-5554', 'install', '-r', str(apk)], timeout=90)
     stage = 'native-launch'
     launch()
@@ -194,6 +204,13 @@ try:
     (output/'runtime-proof.json').write_text(json.dumps(result, indent=2)+'\n')
     print(json.dumps(result))
 except Exception as error:
+    if stage not in ('native-launch', 'emulator-start', 'native-qr'):
+        try:
+            capture('native-journey-stop')
+            labels = [{'text': '[input omitted]' if n.get('class') == 'android.widget.EditText' else n.get('text'), 'id': n.get('resource-id'), 'description': n.get('content-desc')} for n in nodes() if n.get('text') or n.get('resource-id') or n.get('content-desc')]
+            print(json.dumps({'synthetic_native_labels': labels[-25:]}).replace(password, '[redacted]').replace(email, '[synthetic-email]'))
+        except Exception:
+            pass
     if stage == 'native-launch':
         # Fresh installation, before entering either credential: safe public render/crash diagnostics.
         try:
@@ -205,7 +222,7 @@ except Exception as error:
     if stage == 'emulator-start' and emulator_log.exists():
         # Emulator startup happens before installing/logging into the app. No Auth/UI data.
         print(emulator_log.read_text(errors='replace')[-8000:])
-    print(json.dumps({'error_type': type(error).__name__, 'passed': False, 'failed_stage': stage, 'checks_completed': checks, 'details_withheld': True, 'fixture_retirement_required': True}))
+    print(json.dumps({'expected_control': expected_control, 'error_type': type(error).__name__, 'passed': False, 'failed_stage': stage, 'checks_completed': checks, 'details_withheld': True, 'fixture_retirement_required': True}))
     raise SystemExit(1) from None
 finally:
     if emulator is not None:
