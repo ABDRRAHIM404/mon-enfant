@@ -356,8 +356,8 @@ jobs:
         run: |
           mkdir -p "$ANDROID_AVD_HOME"
           sudo chmod 666 /dev/kvm
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install 'system-images;android-34;google_apis;x86_64' >/dev/null
-          echo no | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd --force --name mon-enfant-qa --package 'system-images;android-34;google_apis;x86_64' --device pixel_6 --path "$ANDROID_AVD_HOME/mon-enfant-qa.avd"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install 'system-images;android-34;default;x86_64' >/dev/null
+          echo no | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd --force --name mon-enfant-qa --package 'system-images;android-34;default;x86_64' --device pixel_6 --path "$ANDROID_AVD_HOME/mon-enfant-qa.avd"
           "$ANDROID_HOME/emulator/emulator" -list-avds
           test -f "$ANDROID_AVD_HOME/mon-enfant-qa.ini"
       - name: Exercise actual native UI with fictional accounts only

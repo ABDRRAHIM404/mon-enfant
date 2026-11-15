@@ -48,6 +48,18 @@ def find(label, by_id=False, timeout=45, scroll=False):
         except (subprocess.CalledProcessError, subprocess.TimeoutExpired, ET.ParseError):
             time.sleep(1)
             continue
+        # Only dismiss a known first-boot SYSTEM launcher ANR, never an app-under-test ANR.
+        system_launcher_dialog = any(n.get('resource-id') == 'android:id/alertTitle' and n.get('text') in {"Pixel Launcher isn't responding", "Launcher3 isn't responding"} for n in current_nodes)
+        if system_launcher_dialog:
+            close = next((n for n in current_nodes if n.get('resource-id') == 'android:id/aerr_close'), None)
+            if close is not None:
+                bounds = [int(v) for v in re.findall(r'\d+', close.get('bounds', ''))]
+                assert len(bounds) == 4
+                shell('input', 'tap', str((bounds[0]+bounds[2])//2), str((bounds[1]+bounds[3])//2))
+                if 'system_launcher_first_boot_dialog_closed' not in checks:
+                    checks.append('system_launcher_first_boot_dialog_closed')
+                time.sleep(2)
+                continue
         for node in current_nodes:
             value = node.get('resource-id', '') if by_id else node.get('text', '')
             matches = value == label or (by_id and value.endswith('/' + label)) or (not by_id and node.get('content-desc', '') == label)
@@ -106,7 +118,7 @@ try:
     launch()
     time.sleep(3)
     capture('native-initial-launch')
-    find('login-email', True)
+    find('login-email', True, timeout=90)
     capture('native-login')
     checks.append('native_login_render')
     stage = 'session-only-login'
