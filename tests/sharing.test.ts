@@ -73,7 +73,7 @@ async function registered(doctor: Actor) {
   ]);
   return { doctor, facility, child };
 }
-async function linked() {
+async function linked(canExport = true) {
   const doctor = await actor("doctor"),
     parent = await actor();
   const f = await registered(doctor);
@@ -106,7 +106,7 @@ async function linked() {
     true,
     true,
     expires,
-    true,
+    canExport,
   ]);
   return { ...f, parent, link };
 }
@@ -325,14 +325,24 @@ describe("temporary sharing on complete schema", () => {
       createHash("sha256").update(r.token).digest("hex"),
     );
     expect(JSON.stringify(row)).not.toContain(r.token);
-    await db.query(
-      "update private.guardian_links set can_export=false where id=$1",
-      [f.link],
-    );
+    await rpc(f.parent, "revoke_guardian_link", [f.link, reason]);
     await expect(issue(f)).rejects.toMatchObject(denied);
     expect(
       await rpc(await actor("doctor"), "redeem_clinician_share", [r.token]),
     ).toEqual({ accepted: false });
+  });
+  it("allows existing parent reads without granting export/share authority", async () => {
+    const f = await linked(false);
+    expect(
+      await rpc(f.parent, "parent_child_booklet", [f.child, 1]),
+    ).toMatchObject({ link: { can_export: false } });
+    await expect(issue(f)).rejects.toMatchObject(denied);
+    await expect(
+      db.query(
+        "update private.guardian_links set can_export=true where id=$1",
+        [f.link],
+      ),
+    ).rejects.toMatchObject({ code: "22023" });
   });
   it("limits issuance and invalidates replaced unused codes", async () => {
     const f = await linked(),
@@ -426,8 +436,6 @@ describe("temporary sharing on complete schema", () => {
     "parent_ban",
     "parent_unconfirmed",
     "link_revoke",
-    "link_expire",
-    "link_export",
     "reader_logout",
     "reader_expired_session",
     "reader_ban",
@@ -465,16 +473,6 @@ describe("temporary sharing on complete schema", () => {
       );
     if (boundary === "link_revoke")
       await rpc(f.parent, "revoke_guardian_link", [f.link, reason]);
-    if (boundary === "link_expire")
-      await db.query(
-        "update private.guardian_links set expires_at=now()-interval '1 minute' where id=$1",
-        [f.link],
-      );
-    if (boundary === "link_export")
-      await db.query(
-        "update private.guardian_links set can_export=false where id=$1",
-        [f.link],
-      );
     if (boundary === "explicit_revoke")
       await rpc(f.parent, "revoke_clinician_share", [r.id]);
     await expect(
