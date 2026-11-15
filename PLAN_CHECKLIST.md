@@ -1,6 +1,6 @@
 # Full plan execution and completion audit
 
-Current development focus: **full Phase 8 mobile; Updates 1–3 including real temporary sharing and the canonical account switch have software acceptance**, following the verified synthetic Phase 7 web walkthrough. See UPDATE_WORK_PLAN.md. Remaining Phase 6 checks/operations stay open and are deferred until the app is built, except major authentication, access-control, data-integrity and build checks.
+Current development focus: **Update 5 canonical website stabilization before any further APK work; owner review/approval is required to resume APK.** See UPDATE_5_WORK_PLAN.md. Previous development focus: **full Phase 8 mobile; Updates 1–3 including real temporary sharing and the canonical account switch have software acceptance**, following the verified synthetic Phase 7 web walkthrough. See UPDATE_WORK_PLAN.md. Remaining Phase 6 checks/operations stay open and are deferred until the app is built, except major authentication, access-control, data-integrity and build checks.
 
 See [PROGRESS.md](PROGRESS.md) for verification evidence and remaining approval gates.
 
@@ -180,3 +180,13 @@ The complete goal remains active until the full required scope and its approval 
 - [x] Apply/read back immutable vocabulary migration 20261115101145; original source and authorization boundaries retained.
 - [x] Final source 861d40c / 43699551276 passes 280 cases and 30 standard browsers; actual four desktop/Android web provisional+trusted stories 43699584773 pass light/dark keyboard/touch menus, persistence, duplicate checks and corrections.
 - [x] Independent hosted persistence/permission/source proof, fixture 1d262af083304c3c retirement and scoped visual review; READY dpl_5a3yt7yPeZa8kVtVzVc2Q11W9q1Z / main 65c8f4f canonically published, live health/styles/guard verified and primary synchronized.
+
+## Update 5 — website stabilization
+
+- [ ] Reproduce canonical navigation and HB1/history issues before fixes; exact role/viewport/root-cause evidence.
+- [ ] Fix navigation, saved-history visibility and honest HB1 next-state/manual scheduling without changing clinical rules.
+- [ ] Demonstrate a separate reviewed permitted routine reference and manual catch-up appointment persistence.
+- [ ] Full canonical clinician/nurse/provisional, parent and admin lifecycle walkthroughs and authorization denials.
+- [ ] Current desktop/Android light/dark mouse/touch/keyboard evidence, source regression and independent ledger readback.
+- [ ] Publish concrete bug/functional acceptance reports, retire website fixtures and synchronize primary main.
+- [ ] Owner reviews the results and explicitly approves resuming APK work; email/external approvals remain separate.

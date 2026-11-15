@@ -23,6 +23,7 @@ on:
             mobile-ios-runtime,
             mobile-android,
             mobile-ios,
+            stabilization-repro,
             forms-cloud-accept,
             smart-forms-cloud-accept,
             sharing-cloud-accept,
@@ -183,6 +184,8 @@ jobs:
           name: ${{ inputs.live_probe == 'accessibility-accept' && 'synthetic-live-accessibility-results' || (inputs.live_probe == 'vaccination-accept' || inputs.live_probe == 'vaccine-accessibility') && 'synthetic-live-vaccination-results' || startsWith(inputs.live_probe, 'session-') && 'synthetic-live-session-results' || (inputs.live_probe == 'clinical-accept' || inputs.live_probe == 'clinical-accessibility' || inputs.live_probe == 'clinical-performance') && 'synthetic-live-clinical-results' || 'synthetic-live-evidence-results' }}
           path: |
             test-results/performance-targets.json
+            test-results/live/**/stabilization-repro.json
+            test-results/live/**/stabilization-*.png
             test-results/live/**/smart-forms-proof.json
             test-results/live/**/smart-forms-clinical-proof.json
             test-results/live/**/smart-forms-*.png
