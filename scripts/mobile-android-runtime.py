@@ -91,13 +91,20 @@ def hide_keyboard():
     if re.search(r'mInputShown=true|mIsInputViewShown=true', state):
         shell('input', 'keyevent', '4')
 
+def type_text(value):
+    # ADB bulk key injection can outrun controlled RN inputs on a cold emulator.
+    # Use normal paced key events; do not add any production credential bridge.
+    for character in value:
+        shell('input', 'text', character)
+        time.sleep(0.1)
+
 def login(remember):
     tap('login-email', True)
-    shell('input', 'text', email)
+    type_text(email)
     hide_keyboard()
     assert find('login-email', True).get('text') == email
     tap('login-password', True, scroll=True)
-    shell('input', 'text', password)
+    type_text(password)
     hide_keyboard()
     if remember:
         tap('Rester connecté sur cet appareil personnel', scroll=True)
