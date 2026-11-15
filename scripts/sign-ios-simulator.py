@@ -16,6 +16,17 @@ assert info.get('CFBundleSupportedPlatforms') == ['iPhoneSimulator']
 # This unprefixed identifier is confined to a disposable simulator. It does not
 # claim an Apple development team or qualify this app for device distribution.
 identifier = info['CFBundleIdentifier']
+existing = subprocess.run(['codesign', '-d', '--entitlements', ':-', str(app)], capture_output=True)
+try:
+    current = plistlib.loads(existing.stdout) if existing.returncode == 0 else {}
+except plistlib.InvalidFileException:
+    current = {}
+if current.get('application-identifier') == identifier and current.get('keychain-access-groups') == [identifier]:
+    subprocess.run(['codesign', '--verify', '--deep', '--strict', str(app)], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+    print(json.dumps({'simulator_keychain_entitlement_verified': True, 'existing_xcode_signature_preserved': True, 'distribution_certificate_used': False}))
+    raise SystemExit(0)
+if '--verify-only' in sys.argv:
+    raise SystemExit('Required simulator application/keychain entitlements missing')
 entitlements = Path(os.environ['RUNNER_TEMP'])/'mon-enfant-simulator.entitlements.plist'
 entitlements.write_bytes(plistlib.dumps({'application-identifier': identifier, 'keychain-access-groups': [identifier]}))
 for nested in sorted((app/'Frameworks').glob('*')):

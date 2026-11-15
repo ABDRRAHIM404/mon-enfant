@@ -23,6 +23,7 @@ output = Path('test-results/mobile-ios-runtime').resolve()
 output.mkdir(parents=True)
 proof = json.loads(Path('native-build/build-proof.json').read_text())
 assert proof['platform'] == 'ios' and proof['compiled'] and proof['synthetic_only']
+assert proof.get('keychain_application_entitlement_verified'), 'Use a native build with verified simulator Keychain entitlements'
 stage = 'toolchain'
 
 def command(args, timeout=120):
@@ -51,7 +52,7 @@ try:
     apps = list((temp/'app').glob('*.app'))
     assert len(apps) == 1
     stage = 'simulator-local-signature'
-    command(['python3', 'scripts/sign-ios-simulator.py', str(apps[0])])
+    command(['python3', 'scripts/sign-ios-simulator.py', str(apps[0]), '--verify-only'])
     command(['xcrun', 'simctl', 'install', device['udid'], str(apps[0])])
     stage = 'native-ui-journey'
     flow = []
@@ -105,7 +106,7 @@ try:
         diagnostic = (temp/'private-maestro.log').read_text(errors='replace')
         diagnostic = diagnostic.replace(email, '[synthetic-email]').replace(password, '[redacted]')
         relevant = [line for line in diagnostic.splitlines() if re.search(r'FAIL|Error|Exception|not found|Unable|Assertion|Timed out', line, re.I)]
-        print(json.dumps({'native_automation_diagnostic': relevant[-8:]}))
+        print(json.dumps({'native_automation_diagnostic': relevant[-8:], 'sanitized_automation_tail': diagnostic[-4500:]}))
         raise RuntimeError('Native journey failed')
     result = {'passed': True, 'binary_commit': proof['commit'], 'runtime_commit': os.environ['GITHUB_SHA'], 'fixture_run': run, 'platform': 'iOS Simulator', 'maestro_version': version, 'local_simulator_keychain_signature_verified': True, 'checks': ['native_login_render', 'real_password_login_and_guarded_home', 'session_only_auth_not_restored_after_process_death', 'remembered_auth_restored_after_process_death', 'guardian_child_and_booklet_render', 'native_vaccination_view', 'in_app_notifications_render', 'native_logout_survives_process_restart'], 'synthetic_only': True, 'store_distribution': False, 'fixture_retirement_required': True}
     (output/'runtime-proof.json').write_text(json.dumps(result, indent=2)+'\n')
