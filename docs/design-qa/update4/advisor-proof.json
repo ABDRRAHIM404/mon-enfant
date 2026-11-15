@@ -1,0 +1,10 @@
+{
+  "security_advisor_checked": true,
+  "warn_error_findings": [
+    {
+      "name": "auth_leaked_password_protection",
+      "level": "WARN"
+    }
+  ],
+  "new_schema_findings": 0
+}

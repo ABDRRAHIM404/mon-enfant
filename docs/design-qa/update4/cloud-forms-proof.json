@@ -1,0 +1,63 @@
+{
+  "run": 43699584773,
+  "source": "861d40c70bd179f8cbf2327f234714616d15d66b",
+  "proofs": [
+    {
+      "fixture_run": "1d262af083304c3c",
+      "device": "android",
+      "passed": true,
+      "synthetic_only": true,
+      "real_clinical_entry_and_correction": true,
+      "duplicate_check_preserved": true,
+      "custom_unknown_remains_unmatched": true,
+      "page_errors": 0
+    },
+    {
+      "fixture_run": "1d262af083304c3c",
+      "device": "desktop",
+      "passed": true,
+      "synthetic_only": true,
+      "catalog_and_dependent_dose": true,
+      "incompatible_dose_cleared": true,
+      "custom_unknown_preserved": true,
+      "keyboard_portal_viewport": true,
+      "captures": [
+        "smart-forms-desktop-light.png",
+        "smart-forms-desktop-dark.png"
+      ],
+      "page_errors": 0
+    },
+    {
+      "fixture_run": "1d262af083304c3c",
+      "device": "desktop",
+      "passed": true,
+      "synthetic_only": true,
+      "real_clinical_entry_and_correction": true,
+      "duplicate_check_preserved": true,
+      "custom_unknown_remains_unmatched": true,
+      "page_errors": 0
+    },
+    {
+      "fixture_run": "1d262af083304c3c",
+      "device": "android",
+      "passed": true,
+      "synthetic_only": true,
+      "catalog_and_dependent_dose": true,
+      "incompatible_dose_cleared": true,
+      "custom_unknown_preserved": true,
+      "keyboard_portal_viewport": true,
+      "captures": [
+        "smart-forms-android-light.png",
+        "smart-forms-android-dark.png"
+      ],
+      "page_errors": 0
+    }
+  ],
+  "visual_review": [
+    "desktop light",
+    "desktop dark",
+    "Android light",
+    "Android dark"
+  ],
+  "scope": "new vocabulary/dropdown controls and actual provisional/trusted persistence; no complete site-wide or physical assistive-technology acceptance"
+}

@@ -1,0 +1,17 @@
+{
+  "fixture_run": "1d262af083304c3c",
+  "persistence_verified": true,
+  "catalog_provenance_revisions": 2,
+  "clinical_revisions": 6,
+  "custom_unknown_revisions": 2,
+  "official_mappings": 0,
+  "provisional_children": 3,
+  "provisional_revisions": 6,
+  "quarantined_revisions": 6,
+  "schedule_items": 0,
+  "trusted_children": 2,
+  "uncertain_unmatched_revisions": 6,
+  "unrelated_grants": 0,
+  "original_25_rule_draft_preserved": true,
+  "empty_child_from_failed_harness_retained": 1
+}

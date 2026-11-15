@@ -1,0 +1,7 @@
+{
+  "fixture_run": "1d262af083304c3c",
+  "real_http_vocabulary_passed": true,
+  "anonymous_denied": true,
+  "checks": ["current_clinician_25_draft_choices", "parent_denied"],
+  "temporary_http_sessions_logged_out": true
+}

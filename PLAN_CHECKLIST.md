@@ -176,5 +176,5 @@ The complete goal remains active until the full required scope and its approval 
 - [x] Implement searchable vaccine/version choices, dependent doses, custom/unknown capture, preserved source wording and unverified provisional provenance; source checkpoint 43698844172.
 - [x] Review website data-entry flows and implement shared dropdown styling, multiline provisional narratives, French risk choices and appointment date/time picker; UPDATE_4_FORM_AUDIT.md.
 - [x] Apply/read back immutable vocabulary migration 20261115101145; original source and authorization boundaries retained.
-- [ ] Final source regression and actual desktop/Android web light/dark keyboard/touch form persistence/menu acceptance.
+- [x] Final source 861d40c / 43699551276 passes 280 cases and 30 standard browsers; actual four desktop/Android web provisional+trusted stories 43699584773 pass light/dark keyboard/touch menus, persistence, duplicate checks and corrections.
 - [ ] Independent hosted persistence/permission/source readback, synthetic fixture retirement, visual review, canonical publication and primary-main synchronization.

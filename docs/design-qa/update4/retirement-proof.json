@@ -1,0 +1,14 @@
+{
+  "fixture_run": "1d262af083304c3c",
+  "retirement_verified": true,
+  "accounts_retired": 4,
+  "temporary_secrets_removed": 9,
+  "provider_readback": {
+    "actors": 4,
+    "banned": 4,
+    "capabilities": 0,
+    "grants": 0,
+    "sessions": 0
+  },
+  "private_credentials_removed": true
+}
