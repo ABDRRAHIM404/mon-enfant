@@ -130,7 +130,8 @@ Owner steering (15 November): prioritize the Android APK and website. iPhone/iOS
 
 - [x] Choose/document and implement the native Android/iOS parent client in source: pinned React Native/Expo, MOBILE_PLAN.md; mobile cloud 43671670888, root/backend 43670556470. Runtime acceptance is separate below.
 - [ ] Reuse server authorization, secure sessions, child/booklet/appointments and notification experience.
-- [x] First real Android APK and iOS Simulator compilation: cloud 43669991631, source 581133d; no distribution credentials. Later source changes require updated native evidence.
+- [x] Updated Android APK compilation 43676070830 / b6f6c24, SHA-256 73695914953d67c2e5ba6bfcf546fedf0db991715ae69d32e95448f6bc0ceb43; mobile source checks 43675671068. Corrected iOS simulator packaging 43690462621 is retained as deferred evidence, not iPhone runtime/distribution acceptance.
+- [x] Android native sign-in/session modes, guarded child/booklet/growth/vaccination and real QR redemption/revocation were exercised successfully before the final logout assertion failed in 43692763997. Overall runtime acceptance remains open below.
 - [ ] Complete latest-source native compilation and feasible Android/iOS runtime verification, inspect actual renders and retire all synthetic fixtures without burdening the owner's PC.
 - [ ] Native hardware-camera walkthrough, production vector/adaptive master and owner-approved signing/store distribution arrangements.
 
