@@ -42,6 +42,9 @@ def nodes():
     xml = shell('cat', '/sdcard/mon-enfant-window.xml')
     return list(ET.fromstring(xml).iter('node'))
 
+def scroll_view(direction):
+    shell('input', 'swipe', str(screen_width//2), str(int(screen_height*(0.3 if direction == 'up' else 0.75))), str(screen_width//2), str(int(screen_height*(0.75 if direction == 'up' else 0.3))), '350')
+
 def find(label, by_id=False, timeout=45, scroll=False):
     global expected_control
     expected_control = label
@@ -64,13 +67,22 @@ def find(label, by_id=False, timeout=45, scroll=False):
                     checks.append('system_launcher_first_boot_dialog_closed')
                 time.sleep(2)
                 continue
+        adjusted = False
         for node in current_nodes:
             value = node.get('resource-id', '') if by_id else node.get('text', '')
             matches = value == label or (by_id and value.endswith('/' + label)) or (not by_id and node.get('content-desc', '') == label)
             if matches and node.get('enabled') == 'true':
+                bounds = [int(v) for v in re.findall(r'\d+', node.get('bounds', ''))]
+                if scroll and len(bounds) == 4 and (bounds[1] < screen_height*0.1 or bounds[3] > screen_height*0.85):
+                    scroll_view('up' if bounds[1] < screen_height*0.1 else 'down')
+                    adjusted = True
+                    break
                 return node
+        if adjusted:
+            time.sleep(0.5)
+            continue
         if scroll:
-            shell('input', 'swipe', str(screen_width//2), str(int(screen_height*(0.3 if scroll == 'up' else 0.75))), str(screen_width//2), str(int(screen_height*(0.75 if scroll == 'up' else 0.3))), '350')
+            scroll_view('up' if scroll == 'up' else 'down')
         time.sleep(1)
     raise RuntimeError('Expected native control unavailable')
 
