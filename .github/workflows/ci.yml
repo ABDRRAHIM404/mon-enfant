@@ -184,6 +184,7 @@ jobs:
           path: |
             test-results/performance-targets.json
             test-results/live/**/smart-forms-proof.json
+            test-results/live/**/smart-forms-clinical-proof.json
             test-results/live/**/smart-forms-*.png
             test-results/live/**/forms-proof.json
             test-results/live/**/form-layout-*.png
