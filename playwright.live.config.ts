@@ -137,7 +137,11 @@ export default defineConfig({
     ...(process.env.MON_ENFANT_QA_PROXY && !cloudRuntime
       ? { proxy: { server: process.env.MON_ENFANT_QA_PROXY } }
       : {}),
-    actionTimeout: probe === "stabilization-accept" ? 30000 : 20000,
+    actionTimeout: ["stabilization-accept", "clinician-pages"].includes(
+      probe ?? "",
+    )
+      ? 30000
+      : 20000,
     navigationTimeout: 30000,
     trace: "off",
     video: "off",

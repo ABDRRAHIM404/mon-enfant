@@ -7,14 +7,23 @@ import type { AppointmentPage } from "@/lib/appointments/types";
 export const dynamic = "force-dynamic";
 export default async function Dashboard() {
   const { profile, supabase } = await requireApprovedDoctor();
-  const [registry, appointments, vaccines] = await Promise.all([
-    supabase.rpc("registry_summary"),
-    supabase.rpc("appointment_worklist", { p_bucket: "today" }),
-    supabase.rpc("vaccine_followup_worklist", {
-      p_bucket: "potentially_overdue_unconfirmed",
-    }),
-  ]);
-  if (registry.error || appointments.error || vaccines.error)
+  const [registry, appointments, vaccines, consultations, capabilities] =
+    await Promise.all([
+      supabase.rpc("registry_summary"),
+      supabase.rpc("appointment_worklist", { p_bucket: "today" }),
+      supabase.rpc("vaccine_followup_worklist", {
+        p_bucket: "potentially_overdue_unconfirmed",
+      }),
+      supabase.rpc("clinician_recent_consultations"),
+      supabase.rpc("my_clinical_capabilities"),
+    ]);
+  if (
+    registry.error ||
+    appointments.error ||
+    vaccines.error ||
+    consultations.error ||
+    capabilities.error
+  )
     throw new Error("Impossible de charger le tableau de bord autorisé.");
   const counts = registry.data as {
       patients: number;
@@ -24,35 +33,33 @@ export default async function Dashboard() {
     },
     visits = appointments.data as AppointmentPage,
     refs = vaccines.data as { counts: Record<string, number> };
+  const recent = consultations.data as {
+    total: number;
+    items: {
+      id: string;
+      root_id: string;
+      child_id: string;
+      given_name: string | null;
+      family_name: string | null;
+      recorded_at: string;
+      source_verified: boolean;
+      reason: string;
+      revision: number;
+    }[];
+  };
+  const allowed = capabilities.data as string[];
   const tiles: [number, string, string][] = [
     [counts.patients, "Enfants de mon registre", "/patients"],
-    [counts.uncertain_history, "Historiques inconnus ou partiels", "/patients"],
-    [counts.pending_requests, "Demandes à examiner", "/access-requests"],
-    [counts.facilities, "Lieux d’exercice déclarés", "/practices"],
+    [recent.total, "Consultations documentées", "/consultations"],
+    [
+      refs.counts.potentially_overdue_unconfirmed || 0,
+      "Références vaccinales à revoir",
+      "/follow-up?mode=vaccines",
+    ],
     [
       visits.counts.today || 0,
       "Rendez-vous aujourd’hui",
       "/follow-up?bucket=today",
-    ],
-    [
-      visits.counts.upcoming || 0,
-      "Rendez-vous à venir",
-      "/follow-up?bucket=upcoming",
-    ],
-    [
-      visits.counts.missed_vaccinations || 0,
-      "Rendez-vous vaccinaux passés à revoir",
-      "/follow-up?bucket=missed_vaccinations",
-    ],
-    [
-      visits.counts.resolved_by_other || 0,
-      "Suivis résolus par une dose enregistrée ailleurs",
-      "/follow-up?bucket=resolved_by_other",
-    ],
-    [
-      refs.counts.potentially_overdue_unconfirmed || 0,
-      "Références potentiellement dépassées / non confirmées",
-      "/follow-up?mode=vaccines",
     ],
   ];
   return (
@@ -70,15 +77,21 @@ export default async function Dashboard() {
         <Link className="button primary" href="/patients/new">
           Ajouter un enfant
         </Link>
-        <Link className="button secondary" href="/consultations">
-          Nouvelle consultation
-        </Link>
-        <Link className="button secondary" href="/vaccinations">
-          Enregistrer une vaccination
-        </Link>
-        <Link className="button secondary" href="/appointments">
-          Planifier un rendez-vous
-        </Link>
+        {allowed.includes("consultation") && (
+          <Link className="button secondary" href="/consultations">
+            Nouvelle consultation
+          </Link>
+        )}
+        {allowed.includes("vaccination") && (
+          <Link className="button secondary" href="/vaccinations">
+            Enregistrer une vaccination
+          </Link>
+        )}
+        {allowed.includes("appointment") && (
+          <Link className="button secondary" href="/appointments/new">
+            Planifier un rendez-vous
+          </Link>
+        )}
       </div>
       <LiveRefresh />
       <div className="soignant-stats">
@@ -94,21 +107,73 @@ export default async function Dashboard() {
         enregistrés par un autre soignant autorisé recalculent les suivis
         vaccinaux, sans annuler les consultations indépendantes.
       </p>
-      <section className="panel">
-        <h2>Aujourd’hui ({visits.total})</h2>
-        {visits.items.length ? (
-          visits.items.map((appointment) => (
-            <AppointmentCard key={appointment.id} appointment={appointment} />
-          ))
-        ) : (
-          <p>Aucun rendez-vous en attente aujourd’hui.</p>
-        )}
-        <Link className="text-link" href="/follow-up?bucket=today">
-          Toute la file du jour (30 rendez-vous par page)
-        </Link>
-      </section>
+      <div className="soignant-daily-grid">
+        <section className="panel">
+          <h2>Dernières consultations documentées</h2>
+          <p className="fine">
+            Ordre d’enregistrement dans vos dossiers actuellement autorisés.
+          </p>
+          <div className="soignant-recent-list">
+            {recent.items.map((entry) => (
+              <article key={entry.id}>
+                <div>
+                  <h3>
+                    <Link
+                      href={`/patients/${entry.child_id}/records/${entry.root_id}`}
+                    >
+                      {[entry.given_name, entry.family_name]
+                        .filter(Boolean)
+                        .join(" ") || "Identité non renseignée"}
+                    </Link>
+                  </h3>
+                  <p>{entry.reason}</p>
+                  <small>
+                    Enregistrée le{" "}
+                    {new Intl.DateTimeFormat("fr-MA", {
+                      dateStyle: "medium",
+                      timeZone: "Africa/Casablanca",
+                    }).format(new Date(entry.recorded_at))}{" "}
+                    · Révision {entry.revision}
+                  </small>
+                </div>
+                <span className="workspace-chip">
+                  {entry.source_verified
+                    ? "Source vérifiée"
+                    : "Source non confirmée"}
+                </span>
+              </article>
+            ))}
+          </div>
+          {!recent.items.length && (
+            <p className="empty-state">
+              Aucune consultation documentée dans vos dossiers autorisés.
+            </p>
+          )}
+          <Link className="text-link" href="/consultations">
+            Consulter les historiques
+          </Link>
+        </section>
+        <section className="panel">
+          <h2>Aujourd’hui ({visits.total})</h2>
+          {visits.items.length ? (
+            visits.items.map((appointment) => (
+              <AppointmentCard key={appointment.id} appointment={appointment} />
+            ))
+          ) : (
+            <p>Aucun rendez-vous en attente aujourd’hui.</p>
+          )}
+          <Link className="text-link" href="/follow-up?bucket=today">
+            Toute la file du jour (30 rendez-vous par page)
+          </Link>
+        </section>
+      </div>
       <section className="panel">
         <h2>Continuer votre travail</h2>
+        <p className="fine">
+          {counts.pending_requests} demande(s) à examiner ·{" "}
+          {counts.uncertain_history} historique(s) inconnu(s) ou partiel(s) ·{" "}
+          {counts.facilities} lieu(x) d’exercice déclaré(s).
+        </p>
         <div className="tabs">
           <Link href="/patients/new">Ajouter un enfant</Link>
           <Link href="/patients/new?source=paper">

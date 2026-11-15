@@ -3154,3 +3154,106 @@ select:focus-visible,
     margin: 24px auto;
   }
 }
+
+/* Clinician task hierarchy, scoped away from parent pages. */
+.soignant-main h1 {
+  color: #12392f;
+  font-weight: 750;
+}
+.soignant-main h2,
+.soignant-main h3 {
+  font-weight: 700;
+}
+.soignant-main > .page-heading {
+  margin-block: 0 24px;
+}
+.soignant-stats {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.soignant-daily-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.soignant-daily-grid > * {
+  min-width: 0;
+}
+.soignant-recent-list article {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+.soignant-recent-list article:last-child {
+  border-bottom: 0;
+}
+.soignant-recent-list h3 {
+  margin: 0 0 6px;
+}
+.soignant-recent-list p {
+  margin: 0 0 6px;
+  overflow-wrap: anywhere;
+}
+.soignant-recent-list small {
+  color: var(--muted);
+}
+.soignant-recent-list .workspace-chip {
+  flex-shrink: 0;
+}
+.soignant-phone-picker {
+  display: none;
+}
+.soignant-child-search {
+  display: grid;
+  gap: 10px;
+  margin-block: 16px;
+}
+.soignant-child-search label {
+  display: grid;
+  gap: 6px;
+}
+.soignant-child-search input,
+.soignant-child-search select {
+  width: 100%;
+  min-width: 0;
+}
+.soignant-selector .pagination {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+@media (max-width: 1100px) {
+  .soignant-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .soignant-daily-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 760px) {
+  .soignant-desktop-picker {
+    display: none;
+  }
+  .soignant-phone-picker {
+    display: block;
+  }
+  .soignant-phone-picker summary {
+    min-height: 44px;
+    padding-block: 12px;
+    cursor: pointer;
+  }
+  .soignant-recent-list article {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .soignant-stats > a {
+    padding: 16px;
+  }
+}
+@media (max-width: 380px) {
+  .soignant-stats {
+    grid-template-columns: 1fr;
+  }
+}

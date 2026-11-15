@@ -2,7 +2,8 @@ import Link from "next/link";
 import { appointmentTime } from "@/lib/appointments/calendar";
 import { GrowthChart } from "@/components/clinical/growth-chart";
 import { notFound, redirect } from "next/navigation";
-import { UsersRound, Plus, FileClock } from "lucide-react";
+import { Plus, FileClock } from "lucide-react";
+import { ClinicianChildPicker } from "./child-picker";
 import { getProfessional } from "@/lib/auth";
 import { ClinicianShell, ClinicianHeading } from "./shell";
 import {
@@ -124,14 +125,16 @@ export async function ProvisionalSection({
         <strong>Dossiers non vérifiés — privés à leur auteur.</strong>{" "}
         L’approbation du compte ne valide ni ne publie ces entrées.
       </div>
-      <form action={base} className="registry-filters panel">
-        <label>
-          Rechercher dans mes dossiers privés
-          <input type="search" name="q" maxLength={100} defaultValue={q} />
-        </label>
-        <button className="button secondary">Rechercher</button>
-        {q && <Link href={base}>Réinitialiser</Link>}
-      </form>
+      {section === "children" && (
+        <form action={base} className="registry-filters panel">
+          <label>
+            Rechercher dans mes dossiers privés
+            <input type="search" name="q" maxLength={100} defaultValue={q} />
+          </label>
+          <button className="button secondary">Rechercher</button>
+          {q && <Link href={base}>Réinitialiser</Link>}
+        </form>
+      )}
       {section === "children" ? (
         <section className="panel">
           <h2>Mes enfants provisoires ({data.children_total})</h2>
@@ -170,27 +173,21 @@ export async function ProvisionalSection({
         </section>
       ) : (
         <div className="soignant-section-grid">
-          <aside className="panel">
-            <h2>Sélectionner un enfant</h2>
-            <div className="soignant-child-list">
-              {data.children.map((c) => (
-                <Link
-                  key={c.id}
-                  href={href(c.id)}
-                  aria-current={selected?.id === c.id ? "page" : undefined}
-                >
-                  <UsersRound size={25} aria-hidden="true" />
-                  <span>
-                    {name(c)}
-                    <small>Dossier privé · non vérifié</small>
-                  </span>
-                </Link>
-              ))}
-            </div>
-            {!data.children.length && (
-              <p>Aucun dossier privé ne correspond à ces critères.</p>
-            )}
-          </aside>
+          <ClinicianChildPicker
+            base={base}
+            q={q}
+            page={childPage}
+            total={data.children_total}
+            items={data.children.map((c) => ({
+              id: c.id,
+              label: name(c),
+              caption: "Dossier privé · non vérifié",
+            }))}
+            current={
+              selected ? { id: selected.id, label: name(selected) } : null
+            }
+            privateRecords
+          />
           <div>
             {selected ? (
               <>
@@ -391,25 +388,27 @@ export async function ProvisionalSection({
           </div>
         </div>
       )}
-      <nav className="pagination" aria-label="Liste des enfants provisoires">
-        {childPage > 1 && (
-          <Link
-            href={`${base}?${new URLSearchParams({ q, childPage: String(childPage - 1) })}`}
-          >
-            Enfants précédents
-          </Link>
-        )}
-        <span>
-          Liste {childPage} · {data.children_total} dossier(s)
-        </span>
-        {childPage * 30 < data.children_total && (
-          <Link
-            href={`${base}?${new URLSearchParams({ q, childPage: String(childPage + 1) })}`}
-          >
-            Enfants suivants
-          </Link>
-        )}
-      </nav>
+      {section === "children" && (
+        <nav className="pagination" aria-label="Liste des enfants provisoires">
+          {childPage > 1 && (
+            <Link
+              href={`${base}?${new URLSearchParams({ q, childPage: String(childPage - 1) })}`}
+            >
+              Enfants précédents
+            </Link>
+          )}
+          <span>
+            Liste {childPage} · {data.children_total} dossier(s)
+          </span>
+          {childPage * 30 < data.children_total && (
+            <Link
+              href={`${base}?${new URLSearchParams({ q, childPage: String(childPage + 1) })}`}
+            >
+              Enfants suivants
+            </Link>
+          )}
+        </nav>
+      )}
     </ClinicianShell>
   );
 }

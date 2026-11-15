@@ -1,6 +1,23 @@
 import { test, expect, type Page } from "@playwright/test";
 import { writeFileSync } from "node:fs";
 import { observeBrowserErrors } from "./browser-errors";
+test.afterEach(async ({ page }, info) => {
+  if (info.status !== info.expectedStatus)
+    writeFileSync(
+      info.outputPath("clinician-failure.json"),
+      JSON.stringify(
+        {
+          route: new URL(page.url()).pathname,
+          status: info.status,
+          errors: info.errors.map((e) => ({
+            name: e.value ? "test_failure" : "timeout_or_assertion",
+          })),
+        },
+        null,
+        2,
+      ),
+    );
+});
 const run = process.env.MON_ENFANT_QA_RUN!;
 const labels = [
   "Tableau de bord",

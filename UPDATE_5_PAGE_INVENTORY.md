@@ -27,3 +27,9 @@ Per-page implementation, deployed capture and lifecycle results will be added as
 - Child /patients/:id/vaccinations now includes clinical_timeline history separately from patient_vaccine_items, explicit HB1 no-automation explanation and an appointment-capability-bound manual planning link.
 
 Corrected trusted before evidence: docs/stabilization/update5/trusted-before. Matching HB1 against whole page text was invalid because the fictional child's heading contained HB1; the later same-child browser inspection correctly counts actual clinical-entry cards (zero before the fix). Save/reload/export proves one uncertain unmatched history entry with no routine item/appointment. Source fixtures and current security/build/canonical/visual checks remain pending.
+
+## Current implementation checkpoint — source acceptance remains partial
+
+The canonical 94a0253 desktop walkthrough covered all eight destinations for a verified doctor and unverified nurse, real provisional consultation/vaccination/growth/appointment saves with hard reload, other-author denial, and light appearance. Independent ledger receipt: `docs/stabilization/update5/clinician-desktop-ledger.json`. This does not establish trusted clinical lifecycles or final responsive acceptance.
+
+The next feature revision reduces dashboard summaries to four, adds an authorization-scoped recent-consultation projection, places vaccine history before routine references, and uses a compact phone child selector. These refinements are not yet deployed or visually accepted. The initial inventory above remains the before-state comparison; final page-by-page evidence is pending.

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { UsersRound } from "lucide-react";
+import { ClinicianChildPicker } from "./child-picker";
 import { requireApprovedDoctor } from "@/lib/auth";
 import {
   patientName,
@@ -137,53 +137,19 @@ export async function PatientSection({
           </Link>
         ) : null}
       </ClinicianHeading>
-      <form className="registry-filters panel" action={base}>
-        <label>
-          Rechercher dans mes dossiers autorisés
-          <input name="q" type="search" maxLength={100} defaultValue={q} />
-        </label>
-        <button className="button secondary">Rechercher</button>
-        {q && <Link href={base}>Réinitialiser</Link>}
-      </form>
       <div className="soignant-section-grid">
-        <aside className="panel">
-          <h2>Sélectionner un enfant</h2>
-          <div className="soignant-child-list">
-            {data.items.map((c) => (
-              <Link
-                href={href(c.id)}
-                key={c.id}
-                aria-current={child?.id === c.id ? "page" : undefined}
-              >
-                <UsersRound size={25} aria-hidden="true" />
-                <span>
-                  {patientName(c)}
-                  <small>{c.birth_date || "Date de naissance inconnue"}</small>
-                </span>
-              </Link>
-            ))}
-          </div>
-          {!data.items.length && (
-            <p>Aucun dossier autorisé ne correspond à ces critères.</p>
-          )}
-          <nav className="pagination" aria-label="Enfants autorisés">
-            {childPage > 1 && (
-              <Link
-                href={`${base}?${new URLSearchParams({ q, childPage: String(childPage - 1) })}`}
-              >
-                Précédents
-              </Link>
-            )}
-            <span>{data.total} dossier(s)</span>
-            {childPage * 30 < data.total && (
-              <Link
-                href={`${base}?${new URLSearchParams({ q, childPage: String(childPage + 1) })}`}
-              >
-                Suivants
-              </Link>
-            )}
-          </nav>
-        </aside>
+        <ClinicianChildPicker
+          base={base}
+          q={q}
+          page={childPage}
+          total={data.total}
+          items={data.items.map((c) => ({
+            id: c.id,
+            label: patientName(c),
+            caption: c.birth_date || "Date de naissance inconnue",
+          }))}
+          current={child ? { id: child.id, label: patientName(child) } : null}
+        />
         <div>
           {child ? (
             <>
@@ -217,6 +183,25 @@ export async function PatientSection({
                   <p className="notice">
                     Consultation autorisée. Une habilitation clinique explicite
                     est nécessaire pour cette saisie.
+                  </p>
+                )}
+              </section>
+              <section className="panel" id="section-history">
+                <h2>
+                  {section === "vaccinations"
+                    ? "Historique des vaccinations enregistrées"
+                    : section === "growth"
+                      ? "Historique des mesures"
+                      : "Historique des consultations"}
+                </h2>
+                {history.items.length ? (
+                  history.items.map((entry) => (
+                    <EntryCard key={entry.id} entry={entry} />
+                  ))
+                ) : (
+                  <p className="empty-state">
+                    Aucune saisie de cette rubrique pour cet enfant sur cette
+                    page. Aucune observation ni date n’est inventée.
                   </p>
                 )}
               </section>
@@ -312,25 +297,7 @@ export async function PatientSection({
                   </p>
                 </>
               )}
-              <section className="panel" id="section-history">
-                <h2>
-                  {section === "vaccinations"
-                    ? "Historique des vaccinations enregistrées"
-                    : section === "growth"
-                      ? "Historique des mesures"
-                      : "Historique des consultations"}
-                </h2>
-                {history.items.length ? (
-                  history.items.map((entry) => (
-                    <EntryCard key={entry.id} entry={entry} />
-                  ))
-                ) : (
-                  <p className="empty-state">
-                    Aucune saisie de cette rubrique pour cet enfant sur cette
-                    page. Aucune observation ni date n’est inventée.
-                  </p>
-                )}
-              </section>
+
               <nav
                 className="pagination"
                 aria-label="Historique de cette rubrique"

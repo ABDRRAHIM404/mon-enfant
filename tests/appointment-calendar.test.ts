@@ -63,3 +63,12 @@ describe("appointment calendar and explicit Casablanca instants", () => {
     );
   });
 });
+
+it("uses current Casablanca rules after the September 2026 UTC transition", () => {
+  expect(resolveAppointmentTime("2026-12-01T10:00")).toBe(
+    "2026-12-01T10:00:00+00:00",
+  );
+  expect(localAppointmentInput("2026-12-01T10:00:00Z")).toBe(
+    "2026-12-01T10:00",
+  );
+});
