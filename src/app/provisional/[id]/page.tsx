@@ -1,4 +1,5 @@
 import type { VaccineChoice } from "@/lib/vaccines/choices";
+import { clinicalFieldLabels, clinicalValueLabels } from "@/lib/clinical/types";
 import Link from "next/link";
 import { randomUUID } from "node:crypto";
 import { redirect, notFound } from "next/navigation";
@@ -50,6 +51,96 @@ export default async function ProvisionalBooklet({
   const vocabulary = await supabase.rpc("vaccine_form_choices");
   if (vocabulary.error)
     throw new Error("Choix vaccinaux indisponibles. Rechargez la page.");
+  const entryForm = (
+    <section className="panel" id="entry-form">
+      <h2>{editing ? "Corriger une entrée" : "Ajouter une entrée"}</h2>
+      {editing && (
+        <Link href={`/provisional/${id}`}>Annuler la correction</Link>
+      )}
+      <ProvisionalEntryForm
+        key={editing?.id ?? "new"}
+        childId={id}
+        operationId={randomUUID()}
+        entry={editing}
+        vaccineChoices={vocabulary.data as VaccineChoice[]}
+        initialKind={
+          q.kind && Object.hasOwn(provisionalKinds, q.kind)
+            ? (q.kind as keyof typeof provisionalKinds)
+            : undefined
+        }
+      />
+    </section>
+  );
+  const historySection = (
+    <section className="panel" id="entry-history">
+      <h2>Historique immuable ({result.total} révisions)</h2>
+      {!result.entries.length && (
+        <p>
+          Aucune entrée enregistrée sur cette page. Utilisez le formulaire
+          ci-dessous pour une nouvelle saisie.
+        </p>
+      )}
+      <div className="record-list">
+        {result.entries.map((e) => (
+          <article key={e.id}>
+            <h3>
+              {provisionalKinds[e.kind as keyof typeof provisionalKinds]} ·
+              Révision {e.revision}
+            </h3>
+            <p>
+              Non vérifié · {e.entry_state} · {e.occurred_on || "Date inconnue"}{" "}
+              ({e.occurrence_precision})
+            </p>
+            <dl className="details">
+              {Object.entries(e.payload).map(([k, v]) => (
+                <div key={k}>
+                  <dt>
+                    {(
+                      {
+                        catalog_version_id: "Version du vocabulaire",
+                        catalog_status: "État du catalogue",
+                        dose_code: "Code de dose déclaré",
+                      } as Record<string, string>
+                    )[k] ||
+                      clinicalFieldLabels[k] ||
+                      k}
+                  </dt>
+                  <dd>
+                    {k === "catalog_status"
+                      ? (
+                          {
+                            draft: "Brouillon — non validé",
+                            approved: "Approuvé (vocabulaire seulement)",
+                            retired: "Version retirée",
+                          } as Record<string, string>
+                        )[String(v)] || String(v)
+                      : ["category", "severity", "status"].includes(k)
+                        ? clinicalValueLabels[String(v)] || String(v)
+                        : String(v)}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+            <p>
+              Source : {e.source_type} · {e.source_reference || "Non précisée"}
+            </p>
+            <p>
+              Auteur : {e.owner_id} ({e.author_role}), compte {e.account_status}{" "}
+              · {e.recorded_at}
+            </p>
+            {e.reason && <p>Motif : {e.reason}</p>}
+            <Link href={`?edit=${e.root_id}`}>Corriger / changer l’état</Link>
+          </article>
+        ))}
+      </div>
+      <div className="pagination">
+        {page > 1 && <Link href={`?page=${page - 1}`}>← Précédent</Link>}
+        {result.total > page * 30 && (
+          <Link href={`?page=${page + 1}`}>Suivant →</Link>
+        )}
+      </div>
+    </section>
+  );
   return (
     <main className="workspace">
       <ProvisionalHeader profile={profile} />
@@ -73,65 +164,36 @@ export default async function ProvisionalBooklet({
           Aucun QR de partage, aucune importation ni publication de ce dossier.
         </p>
       </section>
-      <section className="panel">
-        <h2>{editing ? "Corriger une entrée" : "Ajouter une entrée"}</h2>
-        {editing && (
-          <Link href={`/provisional/${id}`}>Annuler la correction</Link>
-        )}
-        <ProvisionalEntryForm
-          key={editing?.id ?? "new"}
-          childId={id}
-          operationId={randomUUID()}
-          entry={editing}
-          vaccineChoices={vocabulary.data as VaccineChoice[]}
-          initialKind={
-            q.kind && Object.hasOwn(provisionalKinds, q.kind)
-              ? (q.kind as keyof typeof provisionalKinds)
-              : undefined
-          }
-        />
-      </section>
-      <section className="panel">
-        <h2>Historique immuable ({result.total} révisions)</h2>
-        <div className="record-list">
-          {result.entries.map((e) => (
-            <article key={e.id}>
-              <h3>
-                {provisionalKinds[e.kind as keyof typeof provisionalKinds]} ·
-                Révision {e.revision}
-              </h3>
-              <p>
-                Non vérifié · {e.entry_state} ·{" "}
-                {e.occurred_on || "Date inconnue"} ({e.occurrence_precision})
-              </p>
-              <dl>
-                {Object.entries(e.payload).map(([k, v]) => (
-                  <div key={k}>
-                    <dt>{k}</dt>
-                    <dd>{String(v)}</dd>
-                  </div>
-                ))}
-              </dl>
-              <p>
-                Source : {e.source_type} ·{" "}
-                {e.source_reference || "Non précisée"}
-              </p>
-              <p>
-                Auteur : {e.owner_id} ({e.author_role}), compte{" "}
-                {e.account_status} · {e.recorded_at}
-              </p>
-              {e.reason && <p>Motif : {e.reason}</p>}
-              <Link href={`?edit=${e.root_id}`}>Corriger / changer l’état</Link>
-            </article>
-          ))}
+      <section className="panel" aria-labelledby="provisional-followup-title">
+        <h2 id="provisional-followup-title">
+          Historique enregistré et suite du suivi
+        </h2>
+        <p>
+          Les entrées de ce dossier restent non vérifiées. Leur enregistrement
+          ne crée ni référence vaccinale validée ni prochain rendez-vous.
+        </p>
+        <p>
+          HB1 : aucun calcul automatique de prochaine dose ni de rattrapage. Le
+          professionnel examine la source et choisit manuellement le suivi
+          nécessaire.
+        </p>
+        <div className="tabs">
+          <Link href="#entry-history">Consulter les entrées enregistrées</Link>
+          <Link href="?kind=vaccination#entry-form">
+            Noter une vaccination / un historique
+          </Link>
+          <Link href="?kind=appointment#entry-form">
+            Noter un rendez-vous provisoire
+          </Link>
         </div>
-        <div className="pagination">
-          {page > 1 && <Link href={`?page=${page - 1}`}>← Précédent</Link>}
-          {result.total > page * 30 && (
-            <Link href={`?page=${page + 1}`}>Suivant →</Link>
-          )}
-        </div>
+        <p className="fine">
+          Un rendez-vous provisoire reste privé à son auteur ; il ne confirme
+          aucune administration et n’est pas publié dans un carnet partagé.
+        </p>
       </section>
+      {editing && entryForm}
+      {historySection}
+      {!editing && entryForm}
     </main>
   );
 }

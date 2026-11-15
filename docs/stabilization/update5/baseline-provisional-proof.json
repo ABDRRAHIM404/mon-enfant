@@ -1,0 +1,10 @@
+{
+  "fixture_run": "30c1d6e447ec495b",
+  "phase": "pre-fix canonical reproduction",
+  "persistence_verified": true,
+  "assigned_routine_items": 0,
+  "hb1_history_revisions": 2,
+  "private_children": 2,
+  "trusted_children": 0,
+  "uncertain_unverified_hb1": 2
+}

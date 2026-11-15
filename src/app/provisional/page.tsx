@@ -74,14 +74,34 @@ export default async function ProvisionalWorkspace({
       : q.view === "documents"
         ? "documents"
         : "home";
+  const viewTitle = kind
+    ? (
+        {
+          consultation: "Consultations provisoires",
+          vaccination: "Vaccinations et historique provisoires",
+          appointment: "Rendez-vous provisoires",
+          growth: "Croissance — mesures provisoires",
+          prescription: "Traitements provisoires",
+          risk: "Risques et allergies provisoires",
+        } as Record<string, string>
+      )[kind]
+    : q.view === "children"
+      ? "Mes enfants provisoires"
+      : q.view === "documents"
+        ? "Documents indisponibles en provisoire"
+        : "Bonjour, soignant";
   return (
     <WorkspaceShell area="provisional" active={active}>
       <section className="workspace-heading">
         <span className="eyebrow">ESPACE MÉDECIN / INFIRMIER(ÈRE)</span>
         <h1 id="main-content" tabIndex={-1}>
-          Bonjour, soignant
+          {viewTitle}
         </h1>
-        <p className="muted">Votre espace clinique Mon Enfant.</p>
+        <p className="muted">
+          {kind
+            ? "Choisissez un dossier privé pour consulter son historique ou saisir une entrée de cette rubrique."
+            : "Votre espace clinique Mon Enfant."}
+        </p>
       </section>
       <section className="workspace-verification workspace-attention">
         <div>
@@ -108,18 +128,20 @@ export default async function ProvisionalWorkspace({
           </Link>
         </p>
       )}
-      <div className="workspace-stat-grid">
-        {tiles.map((tile) => (
-          <section
-            className="workspace-surface workspace-stat"
-            key={tile.label}
-          >
-            <span className="eyebrow">{tile.label}</span>
-            <strong>{tile.value}</strong>
-            <p className="muted">{tile.caption}</p>
-          </section>
-        ))}
-      </div>
+      {!kind && q.view !== "documents" && (
+        <div className="workspace-stat-grid">
+          {tiles.map((tile) => (
+            <section
+              className="workspace-surface workspace-stat"
+              key={tile.label}
+            >
+              <span className="eyebrow">{tile.label}</span>
+              <strong>{tile.value}</strong>
+              <p className="muted">{tile.caption}</p>
+            </section>
+          ))}
+        </div>
+      )}
       <section className="workspace-section" id="dossiers">
         <div className="workspace-section-heading">
           <h2>Mes dossiers provisoires</h2>
@@ -151,13 +173,17 @@ export default async function ProvisionalWorkspace({
               <div>
                 <h3>
                   <Link
-                    href={`/provisional/${child.id}${kind ? `?kind=${kind}` : ""}`}
+                    href={`/provisional/${child.id}${kind ? `?kind=${kind}#entry-history` : ""}`}
                   >
                     {child.identity.given_name || "Prénom inconnu"}{" "}
                     {child.identity.family_name || "Nom inconnu"}
                   </Link>
                 </h3>
-                <p className="muted">Dossier privé</p>
+                <p className="muted">
+                  {kind
+                    ? `Ouvrir : ${provisionalKinds[kind]}`
+                    : "Dossier privé"}
+                </p>
                 <span className="workspace-chip">Non vérifié</span>
                 <p className="sr-only">
                   Naissance : {child.identity.birth_date || "Inconnue"}

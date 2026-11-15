@@ -14,6 +14,10 @@ import {
   Building2,
   UserRound,
 } from "lucide-react";
+import {
+  NavigationFeedback,
+  WorkspaceMobileMenu,
+} from "./workspace-navigation";
 import { Brand } from "./brand";
 import { signOut } from "@/app/auth/actions";
 
@@ -32,7 +36,12 @@ const icons = {
   practices: Building2,
   account: UserRound,
 };
-type Item = { key: keyof typeof icons; label: string; href: string };
+type Item = {
+  key: keyof typeof icons;
+  label: string;
+  href: string;
+  disabled?: boolean;
+};
 export function WorkspaceShell({
   area,
   active = "home",
@@ -109,6 +118,7 @@ export function WorkspaceShell({
             key: "documents",
             label: "Documents",
             href: "/provisional?view=documents",
+            disabled: true,
           },
           { key: "account", label: "Mon compte soignant", href: "/account" },
         ]
@@ -144,6 +154,32 @@ export function WorkspaceShell({
   const mobile = items.filter((item) =>
     ["home", "children", "appointments", "documents"].includes(item.key),
   );
+  function navigationItem(item: Item) {
+    const Icon = icons[item.key];
+    return item.disabled ? (
+      <span
+        className="workspace-nav-unavailable"
+        aria-disabled="true"
+        key={item.key}
+      >
+        <Icon size={17} aria-hidden="true" />
+        <span>
+          {item.label}
+          <small>Indisponible en provisoire</small>
+        </span>
+      </span>
+    ) : (
+      <Link
+        key={item.key}
+        href={item.href}
+        aria-current={active === item.key ? "page" : undefined}
+      >
+        <Icon size={17} aria-hidden="true" />
+        {item.label}
+        <NavigationFeedback />
+      </Link>
+    );
+  }
   return (
     <div className="workspace-site">
       <header className="workspace-topbar">
@@ -196,21 +232,31 @@ export function WorkspaceShell({
           </Link>
         </nav>
       </header>
+      <WorkspaceMobileMenu label={parent ? "Menu parent" : "Menu soignant"}>
+        <nav
+          aria-label={
+            parent
+              ? "Toutes les rubriques parent"
+              : "Toutes les rubriques soignant"
+          }
+        >
+          {items.map(navigationItem)}
+          {!parent && !provisional && (
+            <Link href="/share">
+              Lire un partage parent
+              <NavigationFeedback />
+            </Link>
+          )}
+          <form action={signOut}>
+            <button className="text-link workspace-signout">
+              Se déconnecter
+            </button>
+          </form>
+        </nav>
+      </WorkspaceMobileMenu>
       <aside className="workspace-sidebar">
         <nav aria-label={parent ? "Navigation parent" : "Espace soignant"}>
-          {items.map((item) => {
-            const Icon = icons[item.key];
-            return (
-              <Link
-                key={item.key}
-                href={item.href}
-                aria-current={active === item.key ? "page" : undefined}
-              >
-                <Icon size={17} aria-hidden="true" />
-                {item.label}
-              </Link>
-            );
-          })}
+          {items.map(navigationItem)}
           {!parent && !provisional && (
             <Link href="/share">
               <ShieldCheck size={17} aria-hidden="true" />
@@ -235,19 +281,21 @@ export function WorkspaceShell({
           className="workspace-mobile-nav"
           aria-label="Accès rapides soignant"
         >
-          {mobile.map((item) => {
-            const Icon = icons[item.key];
-            return (
-              <Link
-                key={item.key}
-                href={item.href}
-                aria-current={active === item.key ? "page" : undefined}
-              >
-                <Icon size={21} aria-hidden="true" />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
+          {mobile
+            .filter((item) => !item.disabled)
+            .map((item) => {
+              const Icon = icons[item.key];
+              return (
+                <Link
+                  key={item.key}
+                  href={item.href}
+                  aria-current={active === item.key ? "page" : undefined}
+                >
+                  <Icon size={21} aria-hidden="true" />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
         </nav>
       )}
     </div>
