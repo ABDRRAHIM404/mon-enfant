@@ -160,7 +160,7 @@ describe("native parent read projections", () => {
     const native = await rpc<{
       appointments: Record<string, unknown>[];
       child: unknown;
-      server_current_civil_day: string;
+      server_day: string;
       timezone: string;
     }>(f.parent, "parent_mobile_view", ["booklet", f.child, 1]);
     expect(native.child).toEqual(original.child);
@@ -169,7 +169,7 @@ describe("native parent read projections", () => {
       await db.query<{
         local_stamp: string;
         current_civil_day: string;
-        offset: number;
+        zone_offset_seconds: number;
       }>(
         "select to_char(e.starts_at at time zone 'Africa/Casablanca','DD/MM/YYYY HH24:MI') as local_stamp,(now() at time zone 'Africa/Casablanca')::date::text as current_civil_day,extract(epoch from((e.starts_at at time zone 'Africa/Casablanca')-(e.starts_at at time zone 'UTC')))::integer as zone_offset_seconds from public.appointment_events e where e.appointment_id=$1 order by revision desc limit 1",
         [appointmentId],
