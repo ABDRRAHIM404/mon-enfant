@@ -1,0 +1,51 @@
+{
+  "run": "5d4ec565b0864dce",
+  "migration_sha256": "086710436366917d727f0205fb66e56d3c0b2c60c068d97495bb790cef5a0113",
+  "checks": [
+    {
+      "case": "anonymous_denied",
+      "http": 401
+    },
+    {
+      "case": "A_authorized_empty_trusted_feed",
+      "http": 200
+    },
+    {
+      "case": "A_invalid_limit_denied",
+      "http": 400
+    },
+    {
+      "case": "A_logged_out_session_denied",
+      "http": 403
+    },
+    {
+      "case": "B_authorized_empty_trusted_feed",
+      "http": 200
+    },
+    {
+      "case": "B_invalid_limit_denied",
+      "http": 400
+    },
+    {
+      "case": "B_logged_out_session_denied",
+      "http": 403
+    },
+    {
+      "case": "MANAGER_role_without_verified_clinician_authorization_denied",
+      "http": 403
+    },
+    {
+      "case": "MANAGER_logged_out_session_denied",
+      "http": 403
+    },
+    {
+      "case": "OUTSIDE_role_without_verified_clinician_authorization_denied",
+      "http": 403
+    },
+    {
+      "case": "OUTSIDE_logged_out_session_denied",
+      "http": 403
+    }
+  ],
+  "passed": true
+}

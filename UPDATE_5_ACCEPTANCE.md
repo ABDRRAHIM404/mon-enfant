@@ -8,7 +8,7 @@ This report is not milestone approval. Parent website acceptance is deferred; AP
 - Independent provisional persistence: `docs/stabilization/update5/clinician-desktop-ledger.json`. No provisional-to-trusted promotion; all four entries remain unverified.
 - Applied provisional projection: `docs/stabilization/update5/provisional-section-migration.json`; live role/session denial receipt: `docs/stabilization/update5/provisional-section-http.json`.
 - Light-only canonical appearance previously passed desktop and Android-sized Chromium despite saved dark preference and dark OS: `docs/stabilization/update5/light-appearance.json`.
-- Feature source `87bb599` is undergoing Vercel security tests, explicit TypeScript and production build in `dpl_6pAAgjhbnzQUS5YhyqsQuN9SXoFj`. Its new consultation projection is not applied yet. Latest screenshots cannot establish this source's appearance.
+- Feature source `87bb599` passed 13 Vercel tests, explicit TypeScript and production build in `dpl_6pAAgjhbnzQUS5YhyqsQuN9SXoFj`. Its new consultation projection is now applied with matching stored source and auth-only execution, and live HTTPS role/session checks pass; receipts: `docs/stabilization/update5/clinician-overview-{migration,http}.json`. Latest screenshots cannot establish this source's appearance.
 
 ## Page matrix
 

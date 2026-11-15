@@ -26,3 +26,9 @@ Source correction in progress: history before the new-entry form, readable field
 4. Android provisional dashboard — visible shortcuts work; full feature discoverability is insufficient. [Capture](docs/stabilization/update5/before/04-mobile-limited-navigation.png).
 
 Screenshots support these scoped findings, not full accessibility or production readiness. Mouse, touch, keyboard, destination state and independent data readback supplement them. Parent/admin/all-feature acceptance and external email delivery remain open in UPDATE_5_WORK_PLAN.md.
+
+## Revised clinician design inspection
+
+The canonical 94a0253 desktop capture showed seven summary cards in one row and another two below; this pushed the daily tasks down and made the dashboard harder to scan than the supplied tableau reference. Selected-child feature search occupied a separate full-width panel, while reference controls preceded the saved vaccine ledger. The next feature revision reduces dashboard summaries to four, adds a real grant-scoped recent-consultation list, places saved vaccination history first, and folds child search into a desktop selector/compact phone disclosure. Source and cloud checks establish implementation only; final visual acceptance remains pending.
+
+The new recent-consultation read passed three focused cloud security tests plus live anonymous/verified/admin/unverified/signed-out HTTP checks. It excludes private provisional records and reflects latest immutable corrections under current explicit grants. The remaining trusted clinical lifecycle and three-viewport review are still open in UPDATE_5_ACCEPTANCE.md.

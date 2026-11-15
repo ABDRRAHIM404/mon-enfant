@@ -1,0 +1,19 @@
+{
+  "version": "20261115172000",
+  "sha256": "086710436366917d727f0205fb66e56d3c0b2c60c068d97495bb790cef5a0113",
+  "source_md5": "3753f2f093357a144d687a8a8054f6aa",
+  "project": "zkkasbxvdvecnafgjpxd",
+  "applied": true,
+  "transport": "Supabase linked HTTPS database query",
+  "atomic_migration_and_ledger": true,
+  "pending_source_migrations_before_apply": [
+    "20261115172000"
+  ],
+  "remote_only_migrations": [],
+  "anonymous_execute": false,
+  "authenticated_execute": true,
+  "preview": "dpl_6pAAgjhbnzQUS5YhyqsQuN9SXoFj",
+  "preview_source": "87bb59903d131b045c0bf45f6c27d02afad7b062",
+  "focused_tests_passed": 13,
+  "hosted_ui_acceptance": false
+}
