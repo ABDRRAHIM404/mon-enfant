@@ -31,7 +31,7 @@ Actual native login/home/booklet renders were inspected; labels, bordered contro
 
 Applied immutable native read projection 20261115034112 retains authenticated hosted HTTP acceptance: five views, other-parent denial, canonical Casablanca appointment/time parity and genuine Auth logout/old-token/session-row denial. It adds no clinical rights. Independent synthetic readback confirms one child, three clinical revisions, no active shares and no recipient grants/capabilities; original twenty-five-rule version remains draft revision one. Fixture retirement and exact binary publication are recorded in docs/mobile/android-acceptance.json and PROGRESS.md.
 
-Private APK publication runs entirely in GitHub and requires matching successful build/runtime hashes, unchanged mobile/shared source and verified fixture retirement. See ANDROID_APK.md. This is development preview acceptance with synthetic data, not store distribution or real-patient authorization.
+Private APK publication runs entirely in GitHub and requires matching successful build/runtime hashes, unchanged mobile/shared source and verified fixture retirement. Publication 43697474627 passed and the [private preview APK](https://github.com/ABDRRAHIM404/mon-enfant/releases/tag/android-v0.1.0-preview.1) is available with a matching GitHub asset SHA-256. See ANDROID_APK.md. This is development preview acceptance with synthetic data, not store distribution or real-patient authorization.
 
 ## Deferred iPhone and external gates
 
