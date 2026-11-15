@@ -278,7 +278,11 @@ test("parent purpose-bound sharing, live concurrent claim and revocation", async
     expect(/^[A-Za-z0-9_-]{43}$/.test(secret)).toBe(true);
     expect(qr.value.includes(child)).toBe(false);
     // Open fragment without a session; it stays only in the original page memory while login happens in a separate tab.
-    await reader.goto(qr.value);
+    try {
+      await reader.goto(qr.value);
+    } catch {
+      throw new Error("SHARING_ENTRY_NAVIGATION_FAILED");
+    }
     await expect.poll(() => reader.evaluate(() => location.hash)).toBe("");
     await reader
       .getByRole("button", { name: "Ouvrir le partage", exact: true })
@@ -316,9 +320,9 @@ test("parent purpose-bound sharing, live concurrent claim and revocation", async
       (await rpc(dc, "redeem_clinician_share", { p_token: secret })).body
         .accepted,
     ).toBe(false);
-    expect((await rpc(rc, "get_child_profile", { p_child_id: child })).status).toBe(
-      403,
-    );
+    expect(
+      (await rpc(rc, "get_child_profile", { p_child_id: child })).status,
+    ).toBe(403);
     expect(
       (
         await rpc(rc, "write_clinical_entry", {
