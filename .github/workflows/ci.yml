@@ -48,7 +48,7 @@ on:
         type: string
         default: ""
 concurrency:
-  group: ci-${{ github.ref }}-${{ github.event_name == 'workflow_dispatch' && inputs.live_probe != 'none' && inputs.live_probe != '' && 'live' || github.event_name == 'workflow_dispatch' && inputs.mail_probe != 'none' && 'mail' || 'app' }}
+  group: ci-${{ github.ref }}-${{ github.event_name == 'workflow_dispatch' && startsWith(inputs.live_probe, 'mobile-') && inputs.live_probe || github.event_name == 'workflow_dispatch' && inputs.live_probe != 'none' && inputs.live_probe != '' && 'live' || github.event_name == 'workflow_dispatch' && inputs.mail_probe != 'none' && 'mail' || 'app' }}
   cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' || inputs.live_probe == 'none' || inputs.live_probe == '' }}
 permissions:
   contents: read
@@ -262,12 +262,14 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+          cache: gradle
+          cache-dependency-path: mobile/package-lock.json
       - run: npm ci
         working-directory: mobile
       - run: npx expo prebuild --platform android --no-install
         working-directory: mobile
       - name: Compile bundled development APK with template debug signing only
-        run: ./gradlew :app:assembleRelease --no-daemon --max-workers=2 -PreactNativeArchitectures=arm64-v8a,x86_64 '-Dorg.gradle.jvmargs=-Xmx3g -XX:MaxMetaspaceSize=768m'
+        run: ./gradlew :app:assembleRelease --build-cache --no-daemon --max-workers=2 -PreactNativeArchitectures=arm64-v8a,x86_64 '-Dorg.gradle.jvmargs=-Xmx3g -XX:MaxMetaspaceSize=768m'
         working-directory: mobile/android
       - name: Verify native archive and publish classified build proof
         run: python3 scripts/mobile-native-proof.py android
