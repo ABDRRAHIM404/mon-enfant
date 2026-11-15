@@ -15,6 +15,10 @@ on:
         options:
           [
             none,
+            mobile-bootstrap,
+            mobile-check,
+            mobile-android,
+            mobile-ios,
             sharing-cloud-accept,
             design-cloud-accept,
             updates-cloud-accept,
@@ -105,7 +109,7 @@ jobs:
         run: python3 scripts/configure-resend.py --send-owner-test
 
   live-browser:
-    if: github.event_name == 'workflow_dispatch' && inputs.live_probe != 'none' && inputs.live_probe != ''
+    if: github.event_name == 'workflow_dispatch' && inputs.live_probe != 'none' && inputs.live_probe != '' && !startsWith(inputs.live_probe, 'mobile-')
     runs-on: ubuntu-latest
     timeout-minutes: ${{ (inputs.live_probe == 'vaccine-accessibility' || inputs.live_probe == 'clinical-performance' || inputs.live_probe == 'parent-accept') && 30 || (inputs.live_probe == 'vaccination-accept' || inputs.live_probe == 'clinical-accessibility') && 22 || 18 }}
     env:
@@ -186,4 +190,23 @@ jobs:
             test-results/live/**/contrast-*.json
             test-results/live/**/a11y-*.json
             test-results/live/**/accessibility-proof.json
+          retention-days: 3
+
+  mobile-bootstrap:
+    if: github.event_name == 'workflow_dispatch' && inputs.live_probe == 'mobile-bootstrap'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CI: 1
+      EXPO_NO_TELEMETRY: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node scripts/bootstrap-mobile.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mobile-pinned-manifests
+          path: test-results/mobile-manifests/
           retention-days: 3

@@ -12,3 +12,10 @@ supabase/.temp/
 
 __pycache__/
 *.pyc
+
+mobile/node_modules/
+mobile/.expo/
+mobile/dist/
+mobile/android/
+mobile/ios/
+mobile/coverage/
