@@ -6,7 +6,6 @@ import {
   type ParentChild,
   type PatientVaccineItem,
 } from "../lib/domain";
-import { today } from "../lib/format";
 const unavailable: Record<string, string> = {
   unreviewed_version:
     "Version non approuvée ou retirée : nouvelle date non calculée.",
@@ -20,26 +19,31 @@ const unavailable: Record<string, string> = {
 export function VaccineReference({
   item,
   child,
+  serverDay,
 }: {
   item: PatientVaccineItem;
   child: ParentChild;
+  serverDay: string;
 }) {
-  const reference = routineReference(
-    {
-      doseCode: item.dose_code,
-      vaccineCode: item.vaccine_code,
-      age: item.age,
-      eligibility: item.eligibility,
-      automaticScheduling: item.automatic_scheduling,
-    },
-    {
-      birthDate: child.birth_date,
-      birthPrecision: child.birth_date_precision as
-        "exact" | "estimated" | "unknown",
-      sex: child.sex as "female" | "male" | "unknown",
-    },
-    { status: item.version_status, reviewVerified: item.review_verified },
-  );
+  const reference =
+    item.state === "withdrawn"
+      ? null
+      : routineReference(
+          {
+            doseCode: item.dose_code,
+            vaccineCode: item.vaccine_code,
+            age: item.age,
+            eligibility: item.eligibility,
+            automaticScheduling: item.automatic_scheduling,
+          },
+          {
+            birthDate: child.birth_date,
+            birthPrecision: child.birth_date_precision as
+              "exact" | "estimated" | "unknown",
+            sex: child.sex as "female" | "male" | "unknown",
+          },
+          { status: item.version_status, reviewVerified: item.review_verified },
+        );
   return (
     <Card>
       <Title small>
@@ -55,15 +59,15 @@ export function VaccineReference({
       <Copy>
         {item.state === "withdrawn"
           ? "Référence retirée : aucune nouvelle date calculée."
-          : !reference.startOn
-            ? (unavailable[reference.state] ?? "Date non calculée.")
+          : !reference?.startOn
+            ? (unavailable[reference?.state ?? ""] ?? "Date non calculée.")
             : reference.isWindow
               ? `Fenêtre de routine : ${reference.startOn} au ${reference.endOn} inclus`
               : `Date de référence de routine : ${reference.startOn}`}
       </Copy>
       {item.state !== "withdrawn" &&
-        reference.endOn &&
-        reference.endOn >= today() &&
+        reference?.endOn &&
+        reference.endOn >= serverDay &&
         !item.documented_entries.length && (
           <Copy>
             Référence à venir ou en cours. Le professionnel confirme les soins

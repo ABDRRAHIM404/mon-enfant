@@ -27,31 +27,15 @@ export function birth(child: {
         }).format(new Date(child.birth_date + "T12:00:00Z"));
 }
 export function instant(value: string) {
-  return new Intl.DateTimeFormat("fr-MA", {
-    timeZone: "Africa/Casablanca",
-    dateStyle: "medium",
-    timeStyle: "short",
-    timeZoneName: undefined,
-  }).format(new Date(value));
-}
-export function today() {
-  const parts = Object.fromEntries(
-    new Intl.DateTimeFormat("en-CA", {
-      timeZone: "Africa/Casablanca",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    })
-      .formatToParts(new Date())
-      .map((p) => [p.type, p.value]),
+  return (
+    new Intl.DateTimeFormat("fr-MA", {
+      timeZone: "UTC",
+      dateStyle: "medium",
+      timeStyle: "short",
+    }).format(new Date(value)) + " UTC"
   );
-  return `${parts.year}-${parts.month}-${parts.day}`;
 }
-export function civilAdd(day: string, amount: number) {
-  const d = new Date(day + "T12:00:00Z");
-  d.setUTCDate(d.getUTCDate() + amount);
-  return d.toISOString().slice(0, 10);
-}
+export { addCivilDays as civilAdd } from "../../../src/lib/vaccines/calendar";
 export function invitationToken(value: string) {
   const text = value.trim();
   if (/^[A-Za-z0-9_-]{43}$/.test(text)) return text;

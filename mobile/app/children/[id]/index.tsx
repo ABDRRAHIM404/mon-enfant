@@ -20,7 +20,8 @@ export default function Booklet() {
   const { id } = useLocalSearchParams<{ id: string }>(),
     [page, setPage] = useState(1),
     [section, setSection] = useState("records"),
-    view = useRpc<ParentBooklet>("parent_child_booklet", {
+    view = useRpc<ParentBooklet>("parent_mobile_view", {
+      p_kind: "booklet",
       p_child_id: uuid.test(id ?? "") ? id : null,
       p_page: page,
     }),

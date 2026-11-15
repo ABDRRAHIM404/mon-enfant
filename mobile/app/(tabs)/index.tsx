@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import { useRpc, useAction } from "../../src/lib/data";
-import type { ParentWorkspaceData, AppointmentRow } from "../../src/lib/domain";
-import { name, birth, instant } from "../../src/lib/format";
+import type {
+  ParentWorkspaceData,
+  NativeAppointment,
+} from "../../src/lib/domain";
+import { name, birth } from "../../src/lib/format";
 import {
   Screen,
   Card,
@@ -14,11 +17,12 @@ import {
   Notice,
 } from "../../src/components/ui";
 type Home = ParentWorkspaceData & {
-  next_appointment: AppointmentRow | null;
+  next_appointment: NativeAppointment | null;
   unread_total: number;
+  server_day: string;
 };
 export default function Home() {
-  const view = useRpc<Home>("parent_home_summary"),
+  const view = useRpc<Home>("parent_mobile_view", { p_kind: "home" }),
     router = useRouter(),
     action = useAction(),
     [display, setDisplay] = useState("");
@@ -106,7 +110,7 @@ export default function Home() {
                 {view.data.next_appointment ? (
                   <>
                     <Copy>{view.data.next_appointment.purpose_label}</Copy>
-                    <Copy>{instant(view.data.next_appointment.starts_at)}</Copy>
+                    <Copy>{view.data.next_appointment.starts_display}</Copy>
                     <Copy muted>
                       {view.data.next_appointment.facility_name}
                     </Copy>

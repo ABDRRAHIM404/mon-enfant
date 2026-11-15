@@ -26,12 +26,14 @@ export default function Vaccinations() {
       child: ParentChild;
       items: PatientVaccineItem[];
       total: number;
-    }>("parent_vaccine_items", {
+      server_day: string;
+    }>("parent_mobile_view", {
+      p_kind: "vaccine_references",
       p_child_id: uuid.test(id ?? "") ? id : null,
       p_page: page,
     }),
     history = useRpc<{ items: ClinicalEntry[]; total: number }>(
-      "parent_vaccination_history",
+      "parent_mobile_view",
       { p_child_id: uuid.test(id ?? "") ? id : null, p_page: historyPage },
     );
   return (
@@ -75,6 +77,7 @@ export default function Vaccinations() {
               key={item.id}
               item={item}
               child={refs.data!.child}
+              serverDay={refs.data!.server_day}
             />
           ))}
           {!refs.data.items.length && (

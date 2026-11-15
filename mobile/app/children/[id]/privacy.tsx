@@ -42,7 +42,8 @@ const labels: Record<string, string> = {
 export default function Privacy() {
   const { id } = useLocalSearchParams<{ id: string }>(),
     [page, setPage] = useState(1),
-    booklet = useRpc<ParentBooklet>("parent_child_booklet", {
+    booklet = useRpc<ParentBooklet>("parent_mobile_view", {
+      p_kind: "booklet",
       p_child_id: id,
       p_page: 1,
     }),

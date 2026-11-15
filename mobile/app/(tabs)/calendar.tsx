@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { useRpc } from "../../src/lib/data";
-import { today, civilAdd, name } from "../../src/lib/format";
-import type { ParentWorkspaceData, AppointmentRow } from "../../src/lib/domain";
+import { civilAdd, name } from "../../src/lib/format";
+import {
+  civilDay,
+  type ParentWorkspaceData,
+  type NativeAppointment,
+  type NativeClock,
+} from "../../src/lib/domain";
 import {
   Screen,
   Card,
@@ -11,17 +16,44 @@ import {
   Field,
   DataState,
   Pages,
+  Notice,
 } from "../../src/components/ui";
 import { Appointment } from "../../src/components/appointment";
 export default function Calendar() {
-  const workspace = useRpc<ParentWorkspaceData>("parent_workspace"),
+  const workspace = useRpc<ParentWorkspaceData & NativeClock>(
+      "parent_mobile_view",
+      { p_kind: "home" },
+    ),
     [selected, setSelected] = useState(""),
-    [anchor, setAnchor] = useState(today()),
-    [draft, setDraft] = useState(anchor),
-    [page, setPage] = useState(1);
+    [anchor, setAnchor] = useState<string | null>(null),
+    [draft, setDraft] = useState<string | null>(null),
+    [page, setPage] = useState(1),
+    [error, setError] = useState("");
   const child =
-    workspace.data?.children.find((c) => c.id === selected) ??
-    workspace.data?.children[0];
+      workspace.data?.children.find((c) => c.id === selected) ??
+      workspace.data?.children[0],
+    from = anchor ?? workspace.data?.server_day ?? "";
+  function choose(value: string) {
+    try {
+      civilDay(value);
+      civilAdd(value, 29);
+      setAnchor(value);
+      setDraft(value);
+      setPage(1);
+      setError("");
+    } catch {
+      setError(
+        "Indiquez une date civile valide entre 0001 et 9999, avec une période complète de 30 jours.",
+      );
+    }
+  }
+  function move(days: number) {
+    try {
+      choose(civilAdd(from, days));
+    } catch {
+      setError("La période demandée dépasse les dates prises en charge.");
+    }
+  }
   return (
     <Screen title="Mes rendez-vous">
       <DataState
@@ -34,8 +66,8 @@ export default function Calendar() {
       {workspace.data && (
         <>
           <Copy muted>
-            Rendez-vous enregistrés par les professionnels. Les horaires sont
-            ceux de Casablanca.
+            Rendez-vous enregistrés par les professionnels. Les horaires de
+            Casablanca sont fournis par le serveur.
           </Copy>
           {workspace.data.children.map((c) => (
             <Button
@@ -49,56 +81,30 @@ export default function Calendar() {
               {name(c)}
             </Button>
           ))}
-          {child ? (
+          {child && from ? (
             <>
               <Card>
                 <Field
                   label="Début de la période (AAAA-MM-JJ)"
-                  value={draft}
+                  value={draft ?? from}
                   onChangeText={setDraft}
                   autoCapitalize="none"
                 />
-                <Button
-                  secondary
-                  onPress={() => {
-                    if (
-                      /^\d{4}-\d{2}-\d{2}$/.test(draft) &&
-                      !Number.isNaN(Date.parse(draft))
-                    ) {
-                      setAnchor(draft);
-                      setPage(1);
-                    }
-                  }}
-                >
+                {error && <Notice error>{error}</Notice>}
+                <Button secondary onPress={() => choose(draft ?? from)}>
                   Afficher 30 jours
                 </Button>
-                <Button
-                  secondary
-                  onPress={() => {
-                    const d = civilAdd(anchor, -30);
-                    setAnchor(d);
-                    setDraft(d);
-                    setPage(1);
-                  }}
-                >
+                <Button secondary onPress={() => move(-30)}>
                   Période précédente
                 </Button>
-                <Button
-                  secondary
-                  onPress={() => {
-                    const d = civilAdd(anchor, 30);
-                    setAnchor(d);
-                    setDraft(d);
-                    setPage(1);
-                  }}
-                >
+                <Button secondary onPress={() => move(30)}>
                   Période suivante
                 </Button>
               </Card>
               <CalendarItems
-                key={child.id + anchor}
+                key={child.id + from}
                 child={child.id}
-                from={anchor}
+                from={from}
                 page={page}
                 onPage={setPage}
               />
@@ -124,14 +130,14 @@ function CalendarItems({
   page: number;
   onPage: (v: number) => void;
 }) {
-  const view = useRpc<{ items: AppointmentRow[]; total: number }>(
-    "parent_appointment_calendar",
+  const view = useRpc<{ items: NativeAppointment[]; total: number }>(
+    "parent_mobile_view",
     {
+      p_kind: "calendar",
       p_child_id: child,
       p_from: from,
       p_to: civilAdd(from, 29),
       p_page: page,
-      p_state: "all",
     },
   );
   return (

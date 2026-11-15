@@ -1,12 +1,11 @@
 import { Card, Copy, Title } from "./ui";
-import { appointmentStates, type AppointmentRow } from "../lib/domain";
-import { instant } from "../lib/format";
-export function Appointment({ item }: { item: AppointmentRow }) {
+import { appointmentStates, type NativeAppointment } from "../lib/domain";
+export function Appointment({ item }: { item: NativeAppointment }) {
   return (
     <Card>
       <Title small>{item.purpose_label}</Title>
       <Copy>
-        {instant(item.starts_at)} · {appointmentStates[item.effective_state]}
+        {item.starts_display} · {appointmentStates[item.effective_state]}
       </Copy>
       <Copy muted>
         {item.facility_name} · {item.professional_id}

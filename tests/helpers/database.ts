@@ -242,3 +242,14 @@ export async function sharingDatabase() {
   );
   return db;
 }
+
+export async function mobileDatabase() {
+  const db = await sharingDatabase();
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/20261115034112_parent_mobile_projections.sql",
+      "utf8",
+    ),
+  );
+  return db;
+}
