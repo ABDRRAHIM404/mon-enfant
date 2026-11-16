@@ -1,4 +1,4 @@
-> Update 5 checkpoint (16 November): canonical cbe7281; trusted clinical corrections, manual appointments, QA routine/continuity and independent readback pass; populated tablet 16-destination run/visual review passes. Phone verification, secondary-action report, fixture retirement, publication/synchronization and owner review remain open. See UPDATE_5_ACCEPTANCE.md. Parent/APK/iOS remain deferred.
+> Update 5 checkpoint (16 November): canonical cbe7281; trusted clinical corrections, manual appointments, QA routine/continuity and independent readback pass; populated tablet 16-destination run/visual review passes. Phone verification now passes; secondary-action report, fixture retirement, publication/synchronization and owner review remain open. See UPDATE_5_ACCEPTANCE.md. Parent/APK/iOS remain deferred.
 
 > Current owner milestone: revised Update 5 Espace soignant only, using the eight supplied design references and real dedicated feature pages. Parent implementation/acceptance is a later stage; APK remains paused until both stages and owner approval. See UPDATE_5_PAGE_INVENTORY.md and UPDATE_5_WORK_PLAN.md.
 

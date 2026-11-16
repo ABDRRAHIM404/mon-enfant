@@ -15,11 +15,11 @@ Canonical application **cbe7281ddc5b3fd1adb269a780906eadeeb5696e**, READY **dpl_
 | Private consultation correction/quarantine | Pass | `provisional-correction-{after,ledger-after}.json`; original row unchanged, clinical/amendment reasons distinct |
 | Desktop clinician navigation | Pass, scoped | 16 destinations/two roles in `desktop-804ab4f`; later care/calendar captures cover populated workflows; final report does not imply every secondary action passed |
 | Populated tablet navigation and layout | Pass, scoped | Run 89358, 16 destinations/two roles, no JS errors/overflow; all 16 page captures inspected in `tablet-cbe7281`; private plot width ≥280px |
-| Phone-width navigation/forms/layout | Pending | Managed unit mon-enfant-phone-20261116.service is active; poll its state before replacement |
+| Phone-width navigation/forms/layout | Pass, scoped | Managed unit mon-enfant-phone-20261116.service completed successfully; 16 destinations, four genuine private saves/reloads, no JS errors/overflow; all 16 initial-viewport captures inspected in `phone-cbe7281` |
 | Fixture/QA-clone retirement | Pending | 5d4ec565b0864dce remains active; original source must remain unchanged |
 | Final inventory, broad action coverage and owner review | Pending | Remaining secondary creation/review/account/export actions must be mapped to evidence or explicitly left open; no blanket eight-page acceptance |
 
-Paths above are under `docs/stabilization/update5`. Parent redesign/acceptance, actual mail and other external approvals remain open; APK and iOS stay paused.
+Paths above are under `docs/stabilization/update5`. Responsive private ledger: `responsive-private-ledger.json` independently proves three cases / 13 unverified revisions, exact saved raw measurements and manual dates, zero trusted children/grants/capabilities. Parent redesign/acceptance, actual mail and other external approvals remain open; APK and iOS stay paused.
 
 ## Historical evidence
 

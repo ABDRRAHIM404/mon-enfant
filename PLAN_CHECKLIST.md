@@ -1,4 +1,4 @@
-> Update 5 checkpoint (16 November): canonical cbe7281; trusted clinical corrections, manual appointments, QA routine/continuity and independent readback pass; populated tablet 16-destination run/visual review passes. Phone verification, secondary-action report, fixture retirement, publication/synchronization and owner review remain open. See UPDATE_5_ACCEPTANCE.md. Parent/APK/iOS remain deferred.
+> Update 5 checkpoint (16 November): canonical cbe7281; trusted clinical corrections, manual appointments, QA routine/continuity and independent readback pass; populated tablet 16-destination run/visual review passes. Phone verification now passes; secondary-action report, fixture retirement, publication/synchronization and owner review remain open. See UPDATE_5_ACCEPTANCE.md. Parent/APK/iOS remain deferred.
 
 # Full plan execution and completion audit
 

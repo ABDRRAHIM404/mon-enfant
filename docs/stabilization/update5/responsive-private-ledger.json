@@ -1,0 +1,218 @@
+{
+  "actor_count": 1,
+  "capabilities": 0,
+  "cases": [
+    {
+      "child": "de12062a-37c7-4e84-a753-42dd8d30a87b",
+      "identity": {
+        "birth_date": "2025-01-01",
+        "birth_date_precision": "exact",
+        "family_name": "U5-5d4ec565b0864dce-desktop",
+        "given_name": "Enfant fictif",
+        "local_reference": "",
+        "name_status": "confirmed",
+        "sex": "unknown",
+        "source_reference": ""
+      },
+      "revisions": [
+        {
+          "kind": "appointment",
+          "occurred_on": null,
+          "payload": {
+            "purpose": "Suivi fictif U5-5d4ec565b0864dce-desktop",
+            "scheduled_for": "2026-12-01T10:00:00+00:00",
+            "status": "planned"
+          },
+          "precision": "unknown",
+          "revision": 1,
+          "validation": "unverified"
+        },
+        {
+          "kind": "consultation",
+          "occurred_on": "2026-11-01",
+          "payload": {
+            "findings": "Observation entièrement fictive, sans interprétation clinique.",
+            "reason": "Consultation fictive U5-5d4ec565b0864dce-desktop"
+          },
+          "precision": "exact",
+          "revision": 1,
+          "validation": "unverified"
+        },
+        {
+          "kind": "consultation",
+          "occurred_on": "2026-11-01",
+          "payload": {
+            "findings": "Observation entièrement fictive, sans interprétation clinique.",
+            "reason": "Motif clinique entièrement fictif distinct du motif de correction"
+          },
+          "precision": "exact",
+          "revision": 2,
+          "validation": "unverified"
+        },
+        {
+          "kind": "growth",
+          "occurred_on": "2026-11-01",
+          "payload": {
+            "height_cm": 88,
+            "weight_kg": 12.4
+          },
+          "precision": "exact",
+          "revision": 1,
+          "validation": "unverified"
+        },
+        {
+          "kind": "vaccination",
+          "occurred_on": null,
+          "payload": {
+            "catalog_status": "draft",
+            "catalog_version_id": "1f28d603-44fe-465b-9dd3-47d82a0edd3a",
+            "dose_code": "HB1",
+            "dose_label": "HB1",
+            "vaccine_code": "HB",
+            "vaccine_label": "Hépatite B"
+          },
+          "precision": "unknown",
+          "revision": 1,
+          "validation": "unverified"
+        }
+      ],
+      "validation": "unverified"
+    },
+    {
+      "child": "822c7260-47c6-4943-a911-bc5d8f6cc93e",
+      "identity": {
+        "birth_date": "2025-01-01",
+        "birth_date_precision": "exact",
+        "family_name": "U5-5d4ec565b0864dce-tablet",
+        "given_name": "Enfant fictif",
+        "local_reference": "",
+        "name_status": "confirmed",
+        "sex": "unknown",
+        "source_reference": ""
+      },
+      "revisions": [
+        {
+          "kind": "appointment",
+          "occurred_on": null,
+          "payload": {
+            "purpose": "Suivi fictif U5-5d4ec565b0864dce-tablet",
+            "scheduled_for": "2026-12-01T10:00:00+00:00",
+            "status": "planned"
+          },
+          "precision": "unknown",
+          "revision": 1,
+          "validation": "unverified"
+        },
+        {
+          "kind": "consultation",
+          "occurred_on": "2026-11-01",
+          "payload": {
+            "findings": "Observation entièrement fictive, sans interprétation clinique.",
+            "reason": "Consultation fictive U5-5d4ec565b0864dce-tablet"
+          },
+          "precision": "exact",
+          "revision": 1,
+          "validation": "unverified"
+        },
+        {
+          "kind": "growth",
+          "occurred_on": "2026-11-01",
+          "payload": {
+            "height_cm": 88,
+            "weight_kg": 12.4
+          },
+          "precision": "exact",
+          "revision": 1,
+          "validation": "unverified"
+        },
+        {
+          "kind": "vaccination",
+          "occurred_on": null,
+          "payload": {
+            "catalog_status": "draft",
+            "catalog_version_id": "1f28d603-44fe-465b-9dd3-47d82a0edd3a",
+            "dose_code": "HB1",
+            "dose_label": "HB1",
+            "vaccine_code": "HB",
+            "vaccine_label": "Hépatite B"
+          },
+          "precision": "unknown",
+          "revision": 1,
+          "validation": "unverified"
+        }
+      ],
+      "validation": "unverified"
+    },
+    {
+      "child": "f87cb128-9029-455a-b102-870c0b2beca1",
+      "identity": {
+        "birth_date": "2025-01-01",
+        "birth_date_precision": "exact",
+        "family_name": "U5-5d4ec565b0864dce-android",
+        "given_name": "Enfant fictif",
+        "local_reference": "",
+        "name_status": "confirmed",
+        "sex": "unknown",
+        "source_reference": ""
+      },
+      "revisions": [
+        {
+          "kind": "appointment",
+          "occurred_on": null,
+          "payload": {
+            "purpose": "Suivi fictif U5-5d4ec565b0864dce-android",
+            "scheduled_for": "2026-12-01T10:00:00+00:00",
+            "status": "planned"
+          },
+          "precision": "unknown",
+          "revision": 1,
+          "validation": "unverified"
+        },
+        {
+          "kind": "consultation",
+          "occurred_on": "2026-11-01",
+          "payload": {
+            "findings": "Observation entièrement fictive, sans interprétation clinique.",
+            "reason": "Consultation fictive U5-5d4ec565b0864dce-android"
+          },
+          "precision": "exact",
+          "revision": 1,
+          "validation": "unverified"
+        },
+        {
+          "kind": "growth",
+          "occurred_on": "2026-11-01",
+          "payload": {
+            "height_cm": 88,
+            "weight_kg": 12.4
+          },
+          "precision": "exact",
+          "revision": 1,
+          "validation": "unverified"
+        },
+        {
+          "kind": "vaccination",
+          "occurred_on": null,
+          "payload": {
+            "catalog_status": "approved",
+            "catalog_version_id": "c3b5f31e-59d1-449e-89ad-4f1fd808275a",
+            "dose_code": "HB1",
+            "dose_label": "HB1",
+            "vaccine_code": "HB",
+            "vaccine_label": "Hépatite B"
+          },
+          "precision": "unknown",
+          "revision": 1,
+          "validation": "unverified"
+        }
+      ],
+      "validation": "unverified"
+    }
+  ],
+  "grants": 0,
+  "trusted_children": 0,
+  "status": "pass",
+  "source": "cbe7281ddc5b3fd1adb269a780906eadeeb5696e",
+  "synthetic_only": true,
+  "manual_appointment_time_verified": "All three clinician-chosen 2026-12-01 10:00 Africa/Casablanca slots persist as 10:00Z under the hosted current timezone."
+}

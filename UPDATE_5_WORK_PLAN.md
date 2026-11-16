@@ -22,8 +22,8 @@ Only Espace soignant: verified doctors/nurses and author-only provisional worksp
 | Eight-page inventory                                | In progress | UPDATE_5_PAGE_INVENTORY.md                                                                                                  |
 | Dedicated available clinician views                 | Implemented, acceptance pending | Build before decorative polish                                                                                              |
 | Shared clinician shell and references               | Implemented, acceptance pending     | Preserve parent components                                                                                                  |
-| Clinical lifecycle and authorization                | Pending     | Actual UI plus database evidence                                                                                            |
-| Desktop/tablet/phone visual acceptance              | Pending     | Current canonical screenshots, bounded CSS-pixel captures                                                                   |
+| Clinical lifecycle and authorization                | Scoped stories pass     | Actual UI plus database evidence                                                                                            |
+| Desktop/tablet/phone visual acceptance              | Scoped captures pass     | Current canonical screenshots, bounded CSS-pixel captures                                                                   |
 | Publication, retirement and primary synchronization | Pending     | Active fixture 5d4ec565b0864dce must be retired                                                                             |
 | Clinician owner review                              | Pending     | Explicit owner decision                                                                                                     |
 | Parent website acceptance / APK resume              | Deferred    | Separate later milestone; no implied approval                                                                               |
@@ -34,3 +34,5 @@ Current implementation evidence: canonical 94a0253 desktop 16-destination/two-ro
 ### Verified checkpoint — 16 November
 
 Canonical cbe7281 is READY with 17 tests/types/build. Trusted consultation/growth corrections and appointment lifecycles now pass actual UI/new-session/independent-ledger checks. QA-only reviewed routine and cross-clinician dose/grant revocation also pass with unchanged original source. Tablet 89358 passed all 16 destinations and page-by-page visual inspection; phone managed unit mon-enfant-phone-20261116.service is running. Remaining: phone results, complete action coverage report, fixture/QA retirement, final published evidence/primary synchronization and explicit clinician owner review. Keep all Phase 0–8 external/Phase 6 gates and later parent/APK gates open.
+
+- Phone managed job completed successfully (2.7 minutes, peak 540,258,304 bytes, no memory high/max/OOM events). All 16 page captures inspected; independent private ledger passes three cases/13 quarantined revisions. Final secondary-action mapping/retirement/publication/owner gates remain open.

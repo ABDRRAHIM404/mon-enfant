@@ -1,0 +1,189 @@
+{
+  "fixture_run": "5d4ec565b0864dce",
+  "device": "android",
+  "observations": [
+    {
+      "role": "A",
+      "label": "Tableau de bord",
+      "route": "/dashboard",
+      "heading": "Tableau de bord",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "A",
+      "label": "Enfants",
+      "route": "/patients",
+      "heading": "Enfants",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "A",
+      "label": "Consultations",
+      "route": "/consultations",
+      "heading": "Consultations",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "A",
+      "label": "Vaccinations",
+      "route": "/vaccinations",
+      "heading": "Vaccinations",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "A",
+      "label": "Rendez-vous",
+      "route": "/appointments",
+      "heading": "Mes rendez-vous",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "A",
+      "label": "Croissance",
+      "route": "/growth",
+      "heading": "Croissance",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "A",
+      "label": "Documents",
+      "route": "/documents",
+      "heading": "Documents",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "A",
+      "label": "Mon compte soignant",
+      "route": "/account",
+      "heading": "Votre statut de vérification",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "OUTSIDE",
+      "action": "provisional_write_reload",
+      "kind": "consultation",
+      "child_path": "/provisional/f87cb128-9029-455a-b102-870c0b2beca1",
+      "newly_written": true,
+      "source_marker": "Source fictive U5-5d4ec565b0864dce-android consultation",
+      "persistence_in_ui": true
+    },
+    {
+      "role": "OUTSIDE",
+      "action": "provisional_write_reload",
+      "kind": "growth",
+      "child_path": "/provisional/f87cb128-9029-455a-b102-870c0b2beca1",
+      "newly_written": true,
+      "source_marker": "Source fictive U5-5d4ec565b0864dce-android growth",
+      "persistence_in_ui": true
+    },
+    {
+      "role": "OUTSIDE",
+      "action": "provisional_write_reload",
+      "kind": "vaccination",
+      "child_path": "/provisional/f87cb128-9029-455a-b102-870c0b2beca1",
+      "newly_written": true,
+      "source_marker": "Source fictive U5-5d4ec565b0864dce-android vaccination",
+      "persistence_in_ui": true
+    },
+    {
+      "role": "OUTSIDE",
+      "action": "provisional_write_reload",
+      "kind": "appointment",
+      "child_path": "/provisional/f87cb128-9029-455a-b102-870c0b2beca1",
+      "newly_written": true,
+      "source_marker": "Source fictive U5-5d4ec565b0864dce-android appointment",
+      "persistence_in_ui": true
+    },
+    {
+      "role": "OUTSIDE",
+      "label": "Tableau de bord",
+      "route": "/provisional",
+      "heading": "Tableau de bord",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "OUTSIDE",
+      "label": "Enfants",
+      "route": "/provisional/children",
+      "heading": "Enfants",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "OUTSIDE",
+      "label": "Consultations",
+      "route": "/provisional/consultations",
+      "heading": "Consultations",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "OUTSIDE",
+      "label": "Vaccinations",
+      "route": "/provisional/vaccinations",
+      "heading": "Vaccinations",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "OUTSIDE",
+      "label": "Rendez-vous",
+      "route": "/provisional/appointments",
+      "heading": "Rendez-vous",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "OUTSIDE",
+      "label": "Croissance",
+      "route": "/provisional/growth",
+      "heading": "Croissance",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "OUTSIDE",
+      "label": "Documents",
+      "route": "/provisional/documents",
+      "heading": "Documents",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "OUTSIDE",
+      "label": "Mon compte soignant",
+      "route": "/account",
+      "heading": "Votre statut de vérification",
+      "navigation_and_reload": true
+    },
+    {
+      "action": "other_author_provisional_read_denied",
+      "child_path": "/provisional/f87cb128-9029-455a-b102-870c0b2beca1"
+    }
+  ],
+  "captures": [
+    "clinician-android-A-1.png",
+    "clinician-android-A-2.png",
+    "clinician-android-A-3.png",
+    "clinician-android-A-4.png",
+    "clinician-android-A-5.png",
+    "clinician-android-A-6.png",
+    "clinician-android-A-7.png",
+    "clinician-android-A-8.png",
+    "clinician-android-OUTSIDE-1.png",
+    "clinician-android-OUTSIDE-2.png",
+    "clinician-android-OUTSIDE-3.png",
+    "clinician-android-OUTSIDE-4.png",
+    "clinician-android-OUTSIDE-5.png",
+    "clinician-android-OUTSIDE-6.png",
+    "clinician-android-OUTSIDE-7.png",
+    "clinician-android-OUTSIDE-8.png"
+  ],
+  "page_errors": 0,
+  "status": "navigation_and_provisional_lifecycle_pass_other_clinical_lifecycles_pending",
+  "source": "cbe7281ddc5b3fd1adb269a780906eadeeb5696e",
+  "deployment": "dpl_3eXteaJvzYqcLbfPEvDQ8tykh45G",
+  "runtime": "pass",
+  "duration_seconds": 163,
+  "resource_counters": {
+    "memory_peak_bytes": 540258304,
+    "memory_high_events": 0,
+    "memory_max_events": 0,
+    "oom": 0
+  },
+  "visual_review": "all 16 verified/provisional page captures inspected; readable stacked cards and compact chooser, no page overflow; captures cover initial viewport, not every below-fold control"
+}
