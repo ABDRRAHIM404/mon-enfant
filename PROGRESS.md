@@ -891,3 +891,10 @@ Implemented, migrated, cloud-verified and deployed from `feature/professional-ve
 - Eight-page functional/visual review: docs/design-qa/update5-clinician-review.md. UPDATE_5_ACCEPTANCE.md now reconciles the named passed primary journeys, initial-viewport and below-fold captures, and remaining limits. Owner approval, later parent acceptance/APK resume and actual mail/source/legal/hosting/guardian/Phase 6 gates remain open. Final evidence publication and safe exact primary synchronization follow this checkpoint; do not claim overall owner approval.
 
 - Primary application checkout safely fast-forwarded after a private clean checkpoint backup: clean main **a9066114730060668d5eddacf0dcea6cb4e92f48 == origin/main**. Final evidence-only handoff contains the same application/tests/config, with no fixture/browser/operator process active; exact release HEAD/deployment are checked at handoff. All eight review artifacts and complete-plan checkpoints retain explicit owner and external gates.
+
+
+### Update 5 — explicit owner approval, 16 November 2026
+
+- Owner answered the concrete eight-page review question: **“Approve clinician milestone.”** This closes the clinician-only acceptance gate for reviewed handoff 5c4443e / unchanged application a906611; receipt: docs/stabilization/update5/owner-approval.json. Acceptance, work plan, complete checklist, project plan and working instructions reconciled with that decision.
+- This decision explicitly does **not** resume parent redesign, APK or iOS work and does not approve clinical/source, guardian, privacy/hosting, email delivery or remaining Phase 6 external gates. All temporary actors/credentials remain retired; no fixture is re-created and no new browser/build campaign is necessary for this documentation-only change.
+- Publish this approval record and safely synchronize clean primary main with GitHub; verify exact HEAD equality. Application/tests/config remain identical to the reviewed, cloud/runtime-verified handoff.

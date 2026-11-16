@@ -25,7 +25,7 @@ Only Espace soignant: verified doctors/nurses and author-only provisional worksp
 | Clinical lifecycle and authorization                | Scoped stories pass     | Actual UI plus database evidence                                                                                            |
 | Desktop/tablet/phone visual acceptance              | Scoped captures pass     | Current canonical screenshots, bounded CSS-pixel captures                                                                   |
 | Publication, retirement and primary synchronization | Pending     | Active fixture 5d4ec565b0864dce must be retired                                                                             |
-| Clinician owner review                              | Pending     | Explicit owner decision                                                                                                     |
+| Clinician owner review                              | Approved 16 November     | Explicit owner decision                                                                                                     |
 | Parent website acceptance / APK resume              | Deferred    | Separate later milestone; no implied approval                                                                               |
 
 Current implementation evidence: canonical 94a0253 desktop 16-destination/two-role walkthrough and four provisional save/reload/independent-readback checks pass. Layout refinements follow the actual screenshot findings. See UPDATE_5_ACCEPTANCE.md; trusted write/correction/routine/appointment and final three-viewport checks remain pending. Applied consultation projection and live denial receipts are recorded in PROGRESS.md. Parent website work stays deferred.
@@ -48,6 +48,8 @@ Canonical cbe7281 is READY with 17 tests/types/build. Trusted consultation/growt
 - [x] Fixture 5d4ec565b0864dce and QA clone retired; independent zero-session/access/capability/staff/practice verification, four bans, eight temporary values/private credential files removed; original 25-rule hash unchanged.
 - [x] Eight-page review, route/data inventory, bug report and scoped acceptance artifacts prepared.
 - [x] Application publication and exact clean primary/origin main synchronization verified at a906611; final evidence-only handoff retains the same application source.
-- [ ] Explicit clinician owner review/approval. Parent acceptance, APK resume, iOS and all source/mail/legal/Phase 6 external gates remain separately open.
+- [x] Explicit clinician owner review/approval received 16 November 2026: “Approve clinician milestone.” Parent acceptance, APK resume, iOS and all source/mail/legal/Phase 6 external gates remain separately open.
 
 Historical earlier pending rows above are superseded by this evidence checkpoint, not by implied owner approval. See UPDATE_5_ACCEPTANCE.md for the precise tested scope.
+
+Owner approval received 16 November 2026 closes this clinician-only milestone. Parent redesign/acceptance and APK work remain paused; iOS and all external/source/mail/Phase 6 gates remain deferred/open. See docs/stabilization/update5/owner-approval.json.

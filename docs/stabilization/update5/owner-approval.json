@@ -1,0 +1,14 @@
+{
+  "status": "approved",
+  "approved_on": "2026-11-16",
+  "timezone": "Africa/Casablanca",
+  "decision": "Approve clinician milestone",
+  "scope": "Update 5 clinician website milestone only",
+  "reviewed_handoff_commit": "5c4443e06b4faf4ed6f1a625be99842472a8beaf",
+  "application_source": "a9066114730060668d5eddacf0dcea6cb4e92f48",
+  "canonical": "https://mon-enfant.vercel.app",
+  "parent_redesign_resumed": false,
+  "apk_work_resumed": false,
+  "ios_resumed": false,
+  "external_approvals_waived": false
+}

@@ -1,8 +1,8 @@
-# Update 5 clinician acceptance — owner review pending
+# Update 5 clinician acceptance — owner approved 16 November 2026
 
 Current application source **a9066114730060668d5eddacf0dcea6cb4e92f48**, canonical **https://mon-enfant.vercel.app**, READY **dpl_J2UARxk8CHKVqBVuzsh2HJBUN1oM**. Preview and production logs prove **17 focused tests / four files, explicit TypeScript and production build**. Later evidence-only commits do not change this application source.
 
-This is software acceptance of the named clinician journeys and tested viewports, not owner approval, qualified clinical/source approval or approval to resume APK work. Parent website acceptance is a later separate milestone; iOS remains deferred.
+This is software acceptance of the named clinician journeys and tested viewports, with explicit clinician owner approval recorded on 16 November 2026. It is not qualified clinical/source approval or approval to resume APK work. Parent website acceptance is a later separate milestone; iOS remains deferred.
 
 ## Eight-page result
 
@@ -33,5 +33,5 @@ See the [eight-page visual review](docs/design-qa/update5-clinician-review.md), 
 
 - Fixture/QA retirement: **Pass**, independently verified in `docs/stabilization/update5/fixture-retirement.json`: four banned/suspended actors; zero sessions/active grants/capabilities/staff/practices/pending requests; QA clone retired at revision 3, original draft/rule hash unchanged; eight temporary values and private state/credential files removed. Never prepare run 5d4ec565b0864dce again.
 - Application publication and primary synchronization: **Pass at a906611**, clean main equals origin/main after private backup. The final evidence-only release retains this tested application source; its exact HEAD/deployment are verified separately before handoff.
-- **Owner review/approval of this concrete clinician milestone remains pending.**
+- **Owner approved this clinician milestone on 16 November 2026:** “Approve clinician milestone.” Receipt: `docs/stabilization/update5/owner-approval.json`. This approval closes the clinician review gate only.
 - Parent redesign/acceptance and any APK resume remain later separate gates. Actual invitation/approval/follow-up email delivery, qualified clinical/source, legal/hosting/guardian approvals and remaining Phase 6 operational readiness stay open in the complete Phase 0–8 plan.

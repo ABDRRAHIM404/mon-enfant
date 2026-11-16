@@ -1,6 +1,6 @@
 # Update 5 clinician review — 16 November 2026
 
-Software evidence for the clinician milestone. Owner approval is still pending. Parent redesign/acceptance, native APK publication and iOS remain deferred. All pictured clinical records are fictional.
+Software evidence for the clinician milestone. Owner approved the clinician milestone on 16 November 2026: “Approve clinician milestone.” Parent redesign/acceptance, native APK publication and iOS remain deferred. All pictured clinical records are fictional.
 
 ## Before → after and functional evidence
 
@@ -29,4 +29,4 @@ These checks prove the named journeys and chosen viewports, not every possible s
 
 - **Pass:** canonical a906611 / READY dpl_J2UARxk8CHKVqBVuzsh2HJBUN1oM; 17 cloud tests/types/build and actual three-viewport effective label size ≥10.5 CSS px. See clinician-actions-after.
 - **Pass:** fixture 5d4ec565b0864dce RETIRED, four banned/suspended actors, no sessions/active grants/capabilities/staff/practices/pending requests; eight temporary values and private credential/state files removed. QA clone retired revision 3; original draft revision 1 and 25-rule hash unchanged. See fixture-retirement.json.
-- **Pass:** application publication/clean primary synchronization verified at a906611; evidence-only handoff preserves this source. **Pending:** explicit clinician owner review. Parent acceptance is a later separate requirement before any APK resume.
+- **Pass:** application publication/clean primary synchronization verified at a906611; evidence-only handoff preserves this source. **Approved:** explicit clinician owner review received 16 November 2026. Parent acceptance is a later separate requirement before any APK resume.

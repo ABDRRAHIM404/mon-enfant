@@ -1,8 +1,8 @@
-> Update 5 checkpoint (16 November): canonical application a906611 is READY with 17 tests/types/build; named trusted/private clinical, manual appointment, QA routine/continuity, current-session/denial and desktop/tablet/phone stories pass with independent ledger/capture evidence. Final chart labels pass rendered size checks. Fixture 5d4ec565b0864dce and QA clone are RETIRED (four banned actors, no sessions/access/capabilities, eight temporary values/private credentials removed; original source unchanged). Application publication/primary synchronization verified at a906611; explicit owner review remains open. See UPDATE_5_ACCEPTANCE.md. Parent/APK/iOS and external gates remain deferred/open.
+> Update 5 checkpoint (16 November): canonical application a906611 is READY with 17 tests/types/build; named trusted/private clinical, manual appointment, QA routine/continuity, current-session/denial and desktop/tablet/phone stories pass with independent ledger/capture evidence. Final chart labels pass rendered size checks. Fixture 5d4ec565b0864dce and QA clone are RETIRED (four banned actors, no sessions/access/capabilities, eight temporary values/private credentials removed; original source unchanged). Application publication/primary synchronization verified at a906611; explicit clinician owner approval received 16 November 2026. See UPDATE_5_ACCEPTANCE.md. Parent/APK/iOS and external gates remain deferred/open.
 
 # Full plan execution and completion audit
 
-Current development focus: **revised Update 5 clinician-only eight-page implementation from updates/new-design-update-5; parent implementation is deferred to a later milestone, and APK remains paused until both website stages and owner approvals.** See UPDATE_5_WORK_PLAN.md. Previous development focus: **full Phase 8 mobile; Updates 1–3 including real temporary sharing and the canonical account switch have software acceptance**, following the verified synthetic Phase 7 web walkthrough. See UPDATE_WORK_PLAN.md. Remaining Phase 6 checks/operations stay open and are deferred until the app is built, except major authentication, access-control, data-integrity and build checks.
+Current checkpoint: **Update 5 clinician-only milestone approved by the owner on 16 November 2026; parent implementation remains deferred, and APK remains paused pending the later parent acceptance and separate resume approval.** See UPDATE_5_WORK_PLAN.md. Previous development focus: **full Phase 8 mobile; Updates 1–3 including real temporary sharing and the canonical account switch have software acceptance**, following the verified synthetic Phase 7 web walkthrough. See UPDATE_WORK_PLAN.md. Remaining Phase 6 checks/operations stay open and are deferred until the app is built, except major authentication, access-control, data-integrity and build checks.
 
 See [PROGRESS.md](PROGRESS.md) for verification evidence and remaining approval gates.
 
@@ -187,27 +187,28 @@ The complete goal remains active until the full required scope and its approval 
 
 Current milestone uses the eight pictures in updates/new-design-update-5. Parent redesign/implementation is deferred; its acceptance remains a later prerequisite before APK resumes. Dedicated pages and current deployed functional/visual evidence are required, not merely changed titles.
 
-- [ ] All eight clinician pages have dedicated working UI: dashboard, children, consultations, vaccinations, appointments, growth, intentional Documents coming-soon, working account.
-- [ ] Shared responsive clinician shell matches the supplied direction, exact menu order, scoped search and visible cream/emerald/coral colors; parent screens preserved.
-- [ ] Page inventory maps route/component → RPC/table/permissions, with desktop/tablet/phone captures and lifecycle/denial evidence.
+- [x] All eight clinician pages have dedicated working UI: dashboard, children, consultations, vaccinations, appointments, growth, intentional Documents coming-soon, working account.
+- [x] Shared responsive clinician shell matches the supplied direction, exact menu order, scoped search and visible cream/emerald/coral colors; parent screens preserved.
+- [x] Page inventory maps route/component → RPC/table/permissions, with desktop/tablet/phone captures and lifecycle/denial evidence.
 
 - [x] Owner appearance change: light-only website published and desktop/Android-sized checks pass, including legacy dark preference and dark OS; next Android source updated, native build deferred. See docs/stabilization/update5/light-appearance.json.
 
 - [x] Reproduce canonical navigation and HB1/history issues before fixes; cloud 43715738089, 48 desktop / 24 Android actions, captures and independent provisional readback in UPDATE_5_BUG_REPORT.md.
-- [ ] Fix navigation, saved-history visibility and honest HB1 next-state/manual scheduling without changing clinical rules.
-- [ ] Demonstrate a separate reviewed permitted routine reference and manual catch-up appointment persistence.
-- [ ] Full canonical clinician/nurse/provisional, parent and admin lifecycle walkthroughs and authorization denials.
-- [ ] Current desktop/Android light/dark mouse/touch/keyboard evidence, source regression and independent ledger readback.
-- [ ] Publish concrete bug/functional acceptance reports, retire website fixtures and synchronize primary main.
+- [x] Fix navigation, saved-history visibility and honest HB1 next-state/manual scheduling without changing clinical rules.
+- [x] Demonstrate a separate reviewed permitted routine reference and manual catch-up appointment persistence.
+- [x] Named canonical clinician/private lifecycles, admin capability workflow and current-session/grant denials pass; precise scope and evidence in UPDATE_5_ACCEPTANCE.md.
+- [ ] Separate parent website stabilization/acceptance remains deferred.
+- [x] Current desktop/tablet/phone-width light-only mouse/touch/keyboard evidence (including dark system preference ignored), focused source tests/types/build and independent ledger readback. Native APK acceptance is separate.
+- [x] Publish concrete bug/functional acceptance reports, retire website fixtures and synchronize primary main.
 - [ ] Owner reviews the results and explicitly approves resuming APK work; email/external approvals remain separate.
 
 - [x] Update 5 consultation dashboard projection: 13 focused cloud tests including scoped reads/provisional isolation/calendar, explicit TypeScript/build, and live HTTP role/session denial checks; new read-only migration applied with exact stored source.
-- [ ] Update 5 final clinician acceptance: trusted clinical lifecycles/corrections, final desktop/tablet/phone review after latest layout changes, synthetic fixture retirement, canonical publication/synchronization and owner approval. See UPDATE_5_ACCEPTANCE.md. Parent acceptance and APK resume remain separate future gates.
+- [x] Update 5 final clinician acceptance: trusted clinical lifecycles/corrections, final desktop/tablet/phone review after latest layout changes, synthetic fixture retirement, canonical publication/synchronization and owner approval. See UPDATE_5_ACCEPTANCE.md. Parent acceptance and APK resume remain separate future gates.
 
-- [x] Update 5 current canonical desktop navigation/selector pass (804ab4f, 16 destinations across verified doctor/unverified nurse), durable captures and current-role/session denial. Whole clinician acceptance remains open.
+- [x] Update 5 current canonical desktop navigation/selector pass (804ab4f, 16 destinations across verified doctor/unverified nurse), durable captures and current-role/session denial. The later a906611 acceptance and 16 November owner approval close the clinician milestone.
 - [x] Provisional correction field collision reproduced without a write; source fix and four transport-integrity tests pass, with 17-test/full-type/build cloud preview acceptance.
 - [x] Corrected provisional consultation save/reload/new-session and independent original-row hash comparison (9f892ef; original unchanged, revision 2 linked, still private/unverified).
-- [ ] Final responsive/trusted lifecycle/reviewed QA routine/retirement/owner gates remain open. Tablet functional pass is not visual acceptance; squeezed charts require the new layout and rendered recheck.
+- [x] Final responsive/trusted lifecycle/QA routine/retirement gates passed and owner approved 16 November. The earlier squeezed-tablet visual failure is closed by deployed layout and rendered rechecks (UPDATE_5_ACCEPTANCE.md).
 
 
 ## Update 5 — clinician milestone (16 November)
@@ -218,4 +219,4 @@ Current milestone uses the eight pictures in updates/new-design-update-5. Parent
 - [x] Temporary fixture/QA-version retirement independently verified; no active sessions/grants/caps/staff and no temporary values/private credentials remain.
 - [x] Per-page review/inventory/bug and scoped acceptance reports prepared.
 - [x] Application publication and clean primary/origin main synchronization verified at a906611; final evidence-only handoff uses the same tested application source.
-- [ ] Owner clinician review; separate later parent acceptance before APK resume. No external/Phase 6 approval is waived.
+- [x] Owner clinician review approved 16 November 2026; separate later parent acceptance before APK resume. No external/Phase 6 approval is waived.
