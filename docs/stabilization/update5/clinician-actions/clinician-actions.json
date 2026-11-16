@@ -1,0 +1,19 @@
+{
+  "run": "5d4ec565b0864dce",
+  "child": "37bea915-aaf1-40f8-9145-c18f03c8dc0e",
+  "account_permissions": true,
+  "recovery_entry_only_no_email": true,
+  "documents_register_link": true,
+  "scoped_header_search": true,
+  "followup_header_link": true,
+  "summary_and_export_current_history": true,
+  "revoked_export_denied": true,
+  "raw_growth_three_viewports": true,
+  "page_errors": 0,
+  "status": "pass",
+  "canonical": "https://mon-enfant.vercel.app",
+  "application_source_unchanged_since": "cbe7281ddc5b3fd1adb269a780906eadeeb5696e",
+  "publication_during_readonly_check": "3c43c5f3cbd132edd5636cf4bc0a3a818c18843b",
+  "memory_peak_bytes": 453840896,
+  "memory_high_max_oom": 0
+}

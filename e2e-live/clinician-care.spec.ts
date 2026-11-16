@@ -521,3 +521,108 @@ test("manual follow-up preserves original slots, denies future missed, reschedul
     independent_database_readback: "pending",
   });
 });
+
+test("remaining clinician account actions and export retain current authorization", async ({
+  page,
+}, info) => {
+  test.setTimeout(180000);
+  let errors = 0;
+  observeBrowserErrors(page, "clinician-actions", () => errors++);
+  await login(page, "A");
+  await page.goto("/account");
+  await page
+    .getByRole("link", { name: "Mes habilitations cliniques", exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/account\/clinical-permissions$/);
+  await expect(page.getByRole("main")).toContainText("Gestion des rendez-vous");
+  await page
+    .locator("section.panel")
+    .getByRole("link", { name: "Mon compte", exact: true })
+    .click();
+  await page
+    .getByRole("link", {
+      name: "Changer ou récupérer mon mot de passe",
+      exact: true,
+    })
+    .click();
+  await expect(page).toHaveURL(/\/forgot-password\?audience=clinician$/);
+  await expect(page.locator('input[type="email"]')).toBeVisible();
+  // Recovery delivery is external; do not submit or send mail.
+  await page.goto("/documents");
+  await page
+    .getByRole("link", { name: "Ouvrir mon registre", exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/patients$/);
+  const header = page.locator(".soignant-header");
+  await header.locator('input[name="q"]').fill(run);
+  await header.getByRole("button", { name: "Rechercher", exact: true }).click();
+  await expect(page).toHaveURL(new RegExp("/patients\\?q=" + run));
+  await expect(page.getByRole("main")).toContainText("Enfant fictif");
+  await page
+    .getByRole("link", { name: "Rendez-vous et suivis", exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/follow-up$/);
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  await page.goto(childPath + "/summary");
+  await expect(page.getByRole("main")).toContainText("HB1");
+  await expect(page.getByRole("main")).toContainText("VPO1");
+  const response = await page.request.get(childPath + "/export");
+  expect(response.status()).toBe(200);
+  expect(response.headers()["cache-control"]).toContain("no-store");
+  const ledger = await response.json();
+  expect(ledger.clinical_entries).toHaveLength(6);
+  expect(ledger.vaccine_items_including_all_decisions).toHaveLength(1);
+  expect(ledger.appointments_including_all_events).toHaveLength(4);
+  expect(
+    ledger.clinical_entries.some(
+      (e: { professional_id: string; payload: { dose_label?: string } }) =>
+        e.professional_id.endsWith("-B") && e.payload.dose_label === "VPO1",
+    ),
+  ).toBe(true);
+  for (const [name, width, height] of [
+    ["desktop", 1280, 720],
+    ["tablet", 768, 1024],
+    ["phone", 412, 839],
+  ] as const) {
+    await page.setViewportSize({ width, height });
+    await page.goto("/growth?child=" + child);
+    const charts = page.locator("svg.growth-chart");
+    await expect(charts).toHaveCount(2);
+    for (const chart of await charts.all())
+      expect(
+        await chart.evaluate((el) => el.getBoundingClientRect().width),
+      ).toBeGreaterThanOrEqual(280);
+    for (const text of await charts.locator("text").all())
+      expect(
+        await text.evaluate((el) => {
+          const transform = (el as SVGGraphicsElement).getScreenCTM();
+          return (
+            parseFloat(getComputedStyle(el).fontSize) * (transform?.a ?? 0)
+          );
+        }),
+      ).toBeGreaterThanOrEqual(10.5);
+    await charts.first().scrollIntoViewIfNeeded();
+    await page.screenshot({
+      path: info.outputPath("trusted-growth-" + name + ".png"),
+      scale: "css",
+    });
+  }
+  await logout(page);
+  await login(page, "B");
+  const denied = await page.request.get(childPath + "/export");
+  expect(denied.status()).toBe(404);
+  expect(await denied.text()).not.toContain("HB1");
+  await logout(page);
+  expect(errors).toBe(0);
+  save(info, "clinician-actions", {
+    account_permissions: true,
+    recovery_entry_only_no_email: true,
+    documents_register_link: true,
+    scoped_header_search: true,
+    followup_header_link: true,
+    summary_and_export_current_history: true,
+    revoked_export_denied: true,
+    raw_growth_three_viewports: true,
+    page_errors: errors,
+  });
+});

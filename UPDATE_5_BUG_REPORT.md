@@ -55,3 +55,8 @@ A fully habilitated clinician's actual calendar capture revealed “Nouveau rend
 - **Calendar action contrast: closed technically**, canonical cbe7281. Actual focused runtime 28203 and `trusted-care-5879b92/trusted-appointments.json` prove green background/white foreground and working day/week/month controls. No speculative form-reset patch was made.
 - **Tablet squeezed care/charts: closed at the tested 768px tablet viewport**, canonical cbe7281. Run 89358 passed all 16 verified/private destinations; actual page-by-page capture review shows the compact chooser above a wide care column and a readable private growth plot. See `tablet-cbe7281`. The separately tested phone-width run also passes (phone-cbe7281); this is not a universal viewport claim.
 - **Remaining acceptance gaps, not invented application defects:** full secondary-action evidence mapping, QA fixture/clone retirement, final publication/synchronization and explicit clinician owner review. External/source/mail gates remain open.
+
+
+## Growth axis label scale — rendered finding, fix pending
+
+Actual below-fold chart captures in clinician-actions confirm that the 520-unit SVG scales 11-unit axis/date labels down to roughly 6–7 CSS pixels on the phone. Data and chart width are correct, but those labels are too small. Scoped clinician-only tablet/phone CSS increases SVG text size; the browser now checks effective screen font size, not merely SVG width. Existing before captures are retained. Deployment/rendered recheck remains required; parent/shared-view chart appearance is unchanged.
