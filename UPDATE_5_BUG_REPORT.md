@@ -60,3 +60,6 @@ A fully habilitated clinician's actual calendar capture revealed “Nouveau rend
 ## Growth axis label scale — rendered finding, fix pending
 
 Actual below-fold chart captures in clinician-actions confirm that the 520-unit SVG scales 11-unit axis/date labels down to roughly 6–7 CSS pixels on the phone. Data and chart width are correct, but those labels are too small. Scoped clinician-only tablet/phone CSS increases SVG text size; the browser now checks effective screen font size, not merely SVG width. Existing before captures are retained. Deployment/rendered recheck remains required; parent/shared-view chart appearance is unchanged.
+
+
+Growth label defect is **closed at the tested canonical viewports**: a906611 / READY dpl_J2UARxk8CHKVqBVuzsh2HJBUN1oM passes actual rendered axis/date label size ≥10.5 CSS px, chart width ≥280px, summary/export and revoked-export denial. Inspected enlarged tablet/phone captures against retained before images in clinician-actions and clinician-actions-after. Source/data/calculations and parent appearance are unchanged. No known critical/high clinician defect remains from the reported navigation/HB1/layout issues; owner review is pending, and this does not imply exhaustive every-input/native acceptance.

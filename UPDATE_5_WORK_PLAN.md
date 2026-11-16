@@ -36,3 +36,18 @@ Current implementation evidence: canonical 94a0253 desktop 16-destination/two-ro
 Canonical cbe7281 is READY with 17 tests/types/build. Trusted consultation/growth corrections and appointment lifecycles now pass actual UI/new-session/independent-ledger checks. QA-only reviewed routine and cross-clinician dose/grant revocation also pass with unchanged original source. Tablet 89358 passed all 16 destinations and page-by-page visual inspection; phone managed unit mon-enfant-phone-20261116.service is running. Remaining: phone results, complete action coverage report, fixture/QA retirement, final published evidence/primary synchronization and explicit clinician owner review. Keep all Phase 0–8 external/Phase 6 gates and later parent/APK gates open.
 
 - Phone managed job completed successfully (2.7 minutes, peak 540,258,304 bytes, no memory high/max/OOM events). All 16 page captures inspected; independent private ledger passes three cases/13 quarantined revisions. Final secondary-action mapping/retirement/publication/owner gates remain open.
+
+
+### Clinician software checkpoint ready for owner review — 16 November
+
+- [x] Eight distinct clinician pages and exact shared responsive/light-only primary navigation implemented; selected logo and all eight references retained as direction.
+- [x] Named verified/private primary journeys pass actual canonical UI, persistence/reload/fresh session, corrections/denials and independent database evidence.
+- [x] HB1 uncertainty preserved; separate QA-reviewed VPO1 routine/manual follow-up and second-clinician continuity/revocation pass; no original source or clinical automation change.
+- [x] Desktop/tablet/phone captures reviewed, squeezed tablet column/calendar contrast/correction reason collision and tiny phone chart labels fixed and rendered checks passed.
+- [x] Canonical application a906611 is READY with 17 focused cloud tests, explicit TypeScript and build; final chart/account/export run passes.
+- [x] Fixture 5d4ec565b0864dce and QA clone retired; independent zero-session/access/capability/staff/practice verification, four bans, eight temporary values/private credential files removed; original 25-rule hash unchanged.
+- [x] Eight-page review, route/data inventory, bug report and scoped acceptance artifacts prepared.
+- [x] Application publication and exact clean primary/origin main synchronization verified at a906611; final evidence-only handoff retains the same application source.
+- [ ] Explicit clinician owner review/approval. Parent acceptance, APK resume, iOS and all source/mail/legal/Phase 6 external gates remain separately open.
+
+Historical earlier pending rows above are superseded by this evidence checkpoint, not by implied owner approval. See UPDATE_5_ACCEPTANCE.md for the precise tested scope.

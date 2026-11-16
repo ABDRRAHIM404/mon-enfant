@@ -1,0 +1,21 @@
+{
+  "run": "5d4ec565b0864dce",
+  "child": "37bea915-aaf1-40f8-9145-c18f03c8dc0e",
+  "account_permissions": true,
+  "recovery_entry_only_no_email": true,
+  "documents_register_link": true,
+  "scoped_header_search": true,
+  "followup_header_link": true,
+  "summary_and_export_current_history": true,
+  "revoked_export_denied": true,
+  "raw_growth_three_viewports": true,
+  "page_errors": 0,
+  "status": "pass",
+  "source": "a9066114730060668d5eddacf0dcea6cb4e92f48",
+  "deployment": "dpl_J2UARxk8CHKVqBVuzsh2HJBUN1oM",
+  "effective_chart_label_minimum_css_pixels": 10.5,
+  "all_three_viewports": true,
+  "memory_peak_bytes": 445251584,
+  "memory_high_max_oom": 0,
+  "duration_seconds": 56.4
+}

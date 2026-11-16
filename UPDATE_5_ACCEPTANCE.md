@@ -1,59 +1,37 @@
-# Update 5 clinician acceptance — in progress
+# Update 5 clinician acceptance — owner review pending
 
-This report is not milestone approval. Parent website acceptance is deferred; APK and iOS work remain paused. Source and live evidence must agree before any page receives final Pass.
+Current application source **a9066114730060668d5eddacf0dcea6cb4e92f48**, canonical **https://mon-enfant.vercel.app**, READY **dpl_J2UARxk8CHKVqBVuzsh2HJBUN1oM**. Preview and production logs prove **17 focused tests / four files, explicit TypeScript and production build**. Later evidence-only commits do not change this application source.
 
-## Current checkpoint — 16 November 2026
+This is software acceptance of the named clinician journeys and tested viewports, not owner approval, qualified clinical/source approval or approval to resume APK work. Parent website acceptance is a later separate milestone; iOS remains deferred.
 
-Canonical application **cbe7281ddc5b3fd1adb269a780906eadeeb5696e**, READY **dpl_3eXteaJvzYqcLbfPEvDQ8tykh45G**. Production logs prove 17 focused tests, explicit TypeScript and build. Earlier checkpoint references below are historical evidence, not the current deployed revision.
+## Eight-page result
 
-| Check | Result | Authoritative evidence / limit |
-| --- | --- | --- |
-| Trusted consultation and growth save/correction/new session | Pass | `trusted-care-5879b92/{trusted-consultation,trusted-growth,independent-ledger}.json`; original rows and linked corrections retained |
-| Manual appointments and three calendar views | Pass | `trusted-care-5879b92/trusted-appointments.json`; four manual appointments now retain eight immutable events in `routine/independent-ledger.json`; future-missed denial is form-scoped |
-| QA-only independently reviewed routine and second-clinician dose | Pass | `routine/{routine-reference,routine-continuity,independent-ledger}.json`; original draft/rule hash unchanged; only VPO1 reference, uncertain HB1 separate; no genuine clinical approval claimed |
-| Current grant revocation against same live session | Pass | `routine/routine-revocation.json`; recorded authorship retained; independent ledger confirms revoked B grant |
-| Private consultation correction/quarantine | Pass | `provisional-correction-{after,ledger-after}.json`; original row unchanged, clinical/amendment reasons distinct |
-| Desktop clinician navigation | Pass, scoped | 16 destinations/two roles in `desktop-804ab4f`; later care/calendar captures cover populated workflows; final report does not imply every secondary action passed |
-| Populated tablet navigation and layout | Pass, scoped | Run 89358, 16 destinations/two roles, no JS errors/overflow; all 16 page captures inspected in `tablet-cbe7281`; private plot width ≥280px |
-| Phone-width navigation/forms/layout | Pass, scoped | Managed unit mon-enfant-phone-20261116.service completed successfully; 16 destinations, four genuine private saves/reloads, no JS errors/overflow; all 16 initial-viewport captures inspected in `phone-cbe7281` |
-| Fixture/QA-clone retirement | Pending | 5d4ec565b0864dce remains active; original source must remain unchanged |
-| Final inventory, broad action coverage and owner review | Pending | Remaining secondary creation/review/account/export actions must be mapped to evidence or explicitly left open; no blanket eight-page acceptance |
-
-Paths above are under `docs/stabilization/update5`. Responsive private ledger: `responsive-private-ledger.json` independently proves three cases / 13 unverified revisions, exact saved raw measurements and manual dates, zero trusted children/grants/capabilities. Parent redesign/acceptance, actual mail and other external approvals remain open; APK and iOS stay paused.
-
-## Historical evidence
-
-- Current canonical **804ab4f**, READY **dpl_EPz3t6fQa7mhubGw3KVVXK2GSrUd**: desktop run 7734 passed 16 destinations/two roles, private-history reuse after reload, actual selector interaction and visible 46 px inputs, logout/current-session denial and other-author denial; zero JS errors/overflow. All eight verified-page captures inspected; durable 16 captures/proof: [desktop evidence](docs/stabilization/update5/desktop-804ab4f/clinician-pages.json). This is desktop technical acceptance, with trusted clinical and responsive gates still open.
-- Actual provisional correction field collision was reproduced without saving; source dc6201c separates clinical/amendment reasons and passes 17 focused cloud tests, explicit types/build in READY preview dpl_GFGHxHmkvahBJG8YX93Ra2se7XVS. Canonical 9f892ef now passes corrected save/reload/new-session and independent immutable-row readback: original unchanged, revision 2 linked, reasons separate, still quarantined. Receipts: `docs/stabilization/update5/provisional-correction-{after,ledger-after}.json`.
-
-- Canonical source `94a0253`, deployment `dpl_EVinRVXVrpe9trJjoJMkhW9J1Qmp`: desktop walkthrough passed 16 destinations across a verified doctor and unverified nurse, four provisional saves/hard reloads, logout, other-author denial, zero JavaScript errors and no horizontal overflow. Resource-capped run 74885 completed in 2.6 minutes. Screenshots retained privately at `/tmp/mon-enfant-clinician-pages-desktop-passed` pending final source captures.
-- Independent provisional persistence: `docs/stabilization/update5/clinician-desktop-ledger.json`. No provisional-to-trusted promotion; all four entries remain unverified.
-- Applied provisional projection: `docs/stabilization/update5/provisional-section-migration.json`; live role/session denial receipt: `docs/stabilization/update5/provisional-section-http.json`.
-- Light-only canonical appearance previously passed desktop and Android-sized Chromium despite saved dark preference and dark OS: `docs/stabilization/update5/light-appearance.json`.
-- Feature source `87bb599` passed 13 Vercel tests, explicit TypeScript and production build in `dpl_6pAAgjhbnzQUS5YhyqsQuN9SXoFj`. Its new consultation projection is now applied with matching stored source and auth-only execution, and live HTTPS role/session checks pass; receipts: `docs/stabilization/update5/clinician-overview-{migration,http}.json`. Latest screenshots cannot establish this source's appearance.
-
-- Tablet 9f892ef passed the two-role 16-destination/form/reload/denial technical story but **failed visual review**: selectors squeezed records/raw charts. [Tablet before](docs/stabilization/update5/tablet-before/clinician-pages.json). Layout fix 3aed79c passes 17 tests/types/build in READY preview dpl_G672gY9Df3rN2cDSEtK2YDHF4TKh; final tablet/phone renders remain pending.
-
-## Page matrix
-
-| Section | Before → implemented direction | Real data / interactions | Acceptance still required |
+| Section | Primary journey | Evidence under docs/stabilization/update5 | Status / limits |
 | --- | --- | --- | --- |
-| Tableau de bord | Dense nine summaries → four summaries and real recent documentation | Current registry/grant summaries, appointments, vaccine review, proposed scoped consultation read; gated quick actions | Cloud/new read acceptance; actual recent consultation and corrected/withdrawn history; final three viewports |
-| Enfants | Existing trusted register / reused private home → dedicated private register | Authorized search, pagination, creation/profile and duplicate-review workflows | Full trusted creation/review lifecycle and responsive acceptance |
-| Consultations | Missing global page → child selection and actual history | Clinical timeline, permitted form/revisions; private owner-only equivalent | Trusted save/correct/new-session readback; denied roles and final captures |
-| Vaccinations | Catalog destination / history below controls → dedicated care history first | Saved ledger/provenance, reviewed references, permitted write/manual planner; HB1 uncertainty explained | Trusted HB1/reviewed QA routine/manual appointment lifecycle and final captures |
-| Rendez-vous | Existing calendar / private child chooser → connected calendar and private appointment list | Recorded day/week/month, scheduling/dispositions, private saved follow-up | Trusted plan/reschedule/cancel/disposition persistence and final captures |
-| Croissance | No global page → selected-child measurements and raw charts | Saved observations only, permission-gated entry/correction; no inferred diagnosis | Trusted measure/correction lifecycle and final captures |
-| Documents | Missing page → deliberate coming-soon | No fabricated uploads/downloads; provisional menu explicitly disabled; existing exports retained elsewhere | Final captures and permitted export regression |
-| Mon compte soignant | Existing account → shared shell and clear actual status | Read-only identity, verification/evidence, permissions, recovery/session/logout | Full permitted action/denial walkthrough and final captures |
+| Tableau de bord | Four actual scoped summaries, real latest corrected consultation link, current state/navigation/reload | desktop-804ab4f; tablet-cbe7281; phone-cbe7281; trusted-care-5879b92/trusted-consultation.json | Pass for exercised scope; no fabricated tasks/statistics |
+| Enfants | Private creation/search across viewports; existing-child explicit request/approval keeps the same universal ID | responsive-private-ledger.json; routine/independent-ledger.json; three viewport page-2 captures | Pass for exercised scope; duplicate-review behavior remains preserved from accepted Update 1, no automatic merge/promotion |
+| Consultations | Trusted and private save/reload, immutable correction, fresh session, other-author/current-grant denial | trusted-care-5879b92; provisional-correction-{after,ledger-after}.json | Pass; original clinical reason and correction audit reason stay separate |
+| Vaccinations | Uncertain HB1 ledger, QA independently reviewed eligible reference, manual follow-up, second clinician dose, revoked live-session denial | routine/; clinician-actions-after | Pass software story; original source remains unapproved draft; genuine source/clinical review open |
+| Rendez-vous | Manual plan/reschedule/cancel, genuine future-missed denial, past missed/completed, day/week/month, independent consultation unaffected by dose | trusted-care-5879b92/trusted-appointments.json; routine/independent-ledger.json | Pass; four manual appointments/eight retained events; dose documentation does not manufacture attendance |
+| Croissance | Saved raw observations and linked correction, width ≥280px and rendered labels ≥10.5 CSS px on selected devices | trusted-care-5879b92; clinician-actions-after | Pass; three below-fold chart captures inspected; no percentile/diagnosis invented |
+| Documents | Approved coming-soon state, explicitly disabled private nav, working register link, preserved authorized summary/export and revoked B export 404 | clinician-actions-after; tablet/phone page-7 captures | Pass intentional exception; no fabricated management controls |
+| Mon compte soignant | Actual profession/identity/status, capability-history/recovery-entry links, logout/current-session denial | clinician-actions-after; tablet/phone page-8 captures | Pass named actions; recovery test submits no email; professional evidence review remains a real external process |
 
-All rows remain **Pending** overall. An individual narrow check above is not a final page Pass. No external clinical, legal, guardian, hosting or email approval is inferred.
+## Responsive and integrity evidence
 
-## Remaining exit gates
+- Desktop: 16 two-role menu destinations, visible selector controls, reload and session/other-author denial; later populated clinical/calendar stories supplement the initial screenshots.
+- Final tablet: run **89358**, 16 destinations/two roles, zero JS errors/overflow; all 16 initial-viewport captures inspected. Peak **570,859,520 bytes**, memory high/max/OOM 0.
+- Final phone: managed **mon-enfant-phone-20261116.service**, 16 destinations/two roles/four real private writes and reloads, actual tap/compact selector, zero JS errors/overflow; all 16 captures inspected. Peak **540,258,304 bytes**, high/max/OOM 0. Two earlier interrupted attempts are retained as incomplete, not passes.
+- Final chart/account/export: **mon-enfant-chart-final-20261116.service**, 56.4 seconds, actual canonical a906611, all three chart viewports and account/export/denial assertions pass. Peak **445,251,584 bytes**, high/max/OOM 0; inspected before/after tablet/phone plots.
+- Independent responsive private ledger: three synthetic children / 13 unverified immutable revisions, exact raw 12.4 kg/88 cm and clinician-chosen dates, zero trusted children/grants/capabilities for the private nurse. No provisional promotion.
+- Independent trusted/routine ledgers: consultation/growth originals and linked corrections retained; original uncertain HB1 untouched, second author attributed, one QA VPO1 reference, four appointments/eight events, current grants enforced. Original 25-rule source hash **cb838450d0f2066fa5d914971f9bd8a7** unchanged. Both applied read migrations remain immutable.
+- Light-only behavior ignores saved/system dark preference. No new native binary or hardware acceptance is claimed.
 
-1. Finish and publish the clinician refinements, preserving current-session, role/capability and explicit-grant boundaries.
-2. Exercise each real task, validation, failure, immutable correction/history and hard-reload/new-session persistence; independently read the hosted ledger.
-3. Capture and review desktop/tablet/phone against all eight supplied references. Record remaining bugs and severity honestly.
-4. Retire active fixture `5d4ec565b0864dce`, temporary secrets and any QA-only reviewed clones. Never repeat preparation.
-5. Synchronize the primary main checkout with published GitHub main and verify exact HEAD equality.
-6. Obtain owner review/approval of this concrete clinician milestone. Parent acceptance is a later gate before APK work may resume.
+See the [eight-page visual review](docs/design-qa/update5-clinician-review.md), [route/data inventory](UPDATE_5_PAGE_INVENTORY.md), [bug report](UPDATE_5_BUG_REPORT.md) and complete [progress evidence](PROGRESS.md). Captures use fictional patients only. The legacy secondary tools/forms retain their existing navigation; these results do not claim exhaustive coverage of every possible input or physical device.
+
+## Remaining gates
+
+- Fixture/QA retirement: **Pass**, independently verified in `docs/stabilization/update5/fixture-retirement.json`: four banned/suspended actors; zero sessions/active grants/capabilities/staff/practices/pending requests; QA clone retired at revision 3, original draft/rule hash unchanged; eight temporary values and private state/credential files removed. Never prepare run 5d4ec565b0864dce again.
+- Application publication and primary synchronization: **Pass at a906611**, clean main equals origin/main after private backup. The final evidence-only release retains this tested application source; its exact HEAD/deployment are verified separately before handoff.
+- **Owner review/approval of this concrete clinician milestone remains pending.**
+- Parent redesign/acceptance and any APK resume remain later separate gates. Actual invitation/approval/follow-up email delivery, qualified clinical/source, legal/hosting/guardian approvals and remaining Phase 6 operational readiness stay open in the complete Phase 0–8 plan.

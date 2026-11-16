@@ -1,4 +1,4 @@
-> Update 5 checkpoint (16 November): canonical cbe7281; trusted clinical corrections, manual appointments, QA routine/continuity and independent readback pass; populated tablet 16-destination run/visual review passes. Phone verification now passes; secondary-action report, fixture retirement, publication/synchronization and owner review remain open. See UPDATE_5_ACCEPTANCE.md. Parent/APK/iOS remain deferred.
+> Update 5 checkpoint (16 November): canonical application a906611 is READY with 17 tests/types/build; named trusted/private clinical, manual appointment, QA routine/continuity, current-session/denial and desktop/tablet/phone stories pass with independent ledger/capture evidence. Final chart labels pass rendered size checks. Fixture 5d4ec565b0864dce and QA clone are RETIRED (four banned actors, no sessions/access/capabilities, eight temporary values/private credentials removed; original source unchanged). Application publication/primary synchronization verified at a906611; explicit owner review remains open. See UPDATE_5_ACCEPTANCE.md. Parent/APK/iOS and external gates remain deferred/open.
 
 # Full plan execution and completion audit
 
@@ -208,3 +208,14 @@ Current milestone uses the eight pictures in updates/new-design-update-5. Parent
 - [x] Provisional correction field collision reproduced without a write; source fix and four transport-integrity tests pass, with 17-test/full-type/build cloud preview acceptance.
 - [x] Corrected provisional consultation save/reload/new-session and independent original-row hash comparison (9f892ef; original unchanged, revision 2 linked, still private/unverified).
 - [ ] Final responsive/trusted lifecycle/reviewed QA routine/retirement/owner gates remain open. Tablet functional pass is not visual acceptance; squeezed charts require the new layout and rendered recheck.
+
+
+## Update 5 — clinician milestone (16 November)
+
+- [x] Eight available dedicated pages, intentional Documents exception, shared responsive light-only shell and selected logo; supplied references guide layout without invented clinical data.
+- [x] Recorded primary clinician/private lifecycles, source/current-session/capability/grant denials and independent immutable-ledger readback.
+- [x] Final tested desktop/tablet/phone layouts and readable raw-chart labels; canonical a906611, 17 cloud tests/types/build.
+- [x] Temporary fixture/QA-version retirement independently verified; no active sessions/grants/caps/staff and no temporary values/private credentials remain.
+- [x] Per-page review/inventory/bug and scoped acceptance reports prepared.
+- [x] Application publication and clean primary/origin main synchronization verified at a906611; final evidence-only handoff uses the same tested application source.
+- [ ] Owner clinician review; separate later parent acceptance before APK resume. No external/Phase 6 approval is waived.
