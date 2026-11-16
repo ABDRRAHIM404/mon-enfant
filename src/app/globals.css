@@ -3287,3 +3287,15 @@ select:focus-visible,
     cursor: pointer;
   }
 }
+
+/* Tab surfaces must not override a clinician's primary action background. */
+.soignant-workspace .tabs a.button.primary {
+  background: var(--action);
+  border-color: var(--action);
+  color: #fff;
+  font-size: 14px;
+}
+.soignant-workspace .tabs a.button.primary:hover {
+  background: #0d5649;
+  border-color: #0d5649;
+}

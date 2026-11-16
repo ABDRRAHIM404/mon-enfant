@@ -1,0 +1,14 @@
+{
+  "run": "5d4ec565b0864dce",
+  "child": "37bea915-aaf1-40f8-9145-c18f03c8dc0e",
+  "path": "/patients/37bea915-aaf1-40f8-9145-c18f03c8dc0e/records/95d5d922-c152-4d36-acc0-5f1730cfb1f1",
+  "source_reference": "Source fictive U5-5d4ec565b0864dce clinique consultation",
+  "latest_revision": 2,
+  "original_and_correction_retained": true,
+  "dashboard_recent_link": true,
+  "fresh_session": true,
+  "other_clinician_denied": true,
+  "source": "5879b922a1c02f734c4a2b3e98bbb90970388e0f",
+  "deployment": "dpl_9RZ2LySaqiqqCjHnsy2fm4MnL33h",
+  "independent_database_readback": "pending"
+}

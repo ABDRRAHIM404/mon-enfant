@@ -1,0 +1,15 @@
+{
+  "run": "5d4ec565b0864dce",
+  "child": "37bea915-aaf1-40f8-9145-c18f03c8dc0e",
+  "path": "/patients/37bea915-aaf1-40f8-9145-c18f03c8dc0e/records/28c38cf7-fbcb-4ea4-83b1-ff6f02fcb205",
+  "source_reference": "Source fictive U5-5d4ec565b0864dce clinique growth",
+  "latest_revision": 2,
+  "weight_kg": 12.7,
+  "corrected_height_cm": 89.5,
+  "original_height_cm": 89,
+  "raw_observations_only": true,
+  "fresh_session": true,
+  "source": "5879b922a1c02f734c4a2b3e98bbb90970388e0f",
+  "deployment": "dpl_9RZ2LySaqiqqCjHnsy2fm4MnL33h",
+  "independent_database_readback": "pending"
+}

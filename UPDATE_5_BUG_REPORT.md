@@ -44,3 +44,7 @@ The selector styling issue is closed at canonical 804ab4f: desktop browser asser
 Correction reason collision is **closed technically at canonical 9f892ef**: actual correction survives reload and a fresh session; independent SQL proves separate clinical/amendment values and unchanged original row hash, with both revisions still quarantined. Receipts: docs/stabilization/update5/provisional-correction-{after,ledger-after}.json.
 
 Tablet navigation/persistence passes, but screenshot review found an important presentation defect: fixed sidebar + child selector leave too little width for records and raw growth plots. This remains **open visually**. Source stacks the selector/care column at tablet widths and lets graph cards wrap by available width, using the existing compact child chooser. Before proof: docs/stabilization/update5/tablet-before. Final tablet/phone renders are required before closure.
+
+## Authorized calendar primary action contrast
+
+A fully habilitated clinician's actual calendar capture revealed “Nouveau rendez-vous” rendered white on the white tab surface. The link/action existed; the shared tab background overrode its primary background. Source now restores clinician-only primary-tab background/hover/white-text contrast. Before: docs/stabilization/update5/trusted-care-5879b92/calendar-button-before.png. Rendered closure is pending. Appointment reschedule/cancel/past-visit actions saved successfully; a failed global-alert assertion matched the framework route announcer, so no application form-reset bug or patch is claimed.

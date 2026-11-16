@@ -1,6 +1,24 @@
 import { test, expect, type Page, type TestInfo } from "@playwright/test";
 import { writeFileSync } from "node:fs";
 import { observeBrowserErrors } from "./browser-errors";
+test.afterEach(async ({ page }, info) => {
+  if (info.status !== info.expectedStatus) {
+    writeFileSync(
+      info.outputPath("trusted-care-failure.json"),
+      JSON.stringify({
+        route: new URL(page.url()).pathname,
+        status: info.status,
+      }),
+    );
+    await page
+      .screenshot({
+        path: info.outputPath("trusted-care-failure.png"),
+        scale: "css",
+        timeout: 10000,
+      })
+      .catch(() => undefined);
+  }
+});
 const run = process.env.MON_ENFANT_QA_RUN!;
 const child = "37bea915-aaf1-40f8-9145-c18f03c8dc0e";
 const childPath = `/patients/${child}`;
@@ -329,21 +347,23 @@ test("manual follow-up preserves original slots, denies future missed, reschedul
     const previous = Number(
       await page.locator('[name="expected_revision"]').inputValue(),
     );
+    let form = await disposition(
+      page,
+      "mark_missed",
+      "Tentative fictive de marquer un créneau futur, attendue refusée.",
+    );
+    await form
+      .getByRole("button", { name: "Ajouter la décision", exact: true })
+      .click();
+    await expect(
+      page.locator("main form.auth-form").getByRole("alert"),
+    ).toBeVisible();
+    futureDenialExercised = true;
+    save(info, "trusted-future-appointment-denial", {
+      futurePath,
+      future_mark_missed_denied: true,
+    });
     if (previous === 1) {
-      let form = await disposition(
-        page,
-        "mark_missed",
-        "Tentative fictive de marquer un créneau futur, attendue refusée.",
-      );
-      await form
-        .getByRole("button", { name: "Ajouter la décision", exact: true })
-        .click();
-      await expect(page.getByRole("alert")).toBeVisible();
-      futureDenialExercised = true;
-      save(info, "trusted-future-appointment-denial", {
-        futurePath,
-        future_mark_missed_denied: true,
-      });
       form = await disposition(
         page,
         "reschedule",
@@ -369,10 +389,12 @@ test("manual follow-up preserves original slots, denies future missed, reschedul
           exact: true,
         }),
       ).toBeVisible();
-      await expect(page.getByRole("alert")).toHaveCount(0);
+      await expect(
+        page.locator("main form.auth-form").getByRole("alert"),
+      ).toHaveCount(0);
       await page.reload();
     }
-    const form = await disposition(
+    form = await disposition(
       page,
       "cancel",
       "Annulation entièrement fictive avec motif et historique conservés.",
@@ -386,6 +408,9 @@ test("manual follow-up preserves original slots, denies future missed, reschedul
         exact: true,
       }),
     ).toBeVisible();
+    await expect(
+      page.locator("main form.auth-form").getByRole("alert"),
+    ).toHaveCount(0);
   }
   await page.reload();
   await expect(page.locator("main article.panel").first()).toContainText(
@@ -452,9 +477,22 @@ test("manual follow-up preserves original slots, denies future missed, reschedul
     "Visite déclarée réalisée",
   );
   await page.goto("/appointments?date=2026-12-04&view=day&state=cancelled");
+  const primary = page.getByRole("link", {
+    name: "Nouveau rendez-vous",
+    exact: true,
+  });
+  const contrast = await primary.evaluate((el) => ({
+    background: getComputedStyle(el).backgroundColor,
+    foreground: getComputedStyle(el).color,
+  }));
+  expect(["rgb(8, 127, 91)", "rgb(13, 86, 73)"]).toContain(contrast.background);
+  expect(contrast.foreground).toBe("rgb(255, 255, 255)");
+
   await expect(page.getByRole("main")).toContainText(futureLabel);
   for (const view of ["week", "month"]) {
-    await page.getByLabel("Vue", { exact: true }).selectOption(view);
+    await page
+      .getByRole("combobox", { name: "Vue", exact: true })
+      .selectOption(view);
     await page.getByRole("button", { name: "Afficher", exact: true }).click();
     await expect(page.locator(`.appointment-calendar.${view}`)).toBeVisible();
     await expect(page.getByRole("main")).toContainText(futureLabel);
