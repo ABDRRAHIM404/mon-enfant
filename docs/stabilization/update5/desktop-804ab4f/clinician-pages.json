@@ -1,0 +1,181 @@
+{
+  "fixture_run": "5d4ec565b0864dce",
+  "device": "desktop",
+  "observations": [
+    {
+      "role": "A",
+      "label": "Tableau de bord",
+      "route": "/dashboard",
+      "heading": "Tableau de bord",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "A",
+      "label": "Enfants",
+      "route": "/patients",
+      "heading": "Enfants",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "A",
+      "label": "Consultations",
+      "route": "/consultations",
+      "heading": "Consultations",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "A",
+      "label": "Vaccinations",
+      "route": "/vaccinations",
+      "heading": "Vaccinations",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "A",
+      "label": "Rendez-vous",
+      "route": "/appointments",
+      "heading": "Mes rendez-vous",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "A",
+      "label": "Croissance",
+      "route": "/growth",
+      "heading": "Croissance",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "A",
+      "label": "Documents",
+      "route": "/documents",
+      "heading": "Documents",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "A",
+      "label": "Mon compte soignant",
+      "route": "/account",
+      "heading": "Votre statut de v\u00e9rification",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "OUTSIDE",
+      "action": "provisional_write_reload",
+      "kind": "consultation",
+      "child_path": "/provisional/de12062a-37c7-4e84-a753-42dd8d30a87b",
+      "newly_written": false,
+      "source_marker": "Source fictive U5-5d4ec565b0864dce-desktop consultation",
+      "persistence_in_ui": true
+    },
+    {
+      "role": "OUTSIDE",
+      "action": "provisional_write_reload",
+      "kind": "growth",
+      "child_path": "/provisional/de12062a-37c7-4e84-a753-42dd8d30a87b",
+      "newly_written": false,
+      "source_marker": "Source fictive U5-5d4ec565b0864dce-desktop growth",
+      "persistence_in_ui": true
+    },
+    {
+      "role": "OUTSIDE",
+      "action": "provisional_write_reload",
+      "kind": "vaccination",
+      "child_path": "/provisional/de12062a-37c7-4e84-a753-42dd8d30a87b",
+      "newly_written": false,
+      "source_marker": "Source fictive U5-5d4ec565b0864dce-desktop vaccination",
+      "persistence_in_ui": true
+    },
+    {
+      "role": "OUTSIDE",
+      "action": "provisional_write_reload",
+      "kind": "appointment",
+      "child_path": "/provisional/de12062a-37c7-4e84-a753-42dd8d30a87b",
+      "newly_written": false,
+      "source_marker": "Source fictive U5-5d4ec565b0864dce-desktop appointment",
+      "persistence_in_ui": true
+    },
+    {
+      "role": "OUTSIDE",
+      "label": "Tableau de bord",
+      "route": "/provisional",
+      "heading": "Tableau de bord",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "OUTSIDE",
+      "label": "Enfants",
+      "route": "/provisional/children",
+      "heading": "Enfants",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "OUTSIDE",
+      "label": "Consultations",
+      "route": "/provisional/consultations",
+      "heading": "Consultations",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "OUTSIDE",
+      "label": "Vaccinations",
+      "route": "/provisional/vaccinations",
+      "heading": "Vaccinations",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "OUTSIDE",
+      "label": "Rendez-vous",
+      "route": "/provisional/appointments",
+      "heading": "Rendez-vous",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "OUTSIDE",
+      "label": "Croissance",
+      "route": "/provisional/growth",
+      "heading": "Croissance",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "OUTSIDE",
+      "label": "Documents",
+      "route": "/provisional/documents",
+      "heading": "Documents",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "OUTSIDE",
+      "label": "Mon compte soignant",
+      "route": "/account",
+      "heading": "Votre statut de v\u00e9rification",
+      "navigation_and_reload": true
+    },
+    {
+      "action": "other_author_provisional_read_denied",
+      "child_path": "/provisional/de12062a-37c7-4e84-a753-42dd8d30a87b"
+    }
+  ],
+  "captures": [
+    "clinician-desktop-A-1.png",
+    "clinician-desktop-A-2.png",
+    "clinician-desktop-A-3.png",
+    "clinician-desktop-A-4.png",
+    "clinician-desktop-A-5.png",
+    "clinician-desktop-A-6.png",
+    "clinician-desktop-A-7.png",
+    "clinician-desktop-A-8.png",
+    "clinician-desktop-OUTSIDE-1.png",
+    "clinician-desktop-OUTSIDE-2.png",
+    "clinician-desktop-OUTSIDE-3.png",
+    "clinician-desktop-OUTSIDE-4.png",
+    "clinician-desktop-OUTSIDE-5.png",
+    "clinician-desktop-OUTSIDE-6.png",
+    "clinician-desktop-OUTSIDE-7.png",
+    "clinician-desktop-OUTSIDE-8.png"
+  ],
+  "page_errors": 0,
+  "status": "navigation_and_provisional_lifecycle_pass_other_clinical_lifecycles_pending",
+  "source": "804ab4f1376f6a45b86d3810e93814b3f41fc965",
+  "deployment": "dpl_EPz3t6fQa7mhubGw3KVVXK2GSrUd",
+  "whole_milestone_accepted": false
+}

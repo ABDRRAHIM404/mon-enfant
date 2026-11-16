@@ -34,3 +34,9 @@ The canonical 94a0253 desktop capture showed seven summary cards in one row and 
 The new recent-consultation read passed three focused cloud security tests plus live anonymous/verified/admin/unverified/signed-out HTTP checks. It excludes private provisional records and reflects latest immutable corrections under current explicit grants. The remaining trusted clinical lifecycle and three-viewport review are still open in UPDATE_5_ACCEPTANCE.md.
 
 The first actual refined vaccination capture at canonical 417fcea exposed an unstyled child-selector search input (border invisible under the reset). This was introduced by the new picker, not an authentication or saved-data failure. Source now adds explicit border, background, touch size and focus styling plus browser computed-style/size assertions. Deployment and rendered confirmation remain pending; do not mark the visual defect closed from source alone.
+
+## Provisional correction reason collision — reproduced, fix pending deployment
+
+Actual canonical form inspection (804ab4f, run 78044) confirms both clinical consultation reason and correction reason were submitted under `reason`. FormData therefore selected the clinical reason for amendment metadata. The diagnostic did not save anything. New source separates `correction_reason`, rejects absent/ambiguous amendment inputs before writing, and keeps new-entry amendment metadata null. Four transport/integrity tests pass; actual saved correction and independent immutable-row readback remain pending. Original rows are never rewritten.
+
+The selector styling issue is closed at canonical 804ab4f: desktop browser assertions and inspected vaccination capture confirm a visible border, 46 px input and focus rules; responsive acceptance remains open. Durable desktop captures and proof: docs/stabilization/update5/desktop-804ab4f.

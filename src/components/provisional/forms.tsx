@@ -311,7 +311,12 @@ export function ProvisionalEntryForm({
         <>
           <label>
             Motif de correction
-            <input name="reason" minLength={10} maxLength={1000} required />
+            <input
+              name="correction_reason"
+              minLength={10}
+              maxLength={1000}
+              required
+            />
           </label>
           <label>
             État de l’entrée

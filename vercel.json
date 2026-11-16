@@ -1,4 +1,4 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "npm run test -- tests/provisional-sections.test.ts tests/clinician-overview.test.ts tests/appointment-calendar.test.ts && npm run typecheck && npm run build"
+  "buildCommand": "npm run test -- tests/provisional-sections.test.ts tests/clinician-overview.test.ts tests/appointment-calendar.test.ts tests/provisional-action-reasons.test.ts && npm run typecheck && npm run build"
 }

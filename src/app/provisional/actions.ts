@@ -66,6 +66,17 @@ export async function writeProvisional(
     !provisionalFields[kind]
   )
     return { error: "Rechargez le formulaire." };
+  const correctionReason = text(form, "correction_reason");
+  if (
+    root &&
+    (form.getAll("correction_reason").length !== 1 ||
+      correctionReason.length < 10 ||
+      correctionReason.length > 1000)
+  )
+    return {
+      error:
+        "Précisez un motif de correction distinct (10 à 1 000 caractères). Rechargez le formulaire si ce champ est absent.",
+    };
   const payload: Record<string, string | number> = {};
   for (const field of provisionalFields[kind]) {
     const value = text(form, field.key);
@@ -127,7 +138,7 @@ export async function writeProvisional(
     p_payload: payload,
     p_root_id: root || null,
     p_expected_revision: root ? Number(text(form, "revision")) : null,
-    p_reason: text(form, "reason") || null,
+    p_reason: root ? correctionReason : null,
     p_entry_state: text(form, "entry_state") || "active",
   });
   if (error) return { error: errorMessage(error.code) };
