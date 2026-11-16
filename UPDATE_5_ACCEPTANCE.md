@@ -4,6 +4,9 @@ This report is not milestone approval. Parent website acceptance is deferred; AP
 
 ## Current evidence
 
+- Current canonical **804ab4f**, READY **dpl_EPz3t6fQa7mhubGw3KVVXK2GSrUd**: desktop run 7734 passed 16 destinations/two roles, private-history reuse after reload, actual selector interaction and visible 46 px inputs, logout/current-session denial and other-author denial; zero JS errors/overflow. All eight verified-page captures inspected; durable 16 captures/proof: [desktop evidence](docs/stabilization/update5/desktop-804ab4f/clinician-pages.json). This is desktop technical acceptance, with trusted clinical and responsive gates still open.
+- Actual provisional correction field collision was reproduced without saving; source dc6201c separates clinical/amendment reasons and passes 17 focused cloud tests, explicit types/build in READY preview dpl_GFGHxHmkvahBJG8YX93Ra2se7XVS. Actual corrected save/reload/new-session and independent immutable-row readback remain pending.
+
 - Canonical source `94a0253`, deployment `dpl_EVinRVXVrpe9trJjoJMkhW9J1Qmp`: desktop walkthrough passed 16 destinations across a verified doctor and unverified nurse, four provisional saves/hard reloads, logout, other-author denial, zero JavaScript errors and no horizontal overflow. Resource-capped run 74885 completed in 2.6 minutes. Screenshots retained privately at `/tmp/mon-enfant-clinician-pages-desktop-passed` pending final source captures.
 - Independent provisional persistence: `docs/stabilization/update5/clinician-desktop-ledger.json`. No provisional-to-trusted promotion; all four entries remain unverified.
 - Applied provisional projection: `docs/stabilization/update5/provisional-section-migration.json`; live role/session denial receipt: `docs/stabilization/update5/provisional-section-http.json`.

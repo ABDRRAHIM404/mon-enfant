@@ -201,3 +201,7 @@ Current milestone uses the eight pictures in updates/new-design-update-5. Parent
 
 - [x] Update 5 consultation dashboard projection: 13 focused cloud tests including scoped reads/provisional isolation/calendar, explicit TypeScript/build, and live HTTP role/session denial checks; new read-only migration applied with exact stored source.
 - [ ] Update 5 final clinician acceptance: trusted clinical lifecycles/corrections, final desktop/tablet/phone review after latest layout changes, synthetic fixture retirement, canonical publication/synchronization and owner approval. See UPDATE_5_ACCEPTANCE.md. Parent acceptance and APK resume remain separate future gates.
+
+- [x] Update 5 current canonical desktop navigation/selector pass (804ab4f, 16 destinations across verified doctor/unverified nurse), durable captures and current-role/session denial. Whole clinician acceptance remains open.
+- [x] Provisional correction field collision reproduced without a write; source fix and four transport-integrity tests pass, with 17-test/full-type/build cloud preview acceptance.
+- [ ] Corrected provisional consultation actual save/reload/new-session and independent original-row hash comparison; final responsive/trusted lifecycle/retirement/owner gates remain open.
