@@ -1,0 +1,25 @@
+{
+  "run": "5d4ec565b0864dce",
+  "child": "37bea915-aaf1-40f8-9145-c18f03c8dc0e",
+  "futurePath": "/patients/37bea915-aaf1-40f8-9145-c18f03c8dc0e/appointments/eac25fa8-1dcc-4a5a-8aba-40e3fed43ada",
+  "pastPath": "/patients/37bea915-aaf1-40f8-9145-c18f03c8dc0e/appointments/87af9efb-74a8-44a1-9f1b-2e0ad6c84cc6",
+  "futureLabel": "Suivi fictif U5-5d4ec565b0864dce HB1 manuel",
+  "pastLabel": "Visite fictive U5-5d4ec565b0864dce pass\u00e9e",
+  "original_starts_local": "2026-12-03T09:30",
+  "rescheduled_starts_local": "2026-12-04T11:00",
+  "future_mark_missed_denial_exercised_this_run": false,
+  "future_final_state": "cancelled",
+  "past_final_state": "completed",
+  "expected_events_each": 3,
+  "fresh_session": true,
+  "calendar_views": [
+    "day",
+    "week",
+    "month"
+  ],
+  "manual_followup_purpose": "other",
+  "independent_database_readback": "passed; independent-ledger.json",
+  "source": "cbe7281ddc5b3fd1adb269a780906eadeeb5696e",
+  "deployment": "dpl_3eXteaJvzYqcLbfPEvDQ8tykh45G",
+  "contrast_verified": true
+}

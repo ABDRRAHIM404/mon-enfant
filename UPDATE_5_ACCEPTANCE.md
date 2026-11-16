@@ -2,7 +2,26 @@
 
 This report is not milestone approval. Parent website acceptance is deferred; APK and iOS work remain paused. Source and live evidence must agree before any page receives final Pass.
 
-## Current evidence
+## Current checkpoint — 16 November 2026
+
+Canonical application **cbe7281ddc5b3fd1adb269a780906eadeeb5696e**, READY **dpl_3eXteaJvzYqcLbfPEvDQ8tykh45G**. Production logs prove 17 focused tests, explicit TypeScript and build. Earlier checkpoint references below are historical evidence, not the current deployed revision.
+
+| Check | Result | Authoritative evidence / limit |
+| --- | --- | --- |
+| Trusted consultation and growth save/correction/new session | Pass | `trusted-care-5879b92/{trusted-consultation,trusted-growth,independent-ledger}.json`; original rows and linked corrections retained |
+| Manual appointments and three calendar views | Pass | `trusted-care-5879b92/trusted-appointments.json`; four manual appointments now retain eight immutable events in `routine/independent-ledger.json`; future-missed denial is form-scoped |
+| QA-only independently reviewed routine and second-clinician dose | Pass | `routine/{routine-reference,routine-continuity,independent-ledger}.json`; original draft/rule hash unchanged; only VPO1 reference, uncertain HB1 separate; no genuine clinical approval claimed |
+| Current grant revocation against same live session | Pass | `routine/routine-revocation.json`; recorded authorship retained; independent ledger confirms revoked B grant |
+| Private consultation correction/quarantine | Pass | `provisional-correction-{after,ledger-after}.json`; original row unchanged, clinical/amendment reasons distinct |
+| Desktop clinician navigation | Pass, scoped | 16 destinations/two roles in `desktop-804ab4f`; later care/calendar captures cover populated workflows; final report does not imply every secondary action passed |
+| Populated tablet navigation and layout | Pass, scoped | Run 89358, 16 destinations/two roles, no JS errors/overflow; all 16 page captures inspected in `tablet-cbe7281`; private plot width ≥280px |
+| Phone-width navigation/forms/layout | Pending | Managed unit mon-enfant-phone-20261116.service is active; poll its state before replacement |
+| Fixture/QA-clone retirement | Pending | 5d4ec565b0864dce remains active; original source must remain unchanged |
+| Final inventory, broad action coverage and owner review | Pending | Remaining secondary creation/review/account/export actions must be mapped to evidence or explicitly left open; no blanket eight-page acceptance |
+
+Paths above are under `docs/stabilization/update5`. Parent redesign/acceptance, actual mail and other external approvals remain open; APK and iOS stay paused.
+
+## Historical evidence
 
 - Current canonical **804ab4f**, READY **dpl_EPz3t6fQa7mhubGw3KVVXK2GSrUd**: desktop run 7734 passed 16 destinations/two roles, private-history reuse after reload, actual selector interaction and visible 46 px inputs, logout/current-session denial and other-author denial; zero JS errors/overflow. All eight verified-page captures inspected; durable 16 captures/proof: [desktop evidence](docs/stabilization/update5/desktop-804ab4f/clinician-pages.json). This is desktop technical acceptance, with trusted clinical and responsive gates still open.
 - Actual provisional correction field collision was reproduced without saving; source dc6201c separates clinical/amendment reasons and passes 17 focused cloud tests, explicit types/build in READY preview dpl_GFGHxHmkvahBJG8YX93Ra2se7XVS. Canonical 9f892ef now passes corrected save/reload/new-session and independent immutable-row readback: original unchanged, revision 2 linked, reasons separate, still quarantined. Receipts: `docs/stabilization/update5/provisional-correction-{after,ledger-after}.json`.

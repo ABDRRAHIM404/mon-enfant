@@ -1,0 +1,31 @@
+{
+  "run": "5d4ec565b0864dce",
+  "source": "5879b922a1c02f734c4a2b3e98bbb90970388e0f",
+  "independent_database_read": true,
+  "synthetic_owned_child_guard": true,
+  "clinical_revisions": 5,
+  "consultation_original_and_correction": true,
+  "growth_original_height_cm": 89,
+  "growth_corrected_height_cm": 89.5,
+  "weight_kg": 12.7,
+  "all_revision_links_preserved": true,
+  "uncertain_hb1_original_retained": true,
+  "routine_items": 0,
+  "no_clinical_entry_created_by_appointments": true,
+  "appointments": 2,
+  "appointment_events_each": 3,
+  "future_events": [
+    "created",
+    "rescheduled",
+    "cancelled"
+  ],
+  "past_events": [
+    "created",
+    "missed",
+    "completed"
+  ],
+  "original_and_rescheduled_civil_times_preserved": true,
+  "unrelated_manual_hb1_followup_has_no_vaccine_item": true,
+  "calendar_view_and_contrast_completion_pending": false,
+  "calendar_visual_source": "cbe7281ddc5b3fd1adb269a780906eadeeb5696e"
+}

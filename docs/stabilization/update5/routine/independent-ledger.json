@@ -1,0 +1,208 @@
+{
+  "appointments": [
+    {
+      "events": [
+        {
+          "action": "created",
+          "previous_starts_at": null,
+          "revision": 1,
+          "starts_at": "2026-12-03T09:30:00+00:00",
+          "state": "scheduled"
+        },
+        {
+          "action": "rescheduled",
+          "previous_starts_at": "2026-12-03T09:30:00+00:00",
+          "revision": 2,
+          "starts_at": "2026-12-04T11:00:00+00:00",
+          "state": "scheduled"
+        },
+        {
+          "action": "cancelled",
+          "previous_starts_at": "2026-12-04T11:00:00+00:00",
+          "revision": 3,
+          "starts_at": "2026-12-04T11:00:00+00:00",
+          "state": "cancelled"
+        }
+      ],
+      "id": "eac25fa8-1dcc-4a5a-8aba-40e3fed43ada",
+      "item": null,
+      "label": "Suivi fictif U5-5d4ec565b0864dce HB1 manuel"
+    },
+    {
+      "events": [
+        {
+          "action": "created",
+          "previous_starts_at": null,
+          "revision": 1,
+          "starts_at": "2026-11-10T14:00:00+00:00",
+          "state": "scheduled"
+        },
+        {
+          "action": "missed",
+          "previous_starts_at": "2026-11-10T14:00:00+00:00",
+          "revision": 2,
+          "starts_at": "2026-11-10T14:00:00+00:00",
+          "state": "missed"
+        },
+        {
+          "action": "completed",
+          "previous_starts_at": "2026-11-10T14:00:00+00:00",
+          "revision": 3,
+          "starts_at": "2026-11-10T14:00:00+00:00",
+          "state": "completed"
+        }
+      ],
+      "id": "87af9efb-74a8-44a1-9f1b-2e0ad6c84cc6",
+      "item": null,
+      "label": "Visite fictive U5-5d4ec565b0864dce passée"
+    },
+    {
+      "events": [
+        {
+          "action": "created",
+          "previous_starts_at": null,
+          "revision": 1,
+          "starts_at": "2026-12-08T10:00:00+00:00",
+          "state": "scheduled"
+        }
+      ],
+      "id": "0e628f73-cbd2-4e83-8916-0ace38df082e",
+      "item": "7f9452bd-83bc-4520-b64b-f1469f2620f0",
+      "label": "Suivi vaccinal fictif U5-5d4ec565b0864dce"
+    },
+    {
+      "events": [
+        {
+          "action": "created",
+          "previous_starts_at": null,
+          "revision": 1,
+          "starts_at": "2026-12-09T10:00:00+00:00",
+          "state": "scheduled"
+        }
+      ],
+      "id": "9870a120-a30e-4f7e-a795-474e51c83ab3",
+      "item": null,
+      "label": "Consultation indépendante fictive U5-5d4ec565b0864dce"
+    }
+  ],
+  "clinical_revision_count": 6,
+  "grants": [
+    {
+      "professional": "QAB-5d4ec565b0864dce-A",
+      "revoked": false
+    },
+    {
+      "professional": "QAB-5d4ec565b0864dce-B",
+      "revoked": true
+    }
+  ],
+  "guard_count": 1,
+  "items": [
+    {
+      "dose": "VPO1",
+      "id": "7f9452bd-83bc-4520-b64b-f1469f2620f0",
+      "professional": "QAB-5d4ec565b0864dce-A",
+      "version": "c3b5f31e-59d1-449e-89ad-4f1fd808275a"
+    }
+  ],
+  "registry": [
+    {
+      "number": "001",
+      "professional": "QAB-5d4ec565b0864dce-A"
+    },
+    {
+      "number": "078",
+      "professional": "QAB-5d4ec565b0864dce-B"
+    }
+  ],
+  "vaccinations": [
+    {
+      "date": null,
+      "id": "ceb2c694-2aef-4856-b0d6-22b570ec6623",
+      "item": null,
+      "payload": {
+        "administered_by": "",
+        "administration_facility": "",
+        "administration_facility_status": "unknown",
+        "dose_label": "HB1",
+        "duplicate_override_reason": "",
+        "lot_number": "",
+        "lot_status": "unknown",
+        "matching_status": "unmatched",
+        "notes": "",
+        "provider_status": "unknown",
+        "schedule_item_id": "",
+        "site": "",
+        "site_status": "unknown",
+        "vaccine_code": "HB",
+        "vaccine_label": "Hépatite B"
+      },
+      "precision": "unknown",
+      "professional": "QAB-5d4ec565b0864dce-A",
+      "revision": 1,
+      "root": "ceb2c694-2aef-4856-b0d6-22b570ec6623",
+      "source_type": "paper_transcription",
+      "source_verified": false
+    },
+    {
+      "date": "2026-11-16",
+      "id": "a8ee9666-e68d-413d-84d4-8cca4bc49f25",
+      "item": "7f9452bd-83bc-4520-b64b-f1469f2620f0",
+      "payload": {
+        "administered_by": "Soignant entièrement fictif B",
+        "administration_facility": "Centre entièrement fictif B",
+        "administration_facility_status": "known",
+        "dose_label": "VPO1",
+        "duplicate_override_reason": "",
+        "lot_number": "QA-LOT-U5-5d4ec565b0864dce",
+        "lot_status": "known",
+        "matching_status": "clinician_validated",
+        "notes": "",
+        "provider_status": "known",
+        "schedule_item_id": "7f9452bd-83bc-4520-b64b-f1469f2620f0",
+        "site": "Site fictif non clinique",
+        "site_status": "known",
+        "vaccine_code": "VPO",
+        "vaccine_label": "Poliomyélite (Oral)"
+      },
+      "precision": "exact",
+      "professional": "QAB-5d4ec565b0864dce-B",
+      "revision": 1,
+      "root": "a8ee9666-e68d-413d-84d4-8cca4bc49f25",
+      "source_type": "observed",
+      "source_verified": true
+    }
+  ],
+  "versions": [
+    {
+      "hb1_automatic": false,
+      "hbn_count": 0,
+      "id": "1f28d603-44fe-465b-9dd3-47d82a0edd3a",
+      "independent_review": null,
+      "label": "PNI 2025 — transcription initiale à revoir",
+      "parent_id": null,
+      "review_verified": false,
+      "revision": 1,
+      "rule_count": 25,
+      "rule_hash": "cb838450d0f2066fa5d914971f9bd8a7",
+      "status": "draft"
+    },
+    {
+      "hb1_automatic": false,
+      "hbn_count": 0,
+      "id": "c3b5f31e-59d1-449e-89ad-4f1fd808275a",
+      "independent_review": true,
+      "label": "QA navigateur vaccinal 5d4ec565b0864dce stabilisation",
+      "parent_id": "1f28d603-44fe-465b-9dd3-47d82a0edd3a",
+      "review_verified": true,
+      "revision": 2,
+      "rule_count": 25,
+      "rule_hash": "cb838450d0f2066fa5d914971f9bd8a7",
+      "status": "approved"
+    }
+  ],
+  "status": "pass",
+  "source": "cbe7281ddc5b3fd1adb269a780906eadeeb5696e",
+  "synthetic_only": true,
+  "genuine_clinical_approval_claimed": false
+}

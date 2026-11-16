@@ -11,5 +11,5 @@
   "fresh_session": true,
   "source": "5879b922a1c02f734c4a2b3e98bbb90970388e0f",
   "deployment": "dpl_9RZ2LySaqiqqCjHnsy2fm4MnL33h",
-  "independent_database_readback": "pending"
+  "independent_database_readback": "passed; independent-ledger.json"
 }

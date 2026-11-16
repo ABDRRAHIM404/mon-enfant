@@ -17,7 +17,7 @@ Existing RPCs enforce current sessions and grants; registry membership or admin 
 
 Per-page implementation, deployed capture and lifecycle results will be added as evidence is obtained. No available section is marked complete from this inventory alone.
 
-## Source implementation in progress (not hosted acceptance)
+## Implemented route mapping (acceptance remains scoped)
 
 - Shared layout: src/components/clinician/shell.tsx. Eight exact primary labels; verified and provisional destinations remain distinct. Parent shell is untouched.
 - Verified consultations/vaccinations/growth: /consultations, /vaccinations, /growth → PatientSection → list_patients, clinical_timeline, my_clinical_capabilities and patient_vaccine_items, each still guarded by live professional/grant checks. Existing record forms perform all writes/corrections. Growth charts plot only actual exact-date observations.
@@ -33,3 +33,10 @@ Corrected trusted before evidence: docs/stabilization/update5/trusted-before. Ma
 The canonical 94a0253 desktop walkthrough covered all eight destinations for a verified doctor and unverified nurse, real provisional consultation/vaccination/growth/appointment saves with hard reload, other-author denial, and light appearance. Independent ledger receipt: `docs/stabilization/update5/clinician-desktop-ledger.json`. This does not establish trusted clinical lifecycles or final responsive acceptance.
 
 The next feature revision reduces dashboard summaries to four, adds an authorization-scoped recent-consultation projection, places vaccine history before routine references, and uses a compact phone child selector. These refinements are not yet deployed or visually accepted. The initial inventory above remains the before-state comparison; final page-by-page evidence is pending.
+
+
+## Current evidence checkpoint — 16 November
+
+All eight implemented clinician destinations are deployed in canonical cbe7281; verified doctor/private nurse tablet captures are paired by page number 1–8 in `docs/stabilization/update5/tablet-cbe7281`. Their cream surfaces, emerald active states/actions, selected logo and sparing coral information panels follow the supplied references. The growth mockup’s diagnostic assessment/percentiles and all fabricated patients/counts are deliberately excluded under the owner contract.
+
+Consultation/growth corrections, real manually chosen appointment dispositions, QA routine assignment/cross-clinician dose and current-grant denial now have actual UI plus independent hosted-ledger proof in `trusted-care-5879b92` and `routine`. Source draft/rule hash remains unchanged. `UPDATE_5_ACCEPTANCE.md` distinguishes these passed stories from incomplete phone, secondary-action, cleanup and owner gates. No overall milestone approval is inferred.

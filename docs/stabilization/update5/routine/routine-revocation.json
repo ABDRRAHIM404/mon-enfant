@@ -1,0 +1,13 @@
+{
+  "run": "5d4ec565b0864dce",
+  "child": "37bea915-aaf1-40f8-9145-c18f03c8dc0e",
+  "qa_only": true,
+  "genuine_clinical_approval_claimed": false,
+  "original_live_session_restored": true,
+  "account_still_verified": true,
+  "patient_and_registry_denied": true,
+  "recorded_authorship_retained": true,
+  "authentication_state_persisted_to_file": false,
+  "source": "cbe7281ddc5b3fd1adb269a780906eadeeb5696e",
+  "deployment": "dpl_3eXteaJvzYqcLbfPEvDQ8tykh45G"
+}

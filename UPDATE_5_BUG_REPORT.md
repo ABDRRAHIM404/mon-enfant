@@ -48,3 +48,10 @@ Tablet navigation/persistence passes, but screenshot review found an important p
 ## Authorized calendar primary action contrast
 
 A fully habilitated clinician's actual calendar capture revealed “Nouveau rendez-vous” rendered white on the white tab surface. The link/action existed; the shared tab background overrode its primary background. Source now restores clinician-only primary-tab background/hover/white-text contrast. Before: docs/stabilization/update5/trusted-care-5879b92/calendar-button-before.png. Rendered closure is pending. Appointment reschedule/cancel/past-visit actions saved successfully; a failed global-alert assertion matched the framework route announcer, so no application form-reset bug or patch is claimed.
+
+
+## Current rendered closures — 16 November
+
+- **Calendar action contrast: closed technically**, canonical cbe7281. Actual focused runtime 28203 and `trusted-care-5879b92/trusted-appointments.json` prove green background/white foreground and working day/week/month controls. No speculative form-reset patch was made.
+- **Tablet squeezed care/charts: closed at the tested 768px tablet viewport**, canonical cbe7281. Run 89358 passed all 16 verified/private destinations; actual page-by-page capture review shows the compact chooser above a wide care column and a readable private growth plot. See `tablet-cbe7281`. Phone acceptance remains pending; this closure is not a universal viewport claim.
+- **Remaining acceptance gaps, not invented application defects:** final phone renders/persistence, full secondary-action evidence mapping, QA fixture/clone retirement, final publication/synchronization and explicit clinician owner review. External/source/mail gates remain open.

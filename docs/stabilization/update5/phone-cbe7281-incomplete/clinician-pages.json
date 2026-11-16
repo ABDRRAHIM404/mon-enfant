@@ -1,0 +1,53 @@
+{
+  "fixture_run": "5d4ec565b0864dce",
+  "device": "android",
+  "observations": [
+    {
+      "role": "A",
+      "label": "Tableau de bord",
+      "route": "/dashboard",
+      "heading": "Tableau de bord",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "A",
+      "label": "Enfants",
+      "route": "/patients",
+      "heading": "Enfants",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "A",
+      "label": "Consultations",
+      "route": "/consultations",
+      "heading": "Consultations",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "A",
+      "label": "Vaccinations",
+      "route": "/vaccinations",
+      "heading": "Vaccinations",
+      "navigation_and_reload": true
+    },
+    {
+      "role": "A",
+      "label": "Rendez-vous",
+      "route": "/appointments",
+      "heading": "Mes rendez-vous",
+      "navigation_and_reload": true
+    }
+  ],
+  "captures": [
+    "clinician-android-A-1.png",
+    "clinician-android-A-2.png",
+    "clinician-android-A-3.png",
+    "clinician-android-A-4.png",
+    "clinician-android-A-5.png"
+  ],
+  "page_errors": 0,
+  "status": "interrupted_exit_143",
+  "source": "cbe7281ddc5b3fd1adb269a780906eadeeb5696e",
+  "whole_run_pass": false,
+  "diagnostic": "Process and scope are terminal; no framework failure receipt or memory counters were produced. Cause unproven. Five verified pages captured; no private phone case created."
+}

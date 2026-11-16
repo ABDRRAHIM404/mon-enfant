@@ -29,3 +29,8 @@ Only Espace soignant: verified doctors/nurses and author-only provisional worksp
 | Parent website acceptance / APK resume              | Deferred    | Separate later milestone; no implied approval                                                                               |
 
 Current implementation evidence: canonical 94a0253 desktop 16-destination/two-role walkthrough and four provisional save/reload/independent-readback checks pass. Layout refinements follow the actual screenshot findings. See UPDATE_5_ACCEPTANCE.md; trusted write/correction/routine/appointment and final three-viewport checks remain pending. Applied consultation projection and live denial receipts are recorded in PROGRESS.md. Parent website work stays deferred.
+
+
+### Verified checkpoint — 16 November
+
+Canonical cbe7281 is READY with 17 tests/types/build. Trusted consultation/growth corrections and appointment lifecycles now pass actual UI/new-session/independent-ledger checks. QA-only reviewed routine and cross-clinician dose/grant revocation also pass with unchanged original source. Tablet 89358 passed all 16 destinations and page-by-page visual inspection; phone managed unit mon-enfant-phone-20261116.service is running. Remaining: phone results, complete action coverage report, fixture/QA retirement, final published evidence/primary synchronization and explicit clinician owner review. Keep all Phase 0–8 external/Phase 6 gates and later parent/APK gates open.

@@ -1,3 +1,5 @@
+> Update 5 checkpoint (16 November): canonical cbe7281; trusted clinical corrections, manual appointments, QA routine/continuity and independent readback pass; populated tablet 16-destination run/visual review passes. Phone verification, secondary-action report, fixture retirement, publication/synchronization and owner review remain open. See UPDATE_5_ACCEPTANCE.md. Parent/APK/iOS remain deferred.
+
 > Current owner milestone: revised Update 5 Espace soignant only, using the eight supplied design references and real dedicated feature pages. Parent implementation/acceptance is a later stage; APK remains paused until both stages and owner approval. See UPDATE_5_PAGE_INVENTORY.md and UPDATE_5_WORK_PLAN.md.
 
 # Mon Enfant — Development Plan
@@ -5,7 +7,7 @@
 **Status:** Update 5 canonical website stabilization is the current priority; APK work is paused pending owner acceptance. Implementation in progress — foundation/verification/registry workflows verified; Phase 5 appointment/continuity technical acceptance complete, Phase 7 synthetic parent web technical walkthrough verified, Updates 1–2 canonically verified; Update 3 public/protected read UI published; purpose-bound parent sharing canonically published and software-accepted; Update 4 smart-form software acceptance and canonical publication verified; Phase 8 Android native technical acceptance complete, private development APK published; iPhone deferred; actual application mail and remaining Phase 6/external readiness stay open; see [PROGRESS.md](PROGRESS.md) and [PLAN_CHECKLIST.md](PLAN_CHECKLIST.md)
 **Working name:** Mon Enfant (temporary)
 **Primary objective:** Launch a secure, responsive doctor/admin web application, then introduce the parent experience.
-**Last updated:** 15 November 2026
+**Last updated:** 16 November 2026
 
 > A synthetic-data development deployment is available. No real clinical data is connected. Development and verification must use fictional/synthetic patient information until the external approval gates are met. Timelines are deliberately not promised.
 

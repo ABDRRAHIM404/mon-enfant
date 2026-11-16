@@ -1,0 +1,19 @@
+{
+  "run": "5d4ec565b0864dce",
+  "child": "37bea915-aaf1-40f8-9145-c18f03c8dc0e",
+  "qa_only": true,
+  "genuine_clinical_approval_claimed": false,
+  "rootPath": "/patients/37bea915-aaf1-40f8-9145-c18f03c8dc0e/records/a8ee9666-e68d-413d-84d4-8cca4bc49f25",
+  "item": "7f9452bd-83bc-4520-b64b-f1469f2620f0",
+  "vaccinePath": "/patients/37bea915-aaf1-40f8-9145-c18f03c8dc0e/appointments/0e628f73-cbd2-4e83-8916-0ace38df082e",
+  "otherPath": "/patients/37bea915-aaf1-40f8-9145-c18f03c8dc0e/appointments/9870a120-a30e-4f7e-a795-474e51c83ab3",
+  "explicit_access_exercised_this_run": false,
+  "same_child_universal_id": true,
+  "second_author": "QAB-5d4ec565b0864dce-B",
+  "hb1_still_separate": true,
+  "linked_followup_resolved_without_attendance_claim": true,
+  "independent_visit_still_scheduled": true,
+  "independent_database_readback": "pass; independent-ledger.json",
+  "source": "cbe7281ddc5b3fd1adb269a780906eadeeb5696e",
+  "deployment": "dpl_3eXteaJvzYqcLbfPEvDQ8tykh45G"
+}

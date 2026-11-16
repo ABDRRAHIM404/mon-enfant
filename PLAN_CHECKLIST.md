@@ -1,3 +1,5 @@
+> Update 5 checkpoint (16 November): canonical cbe7281; trusted clinical corrections, manual appointments, QA routine/continuity and independent readback pass; populated tablet 16-destination run/visual review passes. Phone verification, secondary-action report, fixture retirement, publication/synchronization and owner review remain open. See UPDATE_5_ACCEPTANCE.md. Parent/APK/iOS remain deferred.
+
 # Full plan execution and completion audit
 
 Current development focus: **revised Update 5 clinician-only eight-page implementation from updates/new-design-update-5; parent implementation is deferred to a later milestone, and APK remains paused until both website stages and owner approvals.** See UPDATE_5_WORK_PLAN.md. Previous development focus: **full Phase 8 mobile; Updates 1–3 including real temporary sharing and the canonical account switch have software acceptance**, following the verified synthetic Phase 7 web walkthrough. See UPDATE_WORK_PLAN.md. Remaining Phase 6 checks/operations stay open and are deferred until the app is built, except major authentication, access-control, data-integrity and build checks.
