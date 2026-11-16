@@ -5,13 +5,15 @@ This report is not milestone approval. Parent website acceptance is deferred; AP
 ## Current evidence
 
 - Current canonical **804ab4f**, READY **dpl_EPz3t6fQa7mhubGw3KVVXK2GSrUd**: desktop run 7734 passed 16 destinations/two roles, private-history reuse after reload, actual selector interaction and visible 46 px inputs, logout/current-session denial and other-author denial; zero JS errors/overflow. All eight verified-page captures inspected; durable 16 captures/proof: [desktop evidence](docs/stabilization/update5/desktop-804ab4f/clinician-pages.json). This is desktop technical acceptance, with trusted clinical and responsive gates still open.
-- Actual provisional correction field collision was reproduced without saving; source dc6201c separates clinical/amendment reasons and passes 17 focused cloud tests, explicit types/build in READY preview dpl_GFGHxHmkvahBJG8YX93Ra2se7XVS. Actual corrected save/reload/new-session and independent immutable-row readback remain pending.
+- Actual provisional correction field collision was reproduced without saving; source dc6201c separates clinical/amendment reasons and passes 17 focused cloud tests, explicit types/build in READY preview dpl_GFGHxHmkvahBJG8YX93Ra2se7XVS. Canonical 9f892ef now passes corrected save/reload/new-session and independent immutable-row readback: original unchanged, revision 2 linked, reasons separate, still quarantined. Receipts: `docs/stabilization/update5/provisional-correction-{after,ledger-after}.json`.
 
 - Canonical source `94a0253`, deployment `dpl_EVinRVXVrpe9trJjoJMkhW9J1Qmp`: desktop walkthrough passed 16 destinations across a verified doctor and unverified nurse, four provisional saves/hard reloads, logout, other-author denial, zero JavaScript errors and no horizontal overflow. Resource-capped run 74885 completed in 2.6 minutes. Screenshots retained privately at `/tmp/mon-enfant-clinician-pages-desktop-passed` pending final source captures.
 - Independent provisional persistence: `docs/stabilization/update5/clinician-desktop-ledger.json`. No provisional-to-trusted promotion; all four entries remain unverified.
 - Applied provisional projection: `docs/stabilization/update5/provisional-section-migration.json`; live role/session denial receipt: `docs/stabilization/update5/provisional-section-http.json`.
 - Light-only canonical appearance previously passed desktop and Android-sized Chromium despite saved dark preference and dark OS: `docs/stabilization/update5/light-appearance.json`.
 - Feature source `87bb599` passed 13 Vercel tests, explicit TypeScript and production build in `dpl_6pAAgjhbnzQUS5YhyqsQuN9SXoFj`. Its new consultation projection is now applied with matching stored source and auth-only execution, and live HTTPS role/session checks pass; receipts: `docs/stabilization/update5/clinician-overview-{migration,http}.json`. Latest screenshots cannot establish this source's appearance.
+
+- Tablet 9f892ef passed the two-role 16-destination/form/reload/denial technical story but **failed visual review**: selectors squeezed records/raw charts. [Tablet before](docs/stabilization/update5/tablet-before/clinician-pages.json). Layout fix 3aed79c passes 17 tests/types/build in READY preview dpl_G672gY9Df3rN2cDSEtK2YDHF4TKh; final tablet/phone renders remain pending.
 
 ## Page matrix
 

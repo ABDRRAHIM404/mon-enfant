@@ -313,6 +313,7 @@ test("manual follow-up preserves original slots, denies future missed, reschedul
   await login(page, "A");
   const futureLabel = `Suivi fictif U5-${run} HB1 manuel`;
   const pastLabel = `Visite fictive U5-${run} passée`;
+  let futureDenialExercised = false;
   const futurePath = await appointmentCase(
     page,
     futureLabel,
@@ -338,6 +339,11 @@ test("manual follow-up preserves original slots, denies future missed, reschedul
         .getByRole("button", { name: "Ajouter la décision", exact: true })
         .click();
       await expect(page.getByRole("alert")).toBeVisible();
+      futureDenialExercised = true;
+      save(info, "trusted-future-appointment-denial", {
+        futurePath,
+        future_mark_missed_denied: true,
+      });
       form = await disposition(
         page,
         "reschedule",
@@ -467,12 +473,13 @@ test("manual follow-up preserves original slots, denies future missed, reschedul
     pastLabel,
     original_starts_local: "2026-12-03T09:30",
     rescheduled_starts_local: "2026-12-04T11:00",
-    future_mark_missed_denied: true,
+    future_mark_missed_denial_exercised_this_run: futureDenialExercised,
     future_final_state: "cancelled",
     past_final_state: "completed",
     expected_events_each: 3,
     fresh_session: true,
     calendar_views: ["day", "week", "month"],
-    no_hb1_reference_created: true,
+    manual_followup_purpose: "other",
+    independent_database_readback: "pending",
   });
 });

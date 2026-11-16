@@ -204,4 +204,5 @@ Current milestone uses the eight pictures in updates/new-design-update-5. Parent
 
 - [x] Update 5 current canonical desktop navigation/selector pass (804ab4f, 16 destinations across verified doctor/unverified nurse), durable captures and current-role/session denial. Whole clinician acceptance remains open.
 - [x] Provisional correction field collision reproduced without a write; source fix and four transport-integrity tests pass, with 17-test/full-type/build cloud preview acceptance.
-- [ ] Corrected provisional consultation actual save/reload/new-session and independent original-row hash comparison; final responsive/trusted lifecycle/retirement/owner gates remain open.
+- [x] Corrected provisional consultation save/reload/new-session and independent original-row hash comparison (9f892ef; original unchanged, revision 2 linked, still private/unverified).
+- [ ] Final responsive/trusted lifecycle/reviewed QA routine/retirement/owner gates remain open. Tablet functional pass is not visual acceptance; squeezed charts require the new layout and rendered recheck.
