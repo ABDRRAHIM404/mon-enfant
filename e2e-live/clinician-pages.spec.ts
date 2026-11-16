@@ -2,7 +2,7 @@ import { test, expect, type Page } from "@playwright/test";
 import { writeFileSync } from "node:fs";
 import { observeBrowserErrors } from "./browser-errors";
 test.afterEach(async ({ page }, info) => {
-  if (info.status !== info.expectedStatus)
+  if (info.status !== info.expectedStatus) {
     writeFileSync(
       info.outputPath("clinician-failure.json"),
       JSON.stringify(
@@ -17,6 +17,14 @@ test.afterEach(async ({ page }, info) => {
         2,
       ),
     );
+    await page
+      .screenshot({
+        path: info.outputPath("clinician-failure.png"),
+        scale: "css",
+        timeout: 10000,
+      })
+      .catch(() => undefined);
+  }
 });
 const run = process.env.MON_ENFANT_QA_RUN!;
 const labels = [
@@ -124,8 +132,8 @@ test("each clinician section has dedicated scoped UI and provisional writes pers
         const source = `Source fictive ${marker} ${kind}`,
           path = `/provisional/${section}?child=${id}`;
         await page.goto(path);
-        if ((page.viewportSize()?.width || 1672) <= 760) {
-          const picker = page.locator(".soignant-phone-picker");
+        const picker = page.locator(".soignant-phone-picker");
+        if (await picker.isVisible()) {
           await picker.locator("summary").click();
           const search = picker.locator('input[type="search"]');
           await expect(search).toHaveCSS("border-top-style", "solid");
@@ -223,8 +231,14 @@ test("each clinician section has dedicated scoped UI and provisional writes pers
         await page.goto(path);
         await page.reload();
         await expect(page.getByRole("main")).toContainText(source);
-        if (kind === "growth")
-          await expect(page.locator("svg.growth-chart")).toHaveCount(2);
+        if (kind === "growth") {
+          const charts = page.locator("svg.growth-chart");
+          await expect(charts).toHaveCount(2);
+          for (const chart of await charts.all())
+            expect(
+              await chart.evaluate((el) => el.getBoundingClientRect().width),
+            ).toBeGreaterThanOrEqual(280);
+        }
         if (kind === "vaccination")
           await expect(page.getByRole("main")).toContainText(
             "HB1 : aucun calcul automatique",

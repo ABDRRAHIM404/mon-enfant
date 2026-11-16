@@ -1,0 +1,16 @@
+{
+  "run": "5d4ec565b0864dce",
+  "child": "de12062a-37c7-4e84-a753-42dd8d30a87b",
+  "editPath": "/provisional/de12062a-37c7-4e84-a753-42dd8d30a87b?edit=f91d226e-3405-4e4f-be90-d2897274f0d1#entry-form",
+  "stage": "correction_save_reload_new_session_pass",
+  "fields": {
+    "reasonCount": 1,
+    "clinicalReason": "Motif clinique enti\u00e8rement fictif distinct du motif de correction",
+    "amendmentReason": "Correction technique fictive motiv\u00e9e s\u00e9par\u00e9ment"
+  },
+  "submitted": true,
+  "previousRevision": 1,
+  "expectedRevision": 2,
+  "source": "9f892ef41a9556247adec46eb5a72cfa844cfbad",
+  "deployment": "dpl_CrFYFMuw37ejB2WjtQaKDPHdeT8c"
+}

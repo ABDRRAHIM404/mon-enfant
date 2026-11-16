@@ -1,0 +1,15 @@
+{
+  "run": "5d4ec565b0864dce",
+  "source": "9f892ef41a9556247adec46eb5a72cfa844cfbad",
+  "deployment": "dpl_CrFYFMuw37ejB2WjtQaKDPHdeT8c",
+  "independent_database_read": true,
+  "original_row_unchanged": true,
+  "original_row_md5": "ac68edf92515e16c417edc443d149654",
+  "latest_revision": 2,
+  "previous_id_matches_original": true,
+  "clinical_and_amendment_reasons_separate": true,
+  "all_revisions_unverified": true,
+  "child_revisions": 5,
+  "trusted_children": 0,
+  "browser_hard_reload_and_new_session_pass": true
+}
