@@ -221,16 +221,42 @@ it("reads only independently approved QA clone or original draft, never activate
   const a = await actor(),
     editor = await actor("admin", "approved"),
     reviewer = await actor("doctor", "approved"),
-    own = await child(a),
-    id = randomUUID();
+    own = await child(a);
   await db.query(
-    "insert into public.vaccine_versions(id,source_id,parent_id,label,status,revision,created_by,reviewed_by,reviewed_at,review_reference,review_verified) select $1,source_id,id,'QA local read projection','approved',2,$2,$3,now(),'Revue fictive de test uniquement',true from public.vaccine_versions where parent_id is null limit 1",
-    [id, editor.id, reviewer.id],
+    "insert into private.staff_permissions(user_id,can_manage_vaccine_catalog,can_review_vaccine_catalog) values($1,true,false),($2,false,true)",
+    [editor.id, reviewer.id],
   );
   await db.query(
-    "insert into public.vaccine_rules select $1,dose_code,vaccine_code,source_row,source_age,age,eligibility,automatic_scheduling from public.vaccine_rules where version_id=(select parent_id from public.vaccine_versions where id=$1)",
-    [id],
+    "insert into public.professional_capabilities(professional_id,capability,enabled,granted_by) values($1,'vaccination',true,$2)",
+    [reviewer.id, editor.id],
   );
+  const catalog = await rpc<{
+      versions: { id: string; parent_id: string | null; revision: number }[];
+    }>(editor, "vaccine_catalog", []),
+    seed = catalog.versions.find((v) => v.parent_id === null)!;
+  const basis = {
+    reason: "Revue fictive de test uniquement",
+    evidence_reference: "Référence QA locale sans approbation réelle",
+  };
+  const id = await rpc<string>(editor, "change_vaccine_catalog", [
+    randomUUID(),
+    "clone",
+    seed.id,
+    seed.revision,
+    { ...basis, label: "QA local read projection" },
+  ]);
+  await rpc(reviewer, "change_vaccine_catalog", [
+    randomUUID(),
+    "approve",
+    id,
+    1,
+    {
+      ...basis,
+      source_authenticated: true,
+      clinical_reviewed: true,
+      birth_window_reviewed: true,
+    },
+  ]);
   expect(
     (
       await rpc<ProvisionalFollowup>(a, "provisional_vaccination_followup", [
@@ -238,10 +264,13 @@ it("reads only independently approved QA clone or original draft, never activate
       ])
     ).version?.id,
   ).toBe(id);
-  await db.query(
-    "update public.vaccine_versions set status='retired',revision=3 where id=$1",
-    [id],
-  );
+  await rpc(editor, "change_vaccine_catalog", [
+    randomUUID(),
+    "retire",
+    id,
+    2,
+    basis,
+  ]);
   expect(
     (
       await rpc<ProvisionalFollowup>(a, "provisional_vaccination_followup", [
@@ -257,6 +286,7 @@ it("reads only independently approved QA clone or original draft, never activate
     ).rows[0],
   ).toEqual({ status: "draft", revision: 1 });
 });
+
 it("uses latest active declarations and appointments independently of feature pagination, and denies stale sessions/admins", async () => {
   const a = await actor(),
     own = await child(a),
