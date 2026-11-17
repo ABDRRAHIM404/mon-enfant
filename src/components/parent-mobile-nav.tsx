@@ -27,13 +27,15 @@ export function ParentMobileNav() {
       Icon: Heart,
       active:
         pathname.startsWith("/parent") &&
-        (view === "children" || (pathname !== "/parent" && !view)),
+        (view === "children" || /^\/parent\/children\/[^/]+$/.test(pathname)),
     },
     {
       href: "/parent?view=appointments",
       label: "Rendez-vous",
       Icon: CalendarDays,
-      active: pathname === "/parent" && view === "appointments",
+      active:
+        (pathname === "/parent" && view === "appointments") ||
+        pathname.endsWith("/appointments"),
     },
     {
       href: "/parent?view=documents",

@@ -221,3 +221,16 @@ Current milestone uses the eight pictures in updates/new-design-update-5. Parent
 - [x] Per-page review/inventory/bug and scoped acceptance reports prepared.
 - [x] Application publication and clean primary/origin main synchronization verified at a906611; final evidence-only handoff uses the same tested application source.
 - [x] Owner clinician review approved 16 November 2026; separate later parent acceptance before APK resume. No external/Phase 6 approval is waived.
+
+
+## 17 November — dashboard integration request
+
+Current owner request resumes parent website work; APK/iOS stay paused. See [DASHBOARD_INTEGRATION.md](DASHBOARD_INTEGRATION.md) for the page audit and changes.
+
+- [x] Source audit and distinct parent section implementation using existing guarded RPCs.
+- [x] Clinician provisional Documents destination, shared shell continuity and mobile navigation corrections.
+- [x] Local database/unit regressions, types/build and empty-state static responsive checks.
+- [x] Charles instruction review and limited accessible CSS/menu enhancements after source checks.
+- [ ] Fresh synthetic hosted role/persistence/linking/QR end-to-end verification.
+- [ ] Populated mockup comparison, hydrated mobile/form/motion acceptance.
+- [ ] Production publication and primary checkout synchronization.

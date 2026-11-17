@@ -1,9 +1,9 @@
+import { WorkspaceShell } from "@/components/workspace-shell";
 import Link from "next/link";
 import { QrCode } from "@/components/qr/code";
 import { clinicianLookupUrl } from "@/lib/qr/symbol";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
-import { Brand } from "@/components/brand";
 import { EntryCard } from "@/components/clinical/entry-card";
 import { GrowthChart } from "@/components/clinical/growth-chart";
 import { PrintButton } from "@/components/clinical/print-button";
@@ -49,14 +49,7 @@ export default async function ChildBooklet({
     Math.ceil(Math.max(booklet.entry_total, booklet.appointment_total) / 30),
   );
   return (
-    <main className="account-page wide">
-      <header className="workspace-nav no-print">
-        <Brand />
-        <nav aria-label="Navigation parent">
-          <Link href="/parent">Mes enfants</Link>
-          <Link href="/parent/account">Mon compte</Link>
-        </nav>
-      </header>
+    <WorkspaceShell area="parent" active="children">
       <section className="page-heading">
         <span className="eyebrow">CARNET DE MON ENFANT</span>
         <h1 id="main-content" tabIndex={-1}>
@@ -255,6 +248,6 @@ export default async function ChildBooklet({
       <p className="fine">
         Environnement de développement · Données fictives uniquement
       </p>
-    </main>
+    </WorkspaceShell>
   );
 }
