@@ -10,7 +10,8 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "format": "prettier --write src tests e2e \"*.ts\" \"*.mjs\" package.json tsconfig.json"
+    "format": "prettier --write src tests e2e \"*.ts\" \"*.mjs\" package.json tsconfig.json",
+    "test:clinician": "vitest run tests/provisional-sections.test.ts tests/provisional-followup.test.ts tests/vaccine-calendar.test.ts tests/clinician-overview.test.ts tests/appointment-calendar.test.ts tests/provisional-action-reasons.test.ts"
   },
   "license": "UNLICENSED",
   "type": "module",
