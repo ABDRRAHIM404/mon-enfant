@@ -921,3 +921,11 @@ Implemented, migrated, cloud-verified and deployed from `feature/professional-ve
 - Owner requested no more checks: no new browser/unit-test campaign dispatched. Updated regression expectations for the new preview behavior; normal cloud deployment compilation/build gates remain. Previous isolated browser job is terminal and its separate synthetic fixture 415e2cdc0e5f411f has been RETIRED by the cleanup helper (one banned actor, zero temporary GitHub values, private credentials removed).
 
 - Owner explicitly asks direct deployment and will verify the website. Vercel buildCommand now runs npm run build only; optional focused test script remains available for later requested work. No additional browser, regression, emulator or local build is started.
+
+
+### 17 November — vaccination workflow documented and acknowledged
+
+- Owner explicitly defines the intended workflow: Mon Enfant automatically calculates routine dates from the supplied PNI documentation; doctors/nurses verify and adjust patient-specific dates against their vaccination registers. VACCINE_DATA.md now distinguishes automatically calculated dates from dates explicitly checked by a professional, separately from catalog/source or account approval.
+- Calculations remain enabled, including provisional read-only previews. Existing source/status, birth/eligibility, permissions, quarantine, correction/history and trusted assignment review safeguards are preserved; HB1/catch-up and replacement appointments remain manual. This documentation does not claim a new verification feature, patient review or external approval.
+- Owner acknowledgment and the instruction to avoid repeating this same general warning are recorded in AGENTS.md, the project plan and checklist. Revisit only for a new risk, changed condition or actual problem; retain truthful labels and contextual safeguards.
+- Documentation-only change: reviewed the current calculation/preview entry points and checked the documentation diff; no application, source dataset, migration or runtime configuration changes, and no build/browser/regression campaign. Existing untracked parent design files privately backed up and preserved. Publish the documentation checkpoint and verify primary main equals origin/main.

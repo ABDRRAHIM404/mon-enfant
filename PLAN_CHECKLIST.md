@@ -11,6 +11,7 @@ This checklist preserves PROJECT_PLAN.md's complete Phase 0–8 scope. It is not
 ## Phase 0 — baseline and validation
 
 - [x] Requirements/roadmap and supplied source data retained; confirmed decisions documented.
+- [x] Owner-acknowledged vaccination workflow documented (17 November 2026): automatic PNI date calculations remain enabled; doctors/nurses verify and adjust against their registers; calculated and professionally verified dates stay distinct, with all safeguards preserved. See VACCINE_DATA.md. Do not repeat the acknowledged general warning unless a new risk or actual problem arises.
 - [x] Conservative register scope (professional/facility/year/book/local number) documented as provisional.
 - [x] Synthetic-data-only implementation boundary recorded.
 - [x] Consolidated acceptance stories/screens/role boundaries and clinical edge cases in USER_STORIES.md (requirements contract; execution evidence remains per phase).
