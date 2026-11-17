@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "checks": [
+    "settings-values",
+    "profile-confirmation",
+    "refresh-persistence",
+    "role-denials",
+    "empty-states",
+    "parent-responsive",
+    "keyboard-motion",
+    "active-clinician-contrast"
+  ],
+  "preview": "https://mon-enfant-tjtzs3m6r-bounga.vercel.app"
+}

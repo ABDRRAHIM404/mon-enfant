@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "run": "77920eaf87e1484c",
+  "checks": [
+    "private-child-reload",
+    "private-consultation-ui",
+    "private-isolation"
+  ]
+}

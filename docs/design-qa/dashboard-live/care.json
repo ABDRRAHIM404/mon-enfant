@@ -1,0 +1,11 @@
+{
+  "passed": false,
+  "run": "77920eaf87e1484c",
+  "checks": [
+    "consultation-correction",
+    "appointment-ui-create",
+    "appointment-ui-reschedule",
+    "vaccination-ui-manual-HB1"
+  ],
+  "failedStage": "private-child-ui"
+}

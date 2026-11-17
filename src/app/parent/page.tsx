@@ -1,4 +1,6 @@
 import Link from "next/link";
+import Image from "next/image";
+import { ParentSection } from "@/components/parents/section";
 import { redirect } from "next/navigation";
 import {
   UsersRound,
@@ -15,27 +17,21 @@ import type { ParentWorkspaceData } from "@/lib/parents/types";
 import type { AppointmentRow } from "@/lib/appointments/types";
 import { appointmentTime } from "@/lib/appointments/calendar";
 import { WorkspaceShell } from "@/components/workspace-shell";
-import { ParentProfileForm } from "@/components/parents/profile-form";
+import {
+  ParentProfileForm,
+  ParentProfileDisclosure,
+} from "@/components/parents/profile-form";
 import { createClient } from "@/lib/supabase/server";
 import { supabaseConfig } from "@/lib/supabase/config";
 export const dynamic = "force-dynamic";
-const destinations: Record<string, { label: string; suffix: string }> = {
-  children: { label: "Les carnets de mes enfants", suffix: "" },
-  vaccinations: {
-    label: "Les vaccinations de mes enfants",
-    suffix: "/vaccinations",
-  },
-  growth: { label: "La croissance de mes enfants", suffix: "#growth" },
-  appointments: {
-    label: "Les rendez-vous de mes enfants",
-    suffix: "/appointments",
-  },
-  documents: { label: "Les documents de mes enfants", suffix: "#documents" },
-  access: {
-    label: "Le partage et les accès de mes enfants",
-    suffix: "/privacy",
-  },
-};
+const sections = new Set([
+  "children",
+  "vaccinations",
+  "growth",
+  "appointments",
+  "documents",
+  "access",
+]);
 const quickLinks = [
   {
     view: "vaccinations",
@@ -58,18 +54,18 @@ const quickLinks = [
   {
     view: "documents",
     title: "Documents",
-    description: "Historique et carnet",
+    description: "Bientôt disponible",
     Icon: FileText,
   },
 ];
 export default async function ParentWorkspace({
   searchParams,
 }: {
-  searchParams: Promise<{ view?: string }>;
+  searchParams: Promise<{ view?: string; child?: string; page?: string }>;
 }) {
-  const { view } = await searchParams;
-  const focus =
-    view && Object.hasOwn(destinations, view) ? destinations[view] : null;
+  const query = await searchParams;
+  const { view } = query;
+  const focusedSection = view && sections.has(view) ? view : null;
   if (!supabaseConfig()) redirect("/login");
   const supabase = await createClient();
   const {
@@ -90,29 +86,81 @@ export default async function ParentWorkspace({
     next_appointment: AppointmentRow | null;
     unread_total: number;
   };
+  if (focusedSection) {
+    return (
+      <WorkspaceShell area="parent" active={view} unread={unread}>
+        <ParentSection
+          section={focusedSection}
+          childrenList={children}
+          query={query}
+        />
+      </WorkspaceShell>
+    );
+  }
   return (
-    <WorkspaceShell
-      area="parent"
-      active={focus ? view : "home"}
-      unread={unread}
-    >
-      <section className="workspace-heading">
-        <span className="eyebrow">ESPACE PARENT</span>
-        <h1 id="main-content" tabIndex={-1}>
-          {profile ? `Bonjour, ${profile.display_name}` : "Bonjour"}
-        </h1>
-        <p className="muted">Retrouvez l’essentiel du suivi de vos enfants.</p>
+    <WorkspaceShell area="parent" active="home" unread={unread}>
+      <section className="workspace-heading parent-welcome">
+        <div>
+          <span className="eyebrow">ESPACE PARENT</span>
+          <h1 id="main-content" tabIndex={-1}>
+            {profile ? `Bonjour, ${profile.display_name}` : "Bonjour"}
+          </h1>
+          <p className="muted">
+            Retrouvez l’essentiel du suivi de vos enfants.
+          </p>
+        </div>
+        <Image
+          src="/brand/family.png"
+          alt=""
+          width={240}
+          height={204}
+          priority
+        />
       </section>
+      <div className="parent-summary-grid">
+        <Link
+          href="/parent?view=children"
+          className="workspace-surface parent-summary-card"
+        >
+          <UsersRound size={28} aria-hidden="true" />
+          <div>
+            <strong>{children.length}</strong>
+            <span>
+              Carnet{children.length > 1 ? "s" : ""} relié
+              {children.length > 1 ? "s" : ""}
+            </span>
+          </div>
+        </Link>
+        <Link
+          href="/parent/notifications"
+          className="workspace-surface parent-summary-card"
+        >
+          <Bell size={28} aria-hidden="true" />
+          <div>
+            <strong>{unread}</strong>
+            <span>
+              Mise{unread > 1 ? "s" : ""} à jour non lue{unread > 1 ? "s" : ""}
+            </span>
+          </div>
+        </Link>
+        <Link
+          href="/parent?view=appointments"
+          className="workspace-surface parent-summary-card"
+        >
+          <CalendarDays size={28} aria-hidden="true" />
+          <div>
+            <strong className="parent-summary-date">
+              {next ? appointmentTime(next.starts_at) : "Aucun à venir"}
+            </strong>
+            <span>Prochain rendez-vous enregistré</span>
+          </div>
+        </Link>
+      </div>
       <section className="workspace-section" id="children">
         <div className="workspace-section-heading">
-          <h2>{focus?.label ?? "Mes enfants"}</h2>
+          <h2>Mes enfants</h2>
           <Link href="/parent?view=children">Gérer mes enfants →</Link>
         </div>
-        {focus && (
-          <p className="muted workspace-selection-help">
-            Choisissez un enfant dont le carnet vous est relié.
-          </p>
-        )}
         <div className="workspace-child-grid">
           {children.map((child) => (
             <article className="workspace-child-card" key={child.id}>
@@ -123,9 +171,7 @@ export default async function ParentWorkspace({
               />
               <div>
                 <h3>
-                  <Link
-                    href={`/parent/children/${child.id}${focus?.suffix ?? ""}`}
-                  >
+                  <Link href={`/parent/children/${child.id}`}>
                     {patientName(child)}
                   </Link>
                 </h3>
@@ -158,7 +204,7 @@ export default async function ParentWorkspace({
           </p>
         )}
       </section>
-      {!focus && (
+      {!focusedSection && (
         <>
           <div className="workspace-overview-grid">
             <section className="workspace-surface workspace-next-appointment">
@@ -268,11 +314,7 @@ export default async function ParentWorkspace({
           </div>
         </section>
       )}
-      <details
-        className="workspace-surface workspace-secondary"
-        open={!profile}
-      >
-        <summary>Mon profil et relier un carnet</summary>
+      <ParentProfileDisclosure initiallyOpen={!profile}>
         <div className="two-columns">
           <section>
             <h2>Mon profil</h2>
@@ -297,7 +339,7 @@ export default async function ParentWorkspace({
             </p>
           </section>
         </div>
-      </details>
+      </ParentProfileDisclosure>
     </WorkspaceShell>
   );
 }

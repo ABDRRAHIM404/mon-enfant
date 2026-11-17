@@ -88,7 +88,6 @@ export async function ClinicianShell({
       label: "Documents",
       href: base + "/documents",
       icon: FileText,
-      disabled: provisional,
     },
     {
       key: "account",
@@ -98,27 +97,20 @@ export async function ClinicianShell({
     },
   ];
   const links = () =>
-    items.map(({ key, label, href, icon: Icon, disabled }) =>
-      disabled ? (
-        <span className="soignant-nav-disabled" aria-disabled="true" key={key}>
-          <Icon size={21} aria-hidden="true" />
-          <span>
-            {label}
-            <small>Indisponible en provisoire</small>
-          </span>
+    items.map(({ key, label, href, icon: Icon }) => (
+      <Link
+        key={key}
+        href={href}
+        aria-current={active === key ? "page" : undefined}
+      >
+        <Icon size={21} aria-hidden="true" />
+        <span>
+          {label}
+          {key === "documents" && <small>Bientôt disponible</small>}
         </span>
-      ) : (
-        <Link
-          key={key}
-          href={href}
-          aria-current={active === key ? "page" : undefined}
-        >
-          <Icon size={21} aria-hidden="true" />
-          <span>{label}</span>
-          <NavigationFeedback />
-        </Link>
-      ),
-    );
+        <NavigationFeedback />
+      </Link>
+    ));
   const logout = () => (
     <form action={signOut}>
       <button className="soignant-logout">

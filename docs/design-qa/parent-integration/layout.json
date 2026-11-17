@@ -1,0 +1,113 @@
+{
+  "scope": "static SSR empty sections; no authenticated backend or hydration proof",
+  "results": [
+    {
+      "section": "children",
+      "width": 1440,
+      "overflow": false,
+      "menu": null
+    },
+    {
+      "section": "vaccinations",
+      "width": 1440,
+      "overflow": false,
+      "menu": null
+    },
+    {
+      "section": "growth",
+      "width": 1440,
+      "overflow": false,
+      "menu": null
+    },
+    {
+      "section": "appointments",
+      "width": 1440,
+      "overflow": false,
+      "menu": null
+    },
+    {
+      "section": "access",
+      "width": 1440,
+      "overflow": false,
+      "menu": null
+    },
+    {
+      "section": "documents",
+      "width": 1440,
+      "overflow": false,
+      "menu": null
+    },
+    {
+      "section": "children",
+      "width": 820,
+      "overflow": false,
+      "menu": null
+    },
+    {
+      "section": "vaccinations",
+      "width": 820,
+      "overflow": false,
+      "menu": null
+    },
+    {
+      "section": "growth",
+      "width": 820,
+      "overflow": false,
+      "menu": null
+    },
+    {
+      "section": "appointments",
+      "width": 820,
+      "overflow": false,
+      "menu": null
+    },
+    {
+      "section": "access",
+      "width": 820,
+      "overflow": false,
+      "menu": null
+    },
+    {
+      "section": "documents",
+      "width": 820,
+      "overflow": false,
+      "menu": null
+    },
+    {
+      "section": "children",
+      "width": 390,
+      "overflow": false,
+      "menu": "opened native details"
+    },
+    {
+      "section": "vaccinations",
+      "width": 390,
+      "overflow": false,
+      "menu": "opened native details"
+    },
+    {
+      "section": "growth",
+      "width": 390,
+      "overflow": false,
+      "menu": "opened native details"
+    },
+    {
+      "section": "appointments",
+      "width": 390,
+      "overflow": false,
+      "menu": "opened native details"
+    },
+    {
+      "section": "access",
+      "width": 390,
+      "overflow": false,
+      "menu": "opened native details"
+    },
+    {
+      "section": "documents",
+      "width": 390,
+      "overflow": false,
+      "menu": "opened native details"
+    }
+  ]
+}

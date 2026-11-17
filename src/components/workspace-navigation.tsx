@@ -28,6 +28,13 @@ export function WorkspaceMobileMenu({
     <details
       className="workspace-mobile-menu"
       ref={details}
+      onKeyDown={(event) => {
+        if (event.key === "Escape" && details.current?.open) {
+          event.preventDefault();
+          details.current.open = false;
+          details.current.querySelector("summary")?.focus();
+        }
+      }}
       onClick={(event) => {
         if ((event.target as HTMLElement).closest("a"))
           details.current?.removeAttribute("open");

@@ -1,0 +1,12 @@
+{
+  "run": "77920eaf87e1484c",
+  "passed": true,
+  "checks": [
+    "issue-consented-qr",
+    "redeem-ui",
+    "read-only-no-grant",
+    "replay-denial",
+    "same-account-new-session-denial",
+    "parent-revocation-ui"
+  ]
+}

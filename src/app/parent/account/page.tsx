@@ -1,16 +1,12 @@
+import { WorkspaceShell } from "@/components/workspace-shell";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
-import { Brand } from "@/components/brand";
 import { signOut } from "@/app/auth/actions";
 export const dynamic = "force-dynamic";
 export default async function ParentAccount() {
   const { user } = await requireUser();
   return (
-    <main className="account-page">
-      <header>
-        <Brand />
-        <Link href="/parent">Espace parent</Link>
-      </header>
+    <WorkspaceShell area="parent" active="settings">
       <section className="account-card">
         <span className="eyebrow">COMPTE PARENT</span>
         <h1 id="main-content" tabIndex={-1}>
@@ -31,6 +27,6 @@ export default async function ParentAccount() {
           <button className="button secondary">Se déconnecter</button>
         </form>
       </section>
-    </main>
+    </WorkspaceShell>
   );
 }

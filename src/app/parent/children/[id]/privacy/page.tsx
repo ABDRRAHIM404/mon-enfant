@@ -1,3 +1,4 @@
+import { WorkspaceShell } from "@/components/workspace-shell";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ParentSharePanel } from "@/components/sharing/parent-share-panel";
@@ -83,7 +84,7 @@ export default async function Privacy({
   });
   if (shares.error) notFound();
   return (
-    <main className="account-page wide">
+    <WorkspaceShell area="parent" active="access">
       <Link href={`/parent/children/${id}`}>← Carnet de mon enfant</Link>
       <section className="page-heading">
         <h1 id="main-content" tabIndex={-1}>
@@ -142,6 +143,6 @@ export default async function Privacy({
         </Link>
         . Vous pouvez retirer votre accès depuis le carnet.
       </p>
-    </main>
+    </WorkspaceShell>
   );
 }

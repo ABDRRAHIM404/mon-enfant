@@ -76,3 +76,15 @@ Protected checkpoint is canonically published in READY Vercel dpl_CR1C1asRvsdoFX
 Cloud 43664056898 passed the genuine QR/image scan, fragment-only entry, other-tab login, read-only scopes, concurrent claim and revocation stories on desktop/tablet/mobile with zero overflow/page errors. Captures are privately retained at ~/.local/state/mon-enfant/design-qa/43664056898/synthetic-live-evidence-results/live/sharing-parent-purpose-bou-e728e-urrent-claim-and-revocation-{desktop,tablet,mobile}/sharing-*.png. Desktop is 1440×900 CSS pixels; mobile 430×940 with its device DPR. Full-page captures include fixed navigation and, on the retired parent page, a retained keyboard-focus skip link. They are evidence of the actual functional state, not another identical-state pixel comparison. No active bearer QR/link is saved; the rendered QR is decoded in memory during the actual journey.
 
 Directly inspected desktop/mobile retired parent consent/scope/status controls, desktop vaccination reader and mobile booklet reader. The established brand/layout and selected source acceptance above are retained. The new read-only view has no matching supplied screen, so its purpose/countdown/consent/uncertainty/authorship and existing clinical cards are intentional functional additions. Real long synthetic IDs wrap, missing measurements and draft references remain explicit, and no percentage or clinical fact is invented. No new actionable P0/P1/P2 sharing layout finding; smaller presentation refinements and hardware-camera walkthroughs remain deferred. This does not claim a new 16-screen/theme paired campaign. All three synthetic browser proofs and independent native API proof passed and all fixtures were retired; see docs/design-qa/update3-sharing-proof.json. Canonical release verification follows in PROGRESS.md.
+
+
+## 17 November — parent dashboard integration
+
+Current result: **blocked** for full acceptance. See [the scoped review](docs/design-qa/parent-integration/review.md) and [integration report](DASHBOARD_INTEGRATION.md). Prior accepted evidence above is preserved. Eighteen static empty-state layout checks pass; populated/live/hydrated verification is pending.
+
+
+## 17 November — live dashboard follow-up
+
+final result: passed (scoped dashboard review)
+
+Correct-project preview a9e483f is READY and live checks now pass. See [live acceptance and final captures](docs/design-qa/dashboard-live/review.md). The earlier blocked/static-only checkpoint remains historical. Full external clinical/privacy approval and broad accessibility certification are separate. Production publication and synthetic fixture retirement are recorded in PROGRESS.md.

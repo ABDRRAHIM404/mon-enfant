@@ -323,3 +323,16 @@ Update 5 clinician checkpoint, 15 November 2026: eight dedicated available views
 16 November Update 5 evidence: current canonical 804ab4f has full two-role desktop menu/selector acceptance and durable captures. A real correction-form audit-field collision was reproduced and its fix passes 17 focused cloud tests/full types/build; corrected private-data lifecycle is proven by save/reload/new session and an unchanged original-row hash; trusted clinical/routine/appointment and final tablet/phone acceptance remain required. See UPDATE_5_ACCEPTANCE.md; no parent/native or external gate is closed by these checks.
 
 16 November owner decision: “Approve clinician milestone.” The reviewed 5c4443e evidence handoff and unchanged a906611 application source close the clinician-only Update 5 milestone. Parent redesign/acceptance, APK resume, iOS and all clinical/source/mail/legal/Phase 6 external gates remain deferred/open. Approval receipt: docs/stabilization/update5/owner-approval.json.
+
+
+## 17 November — dashboard integration request
+
+Current owner request resumes parent website work; APK/iOS stay paused. See [DASHBOARD_INTEGRATION.md](DASHBOARD_INTEGRATION.md) for the page audit and changes.
+
+- [x] Source audit and distinct parent section implementation using existing guarded RPCs.
+- [x] Clinician provisional Documents destination, shared shell continuity and mobile navigation corrections.
+- [x] Local database/unit regressions, types/build and empty-state static responsive checks.
+- [x] Charles instruction review and limited accessible CSS/menu enhancements after source checks.
+- [ ] Fresh synthetic hosted role/persistence/linking/QR end-to-end verification.
+- [ ] Populated mockup comparison, hydrated mobile/form/motion acceptance.
+- [ ] Production publication and primary checkout synchronization.

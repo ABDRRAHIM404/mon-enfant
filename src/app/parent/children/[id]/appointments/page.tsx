@@ -1,3 +1,4 @@
+import { WorkspaceShell } from "@/components/workspace-shell";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
@@ -64,7 +65,7 @@ export default async function ParentCalendar({
   const href = (date: string, mode: CalendarView = view, n = 1) =>
     `?${new URLSearchParams({ date, view: mode, state, page: String(n) })}`;
   return (
-    <main className="account-page wide">
+    <WorkspaceShell area="parent" active="appointments">
       <Link href={`/parent/children/${id}`}>← Carnet de mon enfant</Link>
       <section className="page-heading">
         <h1 id="main-content" tabIndex={-1}>
@@ -193,6 +194,6 @@ export default async function ParentCalendar({
       >
         Contacter le professionnel par une demande
       </Link>
-    </main>
+    </WorkspaceShell>
   );
 }
