@@ -49,3 +49,7 @@ Read the requested upstream [SKILL.md](https://github.com/LemonFace0309/charles-
 - Static visual checks cover empty sections only. Populated screens, settings forms, actual charts, animations and all live sidebar/secondary journeys still require browser acceptance. Mockup illustrations and unsupported example clinical assessments, percentages, statistics, patient names and permissions are not asserted as implemented. Full visual fidelity is not accepted.
 - No production deployment, DB migration or production merge is claimed. Publish this as a review branch until live evidence is obtained. No clinical/operational/legal approval is inferred.
 - The owner's historical primary checkout path is outside this cloud workspace and cannot be synchronized here. GitHub branch/main state is reported separately.
+
+## Published review checkpoint
+
+Application commit: `ae9525dbcca5009f6f6389edff29ac6cdda092cf`; draft PR https://github.com/ABDRRAHIM404/mon-enfant/pull/1. Final full suite: **315 tests / 40 files passed**. Final explicit types, lint and production build pass after the settings/motion changes. GitHub Actions run `44145729489` is blocked before job startup by account payments/spending-limit restrictions. Vercel's Git check points to a team-access invitation and has not produced a verified deployment. No spending limits or team membership were changed. Production remains unchanged by this task.
