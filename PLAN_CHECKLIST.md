@@ -231,6 +231,8 @@ Current owner request resumes parent website work; APK/iOS stay paused. See [DAS
 - [x] Clinician provisional Documents destination, shared shell continuity and mobile navigation corrections.
 - [x] Local database/unit regressions, types/build and empty-state static responsive checks.
 - [x] Charles instruction review and limited accessible CSS/menu enhancements after source checks.
-- [ ] Fresh synthetic hosted role/persistence/linking/QR end-to-end verification.
-- [ ] Populated mockup comparison, hydrated mobile/form/motion acceptance.
-- [ ] Production publication and primary checkout synchronization.
+- [x] Fresh synthetic hosted role/persistence/linking/QR end-to-end verification.
+- [x] Populated mockup comparison, hydrated mobile/form/motion acceptance (scoped report in docs/design-qa/dashboard-live).
+- [x] Canonical production publication (277e618, READY dpl_GYQEGw2vQgKBAC7wLoEvSSG4oCNu) and cloud main synchronization.
+- [x] Fresh fixture 77920eaf87e1484c retired; no active test sessions/links/grants/capabilities/shares.
+- [ ] Synchronize the owner’s separate PC checkout when that filesystem is available (not mounted in this cloud workspace).

@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "checks": [
+    "canonical-anonymous-guards",
+    "canonical-parent-content",
+    "canonical-clinician",
+    "guardian-link-revocation-ui"
+  ],
+  "commit": "277e618f57232fe8651a96fc8282ecc93a53088e",
+  "url": "https://mon-enfant.vercel.app"
+}

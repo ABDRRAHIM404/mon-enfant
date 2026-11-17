@@ -1,6 +1,6 @@
 # Dashboard integration — 17 November 2026
 
-Status: **source and live preview acceptance passed**; production and retirement recorded in PROGRESS.md. Current request supersedes the historical parent-web pause. Android/APK and iOS remain paused.
+Status: **implemented, live-verified and deployed** as application 277e618; canonical deployment dpl_GYQEGw2vQgKBAC7wLoEvSSG4oCNu READY. Fresh synthetic fixture retired; see PROGRESS.md. Current request supersedes the historical parent-web pause. Android/APK and iOS remain paused.
 
 ## Phase A — source audit
 
@@ -58,3 +58,8 @@ Application commit: `ae9525dbcca5009f6f6389edff29ac6cdda092cf`; draft PR https:/
 ## Live follow-up
 
 The previous access blockers are historical. Correct-project previews now build successfully; final source a9e483f passes the live acceptance in [the scoped report](docs/design-qa/dashboard-live/review.md). All source/permission/clinical safeguards are retained. Final production status and fixture retirement are recorded in PROGRESS.md.
+
+
+## Final result
+
+PR #1 is merged; [the canonical website](https://mon-enfant.vercel.app) is deployed and verified. All 315 tests pass. Live sidebar/responsive, clinical save/refresh/amendment, parent linking, QR/session/revocation and private/role-denial checks pass within the documented scope. Six temporary accounts are retired with zero active sessions/links/grants/capabilities/practices/shares; private credential files removed. See [production and retirement evidence](docs/design-qa/dashboard-live/retirement.json). Historical access blockers above are retained as checkpoints, not current status.

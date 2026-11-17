@@ -1,0 +1,25 @@
+{
+  "run": "77920eaf87e1484c",
+  "retired": true,
+  "actors": 6,
+  "bannedCredentialsCleared": 6,
+  "sessions": 0,
+  "activeLinks": 0,
+  "activeGrants": 0,
+  "enabledCapabilities": 0,
+  "activePractices": 0,
+  "activeShares": 0,
+  "retiredLoginDenied": true,
+  "temporaryGitHubValues": 0,
+  "sourceAfter": {
+    "status": "draft",
+    "revision": 1,
+    "rules": 25,
+    "rulesHash": "2576f108428d7787c76d77d866e8a593"
+  },
+  "previewAccess": {
+    "first": "not found when revocation requested; bounded TTL originally set",
+    "second": "revoked"
+  },
+  "cleanupScope": "Exact six recorded actor IDs; transaction first verifies synthetic_fixture, fixture_kind and fixture_run. DELETE affects auth.sessions for these actors only; no child, medical, audit, table or schema deletion."
+}

@@ -1,6 +1,6 @@
 # Live dashboard acceptance — 17 November 2026
 
-Status: **preview acceptance passed** for the dashboard scope below. Production publication and fixture retirement are recorded separately after completion.
+Status: **passed** for the scoped dashboard acceptance. Canonical production 277e618 is READY; production.json and production-sharing.json pass. Fixture 77920eaf87e1484c is retired; see retirement.json.
 
 Exact application source: a9e483fe412d46c18840f90e6811cf7ec644b541. Preview dpl_2Bpqb6soWCP3BjgJWPAXZQjbwCBd is READY on the correct bounga / mon-enfant project. Earlier preview fe18da5 / dpl_9ysubQduuR3fmx6zGC7G8A3qrxPh established the broad live-flow baseline. Deployment protection stays enabled; exact-preview share links are temporary and will be revoked after testing.
 
