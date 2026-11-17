@@ -81,3 +81,10 @@ Directly inspected desktop/mobile retired parent consent/scope/status controls, 
 ## 17 November — parent dashboard integration
 
 Current result: **blocked** for full acceptance. See [the scoped review](docs/design-qa/parent-integration/review.md) and [integration report](DASHBOARD_INTEGRATION.md). Prior accepted evidence above is preserved. Eighteen static empty-state layout checks pass; populated/live/hydrated verification is pending.
+
+
+## 17 November — live dashboard follow-up
+
+final result: passed (scoped dashboard review)
+
+Correct-project preview a9e483f is READY and live checks now pass. See [live acceptance and final captures](docs/design-qa/dashboard-live/review.md). The earlier blocked/static-only checkpoint remains historical. Full external clinical/privacy approval and broad accessibility certification are separate. Production publication and synthetic fixture retirement are recorded in PROGRESS.md.

@@ -1,0 +1,11 @@
+{
+  "run": "77920eaf87e1484c",
+  "passed": true,
+  "stages": [
+    "appointment-backend",
+    "guardian-invitation-ui",
+    "guardian-claim-ui",
+    "guardian-review-ui",
+    "parent-linked-persistence"
+  ]
+}

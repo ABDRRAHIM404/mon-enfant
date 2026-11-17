@@ -1,6 +1,6 @@
 # Dashboard integration — 17 November 2026
 
-Status: implementation branch; **full acceptance pending**. Current request supersedes the historical parent-web pause. Android/APK and iOS remain paused.
+Status: **source and live preview acceptance passed**; production and retirement recorded in PROGRESS.md. Current request supersedes the historical parent-web pause. Android/APK and iOS remain paused.
 
 ## Phase A — source audit
 
@@ -53,3 +53,8 @@ Read the requested upstream [SKILL.md](https://github.com/LemonFace0309/charles-
 ## Published review checkpoint
 
 Application commit: `ae9525dbcca5009f6f6389edff29ac6cdda092cf`; draft PR https://github.com/ABDRRAHIM404/mon-enfant/pull/1. Final full suite: **315 tests / 40 files passed**. Final explicit types, lint and production build pass after the settings/motion changes. GitHub Actions run `44145729489` is blocked before job startup by account payments/spending-limit restrictions. Vercel's Git check points to a team-access invitation and has not produced a verified deployment. No spending limits or team membership were changed. Production remains unchanged by this task.
+
+
+## Live follow-up
+
+The previous access blockers are historical. Correct-project previews now build successfully; final source a9e483f passes the live acceptance in [the scoped report](docs/design-qa/dashboard-live/review.md). All source/permission/clinical safeguards are retained. Final production status and fixture retirement are recorded in PROGRESS.md.

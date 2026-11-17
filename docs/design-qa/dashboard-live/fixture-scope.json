@@ -1,0 +1,39 @@
+{
+  "run": "77920eaf87e1484c",
+  "syntheticOnly": true,
+  "accounts": 6,
+  "setupCheckpoints": [
+    "parent-profile",
+    "facility",
+    "child-register",
+    "consultation-ui-save",
+    "growth-ui-save",
+    "vaccination-history-backend",
+    "appointment-backend",
+    "guardian-invitation-ui",
+    "guardian-claim-ui",
+    "guardian-review-ui",
+    "parent-linked-persistence"
+  ],
+  "credentialStorage": "private workspace only; no GitHub secrets created",
+  "sourceBefore": {
+    "status": "draft",
+    "revision": 1,
+    "rules": 25,
+    "rulesHash": "2576f108428d7787c76d77d866e8a593"
+  },
+  "ledgerBeforeRetirement": {
+    "trustedChildren": 1,
+    "clinicalRevisions": 6,
+    "vaccineHistory": 2,
+    "appointments": 2,
+    "appointmentEvents": 3,
+    "assignedScheduleItems": 0,
+    "outsideGrants": 0,
+    "guardianLinks": 1,
+    "approvedClaims": 1,
+    "privateChildren": 1,
+    "privateRevisions": 1,
+    "savedReminderDays": 7
+  }
+}
