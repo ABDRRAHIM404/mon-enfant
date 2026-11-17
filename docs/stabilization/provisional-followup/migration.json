@@ -1,0 +1,18 @@
+{
+  "status": "applied_verified_immutable",
+  "pending": [
+    "20261117172314"
+  ],
+  "remote_only": [],
+  "migration_sha256": "04e1038a20dcd01160f8ab9bc79958dea5ff90d93d12c96894b83d88836632f2",
+  "stored_source_md5_expected": "8bb84083bdb30f3e76ba7518cbd39285",
+  "existing_applied_migrations_unchanged": true,
+  "readback": {
+    "anon_execute": false,
+    "authenticated_execute": true,
+    "original_revision": 1,
+    "original_rules_md5": "cb838450d0f2066fa5d914971f9bd8a7",
+    "original_status": "draft",
+    "stored_md5": "8bb84083bdb30f3e76ba7518cbd39285"
+  }
+}

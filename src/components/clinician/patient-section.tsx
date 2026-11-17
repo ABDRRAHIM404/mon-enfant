@@ -210,9 +210,10 @@ export async function PatientSection({
                   <section className="soignant-attention">
                     <h2>Historique enregistré et suite du suivi</h2>
                     <p>
-                      HB1 : aucune prochaine dose ni aucun rattrapage n’est
-                      calculé automatiquement. Une source non confirmée reste un
-                      historique à examiner ; elle ne prouve pas une vaccination
+                      Une HB1 déclarée ne masque pas les autres références de
+                      routine. Pour une HB1 non administrée, incertaine ou un
+                      rattrapage, le suivi reste à décider manuellement. Une
+                      source non confirmée ne prouve pas une vaccination
                       manquée.
                     </p>
                     <p>

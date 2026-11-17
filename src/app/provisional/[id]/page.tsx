@@ -173,11 +173,14 @@ export default async function ProvisionalBooklet({
           ne crée ni référence vaccinale validée ni prochain rendez-vous.
         </p>
         <p>
-          HB1 : aucun calcul automatique de prochaine dose ni de rattrapage. Le
-          professionnel examine la source et choisit manuellement le suivi
-          nécessaire.
+          Une HB1 déclarée ne masque pas les autres repères de routine. Pour une
+          HB1 non administrée, incertaine ou un rattrapage, le professionnel
+          examine l’historique et décide du suivi manuellement.
         </p>
         <div className="tabs">
+          <Link href={`/provisional/vaccinations?child=${id}#routine-followup`}>
+            Vaccinations à venir et suivis planifiés
+          </Link>
           <Link href="#entry-history">Consulter les entrées enregistrées</Link>
           <Link href="?kind=vaccination#entry-form">
             Noter une vaccination / un historique

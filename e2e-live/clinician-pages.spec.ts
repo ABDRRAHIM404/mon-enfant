@@ -241,7 +241,7 @@ test("each clinician section has dedicated scoped UI and provisional writes pers
         }
         if (kind === "vaccination")
           await expect(page.getByRole("main")).toContainText(
-            "HB1 : aucun calcul automatique",
+            "Une HB1 déclarée ne masque pas les autres repères de routine",
           );
         if (kind === "appointment")
           await expect(page.getByRole("main")).toContainText("Planifié");

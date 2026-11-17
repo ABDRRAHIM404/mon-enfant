@@ -166,9 +166,9 @@ export default async function Vaccinations({
           certitude. Elle ne crée ni référence de routine ni rendez-vous.
         </p>
         <p className="soignant-attention">
-          HB1 : aucune prochaine dose ni aucun rattrapage n’est calculé
-          automatiquement. Le professionnel examine l’historique et choisit le
-          suivi nécessaire.
+          Une HB1 déclarée ne masque pas les autres références de routine. Pour
+          une HB1 non administrée, incertaine ou un rattrapage, le professionnel
+          examine l’historique et décide du suivi manuellement.
         </p>
         {(capabilities.data as string[]).includes("appointment") && (
           <Link
