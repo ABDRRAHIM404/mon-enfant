@@ -23,7 +23,7 @@ function credentials(form: FormData) {
   const password = String(form.get("password") ?? "");
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) &&
     email.length <= 254 &&
-    password.length >= 12 &&
+    password.length >= 8 &&
     password.length <= 128
     ? { email, password }
     : null;
@@ -35,7 +35,7 @@ export async function signIn(_: AuthState, form: FormData): Promise<AuthState> {
   if (!input)
     return {
       error:
-        "Vérifiez votre adresse e-mail et votre mot de passe (12 à 128 caractères).",
+        "Vérifiez votre adresse e-mail et votre mot de passe (8 à 128 caractères).",
     };
   const remembered = form.get("remember") === "on";
   const client = await createClient(remembered);
@@ -98,7 +98,7 @@ export async function signUp(_: AuthState, form: FormData): Promise<AuthState> {
   if (!input)
     return {
       error:
-        "Indiquez un e-mail valide et un mot de passe de 12 à 128 caractères.",
+        "Indiquez un e-mail valide et un mot de passe de 8 à 128 caractères.",
     };
   const client = await createClient();
   let siteUrl: string;
@@ -202,13 +202,13 @@ export async function changePassword(
   const { supabase } = await requireUser();
   const password = String(form.get("password") ?? "");
   if (
-    password.length < 12 ||
+    password.length < 8 ||
     password.length > 128 ||
     password !== String(form.get("confirmation") ?? "")
   )
     return {
       error:
-        "Les deux mots de passe doivent être identiques et comporter 12 à 128 caractères.",
+        "Les deux mots de passe doivent être identiques et comporter 8 à 128 caractères.",
     };
   const { error } = await supabase.auth.updateUser({ password });
   if (error) {

@@ -55,10 +55,10 @@ export function AuthForm({
         name="password"
         type="password"
         autoComplete={mode === "login" ? "current-password" : "new-password"}
-        minLength={12}
+        minLength={8}
         maxLength={128}
         required
-        placeholder="12 caractères minimum"
+        placeholder="8 caractères minimum"
         disabled={!configured}
       />
       {mode === "login" && (
