@@ -10,7 +10,12 @@ import { correctionCategories } from "@/lib/parents/types";
 export function ParentSettingsForm({ settings }: { settings: ParentSettings }) {
   const [state, action, pending] = useActionState(saveParentSettings, {});
   return (
-    <form action={action} className="auth-form" aria-busy={pending}>
+    <form
+      action={action}
+      className="auth-form"
+      aria-busy={pending}
+      onReset={(event) => event.preventDefault()}
+    >
       <label>
         Téléphone de contact (facultatif)
         <input

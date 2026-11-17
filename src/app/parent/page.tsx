@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ParentSection } from "@/components/parents/section";
 import { redirect } from "next/navigation";
 import {
@@ -16,7 +17,10 @@ import type { ParentWorkspaceData } from "@/lib/parents/types";
 import type { AppointmentRow } from "@/lib/appointments/types";
 import { appointmentTime } from "@/lib/appointments/calendar";
 import { WorkspaceShell } from "@/components/workspace-shell";
-import { ParentProfileForm } from "@/components/parents/profile-form";
+import {
+  ParentProfileForm,
+  ParentProfileDisclosure,
+} from "@/components/parents/profile-form";
 import { createClient } from "@/lib/supabase/server";
 import { supabaseConfig } from "@/lib/supabase/config";
 export const dynamic = "force-dynamic";
@@ -95,13 +99,63 @@ export default async function ParentWorkspace({
   }
   return (
     <WorkspaceShell area="parent" active="home" unread={unread}>
-      <section className="workspace-heading">
-        <span className="eyebrow">ESPACE PARENT</span>
-        <h1 id="main-content" tabIndex={-1}>
-          {profile ? `Bonjour, ${profile.display_name}` : "Bonjour"}
-        </h1>
-        <p className="muted">Retrouvez l’essentiel du suivi de vos enfants.</p>
+      <section className="workspace-heading parent-welcome">
+        <div>
+          <span className="eyebrow">ESPACE PARENT</span>
+          <h1 id="main-content" tabIndex={-1}>
+            {profile ? `Bonjour, ${profile.display_name}` : "Bonjour"}
+          </h1>
+          <p className="muted">
+            Retrouvez l’essentiel du suivi de vos enfants.
+          </p>
+        </div>
+        <Image
+          src="/brand/family.png"
+          alt=""
+          width={240}
+          height={204}
+          priority
+        />
       </section>
+      <div className="parent-summary-grid">
+        <Link
+          href="/parent?view=children"
+          className="workspace-surface parent-summary-card"
+        >
+          <UsersRound size={28} aria-hidden="true" />
+          <div>
+            <strong>{children.length}</strong>
+            <span>
+              Carnet{children.length > 1 ? "s" : ""} relié
+              {children.length > 1 ? "s" : ""}
+            </span>
+          </div>
+        </Link>
+        <Link
+          href="/parent/notifications"
+          className="workspace-surface parent-summary-card"
+        >
+          <Bell size={28} aria-hidden="true" />
+          <div>
+            <strong>{unread}</strong>
+            <span>
+              Mise{unread > 1 ? "s" : ""} à jour non lue{unread > 1 ? "s" : ""}
+            </span>
+          </div>
+        </Link>
+        <Link
+          href="/parent?view=appointments"
+          className="workspace-surface parent-summary-card"
+        >
+          <CalendarDays size={28} aria-hidden="true" />
+          <div>
+            <strong className="parent-summary-date">
+              {next ? appointmentTime(next.starts_at) : "Aucun à venir"}
+            </strong>
+            <span>Prochain rendez-vous enregistré</span>
+          </div>
+        </Link>
+      </div>
       <section className="workspace-section" id="children">
         <div className="workspace-section-heading">
           <h2>Mes enfants</h2>
@@ -260,11 +314,7 @@ export default async function ParentWorkspace({
           </div>
         </section>
       )}
-      <details
-        className="workspace-surface workspace-secondary"
-        open={!profile}
-      >
-        <summary>Mon profil et relier un carnet</summary>
+      <ParentProfileDisclosure initiallyOpen={!profile}>
         <div className="two-columns">
           <section>
             <h2>Mon profil</h2>
@@ -289,7 +339,7 @@ export default async function ParentWorkspace({
             </p>
           </section>
         </div>
-      </details>
+      </ParentProfileDisclosure>
     </WorkspaceShell>
   );
 }

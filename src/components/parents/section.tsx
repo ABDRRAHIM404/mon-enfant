@@ -232,7 +232,29 @@ export async function ParentSection({
         <section className="workspace-surface workspace-secondary">
           <h2>Vaccinations documentées</h2>
           {recorded.items.map((entry) => (
-            <EntryCard key={entry.id} entry={entry} link={false} />
+            <details className="workspace-vaccine-record" key={entry.id}>
+              <summary>
+                <div>
+                  <h3>
+                    {String(entry.payload.vaccine_label || "Vaccination")} ·{" "}
+                    {String(entry.payload.dose_label || "Dose non précisée")}
+                  </h3>
+                  <p className="muted">
+                    {entry.occurred_on || "Date inconnue"} ·{" "}
+                    {entry.occurrence_precision === "exact"
+                      ? "Date déclarée exacte"
+                      : "Date incertaine"}{" "}
+                    ·{" "}
+                    {entry.source_verified
+                      ? "Source contrôlée"
+                      : "Source non confirmée"}
+                  </p>
+                  <p className="fine">Professionnel {entry.professional_id}</p>
+                </div>
+                <span className="workspace-chip">Entrée enregistrée</span>
+              </summary>
+              <EntryCard entry={entry} link={false} />
+            </details>
           ))}
           {!recorded.items.length && (
             <p className="workspace-empty">
