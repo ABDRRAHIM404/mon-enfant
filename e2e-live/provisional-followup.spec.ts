@@ -20,6 +20,9 @@ test("unverified nurse sees routine calendar after HB1 and saved future follow-u
     .fill(process.env[prefix + "PASSWORD"]!);
   await page.getByRole("button", { name: "Se connecter", exact: true }).click();
   await expect(page).toHaveURL(/\/(provisional|account)$/);
+  await page.goto("/account");
+  await expect(page.getByRole("main")).toContainText("Non vérifié");
+  await expect(page.getByRole("main")).toContainText("Infirmier(e)");
   await page.goto(
     "/provisional/children?q=" + encodeURIComponent(`Suivi-${run}`),
   );
@@ -79,9 +82,7 @@ test("unverified nurse sees routine calendar after HB1 and saved future follow-u
   }
   const followup = "/provisional/vaccinations?child=" + child;
   await page.goto(followup);
-  await expect(page.locator("#routine-followup")).toContainText(
-    "Calendrier en attente de validation clinique",
-  );
+  await expect(page.locator("#routine-followup")).toContainText("2026-12-27");
   await expect(
     page.locator("#routine-followup").getByText("VPO1", { exact: true }),
   ).toBeVisible();
@@ -145,6 +146,23 @@ test("unverified nurse sees routine calendar after HB1 and saved future follow-u
     .click();
   await page.goto(followup);
   await expect(page).toHaveURL(/\/login/);
+  await page.goto("/login?audience=clinician");
+  await page.locator('[name="email"]').fill(process.env[prefix + "EMAIL"]!);
+  await page
+    .locator('[name="password"]')
+    .fill(process.env[prefix + "PASSWORD"]!);
+  await page.getByRole("button", { name: "Se connecter", exact: true }).click();
+  await expect(page).toHaveURL(/\/(account|provisional)$/);
+  await page.goto(followup);
+  await expect(page.locator("#planned-followup")).toContainText(purpose);
+  await expect(
+    page.locator("#routine-followup").getByText("VPO1", { exact: true }),
+  ).toBeVisible();
+  await page.goto("/account");
+  await page
+    .getByRole("button", { name: "Se déconnecter", exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/login/);
   expect(errors).toBe(0);
   writeFileSync(
     info.outputPath("provisional-followup.json"),
@@ -157,10 +175,11 @@ test("unverified nurse sees routine calendar after HB1 and saved future follow-u
         account: "unverified nurse",
         normal_hb1_saved: true,
         routine_other_doses_visible: true,
-        draft_dates_not_activated: true,
+        draft_dates_visible_as_preview: true,
         manual_future_visit_survives_reload: true,
         viewports: ["desktop", "phone"],
         signed_out_denied: true,
+        fresh_session_persistence: true,
         page_errors: errors,
       },
       null,

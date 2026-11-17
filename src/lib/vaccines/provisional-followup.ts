@@ -1,5 +1,5 @@
 import {
-  routineReference,
+  routinePreviewReference,
   type RoutineAge,
   type RoutineReference,
 } from "./calendar";
@@ -36,6 +36,8 @@ export function provisionalRoutineRows(
   identity: Record<string, string>,
   today: string,
 ) {
+  if (!data.version) return [];
+  const version = data.version;
   const child = {
     birthDate: identity.birth_date || null,
     birthPrecision:
@@ -56,7 +58,7 @@ export function provisionalRoutineRows(
         !(r.eligibility === "female" && child.sex === "male"),
     )
     .map((rule) => {
-      const reference: RoutineReference = routineReference(
+      const reference: RoutineReference = routinePreviewReference(
         {
           doseCode: rule.dose_code,
           vaccineCode: rule.vaccine_code,
@@ -65,13 +67,10 @@ export function provisionalRoutineRows(
           automaticScheduling: rule.automatic_scheduling,
         },
         child,
-        {
-          status: data.version?.status ?? "draft",
-          reviewVerified: data.version?.review_verified ?? false,
-        },
       );
       return {
         ...rule,
+        previewOnly: version.status !== "approved" || !version.review_verified,
         reference,
         past: reference.endOn !== null && reference.endOn < today,
         declared: data.declarations.some(

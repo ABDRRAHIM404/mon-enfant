@@ -81,17 +81,36 @@ export type RoutineReference = {
   endOn: CivilDate | null;
   isWindow: boolean;
 };
+type RoutineChild = {
+  birthDate: CivilDate | null;
+  birthPrecision: "exact" | "estimated" | "unknown";
+  sex: "female" | "male" | "unknown";
+};
 export function routineReference(
   rule: RoutineRule,
-  child: {
-    birthDate: CivilDate | null;
-    birthPrecision: "exact" | "estimated" | "unknown";
-    sex: "female" | "male" | "unknown";
-  },
+  child: RoutineChild,
   version: {
     status: "draft" | "approved" | "retired";
     reviewVerified: boolean;
   },
+): RoutineReference {
+  return calculateRoutineReference(
+    rule,
+    child,
+    version.status === "approved" && version.reviewVerified,
+  );
+}
+/** Read-only provisional preview; never grants approval or assigns clinical references. */
+export function routinePreviewReference(
+  rule: RoutineRule,
+  child: RoutineChild,
+): RoutineReference {
+  return calculateRoutineReference(rule, child, true);
+}
+function calculateRoutineReference(
+  rule: RoutineRule,
+  child: RoutineChild,
+  datesEnabled: boolean,
 ): RoutineReference {
   const empty = (state: ReferenceState): RoutineReference => ({
     state,
@@ -116,8 +135,7 @@ export function routineReference(
     throw new RangeError("Invalid agreed rotavirus rule");
   if (!["first_4_weeks", "weeks", "months", "years"].includes(rule.age.unit))
     throw new RangeError("Invalid routine age unit");
-  if (version.status !== "approved" || !version.reviewVerified)
-    return empty("unreviewed_version");
+  if (!datesEnabled) return empty("unreviewed_version");
   if (rule.eligibility === "female" && child.sex === "unknown")
     return empty("eligibility_unknown");
   if (rule.eligibility === "female" && child.sex !== "female")

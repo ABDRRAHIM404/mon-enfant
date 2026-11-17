@@ -70,14 +70,16 @@ it("missing, uncertain and later HB1 history never shifts age-based dates into c
   }
   expect(d.appointments).toEqual([]);
 });
-it("draft review gate, uncertain birth and unknown HPV eligibility never fabricate dates", () => {
+it("draft calendar preview shows dates while uncertain birth and unknown eligibility stay explicit", () => {
   const d = data();
   d.version = { ...d.version!, status: "draft", review_verified: false };
   expect(
-    provisionalRoutineRows(d, identity, "2026-11-17").every(
-      (r) => r.reference.startOn === null,
+    provisionalRoutineRows(d, identity, "2026-11-17").find(
+      (r) => r.dose_code === "VPO1",
     ),
-  ).toBe(true);
+  ).toMatchObject({ previewOnly: true, reference: { startOn: "2026-12-27" } });
+  expect(d.version.status).toBe("draft");
+  expect(d.version.review_verified).toBe(false);
   d.version = { ...d.version!, status: "approved", review_verified: true };
   expect(
     provisionalRoutineRows(

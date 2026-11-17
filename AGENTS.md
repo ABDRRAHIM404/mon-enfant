@@ -1,5 +1,7 @@
 # Mon Enfant working instructions
 
+- Owner follow-up decision (17 November 2026): provisional vaccination calendar must display read-only date previews without the calendar-review-status gate. Preserve original source/status, ownership, birth/eligibility rules and manual HB1/catch-up handling. Owner explicitly requests direct deployment and will verify it; no new browser/regression campaigns. Vercel required build only. Fresh fixture 415e2cdc0e5f411f is RETIRED; never prepare it again. Parent/APK/iOS remain paused.
+
 - Owner appearance decision (15 November 2026): remove dark mode; website and next Android source use light appearance regardless of saved/system preference. Historical dark-mode captures remain evidence only. APK publication stays paused under Update 5.
 
 - Revised Update 5 (owner file updated 15 November): implement the eight distinct clinician pages and shared responsive light-only shell from updates/new-design-update-5. Clinician-only milestone; parent website redesign/implementation is explicitly deferred. Preserve source/permissions and the selected logo; mockup numbers/patients/clinical assessments are not data. Read UPDATE_5_PAGE_INVENTORY.md and revised UPDATE_5_WORK_PLAN.md. APK and iOS remain paused.

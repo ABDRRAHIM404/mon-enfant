@@ -17,8 +17,6 @@ export function ProvisionalVaccinationFollowup({
   const rows = provisionalRoutineRows(data, identity, todayCasablanca());
   const upcoming = rows.filter((r) => !r.past),
     past = rows.filter((r) => r.past);
-  const approved =
-    data.version?.status === "approved" && data.version.review_verified;
   const table = (items: typeof rows) => (
     <div className="table-scroll">
       <table>
@@ -59,7 +57,7 @@ export function ProvisionalVaccinationFollowup({
                       ? "Éligibilité à préciser"
                       : r.reference.state === "disabled_reference_only"
                         ? "Suivi manuel"
-                        : "Date indisponible — calendrier non validé"}
+                        : "Informations nécessaires pour calculer la date"}
               </td>
             </tr>
           ))}
@@ -79,13 +77,10 @@ export function ProvisionalVaccinationFollowup({
         {data.version ? (
           <>
             <p className="fine">Calendrier : {data.version.label}</p>
-            {!approved && (
-              <p className="notice">
-                Calendrier en attente de validation clinique : les doses et âges
-                de référence sont affichés, mais aucune date personnalisée n’est
-                activée.
-              </p>
-            )}
+            <p className="fine">
+              Dates prévisionnelles calculées à partir de la naissance. Elles ne
+              créent pas de rendez-vous et ne valident aucune administration.
+            </p>
             {!data.declarations_complete && (
               <p className="notice">
                 Historique volumineux : les mentions de doses déclarées ne
