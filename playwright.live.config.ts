@@ -16,6 +16,7 @@ if (
     "provisional-correction",
     "clinician-care",
     "clinician-routine",
+    "provisional-followup",
     "forms-cloud-accept",
     "smart-forms-cloud-accept",
     "sharing-cloud-accept",
@@ -43,46 +44,48 @@ if (!/^[a-f0-9]{16}$/.test(process.env.MON_ENFANT_QA_RUN ?? ""))
 export default defineConfig({
   testDir: "./e2e-live",
   testMatch:
-    probe === "clinician-routine"
-      ? "clinician-routine.spec.ts"
-      : probe === "clinician-care"
-        ? "clinician-care.spec.ts"
-        : probe === "provisional-correction"
-          ? "provisional-correction.spec.ts"
-          : probe === "clinician-pages"
-            ? "clinician-pages.spec.ts"
-            : probe === "stabilization-clinical"
-              ? "stabilization-clinical.spec.ts"
-              : probe === "stabilization-repro" ||
-                  probe === "stabilization-accept"
-                ? "stabilization-repro.spec.ts"
-                : probe === "smart-forms-cloud-accept"
-                  ? "smart-forms.spec.ts"
-                  : probe === "forms-cloud-accept"
-                    ? "form-layout.spec.ts"
-                    : probe === "sharing-cloud-accept"
-                      ? "sharing.spec.ts"
-                      : probe === "design-cloud-accept"
-                        ? "design.spec.ts"
-                        : probe === "updates-accept" ||
-                            probe === "updates-cloud-accept"
-                          ? ["updates.spec.ts", "design.spec.ts"]
-                          : probe === "parent-accept"
-                            ? "parent.spec.ts"
-                            : probe?.startsWith("session-")
-                              ? "session.spec.ts"
-                              : probe === "accessibility-accept"
-                                ? "accessibility.spec.ts"
-                                : probe === "vaccination-accept" ||
-                                    probe === "vaccine-accessibility"
-                                  ? "vaccination.spec.ts"
-                                  : probe === "clinical-inspect"
-                                    ? "clinical-inspect.spec.ts"
-                                    : probe === "clinical-accept" ||
-                                        probe === "clinical-accessibility" ||
-                                        probe === "clinical-performance"
-                                      ? "clinical.spec.ts"
-                                      : "evidence.spec.ts",
+    probe === "provisional-followup"
+      ? "provisional-followup.spec.ts"
+      : probe === "clinician-routine"
+        ? "clinician-routine.spec.ts"
+        : probe === "clinician-care"
+          ? "clinician-care.spec.ts"
+          : probe === "provisional-correction"
+            ? "provisional-correction.spec.ts"
+            : probe === "clinician-pages"
+              ? "clinician-pages.spec.ts"
+              : probe === "stabilization-clinical"
+                ? "stabilization-clinical.spec.ts"
+                : probe === "stabilization-repro" ||
+                    probe === "stabilization-accept"
+                  ? "stabilization-repro.spec.ts"
+                  : probe === "smart-forms-cloud-accept"
+                    ? "smart-forms.spec.ts"
+                    : probe === "forms-cloud-accept"
+                      ? "form-layout.spec.ts"
+                      : probe === "sharing-cloud-accept"
+                        ? "sharing.spec.ts"
+                        : probe === "design-cloud-accept"
+                          ? "design.spec.ts"
+                          : probe === "updates-accept" ||
+                              probe === "updates-cloud-accept"
+                            ? ["updates.spec.ts", "design.spec.ts"]
+                            : probe === "parent-accept"
+                              ? "parent.spec.ts"
+                              : probe?.startsWith("session-")
+                                ? "session.spec.ts"
+                                : probe === "accessibility-accept"
+                                  ? "accessibility.spec.ts"
+                                  : probe === "vaccination-accept" ||
+                                      probe === "vaccine-accessibility"
+                                    ? "vaccination.spec.ts"
+                                    : probe === "clinical-inspect"
+                                      ? "clinical-inspect.spec.ts"
+                                      : probe === "clinical-accept" ||
+                                          probe === "clinical-accessibility" ||
+                                          probe === "clinical-performance"
+                                        ? "clinical.spec.ts"
+                                        : "evidence.spec.ts",
   webServer: cloudRuntime
     ? [
         {

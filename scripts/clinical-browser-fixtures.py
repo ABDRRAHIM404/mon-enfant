@@ -100,11 +100,11 @@ def validate(state):
     return ids
 
 
-def prepare(session_only=False, vaccine_browser=False, accessibility_only=False):
-    minimal = session_only or accessibility_only
+def prepare(session_only=False, vaccine_browser=False, accessibility_only=False, provisional_only=False):
+    minimal = session_only or accessibility_only or provisional_only
     if any(name.startswith(PREFIX) for name in secret_names()):
         raise RuntimeError('Finish the recorded clinical fixture run first')
-    state = {'run': uuid.uuid4().hex[:16], 'actors': [], 'secrets': [], 'purpose': 'accessibility' if accessibility_only else 'session' if session_only else 'vaccination' if vaccine_browser else 'clinical'}
+    state = {'run': uuid.uuid4().hex[:16], 'actors': [], 'secrets': [], 'purpose': 'provisional_followup' if provisional_only else 'accessibility' if accessibility_only else 'session' if session_only else 'vaccination' if vaccine_browser else 'clinical'}
     if not minimal and not vaccine_browser:
         state['clinical_story_version'] = 2
     credentials = {}
@@ -127,14 +127,18 @@ def prepare(session_only=False, vaccine_browser=False, accessibility_only=False)
             for field, value in (('EMAIL', email), ('PASSWORD', password)):
                 credentials[PREFIX + role + '_' + field] = value
             save(state, credentials)
-            profile_role = 'admin' if role == 'MANAGER' else 'doctor'
+            profile_role = 'nurse' if provisional_only else 'admin' if role == 'MANAGER' else 'doctor'
             platform = f"QAB-{state['run']}-{role}"
-            sql(f"insert into public.professional_profiles(user_id,role,verification_status,professional_id) values('{uid}','{profile_role}','approved','{platform}')")
+            status = 'unverified' if provisional_only else 'approved'
+            platform_sql = 'null' if provisional_only else f"'{platform}'"
+            sql(f"insert into public.professional_profiles(user_id,role,verification_status,professional_id) values('{uid}','{profile_role}','{status}',{platform_sql})")
             if role == 'MANAGER':
                 sql(f"insert into private.staff_permissions(user_id,can_manage_clinical_permissions,can_manage_vaccine_catalog) values('{uid}',true,{str(vaccine_browser).lower()})")
             if vaccine_browser and role == 'A':
                 sql(f"insert into private.staff_permissions(user_id,can_review_vaccine_catalog) values('{uid}',true)")
             for field in ('EMAIL', 'PASSWORD'):
+                if provisional_only:
+                    continue  # Bounded local browser only; no temporary GitHub values needed.
                 key = PREFIX + role + '_' + field
                 # Record the intended secret before publishing, so interrupted
                 # setup can remove it even if GitHub accepted a timed-out call.
@@ -150,7 +154,7 @@ def prepare(session_only=False, vaccine_browser=False, accessibility_only=False)
 def inspect(run):
     state = load(run)
     ids = validate(state)
-    if state.get('purpose') in ('session', 'accessibility'):
+    if state.get('purpose') in ('session', 'accessibility', 'provisional_followup'):
         rows = sql(f"select (select count(*) from public.children where created_by in({ids}))::integer children,(select count(*) from public.clinical_entries where author_id in({ids}))::integer clinical_entries,(select count(*) from public.access_grants where professional_id in({ids}))::integer grants,(select count(*) from public.professional_capabilities where professional_id in({ids}))::integer capabilities,(select count(*) from private.staff_permissions where user_id in({ids}))::integer staff_permissions")
         if len(state['actors']) != 1 or rows != [{'children': 0, 'clinical_entries': 0, 'grants': 0, 'capabilities': 0, 'staff_permissions': 0}]:
             raise RuntimeError('Session-only fixture scope was not proven')
@@ -160,7 +164,7 @@ def inspect(run):
                 raise RuntimeError('Three keyboard-created fictional practice memberships were not proven')
             print(json.dumps({'run': run, 'accessibility_scope_verified': True, 'fictional_facilities': facilities, **rows[0]}), flush=True)
         else:
-            print(json.dumps({'run': run, 'session_only_scope_verified': True, **rows[0]}), flush=True)
+            print(json.dumps({'run': run, ('provisional_followup_scope_verified' if state.get('purpose') == 'provisional_followup' else 'session_only_scope_verified'): True, **rows[0]}), flush=True)
         return
     if state.get('purpose') == 'vaccination':
         inspect_vaccination(state)
@@ -316,7 +320,10 @@ if __name__ == '__main__':
     parser.add_argument('--session-only', action='store_true', help='Prepare only one fictional doctor, without capabilities, grants or staff permissions')
     parser.add_argument('--vaccine-browser', action='store_true', help='Prepare isolated catalog editor/reviewer appointments for the fictional vaccine browser story')
     parser.add_argument('--accessibility-only', action='store_true', help='Prepare one fictional doctor for keyboard and accessibility checks, without clinical permissions')
+    parser.add_argument('--provisional-only', action='store_true', help='Prepare one unverified fictional nurse, no capabilities or GitHub values, for private follow-up checks')
     args = parser.parse_args()
+    if args.provisional_only and (not args.prepare or args.session_only or args.vaccine_browser or args.accessibility_only):
+        parser.error('--provisional-only requires --prepare and no other scope')
     if args.accessibility_only and (not args.prepare or args.session_only or args.vaccine_browser):
         parser.error('--accessibility-only requires --prepare and cannot combine with other fixture scopes')
     if args.vaccine_browser and (not args.prepare or args.session_only):
@@ -325,7 +332,7 @@ if __name__ == '__main__':
         parser.error('--session-only requires --prepare')
     try:
         if args.prepare:
-            prepare(args.session_only, args.vaccine_browser, args.accessibility_only)
+            prepare(args.session_only, args.vaccine_browser, args.accessibility_only, args.provisional_only)
         elif args.check:
             inspect(args.run)
         else:

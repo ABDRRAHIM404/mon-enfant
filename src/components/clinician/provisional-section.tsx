@@ -4,6 +4,8 @@ import { GrowthChart } from "@/components/clinical/growth-chart";
 import { notFound, redirect } from "next/navigation";
 import { Plus, FileClock } from "lucide-react";
 import { ClinicianChildPicker } from "./child-picker";
+import { ProvisionalVaccinationFollowup } from "./provisional-vaccination-followup";
+import type { ProvisionalFollowup } from "@/lib/vaccines/provisional-followup";
 import { getProfessional } from "@/lib/auth";
 import { ClinicianShell, ClinicianHeading } from "./shell";
 import {
@@ -97,6 +99,13 @@ export async function ProvisionalSection({
     total: number;
   };
   const selected = data.selected_child;
+  const followup =
+    selected && section === "vaccinations"
+      ? await supabase.rpc("provisional_vaccination_followup", {
+          p_child_id: selected.id,
+        })
+      : null;
+  if (followup?.error?.code === "42501") notFound();
   const href = (child: string, n = 1, cp = childPage) =>
     `${base}?${new URLSearchParams({ child, page: String(n), childPage: String(cp), q })}`;
   return (
@@ -204,23 +213,28 @@ export async function ProvisionalSection({
                     Ouvrir le dossier et l’historique complet
                   </Link>
                 </section>
-                {section === "vaccinations" && (
-                  <section className="soignant-attention">
-                    <h2>Historique et suite du suivi</h2>
-                    <p>
-                      Une transcription n’est pas une administration confirmée.
-                      HB1 : aucun calcul automatique de prochaine dose ni de
-                      rattrapage. Aucune référence ni aucun rendez-vous n’est
-                      créé par cet enregistrement.
-                    </p>
-                    <Link
-                      className="text-link"
-                      href={`/provisional/${selected.id}?kind=appointment#entry-form`}
-                    >
-                      Noter un suivi choisi manuellement
-                    </Link>
-                  </section>
-                )}
+                {section === "vaccinations" &&
+                  (followup?.data && !followup.error ? (
+                    <ProvisionalVaccinationFollowup
+                      data={followup.data as ProvisionalFollowup}
+                      childId={selected.id}
+                      identity={selected.identity}
+                    />
+                  ) : (
+                    <section className="panel">
+                      <h2>Vaccinations à venir</h2>
+                      <p role="status">
+                        Le calendrier est temporairement indisponible.
+                        L’historique enregistré ci-dessous est conservé.
+                      </p>
+                      <Link
+                        className="text-link"
+                        href={`/provisional/${selected.id}?kind=appointment#entry-form`}
+                      >
+                        Planifier un suivi manuellement
+                      </Link>
+                    </section>
+                  ))}
                 {section === "growth" && (
                   <div className="soignant-two-column">
                     {[

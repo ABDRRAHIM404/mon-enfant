@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import type { PGlite } from "@electric-sql/pglite";
 import { clinicianUpdatesDatabase } from "./helpers/database";
+import type { ProvisionalFollowup } from "../src/lib/vaccines/provisional-followup";
 let db: PGlite;
 type Actor = { id: string; session: string };
 async function actor(role = "doctor", status = "unverified"): Promise<Actor> {
@@ -75,6 +76,12 @@ beforeAll(async () => {
   await db.exec(
     readFileSync(
       "supabase/migrations/20261115161000_provisional_feature_views.sql",
+      "utf8",
+    ),
+  );
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/20261117172314_provisional_vaccination_followup.sql",
       "utf8",
     ),
   );
@@ -175,4 +182,160 @@ it("rejects malformed feature and pagination queries", async () => {
   await expect(
     section(a, null, "all", 1, "x".repeat(101)),
   ).rejects.toMatchObject({ code: "22023" });
+});
+
+for (const role of ["doctor", "nurse"])
+  it(`${role} can read routine ages for only their private child without account approval`, async () => {
+    const a = await actor(role),
+      b = await actor(),
+      own = await child(a),
+      other = await child(b);
+    const r = await rpc<ProvisionalFollowup>(
+      a,
+      "provisional_vaccination_followup",
+      [own],
+    );
+    expect(r.version).toMatchObject({
+      status: "draft",
+      review_verified: false,
+    });
+    expect(r.rules).toHaveLength(25);
+    expect(
+      r.rules.find((x) => x.dose_code === "HB1")?.automatic_scheduling,
+    ).toBe(false);
+    expect(r.appointments).toEqual([]);
+    expect(r.declarations_complete).toBe(true);
+    for (const id of [other, randomUUID(), null])
+      await expect(
+        rpc(a, "provisional_vaccination_followup", [id]),
+      ).rejects.toMatchObject({ code: "42501" });
+    expect(
+      (
+        await db.query<{ n: number }>(
+          "select count(*)::int n from public.children",
+        )
+      ).rows[0].n,
+    ).toBe(0);
+  });
+it("reads only independently approved QA clone or original draft, never activates the source", async () => {
+  const a = await actor(),
+    editor = await actor("admin", "approved"),
+    reviewer = await actor("doctor", "approved"),
+    own = await child(a),
+    id = randomUUID();
+  await db.query(
+    "insert into public.vaccine_versions(id,source_id,parent_id,label,status,revision,created_by,reviewed_by,reviewed_at,review_reference,review_verified) select $1,source_id,id,'QA local read projection','approved',2,$2,$3,now(),'Revue fictive de test uniquement',true from public.vaccine_versions where parent_id is null limit 1",
+    [id, editor.id, reviewer.id],
+  );
+  await db.query(
+    "insert into public.vaccine_rules select $1,dose_code,vaccine_code,source_row,source_age,age,eligibility,automatic_scheduling from public.vaccine_rules where version_id=(select parent_id from public.vaccine_versions where id=$1)",
+    [id],
+  );
+  expect(
+    (
+      await rpc<ProvisionalFollowup>(a, "provisional_vaccination_followup", [
+        own,
+      ])
+    ).version?.id,
+  ).toBe(id);
+  await db.query(
+    "update public.vaccine_versions set status='retired',revision=3 where id=$1",
+    [id],
+  );
+  expect(
+    (
+      await rpc<ProvisionalFollowup>(a, "provisional_vaccination_followup", [
+        own,
+      ])
+    ).version?.status,
+  ).toBe("draft");
+  expect(
+    (
+      await db.query<{ status: string; revision: number }>(
+        "select status,revision from public.vaccine_versions where parent_id is null",
+      )
+    ).rows[0],
+  ).toEqual({ status: "draft", revision: 1 });
+});
+it("uses latest active declarations and appointments independently of feature pagination, and denies stale sessions/admins", async () => {
+  const a = await actor(),
+    own = await child(a),
+    admin = await actor("admin", "approved");
+  const write = (
+    kind: string,
+    payload: object,
+    root: string | null = null,
+    revision: number | null = null,
+    state = "active",
+  ) =>
+    rpc<string>(a, "write_provisional_entry", [
+      randomUUID(),
+      own,
+      kind,
+      null,
+      "unknown",
+      "reported",
+      null,
+      payload,
+      root,
+      revision,
+      root ? "Correction fictive pour vérifier le suivi" : null,
+      state,
+    ]);
+  const vaccine = await write("vaccination", {
+    vaccine_label: "HB fictif",
+    dose_label: "HB1",
+  });
+  for (let i = 0; i < 31; i++)
+    await write("consultation", {
+      reason: "Consultation entièrement fictive de pagination",
+    });
+  let r = await rpc<ProvisionalFollowup>(
+    a,
+    "provisional_vaccination_followup",
+    [own],
+  );
+  expect(r.declarations).toHaveLength(1);
+  await write(
+    "vaccination",
+    { vaccine_label: "HB fictif", dose_label: "HB1" },
+    vaccine,
+    1,
+    "withdrawn",
+  );
+  const payload = {
+    purpose: "Suivi fictif",
+    scheduled_for: new Date(Date.now() + 30 * 86400000)
+      .toISOString()
+      .replace(/\.\d{3}Z$/, "Z"),
+    status: "planned",
+  };
+  const appointment = await write("appointment", payload);
+  await write(
+    "appointment",
+    { ...payload, status: "cancelled" },
+    appointment,
+    1,
+  );
+  await write("appointment", { ...payload, purpose: "Autre suivi conservé" });
+  r = await rpc<ProvisionalFollowup>(a, "provisional_vaccination_followup", [
+    own,
+  ]);
+  expect(r.declarations).toHaveLength(0);
+  expect(r.appointments_total).toBe(1);
+  expect(r.appointments[0].purpose).toBe("Autre suivi conservé");
+  await expect(
+    rpc(admin, "provisional_vaccination_followup", [own]),
+  ).rejects.toMatchObject({ code: "42501" });
+  await db.query("delete from auth.sessions where id=$1", [a.session]);
+  await expect(
+    rpc(a, "provisional_vaccination_followup", [own]),
+  ).rejects.toMatchObject({ code: "42501" });
+  expect(
+    (
+      await db.query<{ n: number }>(
+        "select count(*)::int n from public.appointments",
+      )
+    ).rows[0].n,
+  ).toBe(0);
 });
