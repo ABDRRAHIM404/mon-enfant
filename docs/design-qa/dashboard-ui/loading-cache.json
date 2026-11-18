@@ -1,0 +1,40 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "stage": "slow-query-navigation-skeleton",
+      "delayMs": 1100,
+      "querySkeleton": true,
+      "shellRetained": true,
+      "reducedMotion": true,
+      "interactiveAfterLoad": true
+    },
+    {
+      "stage": "cancel-pending-navigation",
+      "latestSelectionWins": true
+    },
+    {
+      "stage": "public-asset-edge-cache",
+      "cacheControl": "public, max-age=86400, stale-while-revalidate=604800",
+      "edgeCache": "HIT",
+      "observedNativeImageTransfers": [
+        2742
+      ],
+      "nativeImageReuseAcrossAllAuthenticatedNavigations": "not asserted"
+    },
+    {
+      "stage": "private-responses-not-shared-cache",
+      "cacheControl": "private, no-cache, no-store, max-age=0, must-revalidate",
+      "otherAccountDenied": true,
+      "authorizedAccountRetained": true
+    },
+    {
+      "stage": "phone-skeleton",
+      "width": 390,
+      "formShape": true,
+      "overflow": false
+    }
+  ],
+  "pageErrors": 0,
+  "cacheScope": "public assets/static loading boundaries only; dynamic pages no-store and request-scoped identity deduplication"
+}

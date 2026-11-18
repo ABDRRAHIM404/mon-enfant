@@ -1,0 +1,775 @@
+{
+  "passed": false,
+  "stage": "parent-refresh-data",
+  "observations": [
+    {
+      "role": "PARENT",
+      "width": 1440,
+      "label": "Tableau de bord",
+      "path": "/parent",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PARENT",
+      "width": 1440,
+      "label": "Mes enfants",
+      "path": "/parent",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PARENT",
+      "width": 1440,
+      "label": "Vaccinations",
+      "path": "/parent",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PARENT",
+      "width": 1440,
+      "label": "Croissance",
+      "path": "/parent",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PARENT",
+      "width": 1440,
+      "label": "Rendez-vous",
+      "path": "/parent",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PARENT",
+      "width": 1440,
+      "label": "Documents",
+      "path": "/parent",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PARENT",
+      "width": 1440,
+      "label": "Partage & accès",
+      "path": "/parent",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PARENT",
+      "width": 1440,
+      "label": "Paramètres",
+      "path": "/parent/settings",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PARENT",
+      "width": 820,
+      "label": "Tableau de bord",
+      "path": "/parent",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PARENT",
+      "width": 820,
+      "label": "Mes enfants",
+      "path": "/parent",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PARENT",
+      "width": 820,
+      "label": "Vaccinations",
+      "path": "/parent",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PARENT",
+      "width": 820,
+      "label": "Croissance",
+      "path": "/parent",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PARENT",
+      "width": 820,
+      "label": "Rendez-vous",
+      "path": "/parent",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PARENT",
+      "width": 820,
+      "label": "Documents",
+      "path": "/parent",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PARENT",
+      "width": 820,
+      "label": "Partage & accès",
+      "path": "/parent",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PARENT",
+      "width": 820,
+      "label": "Paramètres",
+      "path": "/parent/settings",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PARENT",
+      "width": 390,
+      "label": "Tableau de bord",
+      "path": "/parent",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PARENT",
+      "width": 390,
+      "label": "Mes enfants",
+      "path": "/parent",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PARENT",
+      "width": 390,
+      "label": "Vaccinations",
+      "path": "/parent",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PARENT",
+      "width": 390,
+      "label": "Croissance",
+      "path": "/parent",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PARENT",
+      "width": 390,
+      "label": "Rendez-vous",
+      "path": "/parent",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PARENT",
+      "width": 390,
+      "label": "Documents",
+      "path": "/parent",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PARENT",
+      "width": 390,
+      "label": "Partage & accès",
+      "path": "/parent",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PARENT",
+      "width": 390,
+      "label": "Paramètres",
+      "path": "/parent/settings",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "DOCTOR",
+      "width": 1440,
+      "label": "Tableau de bord",
+      "path": "/dashboard",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "DOCTOR",
+      "width": 1440,
+      "label": "Enfants",
+      "path": "/patients",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "DOCTOR",
+      "width": 1440,
+      "label": "Consultations",
+      "path": "/consultations",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "DOCTOR",
+      "width": 1440,
+      "label": "Vaccinations",
+      "path": "/vaccinations",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "DOCTOR",
+      "width": 1440,
+      "label": "Rendez-vous",
+      "path": "/appointments",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "DOCTOR",
+      "width": 1440,
+      "label": "Croissance",
+      "path": "/growth",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "DOCTOR",
+      "width": 1440,
+      "label": "Documents",
+      "path": "/documents",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "DOCTOR",
+      "width": 1440,
+      "label": "Mon compte soignant",
+      "path": "/account",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "DOCTOR",
+      "width": 820,
+      "label": "Tableau de bord",
+      "path": "/dashboard",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "DOCTOR",
+      "width": 820,
+      "label": "Enfants",
+      "path": "/patients",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "DOCTOR",
+      "width": 820,
+      "label": "Consultations",
+      "path": "/consultations",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "DOCTOR",
+      "width": 820,
+      "label": "Vaccinations",
+      "path": "/vaccinations",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "DOCTOR",
+      "width": 820,
+      "label": "Rendez-vous",
+      "path": "/appointments",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "DOCTOR",
+      "width": 820,
+      "label": "Croissance",
+      "path": "/growth",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "DOCTOR",
+      "width": 820,
+      "label": "Documents",
+      "path": "/documents",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "DOCTOR",
+      "width": 820,
+      "label": "Mon compte soignant",
+      "path": "/account",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "DOCTOR",
+      "width": 390,
+      "label": "Tableau de bord",
+      "path": "/dashboard",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "DOCTOR",
+      "width": 390,
+      "label": "Enfants",
+      "path": "/patients",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "DOCTOR",
+      "width": 390,
+      "label": "Consultations",
+      "path": "/consultations",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "DOCTOR",
+      "width": 390,
+      "label": "Vaccinations",
+      "path": "/vaccinations",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "DOCTOR",
+      "width": 390,
+      "label": "Rendez-vous",
+      "path": "/appointments",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "DOCTOR",
+      "width": 390,
+      "label": "Croissance",
+      "path": "/growth",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "DOCTOR",
+      "width": 390,
+      "label": "Documents",
+      "path": "/documents",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "DOCTOR",
+      "width": 390,
+      "label": "Mon compte soignant",
+      "path": "/account",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "NURSE",
+      "width": 1440,
+      "label": "Tableau de bord",
+      "path": "/dashboard",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "NURSE",
+      "width": 1440,
+      "label": "Enfants",
+      "path": "/patients",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "NURSE",
+      "width": 1440,
+      "label": "Consultations",
+      "path": "/consultations",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "NURSE",
+      "width": 1440,
+      "label": "Vaccinations",
+      "path": "/vaccinations",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "NURSE",
+      "width": 1440,
+      "label": "Rendez-vous",
+      "path": "/appointments",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "NURSE",
+      "width": 1440,
+      "label": "Croissance",
+      "path": "/growth",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "NURSE",
+      "width": 1440,
+      "label": "Documents",
+      "path": "/documents",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "NURSE",
+      "width": 1440,
+      "label": "Mon compte soignant",
+      "path": "/account",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "NURSE",
+      "width": 820,
+      "label": "Tableau de bord",
+      "path": "/dashboard",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "NURSE",
+      "width": 820,
+      "label": "Enfants",
+      "path": "/patients",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "NURSE",
+      "width": 820,
+      "label": "Consultations",
+      "path": "/consultations",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "NURSE",
+      "width": 820,
+      "label": "Vaccinations",
+      "path": "/vaccinations",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "NURSE",
+      "width": 820,
+      "label": "Rendez-vous",
+      "path": "/appointments",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "NURSE",
+      "width": 820,
+      "label": "Croissance",
+      "path": "/growth",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "NURSE",
+      "width": 820,
+      "label": "Documents",
+      "path": "/documents",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "NURSE",
+      "width": 820,
+      "label": "Mon compte soignant",
+      "path": "/account",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "NURSE",
+      "width": 390,
+      "label": "Tableau de bord",
+      "path": "/dashboard",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "NURSE",
+      "width": 390,
+      "label": "Enfants",
+      "path": "/patients",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "NURSE",
+      "width": 390,
+      "label": "Consultations",
+      "path": "/consultations",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "NURSE",
+      "width": 390,
+      "label": "Vaccinations",
+      "path": "/vaccinations",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "NURSE",
+      "width": 390,
+      "label": "Rendez-vous",
+      "path": "/appointments",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "NURSE",
+      "width": 390,
+      "label": "Croissance",
+      "path": "/growth",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "NURSE",
+      "width": 390,
+      "label": "Documents",
+      "path": "/documents",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "NURSE",
+      "width": 390,
+      "label": "Mon compte soignant",
+      "path": "/account",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PRIVATE",
+      "width": 1440,
+      "label": "Tableau de bord",
+      "path": "/provisional",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PRIVATE",
+      "width": 1440,
+      "label": "Enfants",
+      "path": "/provisional/children",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PRIVATE",
+      "width": 1440,
+      "label": "Consultations",
+      "path": "/provisional/consultations",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PRIVATE",
+      "width": 1440,
+      "label": "Vaccinations",
+      "path": "/provisional/vaccinations",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PRIVATE",
+      "width": 1440,
+      "label": "Rendez-vous",
+      "path": "/provisional/appointments",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PRIVATE",
+      "width": 1440,
+      "label": "Croissance",
+      "path": "/provisional/growth",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PRIVATE",
+      "width": 1440,
+      "label": "Documents",
+      "path": "/provisional/documents",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PRIVATE",
+      "width": 1440,
+      "label": "Mon compte soignant",
+      "path": "/account",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PRIVATE",
+      "width": 820,
+      "label": "Tableau de bord",
+      "path": "/provisional",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PRIVATE",
+      "width": 820,
+      "label": "Enfants",
+      "path": "/provisional/children",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PRIVATE",
+      "width": 820,
+      "label": "Consultations",
+      "path": "/provisional/consultations",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PRIVATE",
+      "width": 820,
+      "label": "Vaccinations",
+      "path": "/provisional/vaccinations",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PRIVATE",
+      "width": 820,
+      "label": "Rendez-vous",
+      "path": "/provisional/appointments",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PRIVATE",
+      "width": 820,
+      "label": "Croissance",
+      "path": "/provisional/growth",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PRIVATE",
+      "width": 820,
+      "label": "Documents",
+      "path": "/provisional/documents",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PRIVATE",
+      "width": 820,
+      "label": "Mon compte soignant",
+      "path": "/account",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PRIVATE",
+      "width": 390,
+      "label": "Tableau de bord",
+      "path": "/provisional",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PRIVATE",
+      "width": 390,
+      "label": "Enfants",
+      "path": "/provisional/children",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PRIVATE",
+      "width": 390,
+      "label": "Consultations",
+      "path": "/provisional/consultations",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PRIVATE",
+      "width": 390,
+      "label": "Vaccinations",
+      "path": "/provisional/vaccinations",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PRIVATE",
+      "width": 390,
+      "label": "Rendez-vous",
+      "path": "/provisional/appointments",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PRIVATE",
+      "width": 390,
+      "label": "Croissance",
+      "path": "/provisional/growth",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PRIVATE",
+      "width": 390,
+      "label": "Documents",
+      "path": "/provisional/documents",
+      "overflow": false,
+      "light": true
+    },
+    {
+      "role": "PRIVATE",
+      "width": 390,
+      "label": "Mon compte soignant",
+      "path": "/account",
+      "overflow": false,
+      "light": true
+    }
+  ],
+  "pageErrors": 0
+}

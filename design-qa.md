@@ -122,3 +122,9 @@ This is the current closeout review; earlier sections describe historical iterat
 Canonical closeout: application 6b6f215 / deployment dpl_2MWuubdsABzcoDTAxi4pgjdR35cG is READY and the canonical alias is verified. `canonical-form-interactions.json` and `canonical-navigation-motion.json` pass; the latter checks reduced motion during the actual pending spinner and Tab traversal through the sidebar. The synthetic account is retired, login denial passes and preview access is revoked. Final owner-facing results: [DASHBOARD_HANDOFF.md](DASHBOARD_HANDOFF.md).
 
 final result: passed
+
+## 18 November — dashboard visual/loading/cache redesign
+
+Latest scoped review: [dashboard-ui/review.md](docs/design-qa/dashboard-ui/review.md). Both source/current boards were opened; mint banners/art, parent metrics/rows, compact vaccine history and month/list calendar are implemented. All 65 page routes and query navigation have useful skeletons. 336 tests, 48 final-source visual checks and five live loading/cache/privacy cases pass. Public/static cache only; private records retain current access checks. Production and fixture retirement are recorded after publication.
+
+final result: passed (preview scope)
