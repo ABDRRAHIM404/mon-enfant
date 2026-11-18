@@ -1,4 +1,4 @@
-> Current dashboard checkpoint (18 November): the owner-requested parent and clinician dashboard integration is implemented and deployed at the 17 November milestone. Final closeout fixes interrupted parent saves and overlapping child-section links; preview cd2bca7 is READY, targeted source/browser checks pass. See DASHBOARD_INTEGRATION.md and the latest PROGRESS.md entry for final publication and fixture retirement. Historical clinician acceptance remains valid. APK/iOS remain paused.
+> Current dashboard checkpoint (18 November): owner-requested parent/clinician integration and final closeout are published in application 6b6f215 / READY canonical production dpl_2MWuubdsABzcoDTAxi4pgjdR35cG. Interrupted saves and overlapping child links are fixed; targeted source and canonical browser checks pass; the one fresh unprivileged parent fixture is RETIRED. See DASHBOARD_HANDOFF.md and PROGRESS.md. Historical clinician acceptance remains valid. APK/iOS remain paused.
 
 # Full plan execution and completion audit
 

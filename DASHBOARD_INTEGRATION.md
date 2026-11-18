@@ -2,6 +2,8 @@
 
 ## Final closeout — 18 November 2026
 
+Final publication: PR #3 is merged as **6b6f2151c413e0cbf8f82d989ea6dbe94e2a4f67**; production **dpl_2MWuubdsABzcoDTAxi4pgjdR35cG** is READY and the canonical alias is verified. Canonical form/navigation checks pass. The new fixture is RETIRED and its preview access is revoked. Owner-facing page-by-page deliverables are in [DASHBOARD_HANDOFF.md](DASHBOARD_HANDOFF.md).
+
 The original dashboard scope is implemented. The original live persistence, role/session/QR and responsive acceptance remains in `docs/design-qa/dashboard-live`; the narrowly scoped follow-up is in `docs/design-qa/dashboard-closeout`.
 
 - Fixed parent profile/settings input loss when a server-action response is interrupted. The form remains mounted, clears stale success, shows that the save could not be confirmed and does not automatically replay a mutation. Framework access/session redirects remain intact.

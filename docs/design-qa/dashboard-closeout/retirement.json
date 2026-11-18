@@ -1,0 +1,18 @@
+{
+  "run": "92c6f2f0db84362d",
+  "status": "RETIRED",
+  "retiredAccounts": 1,
+  "passwordCleared": true,
+  "sessions": 0,
+  "activeGuardianLinks": 0,
+  "professionalProfiles": 0,
+  "clinicalWrites": 0,
+  "outgoingEmail": 0,
+  "finalReminderDays": 3,
+  "retainedSyntheticPreferenceEvents": 8,
+  "previewShareRevoked": true,
+  "loginDenied": true,
+  "generatedPrivateFilesRemoved": 4,
+  "reportCredentialScan": "passed",
+  "scope": "exact fixture account and marker assertions; only its auth.sessions rows removed; no child/clinical/audit rows deleted"
+}

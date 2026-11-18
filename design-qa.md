@@ -119,4 +119,6 @@ This is the current closeout review; earlier sections describe historical iterat
 
 **Follow-up polish and limits.** Literal decorative-artwork/font/card-layout parity with the mockups is not claimed. Broader accessibility certification and external clinical/privacy/operations approvals remain outside this scoped review. This passing result covers the functional dashboard integration and documented reference-guided visual scope, not a pixel-identical clone.
 
+Canonical closeout: application 6b6f215 / deployment dpl_2MWuubdsABzcoDTAxi4pgjdR35cG is READY and the canonical alias is verified. `canonical-form-interactions.json` and `canonical-navigation-motion.json` pass; the latter checks reduced motion during the actual pending spinner and Tab traversal through the sidebar. The synthetic account is retired, login denial passes and preview access is revoked. Final owner-facing results: [DASHBOARD_HANDOFF.md](DASHBOARD_HANDOFF.md).
+
 final result: passed

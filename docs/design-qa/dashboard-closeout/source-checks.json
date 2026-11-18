@@ -1,0 +1,13 @@
+{
+  "application": "6b6f2151c413e0cbf8f82d989ea6dbe94e2a4f67",
+  "previewApplication": "cd2bca774b005bada9559d5364557c8def115dd5",
+  "sourceAndConfigurationIdentical": true,
+  "targetedTests": {
+    "files": 3,
+    "passed": 27
+  },
+  "targetedLint": "passed",
+  "explicitTypes": "passed",
+  "previewBuild": "passed",
+  "previewDeployment": "dpl_5f9diBZtf7xxZZzuKxzqFXsjdYAi"
+}

@@ -1,0 +1,37 @@
+{
+  "run": "92c6f2f0db84362d",
+  "base": "https://mon-enfant.vercel.app",
+  "passed": true,
+  "checks": [
+    {
+      "stage": "profile-first-save-slow-request",
+      "requests": 1,
+      "inputRetained": true,
+      "successVisible": true
+    },
+    {
+      "stage": "settings-slow-save-and-persistence"
+    },
+    {
+      "stage": "settings-server-validation-retains-input"
+    },
+    {
+      "stage": "settings-interrupted-request-retains-input"
+    },
+    {
+      "stage": "settings-server-error-retains-input",
+      "requests": 1
+    },
+    {
+      "stage": "response-lost-after-save-no-automatic-replay",
+      "requests": 1,
+      "committedStateVisibleAfterReload": true
+    },
+    {
+      "stage": "profile-interruption-retains-input"
+    }
+  ],
+  "unexpectedBrowserErrors": 0,
+  "mailSent": 0,
+  "clinicalWrites": 0
+}

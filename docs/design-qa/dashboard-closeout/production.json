@@ -1,0 +1,15 @@
+{
+  "url": "https://mon-enfant.vercel.app",
+  "applicationCommit": "6b6f2151c413e0cbf8f82d989ea6dbe94e2a4f67",
+  "deployment": "dpl_2MWuubdsABzcoDTAxi4pgjdR35cG",
+  "state": "READY",
+  "aliasError": null,
+  "canonicalAliasVerified": true,
+  "applicationMatchesAcceptedPreview": "cd2bca774b005bada9559d5364557c8def115dd5",
+  "formsReport": "canonical-form-interactions.json",
+  "navigationReport": "canonical-navigation-motion.json",
+  "newAuthenticatedFormScenarios": 7,
+  "navigationMotionAndComponentCases": 8,
+  "fixture": "92c6f2f0db84362d",
+  "fixtureStatus": "RETIRED"
+}
