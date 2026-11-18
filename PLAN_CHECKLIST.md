@@ -273,3 +273,10 @@ Current owner request resumes parent website work; APK/iOS stay paused. See [DAS
 - [x] Guards, session revocation, status/pagination, literal input and explicit selection for ambiguous results covered by 19 focused checks.
 - [x] Read-only hosted match checks pass for the owner-specified account; security advisor baseline unchanged. No new hosted actors or clinical permissions.
 - Required Vercel build and canonical deployment receipt are recorded on the search follow-up PR.
+
+## Owner-invoked Unslop pass
+
+- [x] Pin/attribute the skill, capture current public UI, audit shared sources and state the five-line direction.
+- [x] Apply all nine passes across shared/public/parent/clinician/admin presentation; preserve clinical and access behavior.
+- [x] Run relevant component/navigation/loading checks and lint; keep private-data caches unchanged.
+- Required compilation and the bounded preview/final visual review are recorded on the redesign PR; authenticated private visual acceptance remains pending an available session.

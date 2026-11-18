@@ -1,6 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
-import { familyIllustration } from "@/components/dashboard/art";
 import { ParentSection } from "@/components/parents/section";
 import { redirect } from "next/navigation";
 import {
@@ -97,22 +95,14 @@ export default async function ParentWorkspace({
     <WorkspaceShell area="parent" active="home" unread={unread}>
       <section className="workspace-heading parent-welcome">
         <div>
-          <span className="eyebrow">ESPACE PARENT</span>
+          <span className="eyebrow">Espace parent</span>
           <h1 id="main-content" tabIndex={-1}>
-            {profile ? `Bonjour, ${profile.display_name}` : "Bonjour"}
+            Le suivi de mes enfants
           </h1>
           <p className="muted">
             Retrouvez l’essentiel du suivi de vos enfants.
           </p>
         </div>
-        <Image
-          src={familyIllustration}
-          placeholder={familyIllustration.blurDataURL ? "blur" : "empty"}
-          alt=""
-          width={240}
-          height={204}
-          priority
-        />
       </section>
       <div className="parent-summary-grid">
         <Link

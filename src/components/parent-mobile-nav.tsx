@@ -6,27 +6,22 @@ import { Home, Heart, CalendarDays, BookOpen } from "lucide-react";
 export function ParentMobileNav() {
   const pathname = usePathname();
   const params = useSearchParams();
-  if (!(
-    pathname === "/" ||
-    pathname === "/login" ||
-    pathname === "/signup" ||
-    pathname.startsWith("/parent")
-  ))
-    return null;
+  const parent = pathname === "/parent" || pathname.startsWith("/parent/");
+  if (!parent) return null;
   const view = params.get("view");
   const items = [
     {
-      href: pathname.startsWith("/parent") ? "/parent" : "/",
+      href: "/parent",
       label: "Accueil",
       Icon: Home,
-      active: pathname === "/" || (pathname === "/parent" && !view),
+      active: pathname === "/parent" && !view,
     },
     {
       href: "/parent?view=children",
       label: "Enfants",
       Icon: Heart,
       active:
-        pathname.startsWith("/parent") &&
+        parent &&
         (view === "children" || /^\/parent\/children\/[^/]+$/.test(pathname)),
     },
     {

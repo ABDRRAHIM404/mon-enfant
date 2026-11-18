@@ -13,22 +13,22 @@ const features = [
   {
     Icon: Syringe,
     title: "Vaccinations",
-    description: "Calendrier, historique et rappels.",
+    description: "Calendrier, historique et rappels",
   },
   {
     Icon: ChartNoAxesCombined,
     title: "Croissance",
-    description: "Mesures et courbes de suivi.",
+    description: "Mesures et courbes de suivi",
   },
   {
     Icon: CalendarDays,
     title: "Rendez-vous",
-    description: "Prochains soins et consultations.",
+    description: "Prochains soins et consultations",
   },
   {
     Icon: FileText,
     title: "Documents",
-    description: "Carnet et documents médicaux.",
+    description: "Bientôt disponible",
   },
 ];
 export default function Home() {
@@ -38,9 +38,9 @@ export default function Home() {
       <main className="landing-main">
         <section className="landing-hero">
           <div className="landing-copy">
-            <span className="eyebrow">CARNET DE SANTÉ NUMÉRIQUE · MAROC</span>
+            <span className="eyebrow">Carnet de santé numérique · Maroc</span>
             <h1 id="main-content" tabIndex={-1}>
-              Le carnet de santé de votre enfant, <em>à portée de main.</em>
+              Le carnet de santé qui accompagne votre enfant
             </h1>
             <p className="muted">
               Vaccinations, consultations, croissance et prochains rendez-vous.
@@ -48,7 +48,7 @@ export default function Home() {
             </p>
             <div className="landing-actions">
               <Link href="/login" className="button primary">
-                Accéder à mon espace parent <ArrowRight size={17} />
+                Accéder à mon espace <ArrowRight size={17} />
               </Link>
               <Link href="/signup" className="button secondary">
                 Créer un compte parent
@@ -64,15 +64,15 @@ export default function Home() {
           <figure className="family-card">
             <Image
               src="/brand/family.png"
-              alt="Une mère et son enfant partagent un moment de tendresse."
+              alt="Une mère et son enfant partagent un moment de tendresse"
               width={560}
               height={476}
               sizes="(max-width: 700px) 90vw, 40vw"
               priority
             />
             <figcaption>
-              <strong>Sa santé. Son histoire. Toujours avec vous.</strong>
-              <p>Un carnet qui grandit avec votre enfant.</p>
+              <strong>Sa santé, son histoire</strong>
+              <p>Un carnet qui grandit avec votre enfant</p>
             </figcaption>
           </figure>
         </section>
@@ -94,7 +94,7 @@ export default function Home() {
         <section className="landing-guidance" id="securite">
           <ShieldCheck size={24} aria-hidden="true" />
           <div>
-            <h2>Un carnet partagé, des accès autorisés.</h2>
+            <h2>Un carnet partagé, des accès autorisés</h2>
             <p>
               Une invitation sécurisée et une vérification de votre qualité de
               responsable sont nécessaires pour relier un carnet existant. Votre

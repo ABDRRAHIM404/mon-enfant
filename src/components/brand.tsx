@@ -11,11 +11,12 @@ export function Brand() {
             width={44}
             height={44}
             alt=""
+            priority
           />
         </span>
         <span>
           mon enfant
-          <span className="brand-sub">LE CARNET QUI GRANDIT AVEC LUI</span>
+          <span className="brand-sub">Le carnet qui grandit avec lui</span>
           <span className="sr-only"> — Accueil</span>
         </span>
       </Link>

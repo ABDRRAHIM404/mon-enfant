@@ -60,7 +60,7 @@ export default async function PatientProfile({
       child={child}
     >
       <div className="page-heading">
-        <span className="eyebrow">DOSSIER ENFANT</span>
+        <span className="eyebrow">Dossier enfant</span>
         <h1 id="main-content" tabIndex={-1}>
           {patientName(child)}
         </h1>

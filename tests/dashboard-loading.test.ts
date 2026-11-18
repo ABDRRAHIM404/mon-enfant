@@ -58,6 +58,7 @@ describe("dashboard loading and public cache boundaries", () => {
     expect(publicRules.map((rule) => rule.source)).toEqual([
       "/brand/:path*",
       "/dashboard-art/:path*",
+      "/fonts/:path*",
     ]);
     expect(config.experimental?.staleTimes?.dynamic).toBe(0);
     expect(config.experimental?.staleTimes?.static).toBe(300);

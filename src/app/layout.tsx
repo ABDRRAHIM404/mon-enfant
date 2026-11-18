@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./site-design.css";
 import { Suspense } from "react";
 import { ParentMobileNav } from "@/components/parent-mobile-nav";
 export const metadata: Metadata = {
