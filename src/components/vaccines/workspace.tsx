@@ -1,5 +1,5 @@
 import { AdminShell } from "@/components/verification/admin-nav";
-import { DoctorNav } from "@/components/registry/doctor-nav";
+import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
 export function CatalogWorkspace({
   admin,
   children,
@@ -10,9 +10,6 @@ export function CatalogWorkspace({
   return admin ? (
     <AdminShell active="catalog">{children}</AdminShell>
   ) : (
-    <main className="account-page wide">
-      <DoctorNav />
-      {children}
-    </main>
+    <ClinicalWorkspace active="vaccinations">{children}</ClinicalWorkspace>
   );
 }

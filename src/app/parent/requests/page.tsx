@@ -1,3 +1,5 @@
+import { DashboardHeading } from "@/components/dashboard/heading";
+import { ParentWorkflow } from "@/components/parents/workflow";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import {
@@ -21,12 +23,14 @@ export default async function Requests({
   if (error) throw new Error("Impossible de charger les demandes.");
   const view = data as CorrectionPage;
   return (
-    <main className="account-page wide">
+    <ParentWorkflow active="requests">
       <Link href="/parent">← Mon espace parent</Link>
-      <section className="page-heading">
-        <h1 id="main-content" tabIndex={-1}>
-          Mes demandes et réponses
-        </h1>
+      <DashboardHeading
+        title="Mes demandes et réponses"
+        description="Suivez les vérifications et corrections demandées pour les carnets auxquels vous avez accès."
+        section="access"
+      />
+      <section className="parent-context-note">
         <p>
           Vos demandes pour les carnets auxquels vous avez actuellement accès.
           Elles ne modifient pas les soins enregistrés.
@@ -34,6 +38,6 @@ export default async function Requests({
       </section>
       <CorrectionList data={view} parent />
       <RequestPagination total={view.total} page={page} />
-    </main>
+    </ParentWorkflow>
   );
 }

@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export default async function VerificationQueue({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; page?: string }>;
+  searchParams: Promise<{ status?: string; page?: string; q?: string }>;
 }) {
   const { supabase } = await requireReviewer();
   const query = await searchParams;
@@ -24,17 +24,24 @@ export default async function VerificationQueue({
     1,
     Math.min(10000, Number.parseInt(query.page ?? "1", 10) || 1),
   );
-  const {
-    data: requests,
-    error,
-    count,
-  } = await supabase
+  const q = (query.q ?? "").trim().slice(0, 64);
+  let queue = supabase
     .from("verification_requests")
     .select(
       "id,display_name,registration_number,facility_name,status,submitted_at",
       { count: "exact" },
     )
-    .eq("status", status)
+    .eq("status", status);
+  if (q)
+    queue = queue.ilike(
+      "registration_number",
+      `%${q.replace(/[\\%_]/g, "\\$&")}%`,
+    );
+  const {
+    data: requests,
+    error,
+    count,
+  } = await queue
     .order("submitted_at", { ascending: true })
     .range((page - 1) * 30, page * 30 - 1);
   if (error) throw new Error("Impossible de charger les demandes.");
@@ -59,13 +66,32 @@ export default async function VerificationQueue({
             <Link
               aria-current={status === value ? "page" : undefined}
               key={value}
-              href={`?status=${value}`}
+              href={`?${new URLSearchParams({ status: value, q })}`}
             >
               {label}
               <NavigationFeedback />
             </Link>
           ))}
         </nav>
+        <form className="registry-filters" action="/admin/verifications">
+          <input type="hidden" name="status" value={status} />
+          <label>
+            Matricule déclaré
+            <input
+              name="q"
+              defaultValue={q}
+              maxLength={64}
+              placeholder="Rechercher un matricule"
+            />
+          </label>
+          <button className="button primary">Rechercher</button>
+          <Link
+            className="button secondary"
+            href={`/admin/verifications?status=${status}`}
+          >
+            Réinitialiser
+          </Link>
+        </form>
         <div className="admin-list-meta">
           <p className="fine">
             {count ?? 0} demande(s) · Page {page}
@@ -125,10 +151,18 @@ export default async function VerificationQueue({
         )}
         <div className="pagination">
           {page > 1 && (
-            <Link href={`?status=${status}&page=${page - 1}`}>← Précédent</Link>
+            <Link
+              href={`?${new URLSearchParams({ status, q, page: String(page - 1) })}`}
+            >
+              ← Précédent
+            </Link>
           )}
           {(count ?? 0) > page * 30 && (
-            <Link href={`?status=${status}&page=${page + 1}`}>Suivant →</Link>
+            <Link
+              href={`?${new URLSearchParams({ status, q, page: String(page + 1) })}`}
+            >
+              Suivant →
+            </Link>
           )}
         </div>
       </section>

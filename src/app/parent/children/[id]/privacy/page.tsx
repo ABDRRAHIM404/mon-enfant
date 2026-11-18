@@ -1,4 +1,5 @@
-import { WorkspaceShell } from "@/components/workspace-shell";
+import { DashboardHeading } from "@/components/dashboard/heading";
+import { ParentWorkflow } from "@/components/parents/workflow";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ParentSharePanel } from "@/components/sharing/parent-share-panel";
@@ -84,12 +85,14 @@ export default async function Privacy({
   });
   if (shares.error) notFound();
   return (
-    <WorkspaceShell area="parent" active="access">
+    <ParentWorkflow active="access" childId={id} childSection="privacy">
       <Link href={`/parent/children/${id}`}>← Carnet de mon enfant</Link>
-      <section className="page-heading">
-        <h1 id="main-content" tabIndex={-1}>
-          Confidentialité et accès
-        </h1>
+      <DashboardHeading
+        title="Partage et accès"
+        description="Gardez le contrôle des partages et retrouvez l’activité de consultation du carnet."
+        section="access"
+      />
+      <section className="parent-context-note">
         <p>
           Activité de consultation et demandes enregistrées depuis le début de
           votre accès actuel : {new Date(view.since).toLocaleString("fr-MA")}.
@@ -143,6 +146,6 @@ export default async function Privacy({
         </Link>
         . Vous pouvez retirer votre accès depuis le carnet.
       </p>
-    </WorkspaceShell>
+    </ParentWorkflow>
   );
 }

@@ -1,3 +1,5 @@
+import { DashboardHeading } from "@/components/dashboard/heading";
+import { ParentWorkflow } from "@/components/parents/workflow";
 import Link from "next/link";
 import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
@@ -8,7 +10,7 @@ import {
   CorrectionList,
   RequestPagination,
 } from "@/components/parents/correction-list";
-import type { CorrectionPage } from "@/lib/parents/types";
+import type { CorrectionPage, ParentWorkspaceData } from "@/lib/parents/types";
 export const dynamic = "force-dynamic";
 export default async function Requests({
   params,
@@ -29,20 +31,35 @@ export default async function Requests({
     (query.entry && !uuidPattern.test(query.entry))
   )
     notFound();
-  const { data, error } = await supabase.rpc("parent_corrections", {
-    p_child_id: id,
-    p_page: page,
-  });
+  const [corrections, workspace] = await Promise.all([
+    supabase.rpc("parent_corrections", { p_child_id: id, p_page: page }),
+    supabase.rpc("parent_workspace"),
+  ]);
+  const { data, error } = corrections;
+  if (workspace.error)
+    throw Error("Impossible de confirmer le carnet de votre enfant.");
+  const child = (workspace.data as ParentWorkspaceData).children.find(
+    (child) => child.id === id,
+  );
+  if (!child) notFound();
   if (error?.code === "42501") notFound();
   if (error) throw new Error("Impossible de charger les demandes.");
   const view = data as CorrectionPage;
   return (
-    <main className="account-page wide">
+    <ParentWorkflow
+      active="requests"
+      childId={id}
+      childSection="requests"
+      child={child}
+    >
       <Link href={`/parent/children/${id}`}>← Carnet de mon enfant</Link>
+      <DashboardHeading
+        title="Demandes et réponses"
+        description="Posez une question ou signalez une information à vérifier. Le professionnel conserve la responsabilité des soins enregistrés."
+        section="access"
+      />
       <section className="panel">
-        <h1 id="main-content" tabIndex={-1}>
-          Demander une vérification ou correction
-        </h1>
+        <h2>Nouvelle demande</h2>
         <CorrectionRequestForm
           childId={id}
           operationId={randomUUID()}
@@ -52,6 +69,6 @@ export default async function Requests({
       <h2>Mes demandes pour ce carnet</h2>
       <CorrectionList data={view} parent />
       <RequestPagination total={view.total} page={page} />
-    </main>
+    </ParentWorkflow>
   );
 }

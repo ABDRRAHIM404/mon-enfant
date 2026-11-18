@@ -4,7 +4,7 @@ import type { ClinicalEntry } from "@/lib/clinical/types";
 import { notFound } from "next/navigation";
 import { randomUUID } from "node:crypto";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { DoctorNav } from "@/components/registry/doctor-nav";
+import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
 import { VaccineItemForm } from "@/components/vaccines/item-form";
 import {
   uuidPattern,
@@ -130,8 +130,12 @@ export default async function Vaccinations({
     (v) => v.status === "approved" && v.review_verified,
   );
   return (
-    <main className="account-page wide">
-      <DoctorNav />
+    <ClinicalWorkspace
+      active="vaccinations"
+      childId={id}
+      section="vaccinations"
+      child={child}
+    >
       <div className="page-heading">
         <h1 id="main-content" tabIndex={-1}>
           Vaccinations — {patientName(child)}
@@ -141,18 +145,29 @@ export default async function Vaccinations({
           propre historique.
         </p>
       </div>
-      <div className="tabs">
-        <Link href={`/patients/${id}`}>Vue d’ensemble</Link>
-        <Link href={`/patients/${id}/appointments`}>Rendez-vous</Link>
-        <Link href={`/patients/${id}/records?kind=vaccination`}>
-          Administrations et corrections
-        </Link>
-        {allowed && (
-          <Link href={`/patients/${id}/records/new?kind=vaccination`}>
-            Documenter une vaccination
+      <div className="care-page-actions">
+        {allowed ? (
+          <Link
+            className="button primary"
+            href={`/patients/${id}/records/new?kind=vaccination`}
+          >
+            Enregistrer une vaccination
           </Link>
+        ) : (
+          <p className="notice">
+            Une habilitation de vaccination est nécessaire pour enregistrer une
+            administration.{" "}
+            <Link className="text-link" href="/account/clinical-permissions">
+              Mes habilitations
+            </Link>
+          </p>
         )}
-        <Link href={`/patients/${id}/summary`}>Résumé et export</Link>
+        <Link
+          className="button secondary"
+          href={`/patients/${id}/records?kind=vaccination`}
+        >
+          Historique et corrections
+        </Link>
       </div>
       <p className="notice">
         Une référence sans administration rapprochée reste non confirmée. Elle
@@ -329,6 +344,6 @@ export default async function Vaccinations({
           )}
         </section>
       )}
-    </main>
+    </ClinicalWorkspace>
   );
 }

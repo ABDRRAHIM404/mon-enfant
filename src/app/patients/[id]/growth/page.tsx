@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { DoctorNav } from "@/components/registry/doctor-nav";
+import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
 import { GrowthChart } from "@/components/clinical/growth-chart";
 import type { ClinicalEntry } from "@/lib/clinical/types";
 import { uuidPattern } from "@/lib/registry/types";
@@ -21,17 +21,20 @@ export default async function Growth({
     10000,
     Math.max(1, Math.floor(Number(query.page) || 1)),
   );
-  const { data, error } = await supabase.rpc("clinical_timeline", {
-    p_child_id: id,
-    p_kind: "growth",
-    p_page: page,
-  });
+  const [{ data, error }, capabilities] = await Promise.all([
+    supabase.rpc("clinical_timeline", {
+      p_child_id: id,
+      p_kind: "growth",
+      p_page: page,
+    }),
+    supabase.rpc("my_clinical_capabilities"),
+  ]);
   if (error?.code === "42501") notFound();
-  if (error) throw new Error("Impossible de charger les mesures.");
+  if (error || capabilities.error)
+    throw new Error("Impossible de charger les mesures.");
   const result = data as { items: ClinicalEntry[]; total: number };
   return (
-    <main className="account-page wide">
-      <DoctorNav />
+    <ClinicalWorkspace active="growth" childId={id} section="growth">
       <div className="page-heading">
         <h1 id="main-content" tabIndex={-1}>
           Croissance
@@ -41,11 +44,23 @@ export default async function Growth({
           corrections remplacent la projection sans effacer l’original.
         </p>
       </div>
-      <div className="tabs">
-        <Link href={`/patients/${id}/records`}>Dossier clinique</Link>
-        <Link href={`/patients/${id}/records/new?kind=growth`}>
-          Nouvelle mesure
-        </Link>
+      <div className="care-page-actions">
+        {(capabilities.data as string[]).includes("growth") ? (
+          <Link
+            className="button primary"
+            href={`/patients/${id}/records/new?kind=growth`}
+          >
+            Ajouter une mesure
+          </Link>
+        ) : (
+          <p className="notice">
+            Les mesures sont consultables. Une habilitation de croissance est
+            nécessaire pour en ajouter.{" "}
+            <Link className="text-link" href="/account/clinical-permissions">
+              Mes habilitations
+            </Link>
+          </p>
+        )}
       </div>
       <GrowthChart
         entries={result.items}
@@ -138,6 +153,6 @@ export default async function Growth({
           )}
         </nav>
       </section>
-    </main>
+    </ClinicalWorkspace>
   );
 }

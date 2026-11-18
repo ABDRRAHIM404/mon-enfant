@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 export default async function Professionals({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; q?: string; status?: string }>;
 }) {
   const { supabase } = await requireReviewer();
   const query = await searchParams;
@@ -21,16 +21,27 @@ export default async function Professionals({
     1,
     Math.min(10000, Number.parseInt(query.page ?? "1", 10) || 1),
   );
-  const {
-    data: profiles,
-    error,
-    count,
-  } = await supabase
+  const q = (query.q ?? "").trim().slice(0, 100);
+  const status = Object.hasOwn(statusLabels, query.status ?? "")
+    ? query.status!
+    : "all";
+  let directory = supabase
     .from("professional_profiles")
     .select("user_id,role,professional_id,verification_status,created_at", {
       count: "exact",
     })
-    .in("role", ["doctor", "nurse"])
+    .in("role", ["doctor", "nurse"]);
+  if (q)
+    directory = directory.ilike(
+      "professional_id",
+      `%${q.replace(/[\\%_]/g, "\\$&")}%`,
+    );
+  if (status !== "all") directory = directory.eq("verification_status", status);
+  const {
+    data: profiles,
+    error,
+    count,
+  } = await directory
     .order("created_at", { ascending: false })
     .range((page - 1) * 20, page * 20 - 1);
   if (error) throw new Error("Impossible de charger les professionnels.");
@@ -50,6 +61,32 @@ export default async function Professionals({
             </p>
           </div>
         </div>
+        <form className="registry-filters" action="/admin/professionals">
+          <label>
+            Identifiant professionnel
+            <input
+              name="q"
+              defaultValue={q}
+              maxLength={100}
+              placeholder="Rechercher un identifiant"
+            />
+          </label>
+          <label>
+            Statut
+            <select name="status" defaultValue={status}>
+              <option value="all">Tous les statuts</option>
+              {Object.entries(statusLabels).map(([value, label]) => (
+                <option value={value} key={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button className="button primary">Rechercher</button>
+          <Link className="button secondary" href="/admin/professionals">
+            Réinitialiser
+          </Link>
+        </form>
         <p className="fine">
           {count ?? 0} compte(s) · Page {page}
         </p>
@@ -103,9 +140,19 @@ export default async function Professionals({
           )}
         </div>
         <div className="pagination">
-          {page > 1 && <Link href={`?page=${page - 1}`}>← Précédent</Link>}
+          {page > 1 && (
+            <Link
+              href={`?${new URLSearchParams({ q, status, page: String(page - 1) })}`}
+            >
+              ← Précédent
+            </Link>
+          )}
           {(count ?? 0) > page * 20 && (
-            <Link href={`?page=${page + 1}`}>Suivant →</Link>
+            <Link
+              href={`?${new URLSearchParams({ q, status, page: String(page + 1) })}`}
+            >
+              Suivant →
+            </Link>
           )}
         </div>
       </section>

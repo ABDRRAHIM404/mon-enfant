@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { DoctorNav } from "@/components/registry/doctor-nav";
+import {
+  ChildCareActions,
+  ClinicalWorkspace,
+} from "@/components/clinician/care-workspace";
 import { EntryCard } from "@/components/clinical/entry-card";
 import {
   clinicalKinds,
@@ -46,40 +49,19 @@ export default async function Records({
     return `/patients/${id}/records?${new URLSearchParams({ kind, page: String(n) })}`;
   }
   return (
-    <main className="account-page wide">
-      <DoctorNav />
+    <ClinicalWorkspace active="consultations" childId={id} section="records">
       <div className="page-heading">
-        <h1 id="main-content" tabIndex={-1}>Dossier clinique</h1>
+        <h1 id="main-content" tabIndex={-1}>
+          Dossier clinique
+        </h1>
         <p className="muted">
           Dernière révision de chaque saisie, avec accès à l’original et aux
           corrections.
         </p>
       </div>
-      <div className="tabs">
-        <Link href={`/patients/${id}`}>Identité et registre</Link>
-        <Link href={`/patients/${id}/appointments`}>Rendez-vous</Link>
-        <Link href={`/patients/${id}/vaccinations`}>Vaccinations</Link>
-        <Link href={`/patients/${id}/growth`}>Croissance</Link>
-        <Link href={`/patients/${id}/summary`}>Résumé / impression</Link>
-      </div>
+      <ChildCareActions childId={id} allowed={allowed} />
       <section className="panel">
-        <h2>Nouvelle saisie</h2>
-        {allowed.some((c) => clinicalKinds.includes(c as ClinicalKind)) ? (
-          <div className="tabs">
-            {clinicalKinds
-              .filter((k) => allowed.includes(k))
-              .map((k) => (
-                <Link key={k} href={`/patients/${id}/records/new?kind=${k}`}>
-                  {clinicalLabels[k]}
-                </Link>
-              ))}
-          </div>
-        ) : (
-          <p className="notice">
-            Votre compte permet la consultation du dossier. Une habilitation
-            clinique explicite est nécessaire pour chaque type de saisie.
-          </p>
-        )}
+        <h2>Rechercher dans les soins</h2>
         <form className="registry-filters" action={`/patients/${id}/records`}>
           <label>
             Type
@@ -120,6 +102,6 @@ export default async function Records({
           </Link>
         )}
       </nav>
-    </main>
+    </ClinicalWorkspace>
   );
 }

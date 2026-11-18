@@ -1,5 +1,5 @@
 import { requireApprovedDoctor } from "@/lib/auth";
-import { DoctorNav } from "@/components/registry/doctor-nav";
+import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
 import {
   CorrectionList,
   RequestPagination,
@@ -22,8 +22,7 @@ export default async function ParentRequests({
     throw new Error("Impossible de charger les demandes des responsables.");
   const view = data as CorrectionPage;
   return (
-    <main className="account-page wide">
-      <DoctorNav />
+    <ClinicalWorkspace active="tools" tool="parents">
       <section className="page-heading">
         <h1 id="main-content" tabIndex={-1}>
           Demandes des responsables
@@ -36,6 +35,6 @@ export default async function ParentRequests({
       </section>
       <CorrectionList data={view} />
       <RequestPagination total={view.total} page={page} />
-    </main>
+    </ClinicalWorkspace>
   );
 }

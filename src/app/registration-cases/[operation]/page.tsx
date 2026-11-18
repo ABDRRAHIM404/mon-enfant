@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { DoctorNav } from "@/components/registry/doctor-nav";
+import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
 import { ResumeRegistrationForm } from "@/components/registry/forms";
 import { uuidPattern } from "@/lib/registry/types";
 export const dynamic = "force-dynamic";
@@ -41,8 +41,7 @@ export default async function RegistrationCase({
     | undefined;
   if (!item) notFound();
   return (
-    <main className="account-page">
-      <DoctorNav />
+    <ClinicalWorkspace active="tools" tool="registry">
       <section className="panel">
         <h1 id="main-content" tabIndex={-1}>
           Reprendre mon inscription
@@ -71,6 +70,6 @@ export default async function RegistrationCase({
         />
       </section>
       <Link href="/registration-reviews">Retour aux revues</Link>
-    </main>
+    </ClinicalWorkspace>
   );
 }

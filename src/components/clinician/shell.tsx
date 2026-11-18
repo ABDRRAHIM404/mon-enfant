@@ -13,6 +13,11 @@ import {
   Bell,
   LogOut,
   ShieldCheck,
+  Building2,
+  ClipboardList,
+  MessageSquare,
+  QrCode,
+  KeyRound,
 } from "lucide-react";
 import { Brand } from "@/components/brand";
 import {
@@ -31,16 +36,27 @@ export type ClinicianSection =
   | "appointments"
   | "growth"
   | "documents"
-  | "account";
+  | "account"
+  | "tools";
+export type ClinicianTool =
+  | "followup"
+  | "practices"
+  | "access"
+  | "registry"
+  | "parents"
+  | "sharing"
+  | "permissions";
 export async function ClinicianShell({
   active,
   provisional = false,
   profile: provided,
+  tool,
   children,
 }: {
   active: ClinicianSection;
   provisional?: boolean;
   profile?: Professional | null;
+  tool?: ClinicianTool;
   children: React.ReactNode;
 }) {
   const profile = provided ?? (await getProfessional()).profile;
@@ -112,6 +128,69 @@ export async function ClinicianShell({
         <NavigationFeedback />
       </Link>
     ));
+  const tools = [
+    {
+      key: "followup",
+      label: "Suivis et alertes",
+      href: "/follow-up",
+      icon: Bell,
+    },
+    {
+      key: "practices",
+      label: "Lieux d’exercice",
+      href: "/practices",
+      icon: Building2,
+    },
+    {
+      key: "access",
+      label: "Autorisations des dossiers",
+      href: "/access-requests",
+      icon: ShieldCheck,
+    },
+    {
+      key: "registry",
+      label: "Revues d’inscription",
+      href: "/registration-reviews",
+      icon: ClipboardList,
+    },
+    {
+      key: "parents",
+      label: "Demandes des parents",
+      href: "/parent-requests",
+      icon: MessageSquare,
+    },
+    {
+      key: "sharing",
+      label: "Lire un partage parent",
+      href: "/share",
+      icon: QrCode,
+    },
+    {
+      key: "permissions",
+      label: "Mes habilitations",
+      href: "/account/clinical-permissions",
+      icon: KeyRound,
+    },
+  ];
+  const toolsMenu = () =>
+    !provisional && (
+      <details className="soignant-tools" open={Boolean(tool)}>
+        <summary>Outils et accès</summary>
+        <nav aria-label="Outils du suivi clinique">
+          {tools.map(({ key, label, href, icon: Icon }) => (
+            <Link
+              key={key}
+              href={href}
+              aria-current={tool === key ? "page" : undefined}
+            >
+              <Icon size={18} aria-hidden="true" />
+              <span>{label}</span>
+              <NavigationFeedback />
+            </Link>
+          ))}
+        </nav>
+      </details>
+    );
   const logout = () => (
     <form action={signOut}>
       <button className="soignant-logout">
@@ -125,6 +204,7 @@ export async function ClinicianShell({
       <aside className="soignant-sidebar">
         <Brand />
         <nav aria-label="Espace soignant">{links()}</nav>
+        {toolsMenu()}
         <div className="soignant-sidebar-footer">
           <ShieldCheck size={18} aria-hidden="true" />
           <p>
@@ -186,6 +266,7 @@ export async function ClinicianShell({
         <WorkspaceMobileMenu label="Menu soignant">
           <nav aria-label="Toutes les rubriques soignant">
             {links()}
+            {toolsMenu()}
             {logout()}
           </nav>
         </WorkspaceMobileMenu>

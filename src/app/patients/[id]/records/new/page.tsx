@@ -7,7 +7,7 @@ import type { VaccineItemExport } from "@/lib/vaccines/patient-types";
 import { notFound } from "next/navigation";
 import { randomUUID } from "node:crypto";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { DoctorNav } from "@/components/registry/doctor-nav";
+import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
 import { ClinicalForm } from "@/components/clinical/entry-form";
 import {
   clinicalKinds,
@@ -56,11 +56,18 @@ export default async function NewEntry({
       : { data: [], error: null };
   if (vocabulary.error) throw new Error("Choix vaccinaux indisponibles.");
   return (
-    <main className="account-page wide">
-      <DoctorNav />
+    <ClinicalWorkspace active="consultations" childId={id} section="records">
       <div className="page-heading">
         <h1 id="main-content" tabIndex={-1}>
-          {clinicalLabels[kind]}
+          {kind === "vaccination"
+            ? "Enregistrer une vaccination"
+            : kind === "growth"
+              ? "Ajouter une mesure de croissance"
+              : kind === "consultation"
+                ? "Ajouter une consultation"
+                : kind === "prescription"
+                  ? "Ajouter un traitement"
+                  : "Documenter un risque ou une allergie"}
         </h1>
         <p className="muted">
           L’auteur, le lieu, la provenance et les dates seront conservés. Aucune
@@ -98,6 +105,6 @@ export default async function NewEntry({
           </p>
         )}
       </section>
-    </main>
+    </ClinicalWorkspace>
   );
 }

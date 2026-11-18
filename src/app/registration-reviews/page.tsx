@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { DoctorNav } from "@/components/registry/doctor-nav";
+import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
 import { RegistrationReviewForm } from "@/components/registry/forms";
 export const dynamic = "force-dynamic";
 type Review = {
@@ -40,8 +40,7 @@ export default async function RegistrationReviews({
   if (error) throw new Error("Impossible de charger les revues d’inscription.");
   const result = data as { items: Review[]; total: number };
   return (
-    <main className="account-page wide">
-      <DoctorNav />
+    <ClinicalWorkspace active="tools" tool="registry">
       <section className="page-heading">
         <h1 id="main-content" tabIndex={-1}>
           Revues contrôlées d’inscription
@@ -117,6 +116,6 @@ export default async function RegistrationReviews({
           <Link href={`?page=${page + 1}`}>Page suivante</Link>
         )}
       </nav>
-    </main>
+    </ClinicalWorkspace>
   );
 }

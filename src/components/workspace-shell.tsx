@@ -35,6 +35,8 @@ const icons = {
   requests: ClipboardList,
   practices: Building2,
   account: UserRound,
+  notifications: Bell,
+  invitation: ShieldCheck,
 };
 type Item = {
   key: keyof typeof icons;
@@ -85,6 +87,17 @@ export function WorkspaceShell({
           href: "/parent?view=access",
         },
         { key: "settings", label: "Paramètres", href: "/parent/settings" },
+        { key: "requests", label: "Mes demandes", href: "/parent/requests" },
+        {
+          key: "notifications",
+          label: "Notifications",
+          href: "/parent/notifications",
+        },
+        {
+          key: "invitation",
+          label: "Relier un carnet",
+          href: "/parent/invitation",
+        },
       ]
     : provisional
       ? [

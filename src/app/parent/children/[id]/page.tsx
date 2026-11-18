@@ -1,4 +1,5 @@
-import { WorkspaceShell } from "@/components/workspace-shell";
+import { DashboardHeading } from "@/components/dashboard/heading";
+import { ParentWorkflow } from "@/components/parents/workflow";
 import Link from "next/link";
 import { QrCode } from "@/components/qr/code";
 import { clinicianLookupUrl } from "@/lib/qr/symbol";
@@ -49,44 +50,42 @@ export default async function ChildBooklet({
     Math.ceil(Math.max(booklet.entry_total, booklet.appointment_total) / 30),
   );
   return (
-    <WorkspaceShell area="parent" active="children">
-      <section className="page-heading">
-        <span className="eyebrow">CARNET DE MON ENFANT</span>
-        <h1 id="main-content" tabIndex={-1}>
-          {patientName(child)}
-        </h1>
-        <p>
-          {birthLabel(child)} · {child.universal_id}
-        </p>
-        <p className="muted">
-          {historyLabels[child.history_status]} ·{" "}
-          {child.name_status === "provisional"
-            ? "Identité provisoire"
-            : "Identité enregistrée"}
-        </p>
-      </section>
+    <ParentWorkflow
+      active="children"
+      childId={id}
+      childSection="booklet"
+      child={child}
+    >
+      <DashboardHeading
+        title={patientName(child)}
+        description={`${birthLabel(child)} · ${historyLabels[child.history_status]}`}
+        section="children"
+      />
+
       <p className="notice">
         Ce carnet présente les informations enregistrées par les professionnels.
         Une information absente ne signifie pas un soin manqué ni un état de
         santé normal. Contactez le professionnel pour une question ou une
         correction.
       </p>
-      <nav className="tabs no-print" aria-label="Rubriques du carnet">
-        <a href="#visits">Soins et vaccinations</a>
-        <a href="#growth">Croissance</a>
-        <a href="#appointments">Rendez-vous</a>
-        <Link href={`/parent/children/${id}/appointments`}>Calendrier</Link>
-        <Link href={`/parent/children/${id}/vaccinations`}>
-          Références vaccinales
-        </Link>
-        <a href="#access">Mon accès</a>
-        <Link href={`/parent/children/${id}/requests`}>
-          Demandes et corrections
-        </Link>
-        <Link href={`/parent/children/${id}/privacy`}>
-          Confidentialité et accès
-        </Link>
+      <nav
+        className="care-page-actions no-print"
+        aria-label="Dans cette page du carnet"
+      >
+        <a className="button secondary" href="#visits">
+          Soins enregistrés
+        </a>
+        <a className="button secondary" href="#growth">
+          Mesures
+        </a>
+        <a className="button secondary" href="#appointments">
+          Rendez-vous enregistrés
+        </a>
+        <a className="button secondary" href="#access">
+          Mon accès actuel
+        </a>
       </nav>
+
       <div id="documents" className="actions no-print">
         <PrintButton />
         {link.can_export && (
@@ -248,6 +247,6 @@ export default async function ChildBooklet({
       <p className="fine">
         Environnement de développement · Données fictives uniquement
       </p>
-    </WorkspaceShell>
+    </ParentWorkflow>
   );
 }

@@ -7,7 +7,7 @@ import type { VaccineItemExport } from "@/lib/vaccines/patient-types";
 import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { DoctorNav } from "@/components/registry/doctor-nav";
+import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
 import { EntryCard } from "@/components/clinical/entry-card";
 import { ClinicalForm } from "@/components/clinical/entry-form";
 import type { ClinicalEntry } from "@/lib/clinical/types";
@@ -48,8 +48,7 @@ export default async function ClinicalHistory({
       : { data: [], error: null };
   if (vocabulary.error) throw new Error("Choix vaccinaux indisponibles.");
   return (
-    <main className="account-page wide">
-      <DoctorNav />
+    <ClinicalWorkspace active="consultations" childId={id} section="records">
       <div className="page-heading">
         <h1 id="main-content" tabIndex={-1}>
           Historique de la saisie
@@ -88,6 +87,6 @@ export default async function ClinicalHistory({
           </p>
         )}
       </section>
-    </main>
+    </ClinicalWorkspace>
   );
 }

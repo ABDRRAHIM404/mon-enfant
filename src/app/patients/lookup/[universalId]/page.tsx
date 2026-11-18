@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { DoctorNav } from "@/components/registry/doctor-nav";
+import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
 import { uuidPattern } from "@/lib/registry/types";
 export const dynamic = "force-dynamic";
 export default async function Lookup({
@@ -19,8 +19,7 @@ export default async function Lookup({
   if (typeof data === "string" && uuidPattern.test(data))
     redirect(`/patients/${data}`);
   return (
-    <main className="account-page">
-      <DoctorNav />
+    <ClinicalWorkspace active="children">
       <section className="panel">
         <h1 id="main-content" tabIndex={-1}>
           Accès à vérifier
@@ -43,6 +42,6 @@ export default async function Lookup({
           information de l’enfant n’est communiquée avant cette décision.
         </p>
       </section>
-    </main>
+    </ClinicalWorkspace>
   );
 }

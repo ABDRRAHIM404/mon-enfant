@@ -74,6 +74,10 @@ beforeEach(() => {
         mocks.filters.push(["in", ...args]);
         return builder;
       },
+      ilike: (...args: unknown[]) => {
+        mocks.filters.push(["ilike", ...args]);
+        return builder;
+      },
       order: () => builder,
       range: (...args: unknown[]) => {
         mocks.filters.push(["range", ...args]);
@@ -135,8 +139,8 @@ beforeEach(() => {
   }));
 });
 const queue = (query = {}) => Queue({ searchParams: Promise.resolve(query) });
-const professionals = () =>
-  Professionals({ searchParams: Promise.resolve({}) });
+const professionals = (query = {}) =>
+  Professionals({ searchParams: Promise.resolve(query) });
 const permissions = () =>
   Permissions({ searchParams: Promise.resolve({ q: "TEST-PRO-001" }) });
 const review = () => Review({ params: Promise.resolve({ id }) });
@@ -194,6 +198,29 @@ describe("admin presentation preserves review and permission boundaries", () => 
     await queue({ status: "invalid", page: "-4" });
     expect(mocks.filters).toContainEqual(["eq", "status", "under_review"]);
     expect(mocks.filters).toContainEqual(["range", 0, 29]);
+  });
+  it("retains filters and treats wildcard characters as literal identifier text", async () => {
+    const html = renderToStaticMarkup(
+      await Professionals({
+        searchParams: Promise.resolve({
+          q: "TEST_%",
+          status: "suspended",
+          page: "2",
+        }),
+      }),
+    );
+    expect(mocks.filters).toContainEqual([
+      "eq",
+      "verification_status",
+      "suspended",
+    ]);
+    expect(mocks.filters).toContainEqual([
+      "ilike",
+      "professional_id",
+      "%TEST\\_\\%%",
+    ]);
+    expect(html).toContain("q=TEST_%25");
+    expect(html).toContain("status=suspended");
   });
   it("retains reasoned suspension and the clinician-only directory query", async () => {
     const html = renderToStaticMarkup(await professionals());

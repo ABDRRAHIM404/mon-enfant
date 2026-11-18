@@ -1,19 +1,18 @@
-import Link from "next/link";
 import { randomUUID } from "node:crypto";
-import { Brand } from "@/components/brand";
+import { ParentWorkflow } from "@/components/parents/workflow";
+import { DashboardHeading } from "@/components/dashboard/heading";
 import { GuardianClaimForm } from "@/components/parents/guardian-forms";
 export const dynamic = "force-dynamic";
 export default function Invitation() {
   return (
-    <main className="account-page">
-      <header>
-        <Brand />
-        <Link href="/parent">Espace parent</Link>
-      </header>
+    <ParentWorkflow active="invitation">
+      <DashboardHeading
+        title="Relier le carnet de mon enfant"
+        description="Utilisez l’invitation personnelle remise par le professionnel."
+        section="children"
+      />
       <section className="panel">
-        <h1 id="main-content" tabIndex={-1}>
-          Votre invitation personnelle
-        </h1>
+        <h2>Votre invitation personnelle</h2>
         <p>
           Votre invitation permet de demander le lien avec un carnet existant.
           Aucun dossier n’est accessible avant la vérification du responsable
@@ -21,6 +20,6 @@ export default function Invitation() {
         </p>
         <GuardianClaimForm operationId={randomUUID()} />
       </section>
-    </main>
+    </ParentWorkflow>
   );
 }
