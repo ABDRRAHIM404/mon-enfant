@@ -1,8 +1,9 @@
-import { WorkspaceShell } from "@/components/workspace-shell";
+import { DashboardHeading } from "@/components/dashboard/heading";
+import { ParentWorkflow } from "@/components/parents/workflow";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
-import { uuidPattern, patientName } from "@/lib/registry/types";
+import { uuidPattern } from "@/lib/registry/types";
 import {
   calendarRange,
   todayCasablanca,
@@ -65,12 +66,19 @@ export default async function ParentCalendar({
   const href = (date: string, mode: CalendarView = view, n = 1) =>
     `?${new URLSearchParams({ date, view: mode, state, page: String(n) })}`;
   return (
-    <WorkspaceShell area="parent" active="appointments">
+    <ParentWorkflow
+      active="appointments"
+      childId={id}
+      childSection="appointments"
+      child={calendar.child}
+    >
       <Link href={`/parent/children/${id}`}>← Carnet de mon enfant</Link>
-      <section className="page-heading">
-        <h1 id="main-content" tabIndex={-1}>
-          Calendrier — {patientName(calendar.child)}
-        </h1>
+      <DashboardHeading
+        title="Rendez-vous de mon enfant"
+        description="Les créneaux enregistrés par les professionnels, en heure de Casablanca."
+        section="appointments"
+      />
+      <section className="parent-context-note">
         <p>
           Rendez-vous enregistrés par les professionnels. Horaires de
           Casablanca.
@@ -194,6 +202,6 @@ export default async function ParentCalendar({
       >
         Contacter le professionnel par une demande
       </Link>
-    </WorkspaceShell>
+    </ParentWorkflow>
   );
 }

@@ -7,7 +7,7 @@ import type {
 } from "@/lib/appointments/types";
 import { notFound } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { DoctorNav } from "@/components/registry/doctor-nav";
+import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
 import { EntryCard } from "@/components/clinical/entry-card";
 import { PrintButton } from "@/components/clinical/print-button";
 import type { VaccineItemExport } from "@/lib/vaccines/patient-types";
@@ -46,28 +46,30 @@ export default async function Summary({
     appointments.error?.code === "54000"
   )
     return (
-      <main className="account-page wide">
-        <DoctorNav />
+      <ClinicalWorkspace active="children" childId={id} section="summary" print>
         <section className="panel">
-          <h1 id="main-content" tabIndex={-1}>Résumé volumineux</h1>
+          <h1 id="main-content" tabIndex={-1}>
+            Résumé volumineux
+          </h1>
           <p>
             La limite interactive de 5 000 révisions est dépassée. Utilisez une
             procédure d’export autorisée avec un périmètre convenu. Aucun résumé
             partiel n’a été généré.
           </p>
         </section>
-      </main>
+      </ClinicalWorkspace>
     );
   if (profile.error || ledger.error || vaccines.error || appointments.error)
     throw new Error("Impossible de générer le résumé.");
   const child = profile.data as ChildProfile,
     entries = ledger.data as ClinicalEntry[];
   return (
-    <main className="account-page wide print-summary">
-      <DoctorNav />
+    <ClinicalWorkspace active="children" childId={id} section="summary" print>
       <div className="page-heading">
         <span className="eyebrow">RÉSUMÉ CLINIQUE — DONNÉES FICTIVES</span>
-        <h1 id="main-content" tabIndex={-1}>{patientName(child)}</h1>
+        <h1 id="main-content" tabIndex={-1}>
+          {patientName(child)}
+        </h1>
         <p>
           {birthLabel(child)} · {child.universal_id}
         </p>
@@ -152,6 +154,6 @@ export default async function Summary({
       ) : (
         <p className="empty-state">Aucun soin documenté dans ce module.</p>
       )}
-    </main>
+    </ClinicalWorkspace>
   );
 }

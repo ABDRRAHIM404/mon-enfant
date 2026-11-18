@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { DoctorNav } from "@/components/registry/doctor-nav";
+import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
 import { clinicalLabels, type ClinicalKind } from "@/lib/clinical/types";
 export const dynamic = "force-dynamic";
 export default async function MyClinicalPermissions() {
@@ -27,10 +27,11 @@ export default async function MyClinicalPermissions() {
       : clinicalLabels[kind as ClinicalKind] || "Habilitation inconnue";
   }
   return (
-    <main className="account-page wide">
-      <DoctorNav />
+    <ClinicalWorkspace active="tools" tool="permissions">
       <div className="page-heading">
-        <h1 id="main-content" tabIndex={-1}>Mes habilitations cliniques</h1>
+        <h1 id="main-content" tabIndex={-1}>
+          Mes habilitations cliniques
+        </h1>
         <p className="muted">
           L’approbation du compte et l’autorisation de chaque activité sont
           distinctes. Une habilitation ne donne pas accès à un enfant sans
@@ -77,6 +78,6 @@ export default async function MyClinicalPermissions() {
           )}
         </div>
       </section>
-    </main>
+    </ClinicalWorkspace>
   );
 }

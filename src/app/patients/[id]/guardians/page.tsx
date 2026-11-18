@@ -2,7 +2,7 @@ import Link from "next/link";
 import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { DoctorNav } from "@/components/registry/doctor-nav";
+import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
 import {
   GuardianInviteForm,
   GuardianReviewForm,
@@ -53,8 +53,7 @@ export default async function Guardians({
   const view = data as Overview;
   const expiresOn = view.default_expires_on;
   return (
-    <main className="account-page wide">
-      <DoctorNav />
+    <ClinicalWorkspace active="children" childId={id} section="guardians">
       <section className="page-heading">
         <Link href={`/patients/${id}`}>← Dossier enfant</Link>
         <h1 id="main-content" tabIndex={-1}>
@@ -150,6 +149,6 @@ export default async function Guardians({
           ))
         )}
       </section>
-    </main>
+    </ClinicalWorkspace>
   );
 }

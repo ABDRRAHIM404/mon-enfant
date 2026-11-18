@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { randomUUID } from "node:crypto";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { DoctorNav } from "@/components/registry/doctor-nav";
+import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
 import { VaccineItemForm } from "@/components/vaccines/item-form";
 import { uuidPattern, type Facility } from "@/lib/registry/types";
 import type { VaccineItemChange } from "@/lib/vaccines/patient-types";
@@ -30,10 +30,15 @@ export default async function ItemHistory({
     places = facilities.data as Facility[];
   if (!latest) notFound();
   return (
-    <main className="account-page wide">
-      <DoctorNav />
+    <ClinicalWorkspace
+      active="vaccinations"
+      childId={id}
+      section="vaccinations"
+    >
       <div className="page-heading">
-        <h1 id="main-content" tabIndex={-1}>Historique de la référence vaccinale</h1>
+        <h1 id="main-content" tabIndex={-1}>
+          Historique de la référence vaccinale
+        </h1>
         <p className="fine">
           Référence {item}. Les décisions ne modifient aucune administration.
         </p>
@@ -69,6 +74,6 @@ export default async function ItemHistory({
             />
           </section>
         )}
-    </main>
+    </ClinicalWorkspace>
   );
 }

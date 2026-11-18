@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { UsersRound, ShieldCheck, ChevronDown } from "lucide-react";
-import { WorkspaceShell } from "@/components/workspace-shell";
+import { ParentWorkflow } from "@/components/parents/workflow";
 import { EntryCard } from "@/components/clinical/entry-card";
 import type { ClinicalEntry } from "@/lib/clinical/types";
 import { requireUser } from "@/lib/auth";
@@ -62,7 +62,12 @@ export default async function ParentVaccinations({
   };
   const today = todayCasablanca();
   return (
-    <WorkspaceShell area="parent" active="vaccinations">
+    <ParentWorkflow
+      active="vaccinations"
+      childId={id}
+      childSection="vaccinations"
+      child={view.child}
+    >
       <Link className="workspace-breadcrumb" href={`/parent/children/${id}`}>
         ← Mes enfants / {patientName(view.child)} / Vaccinations
       </Link>
@@ -232,6 +237,6 @@ export default async function ParentVaccinations({
           Consulter les rendez-vous
         </Link>
       </div>
-    </WorkspaceShell>
+    </ParentWorkflow>
   );
 }

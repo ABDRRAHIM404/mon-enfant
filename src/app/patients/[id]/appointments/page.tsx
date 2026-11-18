@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { DoctorNav } from "@/components/registry/doctor-nav";
+import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
 import { AppointmentCard } from "@/components/appointments/card";
 import { LiveRefresh } from "@/components/appointments/live-refresh";
 import {
@@ -34,8 +34,11 @@ export default async function PatientAppointments({
     throw new Error("Impossible de charger les rendez-vous.");
   const data = appointments.data as AppointmentPage;
   return (
-    <main className="account-page wide">
-      <DoctorNav />
+    <ClinicalWorkspace
+      active="appointments"
+      childId={id}
+      section="appointments"
+    >
       <div className="page-heading">
         <h1 id="main-content" tabIndex={-1}>
           Rendez-vous — {patientName(profile.data as ChildProfile)}
@@ -45,15 +48,26 @@ export default async function PatientAppointments({
           responsable.
         </p>
       </div>
-      <div className="tabs">
-        <Link href={`/patients/${id}`}>Vue d’ensemble</Link>
-        <Link href={`/patients/${id}/vaccinations`}>Vaccinations</Link>
-        <Link href="/appointments">Mon calendrier</Link>
-        {(caps.data as string[]).includes("appointment") && (
-          <Link href={`/patients/${id}/appointments/new`}>
+      <div className="care-page-actions">
+        {(caps.data as string[]).includes("appointment") ? (
+          <Link
+            className="button primary"
+            href={`/patients/${id}/appointments/new`}
+          >
             Planifier un rendez-vous
           </Link>
+        ) : (
+          <p className="notice">
+            Une habilitation de gestion des rendez-vous est nécessaire pour en
+            planifier.{" "}
+            <Link className="text-link" href="/account/clinical-permissions">
+              Mes habilitations
+            </Link>
+          </p>
         )}
+        <Link className="button secondary" href="/appointments">
+          Mon calendrier
+        </Link>
       </div>
       <LiveRefresh />
       <h2>Rendez-vous conservés</h2>
@@ -74,6 +88,6 @@ export default async function PatientAppointments({
           <Link href={`?page=${page + 1}`}>Suivant</Link>
         )}
       </nav>
-    </main>
+    </ClinicalWorkspace>
   );
 }

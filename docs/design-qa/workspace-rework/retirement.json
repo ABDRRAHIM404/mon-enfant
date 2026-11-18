@@ -1,0 +1,15 @@
+{
+  "run": "bccf8eb71bf34bc8",
+  "ownerApprovedRolesAndCleanup": true,
+  "actors": 3,
+  "retired": 3,
+  "sessions": 0,
+  "active_links": 0,
+  "active_grants": 0,
+  "capabilities": 0,
+  "practices": 0,
+  "staff_rights": 0,
+  "shares": 0,
+  "clinicalAndAuditRecordsPreserved": true,
+  "earlierSixAccountFixtureExcluded": true
+}

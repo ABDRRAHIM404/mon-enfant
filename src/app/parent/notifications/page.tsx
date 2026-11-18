@@ -1,3 +1,5 @@
+import { DashboardHeading } from "@/components/dashboard/heading";
+import { ParentWorkflow } from "@/components/parents/workflow";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
@@ -29,12 +31,14 @@ export default async function Notifications({
   if (error) throw new Error("Impossible de charger les notifications.");
   const view = data as ParentUpdates;
   return (
-    <main className="account-page wide">
+    <ParentWorkflow active="notifications" unread={view.unread_total}>
       <Link href="/parent">← Mon espace parent</Link>
-      <section className="page-heading">
-        <h1 id="main-content" tabIndex={-1}>
-          Mes notifications
-        </h1>
+      <DashboardHeading
+        title="Mes notifications"
+        description="Les dernières informations sur vos carnets et vos demandes."
+        section="access"
+      />
+      <section className="parent-context-note">
         <p>
           {view.unread_total} non consultées · {view.total} événements.
         </p>
@@ -102,6 +106,6 @@ export default async function Notifications({
           </Link>
         )}
       </nav>
-    </main>
+    </ParentWorkflow>
   );
 }

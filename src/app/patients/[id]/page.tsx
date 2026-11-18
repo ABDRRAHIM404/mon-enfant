@@ -1,10 +1,12 @@
-import Link from "next/link";
 import { QrCode } from "@/components/qr/code";
 import { clinicianLookupUrl } from "@/lib/qr/symbol";
 import { appointmentTime } from "@/lib/appointments/calendar";
 import { notFound } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { DoctorNav } from "@/components/registry/doctor-nav";
+import {
+  ChildCareActions,
+  ClinicalWorkspace,
+} from "@/components/clinician/care-workspace";
 import { EndAccessForm } from "@/components/registry/forms";
 import {
   uuidPattern,
@@ -23,9 +25,10 @@ export default async function PatientProfile({
   const { supabase } = await requireApprovedDoctor();
   const { id } = await params;
   if (!uuidPattern.test(id)) notFound();
-  const [{ data, error }, visits] = await Promise.all([
+  const [{ data, error }, visits, capabilities] = await Promise.all([
     supabase.rpc("get_child_profile", { p_child_id: id }),
     supabase.rpc("patient_visit_overview", { p_child_id: id }),
+    supabase.rpc("my_clinical_capabilities"),
   ]);
   if (
     error?.code === "42501" ||
@@ -33,7 +36,7 @@ export default async function PatientProfile({
     (!data && !error)
   )
     notFound();
-  if (error || visits.error)
+  if (error || visits.error || capabilities.error)
     throw new Error("Impossible de charger ce dossier.");
   const child = data as ChildProfile;
   const overview = visits.data as {
@@ -50,8 +53,12 @@ export default async function PatientProfile({
     grants = result.data as AccessGrant[];
   }
   return (
-    <main className="account-page wide">
-      <DoctorNav />
+    <ClinicalWorkspace
+      active="children"
+      childId={id}
+      section="overview"
+      child={child}
+    >
       <div className="page-heading">
         <span className="eyebrow">DOSSIER ENFANT</span>
         <h1 id="main-content" tabIndex={-1}>
@@ -62,16 +69,7 @@ export default async function PatientProfile({
           {birthLabel(child)}
         </p>
       </div>
-      <div className="tabs">
-        <Link href={`/patients/${id}/records`}>Dossier clinique</Link>
-        <Link href={`/patients/${id}/appointments`}>Rendez-vous</Link>
-        <Link href={`/patients/${id}/vaccinations`}>Vaccinations</Link>
-        <Link href={`/patients/${id}/growth`}>Croissance</Link>
-        {child.can_manage_access && (
-          <Link href={`/patients/${id}/guardians`}>Accès des parents</Link>
-        )}
-        <Link href={`/patients/${id}/summary`}>Résumé et impression</Link>
-      </div>
+      <ChildCareActions childId={id} allowed={capabilities.data as string[]} />
       <section className="panel">
         <h2>Continuité des soins</h2>
         <p>
@@ -207,6 +205,6 @@ export default async function PatientProfile({
           </div>
         </section>
       )}
-    </main>
+    </ClinicalWorkspace>
   );
 }

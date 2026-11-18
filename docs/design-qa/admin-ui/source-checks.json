@@ -1,0 +1,18 @@
+{
+  "applicationSource": "926f045ae4e27c8324599231c685f7fd6c6204af",
+  "tests": {
+    "passed": 347,
+    "files": 44
+  },
+  "targetedUiLoadingTests": 20,
+  "types": "passed",
+  "targetedLint": "passed",
+  "vercelPreview": {
+    "id": "dpl_EXsfH1nAMYLNaZFDcCx7fRt16DYA",
+    "state": "READY"
+  },
+  "authenticatedVisualReview": "blocked: existing admin sign-in required; browserAuth declined; no retry",
+  "production": "unchanged",
+  "hostedTestAccountsCreated": 0,
+  "hostedPermissionChanges": 0
+}

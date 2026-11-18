@@ -1,0 +1,18 @@
+{
+  "run": "bccf8eb71bf34bc8",
+  "scope": "authenticated API and persistence checks; not browser interaction acceptance",
+  "passed": true,
+  "checks": [
+    "three-test-password-logins",
+    "role-boundaries",
+    "parent-profile",
+    "new-fictional-child",
+    "save-consultation",
+    "save-prescription",
+    "save-risk",
+    "save-growth",
+    "save-vaccination",
+    "manual-appointment",
+    "no-unrelated-role-medical-access"
+  ]
+}

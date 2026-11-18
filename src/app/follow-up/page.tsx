@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { DoctorNav } from "@/components/registry/doctor-nav";
+import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
 import { LiveRefresh } from "@/components/appointments/live-refresh";
 import { AppointmentCard } from "@/components/appointments/card";
 import {
@@ -52,8 +52,7 @@ export default async function FollowUp({
   const href = (n: number) =>
     `/follow-up?${new URLSearchParams({ mode, bucket, page: String(n) })}`;
   return (
-    <main className="account-page wide">
-      <DoctorNav />
+    <ClinicalWorkspace active="tools" tool="followup">
       <div className="page-heading">
         <h1 id="main-content" tabIndex={-1}>
           Suivis et alertes
@@ -155,6 +154,6 @@ export default async function FollowUp({
         <span>Page {page}</span>
         {page * 30 < data.total && <Link href={href(page + 1)}>Suivant</Link>}
       </nav>
-    </main>
+    </ClinicalWorkspace>
   );
 }

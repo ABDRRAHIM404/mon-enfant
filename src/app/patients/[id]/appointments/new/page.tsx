@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { randomUUID } from "node:crypto";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { DoctorNav } from "@/components/registry/doctor-nav";
+import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
 import { AppointmentForm } from "@/components/appointments/form";
 import {
   uuidPattern,
@@ -41,10 +41,15 @@ export default async function NewAppointment({
   const facilities = places.data as Facility[],
     allowed = (capabilities.data as string[]).includes("appointment");
   return (
-    <main className="account-page wide">
-      <DoctorNav />
+    <ClinicalWorkspace
+      active="appointments"
+      childId={id}
+      section="appointments"
+    >
       <div className="page-heading">
-        <h1 id="main-content" tabIndex={-1}>Planifier — {patientName(profile.data as ChildProfile)}</h1>
+        <h1 id="main-content" tabIndex={-1}>
+          Planifier — {patientName(profile.data as ChildProfile)}
+        </h1>
         <p className="muted">
           Choisissez le créneau après examen du dossier. Aucun rattrapage n’est
           calculé.
@@ -83,6 +88,6 @@ export default async function NewAppointment({
           />
         )}
       </section>
-    </main>
+    </ClinicalWorkspace>
   );
 }

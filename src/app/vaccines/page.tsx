@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { requireVaccineCatalog } from "@/lib/auth";
-import { DoctorNav } from "@/components/registry/doctor-nav";
-import { AdminNav } from "@/components/verification/admin-nav";
+import { CatalogWorkspace } from "@/components/vaccines/workspace";
 import { catalogStatus, type CatalogVersion } from "@/lib/vaccines/types";
 export const dynamic = "force-dynamic";
 export default async function Vaccines({
@@ -24,10 +23,11 @@ export default async function Vaccines({
     total: number;
   };
   return (
-    <main className="account-page wide">
-      {profile?.role === "admin" ? <AdminNav /> : <DoctorNav />}
+    <CatalogWorkspace admin={profile?.role === "admin"}>
       <div className="page-heading">
-        <h1 id="main-content" tabIndex={-1}>Catalogue vaccinal</h1>
+        <h1 id="main-content" tabIndex={-1}>
+          Catalogue vaccinal
+        </h1>
         <p className="muted">
           Versions de référence de routine et historique des revues.
         </p>
@@ -68,6 +68,6 @@ export default async function Vaccines({
           )}
         </nav>
       </section>
-    </main>
+    </CatalogWorkspace>
   );
 }

@@ -8,8 +8,7 @@ import {
   type CatalogSnapshot,
   type CatalogChange,
 } from "@/lib/vaccines/types";
-import { DoctorNav } from "@/components/registry/doctor-nav";
-import { AdminNav } from "@/components/verification/admin-nav";
+import { CatalogWorkspace } from "@/components/vaccines/workspace";
 import { CatalogRules } from "@/components/vaccines/rules";
 import { CatalogForm } from "@/components/vaccines/catalog-form";
 export const dynamic = "force-dynamic";
@@ -45,13 +44,14 @@ export default async function VaccineVersion({
   const selected = v.rules.find((r) => r.dose_code === query.dose);
   const formProps = { versionId: id, revision: v.revision };
   return (
-    <main className="account-page wide">
-      {profile?.role === "admin" ? <AdminNav /> : <DoctorNav />}
+    <CatalogWorkspace admin={profile?.role === "admin"}>
       <div className="page-heading">
         <Link href="/vaccines" className="text-link">
           Toutes les versions
         </Link>
-        <h1 id="main-content" tabIndex={-1}>{v.label}</h1>
+        <h1 id="main-content" tabIndex={-1}>
+          {v.label}
+        </h1>
         <p>
           {catalogStatus[v.status]} · révision {v.revision}
         </p>
@@ -193,6 +193,6 @@ export default async function VaccineVersion({
           )}
         </nav>
       </section>
-    </main>
+    </CatalogWorkspace>
   );
 }

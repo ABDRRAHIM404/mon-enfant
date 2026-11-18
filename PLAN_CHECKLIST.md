@@ -244,3 +244,18 @@ Current owner request resumes parent website work; APK/iOS stay paused. See [DAS
 - [x] Public asset/static-loading caching and request-scoped identity deduplication; private no-store preserved.
 - [x] 336 tests/43 files, types, lint, READY preview and responsive/live acceptance.
 - [x] PR #4 merged as 168b0f4; correct-project production dpl_4FvjCGbqsqdnePe5pU3wKVAHrqHS READY with canonical alias.
+
+## 18 November — admin UI
+
+- [x] Shared admin shell, overview, queue/detail, professional cards, permission labels, catalogue/account framing and loading states implemented in draft PR #5.
+- [x] Source tests, TypeScript and lint pass; permission/evidence/action boundaries preserved.
+- [ ] Authenticated visual and interaction review after existing admin sign-in.
+- [ ] Publish accepted admin update to canonical production and synchronize cloud main.
+
+## Combined UI follow-up
+
+- [x] Doctor child actions, nested care/auxiliary shell and navigation context implemented.
+- [x] Parent child/request/notification/invitation/account navigation/context implemented.
+- [x] Admin search/status and accurate clinical-permission expiry labels implemented.
+- [x] Relevant checks and owner-approved three-account fixture retirement completed.
+- [ ] Complete the full signed-in computer-use audit when the session/viewer tooling is available.
