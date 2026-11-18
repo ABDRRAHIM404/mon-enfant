@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { UsersRound, Stethoscope, LockKeyhole } from "lucide-react";
+import { LockKeyhole } from "lucide-react";
 import { PublicHeader } from "./public-header";
 import { AuthForm } from "./auth-form";
 import { supabaseConfig } from "@/lib/supabase/config";
@@ -13,7 +13,6 @@ export function AuthShell({
   invitation?: boolean;
 }) {
   const configured = !!supabaseConfig();
-  const Icon = parent ? UsersRound : Stethoscope;
   return (
     <div className="public-site">
       <PublicHeader />
@@ -25,12 +24,6 @@ export function AuthShell({
           }
         >
           <div className="story-copy">
-            <Icon
-              className="auth-illustration-icon"
-              size={18}
-              strokeWidth={1.5}
-              aria-hidden="true"
-            />
             <h2>
               {parent
                 ? "Votre famille, au cœur du suivi"

@@ -28,7 +28,7 @@ const features = [
   {
     Icon: FileText,
     title: "Documents",
-    description: "Documents · Bientôt disponible",
+    description: "Bientôt disponible",
   },
 ];
 export default function Home() {
@@ -48,7 +48,7 @@ export default function Home() {
             </p>
             <div className="landing-actions">
               <Link href="/login" className="button primary">
-                Accéder à mon espace parent <ArrowRight size={17} />
+                Accéder à mon espace <ArrowRight size={17} />
               </Link>
               <Link href="/signup" className="button secondary">
                 Créer un compte parent

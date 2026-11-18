@@ -11,6 +11,7 @@ export function Brand() {
             width={44}
             height={44}
             alt=""
+            priority
           />
         </span>
         <span>
