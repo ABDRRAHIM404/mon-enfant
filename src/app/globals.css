@@ -5688,3 +5688,8 @@ select:focus-visible,
     background: white;
   }
 }
+
+.care-child-context + .parent-child-navigation {
+  border-top: 0;
+  border-radius: 0 0 14px 14px;
+}

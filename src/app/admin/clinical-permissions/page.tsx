@@ -1,3 +1,7 @@
+import {
+  clinicalPermissionStatus,
+  clinicalPermissionStatusLabels,
+} from "@/lib/clinical/permission-status";
 import { statusLabels, type VerificationState } from "@/lib/authorization";
 import { clinicalLabels } from "@/lib/clinical/types";
 import Link from "next/link";
@@ -95,6 +99,11 @@ export default async function ClinicalPermissions({
                 {statusLabels[p.verification_status as VerificationState] ??
                   p.verification_status}
               </AdminStatus>
+              {!p.capabilities.length && (
+                <p className="fine">
+                  Aucune habilitation enregistrée pour ce compte.
+                </p>
+              )}
               {p.capabilities.map((c) => (
                 <p className="admin-capability" key={c.capability}>
                   <span>
@@ -106,9 +115,13 @@ export default async function ClinicalPermissions({
                         : c.capability)}
                   </span>
                   <span>
-                    {c.enabled ? "Accordée" : "Révoquée"}
+                    {
+                      clinicalPermissionStatusLabels[
+                        clinicalPermissionStatus(c)
+                      ]
+                    }
                     {c.expires_at
-                      ? ` · échéance ${new Date(c.expires_at).toLocaleDateString("fr-MA", { timeZone: "UTC" })} (UTC)`
+                      ? ` · échéance ${new Date(c.expires_at).toLocaleString("fr-MA", { timeZone: "UTC", dateStyle: "short", timeStyle: "short" })} (UTC)`
                       : ""}
                   </span>
                 </p>
@@ -151,6 +164,11 @@ export default async function ClinicalPermissions({
           />
           <h3>Historique des contrôles et décisions</h3>
           <div className="record-list">
+            {!history?.data?.length && (
+              <p className="fine">
+                Aucune décision enregistrée dans cet historique.
+              </p>
+            )}
             {(
               history?.data as {
                 id: string;

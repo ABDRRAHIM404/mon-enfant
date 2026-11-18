@@ -1,3 +1,4 @@
+import type { ParentWorkspaceData } from "@/lib/parents/types";
 import { DashboardHeading } from "@/components/dashboard/heading";
 import { ParentWorkflow } from "@/components/parents/workflow";
 import Link from "next/link";
@@ -84,8 +85,20 @@ export default async function Privacy({
     p_child_id: id,
   });
   if (shares.error) notFound();
+  const workspace = await supabase.rpc("parent_workspace");
+  if (workspace.error)
+    throw Error("Impossible de confirmer le carnet de votre enfant.");
+  const child = (workspace.data as ParentWorkspaceData).children.find(
+    (child) => child.id === id,
+  );
+  if (!child) notFound();
   return (
-    <ParentWorkflow active="access" childId={id} childSection="privacy">
+    <ParentWorkflow
+      active="access"
+      childId={id}
+      childSection="privacy"
+      child={child}
+    >
       <Link href={`/parent/children/${id}`}>← Carnet de mon enfant</Link>
       <DashboardHeading
         title="Partage et accès"
