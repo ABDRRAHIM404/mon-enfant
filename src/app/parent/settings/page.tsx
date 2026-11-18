@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DashboardHeading } from "@/components/dashboard/heading";
 import { ParentProfileForm } from "@/components/parents/profile-form";
 import { WorkspaceShell } from "@/components/workspace-shell";
 import { requireUser } from "@/lib/auth";
@@ -22,15 +23,11 @@ export default async function Settings() {
   return (
     <WorkspaceShell area="parent" active="settings">
       <Link href="/parent">← Mon espace parent</Link>
-      <section className="workspace-heading">
-        <span className="eyebrow">ESPACE PARENT</span>
-        <h1 id="main-content" tabIndex={-1}>
-          Paramètres
-        </h1>
-        <p className="muted">
-          Gérez votre compte, vos contacts et vos préférences.
-        </p>
-      </section>
+      <DashboardHeading
+        title="Paramètres"
+        description="Gérez votre compte et vos préférences."
+        section="settings"
+      />
       <div className="workspace-overview-grid">
         <section className="workspace-surface">
           <h2>Informations du compte</h2>

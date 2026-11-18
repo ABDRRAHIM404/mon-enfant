@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { ClinicianShell } from "@/components/clinician/shell";
+import { ClinicianShell, ClinicianHeading } from "@/components/clinician/shell";
 import { AppointmentCard } from "@/components/appointments/card";
 import { LiveRefresh } from "@/components/appointments/live-refresh";
 import {
@@ -58,15 +58,10 @@ export default async function Calendar({
     `/appointments?${new URLSearchParams({ date, view: mode, state, page: String(n) })}`;
   return (
     <ClinicianShell active="appointments" profile={profile}>
-      <div className="page-heading">
-        <h1 id="main-content" tabIndex={-1}>
-          Mes rendez-vous
-        </h1>
-        <p className="muted">
-          Heures locales Africa/Casablanca. Vue limitée aux dossiers encore
-          autorisés.
-        </p>
-      </div>
+      <ClinicianHeading
+        title="Rendez-vous"
+        description="Planifiez et retrouvez vos rendez-vous, en heure de Casablanca."
+      />
       <div className="tabs">
         <Link href="/follow-up">Suivis et alertes</Link>
         {(capabilities.data as string[]).includes("appointment") && (

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DashboardHeading } from "@/components/dashboard/heading";
 import { ClinicianShell } from "@/components/clinician/shell";
 import { ShieldCheck, Clock3 } from "lucide-react";
 import { Brand } from "@/components/brand";
@@ -33,7 +34,14 @@ export default async function Account() {
         <span className="eyebrow">
           ESPACE SOIGNANT · MÉDECINS ET INFIRMIER(E)S
         </span>
-        <h1 id="main-content" tabIndex={-1}>
+        <h1
+          id={
+            profile && ["doctor", "nurse"].includes(profile.role)
+              ? undefined
+              : "main-content"
+          }
+          tabIndex={-1}
+        >
           Votre statut de vérification
         </h1>
         <p className="muted">
@@ -151,6 +159,12 @@ export default async function Account() {
         provisional={!canAccessClinicalWorkspace(profile)}
         profile={profile}
       >
+        <DashboardHeading
+          title="Mon compte soignant"
+          description="Votre profil, votre sécurité et vos autorisations."
+          section="settings"
+          clinician
+        />
         <div className="soignant-account-content">{content}</div>
       </ClinicianShell>
     );

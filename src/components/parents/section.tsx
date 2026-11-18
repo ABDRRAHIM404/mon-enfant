@@ -1,6 +1,8 @@
 import Link from "next/link";
+import Image from "next/image";
+import { DashboardHeading } from "@/components/dashboard/heading";
 import { notFound } from "next/navigation";
-import { FileClock, Plus, ShieldCheck, UsersRound } from "lucide-react";
+import { Plus, ShieldCheck, UsersRound } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { patientName, birthLabel } from "@/lib/registry/types";
 import type { ParentWorkspaceData, ParentBooklet } from "@/lib/parents/types";
@@ -51,20 +53,25 @@ export async function ParentSection({
   const title = titles[section];
   if (!title) notFound();
   const heading = (
-    <section className="workspace-heading">
-      <span className="eyebrow">ESPACE PARENT</span>
-      <h1 id="main-content" tabIndex={-1}>
-        {title[0]}
-      </h1>
-      <p className="muted">{title[1]}</p>
-    </section>
+    <DashboardHeading
+      title={title[0]}
+      description={title[1]}
+      section={section}
+    />
   );
   if (section === "documents")
     return (
       <>
         {heading}
         <section className="workspace-surface parent-coming-soon">
-          <FileClock size={64} aria-hidden="true" />
+          <Image
+            className="dashboard-document-art"
+            src="/dashboard-art/documents-soon.png"
+            width={360}
+            height={260}
+            alt=""
+            sizes="(max-width: 700px) 220px, 320px"
+          />
           <span className="workspace-chip">Bientôt disponible</span>
           <h2>Vos documents, au même endroit</h2>
           <p>
@@ -82,7 +89,7 @@ export async function ParentSection({
     return (
       <>
         {heading}
-        <div className="workspace-child-grid">
+        <div className="workspace-child-grid parent-children-list">
           {childrenList.map((child) => (
             <article className="workspace-child-card" key={child.id}>
               <UsersRound

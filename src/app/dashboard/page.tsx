@@ -1,6 +1,7 @@
 import Link from "next/link";
+import { UsersRound, Stethoscope, Syringe, CalendarDays } from "lucide-react";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { ClinicianShell } from "@/components/clinician/shell";
+import { ClinicianShell, ClinicianHeading } from "@/components/clinician/shell";
 import { AppointmentCard } from "@/components/appointments/card";
 import { LiveRefresh } from "@/components/appointments/live-refresh";
 import type { AppointmentPage } from "@/lib/appointments/types";
@@ -64,15 +65,10 @@ export default async function Dashboard() {
   ];
   return (
     <ClinicianShell active="home" profile={profile}>
-      <div className="page-heading">
-        <span className="eyebrow">ESPACE MÉDECIN / INFIRMIER(ÈRE)</span>
-        <h1 id="main-content" tabIndex={-1}>
-          Tableau de bord
-        </h1>
-        <p className="muted">
-          Vos dossiers autorisés, rendez-vous et suivis actualisés.
-        </p>
-      </div>
+      <ClinicianHeading
+        title="Tableau de bord"
+        description="Vos dossiers autorisés, rendez-vous et suivis au même endroit."
+      />
       <div className="soignant-heading-actions">
         <Link className="button primary" href="/patients/new">
           Ajouter un enfant
@@ -95,12 +91,18 @@ export default async function Dashboard() {
       </div>
       <LiveRefresh />
       <div className="soignant-stats">
-        {tiles.map(([count, label, href]) => (
-          <Link className="panel stat-card" href={href} key={label}>
-            <strong>{count}</strong>
-            <span>{label}</span>
-          </Link>
-        ))}
+        {tiles.map(([count, label, href], index) => {
+          const Icon = [UsersRound, Stethoscope, Syringe, CalendarDays][index];
+          return (
+            <Link className="panel stat-card" href={href} key={label}>
+              <Icon size={28} aria-hidden="true" />
+              <div>
+                <strong>{count}</strong>
+                <span>{label}</span>
+              </div>
+            </Link>
+          );
+        })}
       </div>
       <p className="soignant-attention">
         Une référence non confirmée n’est pas un rendez-vous manqué. Les soins
