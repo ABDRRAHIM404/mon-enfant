@@ -3350,9 +3350,25 @@ select:focus-visible,
   color: var(--teal);
 }
 .parent-child-actions {
+  display: flex;
   flex-wrap: wrap;
+  gap: 8px;
   font-size: 14px;
   margin-top: 20px;
+}
+.parent-child-actions a {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: var(--pale);
+  color: var(--teal);
+}
+.parent-child-actions a::after {
+  content: none;
 }
 .parent-invite-card {
   display: flex;
