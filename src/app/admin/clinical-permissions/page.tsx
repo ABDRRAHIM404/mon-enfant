@@ -14,11 +14,10 @@ import {
   AdminEmpty,
 } from "@/components/verification/admin-nav";
 import { PermissionForm } from "@/components/clinical/permission-form";
+import type { ProfessionalSearchResult } from "@/lib/admin/professional-search";
 export const dynamic = "force-dynamic";
-type Professional = {
-  user_id: string;
+type Professional = ProfessionalSearchResult & {
   professional_id: string;
-  verification_status: string;
   capabilities: {
     capability: string;
     enabled: boolean;
@@ -32,7 +31,7 @@ export default async function ClinicalPermissions({
 }) {
   const { supabase } = await requireClinicalPermissionManager();
   const params = await searchParams;
-  const q = (params.q ?? "").slice(0, 100),
+  const q = (params.q ?? "").trim().slice(0, 254),
     page = Math.min(10000, Math.max(1, Math.floor(Number(params.page) || 1)));
   const { data, error } = await supabase.rpc("list_clinical_permissions", {
     p_query: q,
@@ -40,7 +39,8 @@ export default async function ClinicalPermissions({
   });
   if (error) throw new Error("Impossible de charger les habilitations.");
   const result = data as { items: Professional[]; total: number };
-  const selected = result.items.length === 1 ? result.items[0] : null;
+  const selected =
+    result.total === 1 && result.items.length === 1 ? result.items[0] : null;
   const history = selected
     ? await supabase.rpc("clinical_capability_history", {
         p_professional_id: selected.user_id,
@@ -64,25 +64,31 @@ export default async function ClinicalPermissions({
           <div>
             <h2>Rechercher un professionnel</h2>
             <p className="muted">
-              Saisissez son identifiant pour consulter ses habilitations.
+              Recherchez par e-mail, prénom, nom ou identifiant professionnel.
             </p>
           </div>
         </div>
         <form className="registry-filters" action="/admin/clinical-permissions">
           <label>
-            Identifiant professionnel
-            <input name="q" defaultValue={q} maxLength={100} />
+            E-mail, prénom, nom ou identifiant professionnel
+            <input
+              type="search"
+              name="q"
+              defaultValue={q}
+              maxLength={254}
+              placeholder="Rechercher un professionnel"
+            />
           </label>
           <button className="button primary">Rechercher</button>
         </form>
         <p className="fine">
-          {result.total} professionnel(s) · 30 par page · recherchez
-          l’identifiant pour ouvrir le formulaire et son historique.
+          {result.total} professionnel(s) · 30 par page · sélectionnez un compte
+          pour ouvrir ses habilitations et son historique.
         </p>
         <div className="admin-permission-list">
           {!result.items.length && (
             <AdminEmpty title="Aucun professionnel trouvé">
-              Essayez un autre identifiant ou effacez la recherche.
+              Essayez un e-mail, un prénom, un nom ou un identifiant.
             </AdminEmpty>
           )}
           {result.items.map((p) => (
@@ -92,9 +98,14 @@ export default async function ClinicalPermissions({
                   className="text-link"
                   href={`/admin/clinical-permissions?q=${encodeURIComponent(p.professional_id)}`}
                 >
-                  {p.professional_id}
+                  {p.display_name || p.professional_id}
                 </Link>
               </h3>
+              {p.email && <p>{p.email}</p>}
+              <p className="fine">
+                {p.professional_id} ·{" "}
+                {p.role === "nurse" ? "Infirmier(e)" : "Médecin"}
+              </p>
               <AdminStatus value={p.verification_status}>
                 {statusLabels[p.verification_status as VerificationState] ??
                   p.verification_status}
@@ -154,6 +165,10 @@ export default async function ClinicalPermissions({
             <div>
               <h2>Modifier une habilitation</h2>
               <p className="muted">
+                {selected.display_name ||
+                  selected.email ||
+                  selected.professional_id}
+                {" · "}
                 {selected.professional_id} · Une décision motivée et historisée.
               </p>
             </div>

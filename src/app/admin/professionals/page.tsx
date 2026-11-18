@@ -9,6 +9,7 @@ import {
 } from "@/components/verification/admin-nav";
 import { SuspensionForm } from "@/components/verification/review-form";
 import Link from "next/link";
+import type { ProfessionalSearchResult } from "@/lib/admin/professional-search";
 export const dynamic = "force-dynamic";
 export default async function Professionals({
   searchParams,
@@ -21,30 +22,20 @@ export default async function Professionals({
     1,
     Math.min(10000, Number.parseInt(query.page ?? "1", 10) || 1),
   );
-  const q = (query.q ?? "").trim().slice(0, 100);
+  const q = (query.q ?? "").trim().slice(0, 254);
   const status = Object.hasOwn(statusLabels, query.status ?? "")
     ? query.status!
     : "all";
-  let directory = supabase
-    .from("professional_profiles")
-    .select("user_id,role,professional_id,verification_status,created_at", {
-      count: "exact",
-    })
-    .in("role", ["doctor", "nurse"]);
-  if (q)
-    directory = directory.ilike(
-      "professional_id",
-      `%${q.replace(/[\\%_]/g, "\\$&")}%`,
-    );
-  if (status !== "all") directory = directory.eq("verification_status", status);
-  const {
-    data: profiles,
-    error,
-    count,
-  } = await directory
-    .order("created_at", { ascending: false })
-    .range((page - 1) * 20, page * 20 - 1);
+  const { data, error } = await supabase.rpc("list_admin_professionals", {
+    p_query: q,
+    p_status: status,
+    p_page: page,
+  });
   if (error) throw new Error("Impossible de charger les professionnels.");
+  const { items: profiles, total: count } = data as {
+    items: ProfessionalSearchResult[];
+    total: number;
+  };
   return (
     <AdminShell active="professionals">
       <AdminHeading
@@ -63,12 +54,13 @@ export default async function Professionals({
         </div>
         <form className="registry-filters" action="/admin/professionals">
           <label>
-            Identifiant professionnel
+            E-mail, prénom, nom ou identifiant professionnel
             <input
               name="q"
               defaultValue={q}
-              maxLength={100}
-              placeholder="Rechercher un identifiant"
+              type="search"
+              maxLength={254}
+              placeholder="Rechercher un professionnel"
             />
           </label>
           <label>
@@ -103,9 +95,16 @@ export default async function Professionals({
                     {p.role === "nurse" ? "I" : "M"}
                   </div>
                   <div>
-                    <h3>{p.professional_id ?? "Identifiant non attribué"}</h3>
+                    <h3>
+                      {p.display_name ||
+                        p.professional_id ||
+                        "Compte professionnel"}
+                    </h3>
+                    {p.email && <p>{p.email}</p>}
                     <p className="muted">
                       {p.role === "nurse" ? "Infirmier(e)" : "Médecin"}
+                      {" · "}
+                      {p.professional_id ?? "Identifiant non attribué"}
                     </p>
                   </div>
                   <AdminStatus value={p.verification_status}>
