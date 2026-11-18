@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { familyIllustration } from "@/components/dashboard/art";
 import { ParentSection } from "@/components/parents/section";
 import { redirect } from "next/navigation";
 import {
@@ -11,6 +12,7 @@ import {
   CalendarDays,
   FileText,
   Bell,
+  ClipboardList,
 } from "lucide-react";
 import { patientName, birthLabel } from "@/lib/registry/types";
 import type { ParentWorkspaceData } from "@/lib/parents/types";
@@ -21,8 +23,8 @@ import {
   ParentProfileForm,
   ParentProfileDisclosure,
 } from "@/components/parents/profile-form";
-import { createClient } from "@/lib/supabase/server";
-import { supabaseConfig } from "@/lib/supabase/config";
+import { requireUser } from "@/lib/auth";
+
 export const dynamic = "force-dynamic";
 const sections = new Set([
   "children",
@@ -66,13 +68,7 @@ export default async function ParentWorkspace({
   const query = await searchParams;
   const { view } = query;
   const focusedSection = view && sections.has(view) ? view : null;
-  if (!supabaseConfig()) redirect("/login");
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-  if (authError || !user || user.is_anonymous) redirect("/login");
+  const { supabase } = await requireUser();
   const { data, error } = await supabase.rpc("parent_home_summary");
   if (error?.code === "42501") redirect("/login");
   if (error) throw new Error("Impossible de charger votre espace parent.");
@@ -110,7 +106,8 @@ export default async function ParentWorkspace({
           </p>
         </div>
         <Image
-          src="/brand/family.png"
+          src={familyIllustration}
+          placeholder={familyIllustration.blurDataURL ? "blur" : "empty"}
           alt=""
           width={240}
           height={204}
@@ -155,55 +152,90 @@ export default async function ParentWorkspace({
             <span>Prochain rendez-vous enregistré</span>
           </div>
         </Link>
+        <Link
+          href="/parent/invitation"
+          className="workspace-surface parent-summary-card"
+        >
+          <ClipboardList size={28} aria-hidden="true" />
+          <div>
+            <strong>
+              {claims.filter((claim) => claim.state === "pending").length}
+            </strong>
+            <span>Demandes en cours</span>
+          </div>
+        </Link>
       </div>
-      <section className="workspace-section" id="children">
-        <div className="workspace-section-heading">
-          <h2>Mes enfants</h2>
-          <Link href="/parent?view=children">Gérer mes enfants →</Link>
-        </div>
-        <div className="workspace-child-grid">
-          {children.map((child) => (
-            <article className="workspace-child-card" key={child.id}>
-              <UsersRound
-                className="workspace-avatar"
-                size={54}
-                aria-hidden="true"
-              />
+      <div className="parent-home-layout">
+        <section className="workspace-section" id="children">
+          <div className="workspace-section-heading">
+            <h2>Mes enfants</h2>
+            <Link href="/parent?view=children">Gérer mes enfants →</Link>
+          </div>
+          <div className="workspace-child-grid">
+            {children.map((child) => (
+              <article className="workspace-child-card" key={child.id}>
+                <UsersRound
+                  className="workspace-avatar"
+                  size={54}
+                  aria-hidden="true"
+                />
+                <div>
+                  <h3>
+                    <Link href={`/parent/children/${child.id}`}>
+                      {patientName(child)}
+                    </Link>
+                  </h3>
+                  <p className="muted">{birthLabel(child)}</p>
+                  <span className="workspace-chip">Accès vérifié</span>
+                  <p className="sr-only">
+                    {child.universal_id} · Accès jusqu’au{" "}
+                    {new Date(child.expires_at).toLocaleDateString("fr-MA", {
+                      timeZone: "Africa/Casablanca",
+                    })}
+                  </p>
+                </div>
+                <ChevronRight size={17} aria-hidden="true" />
+              </article>
+            ))}
+            <article className="workspace-child-card workspace-add-child">
               <div>
+                <Plus
+                  className="workspace-avatar"
+                  size={44}
+                  aria-hidden="true"
+                />
                 <h3>
-                  <Link href={`/parent/children/${child.id}`}>
-                    {patientName(child)}
-                  </Link>
+                  <Link href="/parent/invitation">Ajouter un enfant</Link>
                 </h3>
-                <p className="muted">{birthLabel(child)}</p>
-                <span className="workspace-chip">Accès vérifié</span>
-                <p className="sr-only">
-                  {child.universal_id} · Accès jusqu’au{" "}
-                  {new Date(child.expires_at).toLocaleDateString("fr-MA", {
-                    timeZone: "Africa/Casablanca",
-                  })}
-                </p>
+                <p className="muted">À partir d’une invitation sécurisée.</p>
               </div>
-              <ChevronRight size={17} aria-hidden="true" />
             </article>
-          ))}
-          <article className="workspace-child-card workspace-add-child">
-            <div>
-              <Plus className="workspace-avatar" size={44} aria-hidden="true" />
-              <h3>
-                <Link href="/parent/invitation">Ajouter un enfant</Link>
-              </h3>
-              <p className="muted">À partir d’une invitation sécurisée.</p>
-            </div>
-          </article>
-        </div>
-        {!children.length && (
-          <p className="workspace-empty">
-            Aucun carnet relié pour le moment. Une demande en attente ne donne
-            pas encore accès aux informations de l’enfant.
-          </p>
-        )}
-      </section>
+          </div>
+          {!children.length && (
+            <p className="workspace-empty">
+              Aucun carnet relié pour le moment. Une demande en attente ne donne
+              pas encore accès aux informations de l’enfant.
+            </p>
+          )}
+        </section>
+        <section className="workspace-surface dashboard-guide">
+          <h2>Que pouvez-vous faire ici ?</h2>
+          <div>
+            {quickLinks.map(({ view, title, description, Icon }) => (
+              <Link key={view} href={`/parent?view=${view}`}>
+                <span className={`dashboard-guide-icon guide-${view}`}>
+                  <Icon size={24} aria-hidden="true" />
+                </span>
+                <span>
+                  <strong>{title}</strong>
+                  <small>{description}</small>
+                </span>
+                <ChevronRight size={18} aria-hidden="true" />
+              </Link>
+            ))}
+          </div>
+        </section>
+      </div>
       {!focusedSection && (
         <>
           <div className="workspace-overview-grid">
@@ -262,28 +294,6 @@ export default async function ParentWorkspace({
               </Link>
             </section>
           </div>
-          <section className="workspace-section">
-            <div className="workspace-section-heading">
-              <h2>Accès rapide</h2>
-            </div>
-            <div className="workspace-quick-grid">
-              {quickLinks.map(({ view, title, description, Icon }) => (
-                <Link
-                  href={`/parent?view=${view}`}
-                  className="workspace-surface workspace-quick-card"
-                  key={view}
-                >
-                  <Icon
-                    className="workspace-avatar"
-                    size={44}
-                    aria-hidden="true"
-                  />
-                  <h3>{title}</h3>
-                  <p className="muted">{description}</p>
-                </Link>
-              ))}
-            </div>
-          </section>
         </>
       )}
       {claims.length > 0 && (

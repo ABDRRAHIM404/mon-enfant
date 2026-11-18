@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { appointmentTime } from "@/lib/appointments/calendar";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { ClinicianShell } from "@/components/clinician/shell";
+import { ClinicianShell, ClinicianHeading } from "@/components/clinician/shell";
 import {
   historyLabels,
   patientName,
@@ -47,13 +47,10 @@ export default async function Patients({
   }
   return (
     <ClinicianShell active="children" profile={profile}>
-      <div className="page-heading">
-        <span className="eyebrow">MON REGISTRE</span>
-        <h1 id="main-content" tabIndex={-1}>
-          Enfants
-        </h1>
-        <p className="muted">Recherche limitée à vos dossiers autorisés.</p>
-      </div>
+      <ClinicianHeading
+        title="Enfants"
+        description="Retrouvez les enfants suivis et leurs dossiers autorisés."
+      />
       <div className="tabs">
         <Link href="/patients/new">Inscrire un enfant</Link>
         <Link href="/patients/new?source=paper">

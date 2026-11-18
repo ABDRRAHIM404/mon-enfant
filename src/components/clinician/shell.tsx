@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DashboardHeading } from "@/components/dashboard/heading";
 import {
   Home,
   UsersRound,
@@ -207,16 +208,24 @@ export function ClinicianHeading({
   description: string;
   children?: React.ReactNode;
 }) {
+  const section = (
+    {
+      Enfants: "children",
+      Consultations: "consultations",
+      Vaccinations: "vaccinations",
+      Croissance: "growth",
+      Documents: "documents",
+      "Rendez-vous": "appointments",
+    } as Record<string, string>
+  )[title];
   return (
-    <div className="soignant-heading">
-      <div>
-        <span className="eyebrow">ESPACE SOIGNANT</span>
-        <h1 id="main-content" tabIndex={-1}>
-          {title}
-        </h1>
-        <p className="muted">{description}</p>
-      </div>
-      {children && <div className="soignant-heading-actions">{children}</div>}
-    </div>
+    <DashboardHeading
+      title={title}
+      description={description}
+      section={section}
+      clinician
+    >
+      {children}
+    </DashboardHeading>
   );
 }

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { ClinicianShell } from "@/components/clinician/shell";
+import { ClinicianShell, ClinicianHeading } from "@/components/clinician/shell";
 import { AppointmentCard } from "@/components/appointments/card";
 import { LiveRefresh } from "@/components/appointments/live-refresh";
 import {
@@ -27,7 +27,7 @@ export default async function Calendar({
   const q = await searchParams;
   const view: CalendarView = ["day", "week", "month"].includes(q.view ?? "")
     ? (q.view as CalendarView)
-    : "week";
+    : "month";
   let anchor = q.date || todayCasablanca(),
     range;
   try {
@@ -58,15 +58,10 @@ export default async function Calendar({
     `/appointments?${new URLSearchParams({ date, view: mode, state, page: String(n) })}`;
   return (
     <ClinicianShell active="appointments" profile={profile}>
-      <div className="page-heading">
-        <h1 id="main-content" tabIndex={-1}>
-          Mes rendez-vous
-        </h1>
-        <p className="muted">
-          Heures locales Africa/Casablanca. Vue limitée aux dossiers encore
-          autorisés.
-        </p>
-      </div>
+      <ClinicianHeading
+        title="Rendez-vous"
+        description="Planifiez et retrouvez vos rendez-vous, en heure de Casablanca."
+      />
       <div className="tabs">
         <Link href="/follow-up">Suivis et alertes</Link>
         {(capabilities.data as string[]).includes("appointment") && (
@@ -76,88 +71,93 @@ export default async function Calendar({
         )}
       </div>
       <LiveRefresh />
-      <section className="panel">
-        <form className="registry-filters" action="/appointments">
-          <label>
-            Date
-            <input type="date" name="date" required defaultValue={anchor} />
-          </label>
-          <label>
-            Vue
-            <select name="view" defaultValue={view}>
-              <option value="day">Jour</option>
-              <option value="week">Semaine</option>
-              <option value="month">Mois</option>
-            </select>
-          </label>
-          <label>
-            État
-            <select name="state" defaultValue={state}>
-              <option value="all">Tous</option>
-              {Object.entries(appointmentStates).map(([value, label]) => (
-                <option value={value} key={value}>
-                  {label}
-                </option>
+      <div className={`dashboard-calendar-layout calendar-layout-${view}`}>
+        <section className="panel">
+          <form className="registry-filters" action="/appointments">
+            <label>
+              Date
+              <input type="date" name="date" required defaultValue={anchor} />
+            </label>
+            <label>
+              Vue
+              <select name="view" defaultValue={view}>
+                <option value="day">Jour</option>
+                <option value="week">Semaine</option>
+                <option value="month">Mois</option>
+              </select>
+            </label>
+            <label>
+              État
+              <select name="state" defaultValue={state}>
+                <option value="all">Tous</option>
+                {Object.entries(appointmentStates).map(([value, label]) => (
+                  <option value={value} key={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button className="button primary">Afficher</button>
+          </form>
+          <nav className="pagination" aria-label="Période du calendrier">
+            <Link href={href(range.previous)}>Période précédente</Link>
+            <span>
+              {range.from} au {range.to}
+            </span>
+            <Link href={href(range.next)}>Période suivante</Link>
+          </nav>
+          <div
+            className={`appointment-calendar ${view}`}
+            role="group"
+            aria-label="Jours et nombre de rendez-vous"
+          >
+            {view !== "day" &&
+              ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map((day) => (
+                <strong key={day}>{day}</strong>
               ))}
-            </select>
-          </label>
-          <button className="button primary">Afficher</button>
-        </form>
-        <nav className="pagination" aria-label="Période du calendrier">
-          <Link href={href(range.previous)}>Période précédente</Link>
-          <span>
-            {range.from} au {range.to}
-          </span>
-          <Link href={href(range.next)}>Période suivante</Link>
-        </nav>
-        <div
-          className={`appointment-calendar ${view}`}
-          role="group"
-          aria-label="Jours et nombre de rendez-vous"
-        >
-          {view !== "day" &&
-            ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map((day) => (
-              <strong key={day}>{day}</strong>
+            {range.days.map((day) => (
+              <Link
+                key={day}
+                href={href(day, "day")}
+                className={
+                  day.slice(0, 7) !== anchor.slice(0, 7) && view === "month"
+                    ? "muted"
+                    : ""
+                }
+              >
+                <span>{day.slice(8)}</span>
+                <small>{counts.get(day) || 0} RDV</small>
+                <span className="sr-only"> — {day}</span>
+              </Link>
             ))}
-          {range.days.map((day) => (
-            <Link
-              key={day}
-              href={href(day, "day")}
-              className={
-                day.slice(0, 7) !== anchor.slice(0, 7) && view === "month"
-                  ? "muted"
-                  : ""
-              }
-            >
-              <span>{day.slice(8)}</span>
-              <small>{counts.get(day) || 0} RDV</small>
-              <span className="sr-only"> — {day}</span>
-            </Link>
+          </div>
+          <p className="fine">
+            {data.total} rendez-vous dans cette période et ce filtre. Les
+            nombres du calendrier couvrent toute la période ; la liste est
+            paginée par 50.
+          </p>
+        </section>
+        <section className="dashboard-calendar-list">
+          <h2>Rendez-vous de la période</h2>
+          {data.items.map((appointment) => (
+            <AppointmentCard key={appointment.id} appointment={appointment} />
           ))}
-        </div>
-        <p className="fine">
-          {data.total} rendez-vous dans cette période et ce filtre. Les nombres
-          du calendrier couvrent toute la période ; la liste est paginée par 50.
-        </p>
-      </section>
-      <h2>Rendez-vous de la période</h2>
-      {data.items.map((appointment) => (
-        <AppointmentCard key={appointment.id} appointment={appointment} />
-      ))}
-      {!data.items.length && (
-        <p className="empty-state">
-          Aucun rendez-vous pour cette période et ce filtre.
-        </p>
-      )}
-      <nav className="pagination" aria-label="Rendez-vous de la période">
-        {page > 1 && (
-          <Link href={href(anchor, view, page - 1)}>Liste précédente</Link>
-        )}
-        <span>Page {page}</span>
-        {page * 50 < data.total && (
-          <Link href={href(anchor, view, page + 1)}>Liste suivante</Link>
-        )}
-      </nav>
+          {!data.items.length && (
+            <p className="empty-state">
+              Aucun rendez-vous pour cette période et ce filtre.
+            </p>
+          )}
+          <nav className="pagination" aria-label="Rendez-vous de la période">
+            {page > 1 && (
+              <Link href={href(anchor, view, page - 1)}>Liste précédente</Link>
+            )}
+            <span>Page {page}</span>
+            {page * 50 < data.total && (
+              <Link href={href(anchor, view, page + 1)}>Liste suivante</Link>
+            )}
+          </nav>
+        </section>
+      </div>
     </ClinicianShell>
   );
 }

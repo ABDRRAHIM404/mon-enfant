@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { redirect } from "next/navigation";
 import { Plus, UsersRound, ChevronRight } from "lucide-react";
 import { getProfessional } from "@/lib/auth";
-import { ClinicianShell } from "@/components/clinician/shell";
+import { ClinicianShell, ClinicianHeading } from "@/components/clinician/shell";
 import { ProvisionalChildForm } from "@/components/provisional/forms";
 import { provisionalKinds, type ProvisionalChild } from "@/lib/provisional";
 import { statusLabels } from "@/lib/authorization";
@@ -86,17 +86,14 @@ export default async function ProvisionalWorkspace({
         : "Tableau de bord";
   return (
     <ClinicianShell active="home" provisional profile={profile}>
-      <section className="workspace-heading">
-        <span className="eyebrow">ESPACE MÉDECIN / INFIRMIER(ÈRE)</span>
-        <h1 id="main-content" tabIndex={-1}>
-          {viewTitle}
-        </h1>
-        <p className="muted">
-          {kind
-            ? "Choisissez un dossier privé pour consulter son historique ou saisir une entrée de cette rubrique."
-            : "Votre espace clinique Mon Enfant."}
-        </p>
-      </section>
+      <ClinicianHeading
+        title={viewTitle}
+        description={
+          kind
+            ? "Choisissez un dossier privé pour consulter son historique."
+            : "Bienvenue dans votre espace clinique privé Mon Enfant."
+        }
+      />
       <section className="workspace-verification workspace-attention">
         <div>
           <span className="workspace-status">

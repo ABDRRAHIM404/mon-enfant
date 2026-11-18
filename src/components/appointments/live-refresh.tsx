@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { RefreshCw } from "lucide-react";
 export function LiveRefresh() {
   const router = useRouter(),
     [pending, startTransition] = useTransition();
@@ -27,17 +28,16 @@ export function LiveRefresh() {
     };
   }, [router]);
   return (
-    <div className="tabs">
+    <div className="dashboard-refresh" aria-busy={pending}>
       <button
         className="button secondary"
         disabled={pending}
         onClick={() => startTransition(() => router.refresh())}
       >
+        <RefreshCw size={15} aria-hidden="true" />
         {pending ? "Actualisation…" : "Actualiser les suivis"}
       </button>
-      <span className="fine">
-        Actualisation automatique chaque minute quand cette page est visible.
-      </span>
+      <span className="fine">Mise à jour automatique</span>
     </div>
   );
 }

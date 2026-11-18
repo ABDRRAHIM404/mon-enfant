@@ -1,9 +1,12 @@
 import "server-only";
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "./supabase/server";
 import { supabaseConfig } from "./supabase/config";
 import { canAccessClinicalWorkspace, type Professional } from "./authorization";
-export async function requireUser() {
+// React's server-render cache is scoped to this request only. Never reuse an
+// identity, clinical result or permission across requests or accounts.
+export const requireUser = cache(async function requireUser() {
   if (!supabaseConfig()) redirect("/login");
   const supabase = await createClient();
   const {
@@ -12,8 +15,8 @@ export async function requireUser() {
   } = await supabase.auth.getUser();
   if (error || !user || user.is_anonymous) redirect("/login");
   return { user, supabase };
-}
-export async function getProfessional() {
+});
+export const getProfessional = cache(async function getProfessional() {
   const { user, supabase } = await requireUser();
   const { data, error } = await supabase
     .from("professional_profiles")
@@ -22,7 +25,7 @@ export async function getProfessional() {
     .maybeSingle();
   if (error) throw new Error("Impossible de charger le statut professionnel.");
   return { user, profile: data as Professional | null, supabase };
-}
+});
 export async function requireApprovedDoctor() {
   const result = await getProfessional();
   if (!canAccessClinicalWorkspace(result.profile)) redirect("/account");
