@@ -17,13 +17,13 @@ Owner request: inspect and improve the admin area. The existing parent/clinician
 
 Source-rendered component tests use fictional in-memory responses only. They verify queue filtering/pagination, guard-before-read, separate clinical permission management, evidence routing, approval checks, suspension reason fields, real overview query scope, loading semantics, empty editor absence and the admin account branch. No hosted admin account, capability or test data was created. No Auth, RLS, schema, clinical/vaccine source, server action or evidence route behavior was changed.
 
-The full suite passed 346 tests / 44 files before one additional account presentation case; the final targeted suite passes 20 cases, including that additional case. TypeScript and targeted lint pass. Vercel compilation is checked for the submitted preview.
+The final full suite passes 347 tests / 44 files; the targeted UI/loading suite passes 20 cases. Explicit TypeScript and targeted lint pass. Vercel preview dpl_EXsfH1nAMYLNaZFDcCx7fRt16DYA is READY for exact application source 926f045ae4e27c8324599231c685f7fd6c6204af.
 
 ## Live inspection limits
 
 1. Canonical `/admin`: blocked by the ordinary sign-in screen in the shared browser. This verifies the anonymous sign-in barrier, not the authenticated admin flow.
 2. Source components: rendered with explicitly synthetic responses for structural verification; these are not live admin screenshots or backend acceptance.
-3. Authenticated visual/interaction review: pending an existing admin session. No full UI audit, responsive screenshot acceptance or accessibility certification is claimed. The browser also denied a local-file preview under its URL policy; no alternate surface or URL was used to work around that denial.
+3. Authenticated visual/interaction review: pending an existing admin session. The secure browser-auth request returned `declined`; authentication stopped and no further sign-in or takeover was requested. No full UI audit, responsive screenshot acceptance or accessibility certification is claimed. The browser also denied a local-file preview under its URL policy; no alternate surface or URL was used to work around that denial.
 
 The earlier six-account dashboard test fixture remains pending explicit owner-approved cleanup; this UI task does not reuse it or attempt its blocked cleanup.
 
