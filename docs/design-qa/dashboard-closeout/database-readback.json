@@ -1,0 +1,12 @@
+{
+  "run": "92c6f2f0db84362d",
+  "scope": "fixture-scoped readback before canonical checks and retirement",
+  "fixtureAccounts": 1,
+  "professionalProfiles": 0,
+  "activeGuardianLinks": 0,
+  "reminderDays": 3,
+  "contactPhoneEmpty": true,
+  "settingsEvents": 6,
+  "clinicalWrites": 0,
+  "mailSent": 0
+}

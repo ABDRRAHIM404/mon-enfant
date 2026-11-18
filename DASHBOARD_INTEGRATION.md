@@ -1,5 +1,18 @@
 # Dashboard integration — 17 November 2026
 
+## Final closeout — 18 November 2026
+
+The original dashboard scope is implemented. The original live persistence, role/session/QR and responsive acceptance remains in `docs/design-qa/dashboard-live`; the narrowly scoped follow-up is in `docs/design-qa/dashboard-closeout`.
+
+- Fixed parent profile/settings input loss when a server-action response is interrupted. The form remains mounted, clears stale success, shows that the save could not be confirmed and does not automatically replay a mutation. Framework access/session redirects remain intact.
+- Fixed overlapping links in Mes enfants: the full-card overlay previously routed the first three child-section targets to Partage & accès. Each link now has its own separated, minimum 44px target and correct pointer hit area.
+- Preview application **cd2bca774b005bada9559d5364557c8def115dd5**, deployment **dpl_5f9diBZtf7xxZZzuKxzqFXsjdYAi**, is READY. Seven actual authenticated form scenarios and eight navigation/motion/component scenarios pass, with zero unexpected browser exceptions. The response-loss check lets the server commit, drops the response in Chromium, verifies no automatic resend and reloads the committed preference.
+- 27 focused tests across three files pass; explicit `next typegen && tsc --noEmit` passes; targeted lint passes; the exact preview's Vercel production build passes. Earlier 315-test/full dashboard acceptance is retained as earlier evidence, not relabeled as a fresh full-suite run.
+- Visual comparison includes all eight parent and all eight clinician references, previous populated browser captures, fresh 1672×941 parent captures and focused child-link states. Source designs contain illustrative data and controls outside existing authority. These are reference-guided dashboards, not a pixel-identical reproduction: decorative artwork, card arrangements, account controls and data-dependent summaries have documented differences. See the current section of `design-qa.md`.
+- Fresh fixture **92c6f2f0db84362d** has one synthetic parent account only: no professional role, child link or clinical permission, no clinical writes and no email. Child-card pointer checks use the actual server-rendered component with a fictional list prop and deployed CSS, clearly distinguished from backend linking acceptance. Retirement and canonical publication are recorded at the end of PROGRESS.md when complete.
+
+The historical blocked/pending checkpoints below are retained for provenance. Their network/interruption gap is closed by this follow-up. Documents stays coming soon; app notification emails and native APK/iOS are outside this closeout.
+
 Status: **implemented, live-verified and deployed** as application 277e618; canonical deployment dpl_GYQEGw2vQgKBAC7wLoEvSSG4oCNu READY. Fresh synthetic fixture retired; see PROGRESS.md. Current request supersedes the historical parent-web pause. Android/APK and iOS remain paused.
 
 ## Phase A — source audit

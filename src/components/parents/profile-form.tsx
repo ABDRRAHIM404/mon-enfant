@@ -1,8 +1,10 @@
 "use client";
 import { useActionState, useState, type ReactNode } from "react";
 import { saveParentProfile } from "@/app/parent/actions";
+import { recoverableSave } from "@/lib/recoverable-save";
+const saveProfile = recoverableSave(saveParentProfile);
 export function ParentProfileForm({ name = "" }: { name?: string }) {
-  const [state, action, pending] = useActionState(saveParentProfile, {});
+  const [state, action, pending] = useActionState(saveProfile, {});
   return (
     <form
       action={action}

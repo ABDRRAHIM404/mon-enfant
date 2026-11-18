@@ -1,0 +1,25 @@
+{
+  "run": "92c6f2f0db84362d",
+  "checks": [
+    {
+      "stage": "profile-first-save-slow-request",
+      "requests": 1,
+      "inputRetained": true,
+      "successVisible": true
+    },
+    {
+      "stage": "settings-slow-save-and-persistence"
+    },
+    {
+      "stage": "settings-server-validation-retains-input"
+    },
+    {
+      "stage": "settings-interrupted-request-retains-input",
+      "passed": false,
+      "issue": "interrupted request replaced form and lost input"
+    }
+  ],
+  "unexpectedBrowserErrors": 0,
+  "mailSent": 0,
+  "clinicalWrites": 0
+}

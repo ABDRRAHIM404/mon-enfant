@@ -1,5 +1,13 @@
 # Mon Enfant email delivery
 
+## Current Auth sender — owner-confirmed 17 November 2026
+
+The owner switched hosted Supabase Auth to personal Gmail SMTP to avoid buying a sending domain. A mistyped SMTP username caused Gmail `535` login failures; after correcting it, the owner received the confirmation message in spam and reported confirmation/sign-in working ("all good now"). Marking that message as not spam was recommended. This proves that owner's walkthrough, not general inbox placement or broader deliverability. No password, app password or confirmation token was requested in chat.
+
+The hosted Email-provider screenshot shows minimum password length 8 with no required character classes; the owner reports saving it. Website policy e27a31b is deployed and matches 8. The available connector does not expose hosted Auth configuration readback. The SMTP setting was changed by the owner, not by a database migration.
+
+The Resend setup/evidence below is historical and must not be reapplied over the owner's working Gmail configuration. Application approval/invitation/follow-up mail is separate from Auth; it has not been enabled by this SMTP change and is outside the dashboard closeout.
+
 Supabase remains the authentication/session authority. Signup confirmation and password recovery continue through its existing Auth APIs and callback routes. Resend now delivers owner-only development mail through SMTP. Registering its MCP connection alone does not prove SMTP or mailbox delivery; the actual evidence is recorded below.
 
 ## Current connection and activation

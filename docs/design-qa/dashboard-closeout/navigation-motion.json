@@ -1,0 +1,144 @@
+{
+  "passed": true,
+  "base": "https://mon-enfant-grxoevupz-bounga.vercel.app",
+  "checks": [
+    {
+      "stage": "slow-navigation-pending-feedback",
+      "earlyOpacity": "0",
+      "lateOpacity": "1"
+    },
+    {
+      "stage": "navigation-interruption-last-selection-wins"
+    },
+    {
+      "stage": "keyboard-and-reduced-motion"
+    },
+    {
+      "stage": "phone-menu-and-navigation"
+    },
+    {
+      "stage": "fresh-empty-sections-and-brand",
+      "captures": 8,
+      "viewport": "1672x941",
+      "state": "own synthetic parent; no linked child"
+    },
+    {
+      "stage": "child-link-pointer-hit-tests-component-fixture",
+      "width": 1440,
+      "scope": "actual server-rendered component with a fictional authorized-list prop and deployed CSS; not a backend linking test",
+      "results": [
+        {
+          "label": "Vaccinations",
+          "href": "?view=vaccinations&child=11111111-1111-4111-8111-111111111111",
+          "height": 44,
+          "width": 98.34375,
+          "center": "?view=vaccinations&child=11111111-1111-4111-8111-111111111111",
+          "edge": "?view=vaccinations&child=11111111-1111-4111-8111-111111111111"
+        },
+        {
+          "label": "Croissance",
+          "href": "?view=growth&child=11111111-1111-4111-8111-111111111111",
+          "height": 44,
+          "width": 90.03125,
+          "center": "?view=growth&child=11111111-1111-4111-8111-111111111111",
+          "edge": "?view=growth&child=11111111-1111-4111-8111-111111111111"
+        },
+        {
+          "label": "Rendez-vous",
+          "href": "?view=appointments&child=11111111-1111-4111-8111-111111111111",
+          "height": 44,
+          "width": 102.5,
+          "center": "?view=appointments&child=11111111-1111-4111-8111-111111111111",
+          "edge": "?view=appointments&child=11111111-1111-4111-8111-111111111111"
+        },
+        {
+          "label": "Partage & accès",
+          "href": "?view=access&child=11111111-1111-4111-8111-111111111111",
+          "height": 44,
+          "width": 122.734375,
+          "center": "?view=access&child=11111111-1111-4111-8111-111111111111",
+          "edge": "?view=access&child=11111111-1111-4111-8111-111111111111"
+        }
+      ]
+    },
+    {
+      "stage": "child-link-pointer-hit-tests-component-fixture",
+      "width": 820,
+      "scope": "actual server-rendered component with a fictional authorized-list prop and deployed CSS; not a backend linking test",
+      "results": [
+        {
+          "label": "Vaccinations",
+          "href": "?view=vaccinations&child=11111111-1111-4111-8111-111111111111",
+          "height": 44,
+          "width": 98.34375,
+          "center": "?view=vaccinations&child=11111111-1111-4111-8111-111111111111",
+          "edge": "?view=vaccinations&child=11111111-1111-4111-8111-111111111111"
+        },
+        {
+          "label": "Croissance",
+          "href": "?view=growth&child=11111111-1111-4111-8111-111111111111",
+          "height": 44,
+          "width": 90.03125,
+          "center": "?view=growth&child=11111111-1111-4111-8111-111111111111",
+          "edge": "?view=growth&child=11111111-1111-4111-8111-111111111111"
+        },
+        {
+          "label": "Rendez-vous",
+          "href": "?view=appointments&child=11111111-1111-4111-8111-111111111111",
+          "height": 44,
+          "width": 102.5,
+          "center": "?view=appointments&child=11111111-1111-4111-8111-111111111111",
+          "edge": "?view=appointments&child=11111111-1111-4111-8111-111111111111"
+        },
+        {
+          "label": "Partage & accès",
+          "href": "?view=access&child=11111111-1111-4111-8111-111111111111",
+          "height": 44,
+          "width": 122.734375,
+          "center": "?view=access&child=11111111-1111-4111-8111-111111111111",
+          "edge": "?view=access&child=11111111-1111-4111-8111-111111111111"
+        }
+      ]
+    },
+    {
+      "stage": "child-link-pointer-hit-tests-component-fixture",
+      "width": 390,
+      "scope": "actual server-rendered component with a fictional authorized-list prop and deployed CSS; not a backend linking test",
+      "results": [
+        {
+          "label": "Vaccinations",
+          "href": "?view=vaccinations&child=11111111-1111-4111-8111-111111111111",
+          "height": 44,
+          "width": 98.34375,
+          "center": "?view=vaccinations&child=11111111-1111-4111-8111-111111111111",
+          "edge": "?view=vaccinations&child=11111111-1111-4111-8111-111111111111"
+        },
+        {
+          "label": "Croissance",
+          "href": "?view=growth&child=11111111-1111-4111-8111-111111111111",
+          "height": 44,
+          "width": 90.03125,
+          "center": "?view=growth&child=11111111-1111-4111-8111-111111111111",
+          "edge": "?view=growth&child=11111111-1111-4111-8111-111111111111"
+        },
+        {
+          "label": "Rendez-vous",
+          "href": "?view=appointments&child=11111111-1111-4111-8111-111111111111",
+          "height": 44,
+          "width": 102.5,
+          "center": "?view=appointments&child=11111111-1111-4111-8111-111111111111",
+          "edge": "?view=appointments&child=11111111-1111-4111-8111-111111111111"
+        },
+        {
+          "label": "Partage & accès",
+          "href": "?view=access&child=11111111-1111-4111-8111-111111111111",
+          "height": 44,
+          "width": 122.734375,
+          "center": "?view=access&child=11111111-1111-4111-8111-111111111111",
+          "edge": "?view=access&child=11111111-1111-4111-8111-111111111111"
+        }
+      ]
+    }
+  ],
+  "unexpectedErrors": 0
+}

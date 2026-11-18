@@ -7,8 +7,10 @@ import {
 } from "@/app/parent/actions";
 import type { ParentSettings, CorrectionRequest } from "@/lib/parents/types";
 import { correctionCategories } from "@/lib/parents/types";
+import { recoverableSave } from "@/lib/recoverable-save";
+const saveSettings = recoverableSave(saveParentSettings);
 export function ParentSettingsForm({ settings }: { settings: ParentSettings }) {
-  const [state, action, pending] = useActionState(saveParentSettings, {});
+  const [state, action, pending] = useActionState(saveSettings, {});
   return (
     <form
       action={action}
