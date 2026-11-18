@@ -56,7 +56,17 @@ export default async function NewEntry({
       : { data: [], error: null };
   if (vocabulary.error) throw new Error("Choix vaccinaux indisponibles.");
   return (
-    <ClinicalWorkspace active="consultations" childId={id} section="records">
+    <ClinicalWorkspace
+      active={
+        kind === "vaccination"
+          ? "vaccinations"
+          : kind === "growth"
+            ? "growth"
+            : "consultations"
+      }
+      childId={id}
+      section="records"
+    >
       <div className="page-heading">
         <h1 id="main-content" tabIndex={-1}>
           {kind === "vaccination"

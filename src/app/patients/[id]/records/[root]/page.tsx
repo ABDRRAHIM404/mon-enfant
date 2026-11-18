@@ -48,7 +48,17 @@ export default async function ClinicalHistory({
       : { data: [], error: null };
   if (vocabulary.error) throw new Error("Choix vaccinaux indisponibles.");
   return (
-    <ClinicalWorkspace active="consultations" childId={id} section="records">
+    <ClinicalWorkspace
+      active={
+        latest.kind === "vaccination"
+          ? "vaccinations"
+          : latest.kind === "growth"
+            ? "growth"
+            : "consultations"
+      }
+      childId={id}
+      section="records"
+    >
       <div className="page-heading">
         <h1 id="main-content" tabIndex={-1}>
           Historique de la saisie

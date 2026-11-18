@@ -49,7 +49,17 @@ export default async function Records({
     return `/patients/${id}/records?${new URLSearchParams({ kind, page: String(n) })}`;
   }
   return (
-    <ClinicalWorkspace active="consultations" childId={id} section="records">
+    <ClinicalWorkspace
+      active={
+        kind === "vaccination"
+          ? "vaccinations"
+          : kind === "growth"
+            ? "growth"
+            : "consultations"
+      }
+      childId={id}
+      section="records"
+    >
       <div className="page-heading">
         <h1 id="main-content" tabIndex={-1}>
           Dossier clinique

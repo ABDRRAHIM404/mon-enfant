@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "transport": "authenticated HTTP render checks; no browser session/cookie injection or screenshot acceptance",
+  "source": "dc0c887b9c5f6714ca787eedcb6cc10e71753b3e",
+  "observations": [
+    {
+      "role": "DOCTOR",
+      "path": "/patients/[fixture]",
+      "status": 200,
+      "privateNoStore": true,
+      "expectedContent": true
+    },
+    {
+      "role": "PARENT",
+      "path": "/parent/children/[fixture]/privacy",
+      "status": 200,
+      "privateNoStore": true,
+      "expectedContent": true
+    },
+    {
+      "role": "ADMIN",
+      "path": "/admin/clinical-permissions?q=TEST-UI-bccf8eb71bf34bc8-DOCTOR",
+      "status": 200,
+      "privateNoStore": true,
+      "expectedContent": true
+    }
+  ],
+  "scope": "brief affected-page checks only; no broad campaign"
+}

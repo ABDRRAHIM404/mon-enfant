@@ -251,3 +251,11 @@ Current owner request resumes parent website work; APK/iOS stay paused. See [DAS
 - [x] Source tests, TypeScript and lint pass; permission/evidence/action boundaries preserved.
 - [ ] Authenticated visual and interaction review after existing admin sign-in.
 - [ ] Publish accepted admin update to canonical production and synchronize cloud main.
+
+## Combined UI follow-up
+
+- [x] Doctor child actions, nested care/auxiliary shell and navigation context implemented.
+- [x] Parent child/request/notification/invitation/account navigation/context implemented.
+- [x] Admin search/status and accurate clinical-permission expiry labels implemented.
+- [x] Relevant checks and owner-approved three-account fixture retirement completed.
+- [ ] Complete the full signed-in computer-use audit when the session/viewer tooling is available.

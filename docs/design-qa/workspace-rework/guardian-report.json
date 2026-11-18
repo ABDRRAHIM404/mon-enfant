@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "scope": "authenticated API persistence and denials; not browser acceptance",
+  "run": "bccf8eb71bf34bc8",
+  "checks": [
+    "guardian-invitation-and-claim",
+    "verified-parent-link",
+    "parent-request-and-professional-response",
+    "parent-notifications"
+  ]
+}
