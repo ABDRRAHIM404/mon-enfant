@@ -19,6 +19,8 @@ export default async function Account() {
   const canReview = reviewPermission?.data === true && !reviewPermission?.error;
   const canManageClinical =
     clinicalPermission?.data === true && !clinicalPermission?.error;
+  const AccountTitle =
+    profile && ["doctor", "nurse"].includes(profile.role) ? "h2" : "h1";
   const content = (
     <section className="account-page">
       <header>
@@ -34,7 +36,7 @@ export default async function Account() {
         <span className="eyebrow">
           ESPACE SOIGNANT · MÉDECINS ET INFIRMIER(E)S
         </span>
-        <h1
+        <AccountTitle
           id={
             profile && ["doctor", "nurse"].includes(profile.role)
               ? undefined
@@ -43,7 +45,7 @@ export default async function Account() {
           tabIndex={-1}
         >
           Votre statut de vérification
-        </h1>
+        </AccountTitle>
         <p className="muted">
           L’accès à l’espace clinique dépend de la validation de vos
           qualifications et de vos autorisations.

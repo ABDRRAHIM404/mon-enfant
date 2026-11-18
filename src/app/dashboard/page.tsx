@@ -104,11 +104,14 @@ export default async function Dashboard() {
           );
         })}
       </div>
-      <p className="soignant-attention">
-        Une référence non confirmée n’est pas un rendez-vous manqué. Les soins
-        enregistrés par un autre soignant autorisé recalculent les suivis
-        vaccinaux, sans annuler les consultations indépendantes.
-      </p>
+      <details className="dashboard-explanation">
+        <summary>Comprendre les suivis vaccinaux</summary>
+        <p>
+          Une référence non confirmée n’est pas un rendez-vous manqué. Les soins
+          enregistrés par un autre soignant autorisé recalculent les suivis
+          vaccinaux, sans annuler les consultations indépendantes.
+        </p>
+      </details>
       <div className="soignant-daily-grid">
         <section className="panel">
           <h2>Dernières consultations documentées</h2>

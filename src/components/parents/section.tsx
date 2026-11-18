@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { documentsIllustration } from "@/components/dashboard/art";
 import { DashboardHeading } from "@/components/dashboard/heading";
 import { notFound } from "next/navigation";
 import { Plus, ShieldCheck, UsersRound } from "lucide-react";
@@ -66,7 +67,9 @@ export async function ParentSection({
         <section className="workspace-surface parent-coming-soon">
           <Image
             className="dashboard-document-art"
-            src="/dashboard-art/documents-soon.png"
+            src={documentsIllustration}
+            placeholder={documentsIllustration.blurDataURL ? "blur" : "empty"}
+            priority
             width={360}
             height={260}
             alt=""

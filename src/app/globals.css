@@ -4298,3 +4298,21 @@ select:focus-visible,
     grid-template-columns: minmax(0, 1fr);
   }
 }
+.dashboard-page-heading h1 {
+  font-weight: 750;
+}
+.dashboard-explanation {
+  margin: 0 0 18px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.dashboard-explanation summary {
+  min-height: 36px;
+  cursor: pointer;
+  color: var(--teal);
+  padding-block: 8px;
+}
+.dashboard-explanation p {
+  max-width: 90ch;
+  margin: 8px 0;
+}

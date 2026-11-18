@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { documentsIllustration } from "@/components/dashboard/art";
 import { redirect } from "next/navigation";
 import { getProfessional, requireApprovedDoctor } from "@/lib/auth";
 import { ClinicianShell, ClinicianHeading } from "./shell";
@@ -30,7 +31,9 @@ export async function ClinicianDocuments({
       <section className="panel soignant-coming-soon">
         <Image
           className="dashboard-document-art"
-          src="/dashboard-art/documents-soon.png"
+          src={documentsIllustration}
+          placeholder={documentsIllustration.blurDataURL ? "blur" : "empty"}
+          priority
           width={360}
           height={260}
           alt=""

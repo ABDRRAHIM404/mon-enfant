@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     localPatterns: [
       { pathname: "/brand/**", search: "" },
       { pathname: "/dashboard-art/**", search: "" },
+      { pathname: "/_next/static/media/**", search: "" },
     ],
   },
   async headers() {

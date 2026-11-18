@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { clinicianIllustration, familyIllustration } from "./art";
 import {
   CalendarDays,
   ChartNoAxesCombined,
@@ -33,6 +34,7 @@ export function DashboardHeading({
   clinician?: boolean;
 }) {
   const Icon = icons[section as keyof typeof icons] ?? Stethoscope;
+  const illustration = clinician ? clinicianIllustration : familyIllustration;
   return (
     <section className="dashboard-page-heading">
       <div className="dashboard-heading-copy">
@@ -50,12 +52,9 @@ export function DashboardHeading({
       </div>
       <Image
         className="dashboard-heading-art"
-        src={
-          clinician
-            ? "/dashboard-art/clinician-welcome.png"
-            : "/brand/family.png"
-        }
+        src={illustration}
         alt=""
+        placeholder={illustration.blurDataURL ? "blur" : "empty"}
         width={300}
         height={160}
         sizes="(max-width: 700px) 110px, 280px"

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { familyIllustration } from "@/components/dashboard/art";
 import { ParentSection } from "@/components/parents/section";
 import { redirect } from "next/navigation";
 import {
@@ -105,7 +106,8 @@ export default async function ParentWorkspace({
           </p>
         </div>
         <Image
-          src="/brand/family.png"
+          src={familyIllustration}
+          placeholder={familyIllustration.blurDataURL ? "blur" : "empty"}
           alt=""
           width={240}
           height={204}
