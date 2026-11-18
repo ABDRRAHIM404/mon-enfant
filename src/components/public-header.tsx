@@ -1,15 +1,23 @@
 import Link from "next/link";
 import { Menu } from "lucide-react";
 import { Brand } from "./brand";
+
+const sections = [
+  { href: "/#fonctionnalites", label: "Le parcours" },
+  { href: "/#fondateurs", label: "Les fondateurs" },
+  { href: "/#aide", label: "Contact" },
+];
+
 export function PublicHeader() {
   return (
     <header className="public-header">
       <Brand />
       <nav className="public-links" aria-label="Découvrir Mon Enfant">
-        <Link href="/">Accueil</Link>
-        <Link href="/#fonctionnalites">Fonctionnalités</Link>
-        <Link href="/#securite">Sécurité</Link>
-        <Link href="/#aide">Aide</Link>
+        {sections.map(({ href, label }) => (
+          <Link key={href} href={href}>
+            {label}
+          </Link>
+        ))}
       </nav>
       <nav className="public-actions" aria-label="Accéder à mon compte">
         <Link href="/login" className="button primary">
@@ -27,12 +35,14 @@ export function PublicHeader() {
           <Menu size={22} aria-hidden="true" />
         </summary>
         <nav aria-label="Menu mobile">
-          <Link href="/">Accueil</Link>
-          <Link href="/#fonctionnalites">Fonctionnalités</Link>
+          {sections.map(({ href, label }) => (
+            <Link key={href} href={href}>
+              {label}
+            </Link>
+          ))}
           <Link href="/login">Espace parent</Link>
           <Link href="/signup">Créer un compte parent</Link>
           <Link href="/login?audience=clinician">Espace soignant</Link>
-          <Link href="/#aide">Aide</Link>
         </nav>
       </details>
     </header>
