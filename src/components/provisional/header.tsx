@@ -22,7 +22,7 @@ export function ProvisionalHeader({ profile }: { profile: Professional }) {
             : "panel provisional-warning"
         }
       >
-        <span className="eyebrow">MÉDECINS ET INFIRMIER(E)S</span>
+        <span className="eyebrow">Médecins et infirmier(e)s</span>
         <p className="status">
           Compte : {statusLabels[profile.verification_status]} ·{" "}
           {profile.role === "nurse" ? "Infirmier(e)" : "Médecin"}

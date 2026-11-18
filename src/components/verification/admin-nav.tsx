@@ -58,7 +58,7 @@ export type AdminSection = (typeof items)[number]["key"];
 export function AdminNav({ active = "home" }: { active?: AdminSection }) {
   return (
     <nav aria-label="Administration" className="admin-navigation">
-      <span className="admin-nav-label">ESPACE DE TRAVAIL</span>
+      <span className="admin-nav-label">Espace de travail</span>
       {items.map(({ key, href, label, icon: Icon }) => (
         <Link
           key={key}
@@ -137,7 +137,7 @@ export function AdminHeading({
   return (
     <section className="admin-heading">
       <div>
-        <span className="eyebrow">ADMINISTRATION</span>
+        <span className="eyebrow">Administration</span>
         <h1 id="main-content" tabIndex={-1}>
           {title}
         </h1>

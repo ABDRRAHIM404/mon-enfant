@@ -27,8 +27,8 @@ export function AuthShell({
           <div className="story-copy">
             <Icon
               className="auth-illustration-icon"
-              size={96}
-              strokeWidth={1.3}
+              size={18}
+              strokeWidth={1.5}
               aria-hidden="true"
             />
             <h2>
@@ -50,7 +50,7 @@ export function AuthShell({
         <section className="auth-main">
           <div className="auth-card">
             <span className="eyebrow">
-              {parent ? "ESPACE PARENT" : "MÉDECIN / INFIRMIER(ÈRE)"}
+              {parent ? "Espace parent" : "Médecin / Infirmier(ère)"}
             </span>
             <h1 id="main-content" tabIndex={-1}>
               {mode === "login"

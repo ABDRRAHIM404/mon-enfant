@@ -15,7 +15,10 @@ export function PublicHeader() {
         <Link href="/login" className="button primary">
           Espace parent
         </Link>
-        <Link href="/login?audience=clinician" className="button secondary">
+        <Link
+          href="/login?audience=clinician"
+          className="public-clinician-link"
+        >
           Espace soignant
         </Link>
       </nav>

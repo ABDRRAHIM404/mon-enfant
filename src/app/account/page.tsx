@@ -104,7 +104,7 @@ export default async function Account() {
           <ShieldCheck />
         </span>
         <span className="eyebrow">
-          ESPACE SOIGNANT · MÉDECINS ET INFIRMIER(E)S
+          Espace soignant · Médecins et infirmier(e)s
         </span>
         <AccountTitle
           id={
