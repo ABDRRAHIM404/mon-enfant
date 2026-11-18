@@ -52,8 +52,8 @@ export function ParentSettingsForm({ settings }: { settings: ParentSettings }) {
       </p>
       <p className="fine">
         Les messages de connexion, de confirmation et de récupération du compte
-        restent gérés par Supabase Auth. Vos préférences n’accordent aucun accès
-        au carnet et ne modifient aucun soin.
+        restent indépendants de ces préférences. Vos préférences n’accordent
+        aucun accès au carnet et ne modifient aucun soin.
       </p>
       {state.error && (
         <p role="alert" className="form-error">

@@ -4236,3 +4236,24 @@ select:focus-visible,
     animation: none;
   }
 }
+.dashboard-refresh {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin: 12px 0 18px;
+}
+.dashboard-refresh .button {
+  min-height: 36px;
+  padding: 7px 12px;
+  font-size: 12px;
+}
+.dashboard-refresh .fine {
+  font-size: 11px;
+}
+@media (max-width: 760px) {
+  .dashboard-refresh {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}
