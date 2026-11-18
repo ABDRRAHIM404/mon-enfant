@@ -30,7 +30,7 @@ export function ApprovalNoticeRetryForm({ requestId }: { requestId: string }) {
 export function ReviewForm({ requestId }: { requestId: string }) {
   const [state, action, pending] = useActionState(reviewApplication, {});
   return (
-    <form action={action} className="auth-form">
+    <form action={action} className="auth-form" aria-busy={pending}>
       <input name="requestId" value={requestId} type="hidden" />
       <label htmlFor="decision">Décision</label>
       <select id="decision" name="decision" required defaultValue="">
@@ -92,7 +92,7 @@ export function SuspensionForm({
 }) {
   const [state, action, pending] = useActionState(setSuspension, {});
   return (
-    <form action={action} className="auth-form">
+    <form action={action} className="auth-form" aria-busy={pending}>
       <input type="hidden" name="userId" value={userId} />
       <input
         type="hidden"

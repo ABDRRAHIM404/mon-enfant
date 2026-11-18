@@ -17,23 +17,28 @@ export function NavigationFeedback() {
     const timer = window.setTimeout(() => {
       const link = anchor.current?.closest("a");
       const root = anchor.current?.closest(
-        ".workspace-site,.soignant-workspace",
+        ".workspace-site,.soignant-workspace,.admin-workspace",
       );
       const main = root?.querySelector("main");
       if (!link || !main) return;
       const url = new URL(link.href);
       const target = url.pathname + "/" + (url.searchParams.get("view") ?? "");
-      const variant: SkeletonVariant = /settings|account|\/new/.test(target)
-        ? "form"
-        : /documents/.test(target)
-          ? "documents"
-          : /appointments/.test(target)
-            ? "calendar"
-            : /growth|vaccinations|consultations/.test(target)
-              ? "clinical"
-              : /children|patients/.test(target)
-                ? "list"
-                : "overview";
+      const variant: SkeletonVariant =
+        url.pathname === "/admin"
+          ? "overview"
+          : /settings|account|\/new|\/admin\/verifications\/[0-9a-f-]{36}/.test(
+                target,
+              )
+            ? "form"
+            : /documents/.test(target)
+              ? "documents"
+              : /appointments/.test(target)
+                ? "calendar"
+                : /growth|vaccinations|consultations/.test(target)
+                  ? "clinical"
+                  : /children|patients|\/admin|\/vaccines/.test(target)
+                    ? "list"
+                    : "overview";
       const bounds = main.getBoundingClientRect();
       setOverlay({
         left: Math.max(0, bounds.left),
@@ -49,7 +54,7 @@ export function NavigationFeedback() {
   useEffect(() => {
     if (!overlay) return;
     const main = anchor.current
-      ?.closest(".workspace-site,.soignant-workspace")
+      ?.closest(".workspace-site,.soignant-workspace,.admin-workspace")
       ?.querySelector("main");
     if (!main) return;
     const previous = main.inert;

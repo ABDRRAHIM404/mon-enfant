@@ -1,4 +1,4 @@
-import { DashboardLoading } from "@/components/dashboard/skeleton";
+import { AdminLoading } from "@/components/verification/admin-nav";
 export default function Loading() {
-  return <DashboardLoading area="neutral" variant="list" />;
+  return <AdminLoading active="requests" variant="form" />;
 }

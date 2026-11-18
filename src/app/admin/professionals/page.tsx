@@ -1,7 +1,12 @@
 import { requireReviewer } from "@/lib/auth";
 import { statusLabels } from "@/lib/authorization";
 import type { VerificationState } from "@/lib/authorization";
-import { AdminNav } from "@/components/verification/admin-nav";
+import {
+  AdminShell,
+  AdminHeading,
+  AdminStatus,
+  AdminEmpty,
+} from "@/components/verification/admin-nav";
 import { SuspensionForm } from "@/components/verification/review-form";
 import Link from "next/link";
 export const dynamic = "force-dynamic";
@@ -30,42 +35,68 @@ export default async function Professionals({
     .range((page - 1) * 20, page * 20 - 1);
   if (error) throw new Error("Impossible de charger les professionnels.");
   return (
-    <main className="account-page wide">
-      <AdminNav />
-      <section className="page-heading">
-        <span className="eyebrow">ADMINISTRATION</span>
-        <h1 id="main-content" tabIndex={-1}>
-          Comptes professionnels
-        </h1>
-        <p className="muted">
-          La suspension coupe l’accès clinique immédiatement. Toute modification
-          nécessite un motif.
-        </p>
-      </section>
+    <AdminShell active="professionals">
+      <AdminHeading
+        section="professionals"
+        title="Professionnels"
+        description="Consultez les comptes, leur statut de vérification et les actions disponibles."
+      />
       <section className="panel">
+        <div className="admin-section-title">
+          <div>
+            <h2>Comptes professionnels</h2>
+            <p className="muted">
+              Toute suspension ou réactivation nécessite un motif historisé.
+            </p>
+          </div>
+        </div>
         <p className="fine">
           {count ?? 0} compte(s) · Page {page}
         </p>
-        <div className="record-list">
+        <div className="admin-professional-list">
           {!profiles?.length ? (
-            <p className="empty-state">Aucun compte professionnel.</p>
+            <AdminEmpty title="Aucun compte professionnel">
+              Les comptes médecins et infirmiers apparaîtront ici.
+            </AdminEmpty>
           ) : (
             profiles.map((p) => (
-              <article key={p.user_id}>
-                <strong>
-                  {p.professional_id ?? "Professionnel non vérifié"}
-                </strong>
-                <p>{p.role === "nurse" ? "Infirmier(e)" : "Médecin"}</p>
-                <p className="fine">Compte : {p.user_id}</p>
-                <p className="status">
-                  {statusLabels[p.verification_status as VerificationState]}
-                </p>
+              <article key={p.user_id} className="admin-professional-card">
+                <div className="admin-professional-summary">
+                  <div className="admin-person-icon" aria-hidden="true">
+                    {p.role === "nurse" ? "I" : "M"}
+                  </div>
+                  <div>
+                    <h3>{p.professional_id ?? "Identifiant non attribué"}</h3>
+                    <p className="muted">
+                      {p.role === "nurse" ? "Infirmier(e)" : "Médecin"}
+                    </p>
+                  </div>
+                  <AdminStatus value={p.verification_status}>
+                    {statusLabels[p.verification_status as VerificationState]}
+                  </AdminStatus>
+                </div>
+                <details className="admin-account-id">
+                  <summary>Identifiant du compte</summary>
+                  <p className="fine">{p.user_id}</p>
+                </details>
                 {["approved", "suspended"].includes(p.verification_status) && (
-                  <SuspensionForm
-                    key={p.verification_status}
-                    userId={p.user_id}
-                    suspended={p.verification_status === "suspended"}
-                  />
+                  <details className="admin-account-action">
+                    <summary>
+                      {p.verification_status === "suspended"
+                        ? "Réactiver ce compte"
+                        : "Suspendre ce compte"}
+                    </summary>
+                    <p className="fine">
+                      {p.verification_status === "suspended"
+                        ? "La réactivation rétablit les accès selon les autorisations existantes."
+                        : "La suspension coupe l’accès clinique immédiatement."}
+                    </p>
+                    <SuspensionForm
+                      key={p.verification_status}
+                      userId={p.user_id}
+                      suspended={p.verification_status === "suspended"}
+                    />
+                  </details>
                 )}
               </article>
             ))
@@ -78,6 +109,6 @@ export default async function Professionals({
           )}
         </div>
       </section>
-    </main>
+    </AdminShell>
   );
 }

@@ -1,7 +1,14 @@
+import { statusLabels, type VerificationState } from "@/lib/authorization";
+import { clinicalLabels } from "@/lib/clinical/types";
 import Link from "next/link";
 import { randomUUID } from "node:crypto";
 import { requireClinicalPermissionManager } from "@/lib/auth";
-import { AdminNav } from "@/components/verification/admin-nav";
+import {
+  AdminShell,
+  AdminHeading,
+  AdminStatus,
+  AdminEmpty,
+} from "@/components/verification/admin-nav";
 import { PermissionForm } from "@/components/clinical/permission-form";
 export const dynamic = "force-dynamic";
 type Professional = {
@@ -38,19 +45,25 @@ export default async function ClinicalPermissions({
   if (history?.error)
     throw new Error("Impossible de charger l’historique des habilitations.");
   return (
-    <main className="account-page wide">
-      <AdminNav />
-      <div className="page-heading">
-        <h1 id="main-content" tabIndex={-1}>
-          Habilitations cliniques
-        </h1>
-        <p className="muted">
-          Permission d’administration distincte de la revue d’identité. Aucune
-          habilitation ne donne un accès aux dossiers d’enfants.
-        </p>
-      </div>
+    <AdminShell active="permissions">
+      <AdminHeading
+        section="permissions"
+        title="Habilitations cliniques"
+        description="Gérez les activités autorisées et retrouvez l’historique des contrôles."
+      />
+      <p className="admin-context-note">
+        La gestion des habilitations est distincte de la revue d’identité. Elle
+        ne donne pas accès aux dossiers d’enfants.
+      </p>
       <section className="panel">
-        <h2>Professionnels et habilitations</h2>
+        <div className="admin-section-title">
+          <div>
+            <h2>Rechercher un professionnel</h2>
+            <p className="muted">
+              Saisissez son identifiant pour consulter ses habilitations.
+            </p>
+          </div>
+        </div>
         <form className="registry-filters" action="/admin/clinical-permissions">
           <label>
             Identifiant professionnel
@@ -62,9 +75,14 @@ export default async function ClinicalPermissions({
           {result.total} professionnel(s) · 30 par page · recherchez
           l’identifiant pour ouvrir le formulaire et son historique.
         </p>
-        <div className="record-list">
+        <div className="admin-permission-list">
+          {!result.items.length && (
+            <AdminEmpty title="Aucun professionnel trouvé">
+              Essayez un autre identifiant ou effacez la recherche.
+            </AdminEmpty>
+          )}
           {result.items.map((p) => (
-            <article key={p.user_id}>
+            <article key={p.user_id} className="admin-permission-card">
               <h3>
                 <Link
                   className="text-link"
@@ -73,11 +91,26 @@ export default async function ClinicalPermissions({
                   {p.professional_id}
                 </Link>
               </h3>
-              <p>{p.verification_status}</p>
+              <AdminStatus value={p.verification_status}>
+                {statusLabels[p.verification_status as VerificationState] ??
+                  p.verification_status}
+              </AdminStatus>
               {p.capabilities.map((c) => (
-                <p className="fine" key={c.capability}>
-                  {c.capability} : {c.enabled ? "accordée" : "révoquée"}
-                  {c.expires_at ? ` · échéance ${c.expires_at}` : ""}
+                <p className="admin-capability" key={c.capability}>
+                  <span>
+                    {clinicalLabels[
+                      c.capability as keyof typeof clinicalLabels
+                    ] ??
+                      (c.capability === "appointment"
+                        ? "Gestion des rendez-vous"
+                        : c.capability)}
+                  </span>
+                  <span>
+                    {c.enabled ? "Accordée" : "Révoquée"}
+                    {c.expires_at
+                      ? ` · échéance ${new Date(c.expires_at).toLocaleDateString("fr-MA", { timeZone: "UTC" })} (UTC)`
+                      : ""}
+                  </span>
                 </p>
               ))}
             </article>
@@ -104,7 +137,14 @@ export default async function ClinicalPermissions({
       </section>
       {selected && (
         <section className="panel">
-          <h2>Modifier l’habilitation — {selected.professional_id}</h2>
+          <div className="admin-section-title">
+            <div>
+              <h2>Modifier une habilitation</h2>
+              <p className="muted">
+                {selected.professional_id} · Une décision motivée et historisée.
+              </p>
+            </div>
+          </div>
           <PermissionForm
             professionalId={selected.user_id}
             operationId={randomUUID()}
@@ -124,7 +164,13 @@ export default async function ClinicalPermissions({
             ).map((h) => (
               <article key={h.id}>
                 <strong>
-                  {h.capability} — {h.enabled ? "accordée" : "révoquée"}
+                  {clinicalLabels[
+                    h.capability as keyof typeof clinicalLabels
+                  ] ??
+                    (h.capability === "appointment"
+                      ? "Gestion des rendez-vous"
+                      : h.capability)}{" "}
+                  — {h.enabled ? "accordée" : "révoquée"}
                 </strong>
                 <p>{h.reason}</p>
                 <p>Source contrôlée : {h.evidence_reference}</p>
@@ -136,6 +182,6 @@ export default async function ClinicalPermissions({
           </div>
         </section>
       )}
-    </main>
+    </AdminShell>
   );
 }

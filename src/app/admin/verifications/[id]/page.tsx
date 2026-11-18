@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireReviewer } from "@/lib/auth";
-import { AdminNav } from "@/components/verification/admin-nav";
+import {
+  AdminShell,
+  AdminHeading,
+  AdminStatus,
+} from "@/components/verification/admin-nav";
 import {
   ReviewForm,
   ApprovalNoticeRetryForm,
@@ -40,18 +44,20 @@ export default async function Review({
     unavailable: "Suivi indisponible",
   };
   return (
-    <main className="account-page wide">
-      <AdminNav />
-      <section className="page-heading">
-        <Link className="text-link" href="/admin/verifications">
-          ← File de vérification
-        </Link>
-        <h1 id="main-content" tabIndex={-1}>
-          {request.display_name}
-        </h1>
-        <p className="status">{requestStatusLabels[request.status]}</p>
-      </section>
-      <div className="two-columns">
+    <AdminShell active="requests">
+      <Link className="text-link admin-back-link" href="/admin/verifications">
+        ← Retour aux vérifications
+      </Link>
+      <AdminHeading
+        section="requests"
+        title={request.display_name}
+        description="Vérifiez les informations déclarées et les justificatifs avant de prendre une décision."
+      >
+        <AdminStatus value={request.status}>
+          {requestStatusLabels[request.status]}
+        </AdminStatus>
+      </AdminHeading>
+      <div className="two-columns admin-review-columns">
         <section className="panel">
           <h2>Justificatifs et identité</h2>
           <dl className="details">
@@ -132,6 +138,6 @@ export default async function Review({
           ) : null}
         </section>
       ) : null}
-    </main>
+    </AdminShell>
   );
 }

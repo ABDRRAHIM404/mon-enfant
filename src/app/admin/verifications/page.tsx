@@ -1,6 +1,12 @@
+import { NavigationFeedback } from "@/components/workspace-navigation";
 import Link from "next/link";
 import { requireReviewer } from "@/lib/auth";
-import { AdminNav } from "@/components/verification/admin-nav";
+import {
+  AdminShell,
+  AdminHeading,
+  AdminStatus,
+  AdminEmpty,
+} from "@/components/verification/admin-nav";
 import { requestStatusLabels } from "@/lib/verification/validation";
 export const dynamic = "force-dynamic";
 export default async function VerificationQueue({
@@ -33,35 +39,46 @@ export default async function VerificationQueue({
     .range((page - 1) * 30, page * 30 - 1);
   if (error) throw new Error("Impossible de charger les demandes.");
   return (
-    <main className="account-page wide">
-      <AdminNav />
-      <section className="page-heading">
-        <span className="eyebrow">ADMINISTRATION · ACCÈS RESTREINT</span>
-        <h1 id="main-content" tabIndex={-1}>
-          Vérification des professionnels
-        </h1>
-        <p className="muted">
-          Examinez les qualifications, contrôlez les sources et motivez chaque
-          décision.
-        </p>
-      </section>
-      <nav className="tabs" aria-label="Statut des demandes">
-        {Object.entries(requestStatusLabels).map(([value, label]) => (
-          <Link
-            aria-current={status === value ? "page" : undefined}
-            key={value}
-            href={`?status=${value}`}
-          >
-            {label}
-          </Link>
-        ))}
-      </nav>
-      <section className="panel">
-        <p className="fine">
-          {count ?? 0} demande(s) · Page {page}
-        </p>
+    <AdminShell active="requests">
+      <AdminHeading
+        section="requests"
+        title="Vérifications"
+        description="Examinez les qualifications et retrouvez chaque décision dans son historique."
+      />
+      <section className="panel admin-queue-panel">
+        <div className="admin-section-title">
+          <div>
+            <h2>Demandes des professionnels</h2>
+            <p className="muted">
+              Sélectionnez une file pour retrouver les dossiers correspondants.
+            </p>
+          </div>
+        </div>
+        <nav className="tabs admin-tabs" aria-label="Statut des demandes">
+          {Object.entries(requestStatusLabels).map(([value, label]) => (
+            <Link
+              aria-current={status === value ? "page" : undefined}
+              key={value}
+              href={`?status=${value}`}
+            >
+              {label}
+              <NavigationFeedback />
+            </Link>
+          ))}
+        </nav>
+        <div className="admin-list-meta">
+          <p className="fine">
+            {count ?? 0} demande(s) · Page {page}
+          </p>
+          <AdminStatus value={status}>
+            {requestStatusLabels[status]}
+          </AdminStatus>
+        </div>
         {!requests?.length ? (
-          <div className="empty-state">Aucune demande dans cette file.</div>
+          <AdminEmpty title="Aucune demande dans cette file">
+            Les nouveaux dossiers apparaîtront ici. Vous pouvez consulter les
+            autres statuts ci-dessus.
+          </AdminEmpty>
         ) : (
           <div
             className="table-scroll"
@@ -69,32 +86,32 @@ export default async function VerificationQueue({
             aria-label="Demandes de vérification"
             tabIndex={0}
           >
-            <table>
+            <table className="admin-table">
               <thead>
                 <tr>
-                  <th>Professionnel</th>
-                  <th>Matricule</th>
-                  <th>Établissement</th>
-                  <th>Soumission</th>
-                  <th>Action</th>
+                  <th scope="col">Professionnel</th>
+                  <th scope="col">Matricule</th>
+                  <th scope="col">Établissement</th>
+                  <th scope="col">Soumission</th>
+                  <th scope="col">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {requests.map((r) => (
                   <tr key={r.id}>
-                    <td>
+                    <td data-label="Professionnel">
                       <strong>{r.display_name}</strong>
                     </td>
-                    <td>{r.registration_number}</td>
-                    <td>{r.facility_name}</td>
-                    <td>
+                    <td data-label="Matricule">{r.registration_number}</td>
+                    <td data-label="Établissement">{r.facility_name}</td>
+                    <td data-label="Soumission">
                       {new Date(r.submitted_at).toLocaleDateString("fr-MA", {
                         timeZone: "Africa/Casablanca",
                       })}
                     </td>
-                    <td>
+                    <td data-label="Action">
                       <Link
-                        className="text-link"
+                        className="button secondary admin-review-link"
                         href={`/admin/verifications/${r.id}`}
                       >
                         Examiner le dossier
@@ -115,6 +132,6 @@ export default async function VerificationQueue({
           )}
         </div>
       </section>
-    </main>
+    </AdminShell>
   );
 }
