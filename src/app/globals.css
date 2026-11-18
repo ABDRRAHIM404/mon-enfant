@@ -4257,3 +4257,44 @@ select:focus-visible,
     flex-wrap: wrap;
   }
 }
+.dashboard-calendar-layout.calendar-layout-month {
+  display: grid;
+  grid-template-columns: minmax(330px, 0.85fr) minmax(0, 1.3fr);
+  gap: 24px;
+  align-items: start;
+}
+.calendar-layout-month .registry-filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.calendar-layout-month .appointment-calendar > a {
+  min-height: 55px;
+  padding: 5px 2px;
+  border-radius: 12px;
+}
+.calendar-layout-month .appointment-calendar small {
+  font-size: 10px;
+}
+.calendar-layout-month .appointment-calendar > strong {
+  font-size: 11px;
+}
+.dashboard-calendar-list > h2 {
+  margin: 0 0 16px;
+  font-size: 23px;
+}
+.soignant-workspace .workspace-vaccine-record {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+.soignant-workspace .workspace-vaccine-record h3 {
+  margin: 0 0 5px;
+  font-size: 17px;
+}
+.soignant-workspace .workspace-vaccine-record summary {
+  min-height: 68px;
+}
+@media (max-width: 1100px) {
+  .dashboard-calendar-layout.calendar-layout-month {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

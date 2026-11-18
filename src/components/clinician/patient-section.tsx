@@ -195,9 +195,49 @@ export async function PatientSection({
                       : "Historique des consultations"}
                 </h2>
                 {history.items.length ? (
-                  history.items.map((entry) => (
-                    <EntryCard key={entry.id} entry={entry} />
-                  ))
+                  history.items.map((entry) =>
+                    section === "vaccinations" ? (
+                      <details
+                        className="workspace-vaccine-record"
+                        key={entry.id}
+                      >
+                        <summary>
+                          <div>
+                            <h3>
+                              {String(
+                                entry.payload.vaccine_label || "Vaccination",
+                              )}{" "}
+                              ·{" "}
+                              {String(
+                                entry.payload.dose_label || "Dose non précisée",
+                              )}
+                            </h3>
+                            <p className="muted">
+                              {entry.occurred_on || "Date inconnue"} ·{" "}
+                              {entry.occurrence_precision === "exact"
+                                ? "Date déclarée exacte"
+                                : "Date incertaine"}
+                            </p>
+                            <p className="fine">
+                              {entry.source_verified
+                                ? "Source contrôlée"
+                                : "Source non confirmée"}{" "}
+                              · {entry.professional_id}
+                            </p>
+                          </div>
+                          <span className="workspace-chip">
+                            {entry.entry_state === "withdrawn"
+                              ? "Retirée · "
+                              : ""}
+                            Révision {entry.revision} · Voir le détail
+                          </span>
+                        </summary>
+                        <EntryCard entry={entry} />
+                      </details>
+                    ) : (
+                      <EntryCard key={entry.id} entry={entry} />
+                    ),
+                  )
                 ) : (
                   <p className="empty-state">
                     Aucune saisie de cette rubrique pour cet enfant sur cette
