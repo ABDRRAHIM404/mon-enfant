@@ -128,3 +128,7 @@ final result: passed
 Latest scoped review: [dashboard-ui/review.md](docs/design-qa/dashboard-ui/review.md). Both source/current boards were opened; mint banners/art, parent metrics/rows, compact vaccine history and month/list calendar are implemented. All 65 page routes and query navigation have useful skeletons. 336 tests, 48 final-source visual checks and five live loading/cache/privacy cases pass. Public/static cache only; private records retain current access checks. Production and fixture retirement are recorded after publication.
 
 final result: passed (preview scope)
+
+Canonical UI/loading/cache publication: PR #4 / 168b0f4, READY dpl_4FvjCGbqsqdnePe5pU3wKVAHrqHS. Production reports pass, including access revocation with an existing session. Test fixture retirement remains pending explicit owner approval after automatic review rejection; it is not falsely marked complete.
+
+final result: passed (scoped canonical UI/loading/cache); cleanup pending owner approval

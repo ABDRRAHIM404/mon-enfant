@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "checks": [
+    "canonical-anonymous-guards",
+    "canonical-parent-content",
+    "canonical-clinician",
+    "guardian-link-revocation-ui"
+  ],
+  "applicationSource": "d2ecdd346d971dd9f92b79449a688d9eeeb9d3a3",
+  "url": "https://mon-enfant.vercel.app",
+  "deployment": "dpl_4FvjCGbqsqdnePe5pU3wKVAHrqHS",
+  "mergedCommit": "168b0f4feeec8b7095a40256cd1fdcc98653d818"
+}

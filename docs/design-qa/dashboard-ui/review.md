@@ -1,6 +1,6 @@
 # Dashboard UI, loading and cache review — 18 November 2026
 
-Current application source: d2ecdd346d971dd9f92b79449a688d9eeeb9d3a3. Preview dpl_9WWNcUHmEcZ7Z9hyRQPsMiARgskQ is READY. Production verification follows publication.
+Current application source: d2ecdd346d971dd9f92b79449a688d9eeeb9d3a3. Preview dpl_9WWNcUHmEcZ7Z9hyRQPsMiARgskQ is READY. PR #4 merged as 168b0f4. Production dpl_4FvjCGbqsqdnePe5pU3wKVAHrqHS is READY on the canonical alias.
 
 ## Visual scope
 
@@ -24,6 +24,6 @@ Actual public asset responses show Vercel CDN HIT and the configured TTL. Univer
 
 An earlier cache test incorrectly demanded universal browser cache reuse despite CDN HIT and correct headers. The final test asserts the documented cache layer and records the actual transfer instead. A phone skeleton selector was made unique; a capture-only lazy image decode wait was restricted to visible images. These runner issues did not require weakening application checks.
 
-Fresh synthetic run 2a1ea3a1a0284192 verifies actual registration, clinical persistence, QR guardian approval and linked reads. Retirement and canonical results will be recorded in the handoff. No real-person data or email was used. No database schema, RLS or vaccine reference was changed.
+Fresh synthetic run 2a1ea3a1a0284192 verifies actual registration, clinical persistence, QR guardian approval and linked reads. Canonical results pass in `production.json` and `canonical-loading-cache.json`, including immediate existing-session denial after guardian-link revocation. Retirement is blocked pending explicit owner approval: automatic approval review rejected the exact six-account cleanup twice, including after a read-only check confirmed all six marked accounts use unreachable test addresses. No workaround was attempted; private cleanup inputs remain mode600. No real-person data or email was used. No database schema, RLS or vaccine reference was changed.
 
-final result: passed (preview UI/loading/cache scope)
+final result: passed (canonical UI/loading/cache scope); fixture retirement pending explicit owner approval

@@ -236,3 +236,11 @@ Current owner request resumes parent website work; APK/iOS stay paused. See [DAS
 - [x] Canonical production publication (277e618, READY dpl_GYQEGw2vQgKBAC7wLoEvSSG4oCNu) and cloud main synchronization.
 - [x] Fresh fixture 77920eaf87e1484c retired; no active test sessions/links/grants/capabilities/shares.
 - [ ] Synchronize the owner’s separate PC checkout when that filesystem is available (not mounted in this cloud workspace).
+
+## 18 November — owner dashboard UI/loading/cache request
+
+- [x] Parent/clinician visual improvements from all sixteen supplied mockups.
+- [x] Skeleton boundaries on all 65 pages and sidebar/query loading, cancellation and reduced motion.
+- [x] Public asset/static-loading caching and request-scoped identity deduplication; private no-store preserved.
+- [x] 336 tests/43 files, types, lint, READY preview and responsive/live acceptance.
+- [x] PR #4 merged as 168b0f4; correct-project production dpl_4FvjCGbqsqdnePe5pU3wKVAHrqHS READY with canonical alias.

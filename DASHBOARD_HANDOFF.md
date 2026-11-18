@@ -2,6 +2,8 @@
 
 Website: https://mon-enfant.vercel.app
 
+Latest owner-requested visual update: [DASHBOARD_UI.md](DASHBOARD_UI.md). Both dashboards now have illustrated mint headings, stronger cards/spacing, actual parent summaries and child rows, compact clinician vaccine history and month/list appointments. Skeletons cover all 65 page routes and sidebar query transitions. Public/static assets can be reused while private data and permissions remain fresh. This supersedes the earlier decorative-artwork limitation below for the new illustrations; no pixel-identical clone or universal zero-network caching is claimed.
+
 Original request: both eight-section dashboards, working authorized backend features, responsive layout, subtle Charles UX interactions, functional verification and documented handoff. Android/APK and iOS remain paused.
 
 ## Parent pages
@@ -66,3 +68,7 @@ Eight-character password PR: https://github.com/ABDRRAHIM404/mon-enfant/pull/2 â
 Final closeout PR: https://github.com/ABDRRAHIM404/mon-enfant/pull/3 â€” merged application **6b6f2151c413e0cbf8f82d989ea6dbe94e2a4f67**. Its application/configuration code is identical to accepted preview cd2bca7. Production **dpl_2MWuubdsABzcoDTAxi4pgjdR35cG** is READY and the canonical alias is verified. All seven form and eight navigation/motion/component cases pass on the canonical site, including active pending-state reduced motion and sequential keyboard navigation. The single closeout fixture is retired: account banned, password cleared, zero sessions/active guardian links/professional authority, login denial verified and preview share revoked. Original fixtures remain retired. No clinical/audit history was deleted.
 
 The cloud checkout is synchronized with GitHub main. The separate historical PC checkout is not mounted in this environment; synchronization there is not claimed. GitHub Actions' account billing block is separate from the completed Vercel build and browser verification; no paid limit was increased.
+
+## Latest visual/loading/cache publication
+
+PR #4 / 168b0f4 is live in READY production dpl_4FvjCGbqsqdnePe5pU3wKVAHrqHS. 336 tests, responsive acceptance and canonical loading/cache/access-revocation checks pass; [evidence](docs/design-qa/dashboard-ui/review.md). The remaining task is retirement of six synthetic test accounts: automatic approval review requires the owner's explicit approval. Their guardian link is already revoked; no real account or medical/audit record is in the cleanup scope.
