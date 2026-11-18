@@ -8,6 +8,8 @@ The parent’s child pages, requests, notifications, invitation and account now 
 
 Admin access follow-up: clinical-permission and catalogue management require explicit permissions beyond professional review. Denial now stays in the admin workspace with an explanation instead of silently opening account settings. Account settings lists catalogue management alongside the other permissions. Shared account/catalogue skeletons are neutral while identity is loading, avoiding the clinician-sidebar flash. No account permissions are automatically enabled.
 
+Admin account search accepts an email, first name, surname or professional ID on both Professionnels and Habilitations cliniques. Results display name, email and ID; select the intended account before changing an activity. Existing permissions still control both searches and writes.
+
 Existing clinical/source/access guards remain. Three temporary owner-approved test accounts were used and retired; their clinical/audit history is preserved. The earlier six-account cleanup remains separate. Relevant UI checks and required compilation are used for this fix; unrelated suites are not rerun.
 
 The full signed-in computer-use audit remains blocked by the unavailable shared viewer/authentication handoff. API and HTTP page checks are documented separately: [review](docs/design-qa/workspace-rework/review.md). PR #5 contains the combined implementation and deployment records.

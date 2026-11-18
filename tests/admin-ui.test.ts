@@ -114,28 +114,32 @@ beforeEach(() => {
   });
   mocks.rpc.mockImplementation(async (name: string) => ({
     error: null,
-    data:
-      name === "list_clinical_permissions"
-        ? {
-            total: mocks.empty ? 0 : 1,
-            items: mocks.empty
-              ? []
-              : [
-                  {
-                    user_id: id,
-                    professional_id: "TEST-PRO-001",
-                    verification_status: "approved",
-                    capabilities: [
-                      {
-                        capability: "consultation",
-                        enabled: true,
-                        expires_at: null,
-                      },
-                    ],
-                  },
-                ],
-          }
-        : [],
+    data: ["list_clinical_permissions", "list_admin_professionals"].includes(
+      name,
+    )
+      ? {
+          total: mocks.empty ? 0 : 1,
+          items: mocks.empty
+            ? []
+            : [
+                {
+                  user_id: id,
+                  professional_id: "TEST-PRO-001",
+                  email: "nadia@example.invalid",
+                  display_name: "Nadia Benali",
+                  role: "nurse",
+                  verification_status: "approved",
+                  capabilities: [
+                    {
+                      capability: "consultation",
+                      enabled: true,
+                      expires_at: null,
+                    },
+                  ],
+                },
+              ],
+        }
+      : [],
   }));
 });
 const queue = (query = {}) => Queue({ searchParams: Promise.resolve(query) });
@@ -199,7 +203,7 @@ describe("admin presentation preserves review and permission boundaries", () => 
     expect(mocks.filters).toContainEqual(["eq", "status", "under_review"]);
     expect(mocks.filters).toContainEqual(["range", 0, 29]);
   });
-  it("retains filters and treats wildcard characters as literal identifier text", async () => {
+  it("sends literal search text and status to the guarded directory RPC and retains pagination", async () => {
     const html = renderToStaticMarkup(
       await Professionals({
         searchParams: Promise.resolve({
@@ -209,22 +213,23 @@ describe("admin presentation preserves review and permission boundaries", () => 
         }),
       }),
     );
-    expect(mocks.filters).toContainEqual([
-      "eq",
-      "verification_status",
-      "suspended",
-    ]);
-    expect(mocks.filters).toContainEqual([
-      "ilike",
-      "professional_id",
-      "%TEST\\_\\%%",
-    ]);
+    expect(mocks.rpc).toHaveBeenCalledWith("list_admin_professionals", {
+      p_query: "TEST_%",
+      p_status: "suspended",
+      p_page: 2,
+    });
     expect(html).toContain("q=TEST_%25");
     expect(html).toContain("status=suspended");
   });
   it("retains reasoned suspension and the clinician-only directory query", async () => {
     const html = renderToStaticMarkup(await professionals());
-    expect(mocks.filters).toContainEqual(["in", "role", ["doctor", "nurse"]]);
+    expect(mocks.rpc).toHaveBeenCalledWith("list_admin_professionals", {
+      p_query: "",
+      p_status: "all",
+      p_page: 1,
+    });
+    expect(html).toContain("Nadia Benali");
+    expect(html).toContain("nadia@example.invalid");
     expect(html).toContain('name="reason"');
     expect(html).toContain('value="suspend"');
   });
@@ -238,6 +243,30 @@ describe("admin presentation preserves review and permission boundaries", () => 
     });
     expect(html).toContain('name="operationId"');
     expect(html).toContain('name="verified"');
+    expect(html).toContain("Nadia Benali");
+    expect(html).toContain("nadia@example.invalid");
+    expect(html).toContain("E-mail, prénom, nom ou identifiant professionnel");
+  });
+  it("does not pick a permission target from the final page of ambiguous matches", async () => {
+    mocks.rpc.mockResolvedValueOnce({
+      error: null,
+      data: {
+        total: 31,
+        items: [
+          { user_id: id, professional_id: "TEST-PRO-001", capabilities: [] },
+        ],
+      },
+    });
+    const html = renderToStaticMarkup(
+      await Permissions({
+        searchParams: Promise.resolve({ q: "Nadia", page: "2" }),
+      }),
+    );
+    expect(html).not.toContain('name="professionalId"');
+    expect(mocks.rpc).not.toHaveBeenCalledWith(
+      "clinical_capability_history",
+      expect.anything(),
+    );
   });
   it("retains all review checks and the protected evidence endpoint", async () => {
     const html = renderToStaticMarkup(await review());

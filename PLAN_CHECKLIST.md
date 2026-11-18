@@ -265,4 +265,11 @@ Current owner request resumes parent website work; APK/iOS stay paused. See [DAS
 - [x] Diagnose existing permission flags without modifying accounts.
 - [x] Explain denied clinical-permission/catalogue access inside administration; remove clinician skeleton from shared account/catalogue routes.
 - [x] Fifteen focused regression checks and targeted lint pass; no unrelated suites or new fixtures.
-- [ ] Required Vercel compilation and canonical publication; deployment receipt recorded on the follow-up PR.
+- [x] PR #6: required compilation and canonical publication fcadf93 / READY dpl_369WG9kRgrjsC8VfZwFtLUsDxJy7.
+
+## Admin account search
+
+- [x] Email, first-name, surname and professional-ID search on professional directory and clinical-permission pages; names/emails label results.
+- [x] Guards, session revocation, status/pagination, literal input and explicit selection for ambiguous results covered by 19 focused checks.
+- [x] Read-only hosted match checks pass for the owner-specified account; security advisor baseline unchanged. No new hosted actors or clinical permissions.
+- Required Vercel build and canonical deployment receipt are recorded on the search follow-up PR.
