@@ -14,16 +14,19 @@ import { initializeProfile, signOut } from "@/app/auth/actions";
 export const dynamic = "force-dynamic";
 export default async function Account() {
   const { user, profile, supabase } = await getProfessional();
-  const [reviewPermission, clinicalPermission] =
+  const [reviewPermission, clinicalPermission, catalogPermission] =
     profile?.role === "admin" && profile.verification_status === "approved"
       ? await Promise.all([
           supabase.rpc("can_review_professionals"),
           supabase.rpc("can_manage_clinical_permissions"),
+          supabase.rpc("vaccine_catalog_permissions"),
         ])
-      : [null, null];
+      : [null, null, null];
   const canReview = reviewPermission?.data === true && !reviewPermission?.error;
   const canManageClinical =
     clinicalPermission?.data === true && !clinicalPermission?.error;
+  const canManageCatalog =
+    catalogPermission?.data?.manage === true && !catalogPermission?.error;
   if (profile?.role === "admin") {
     return (
       <AdminShell active="account">
@@ -72,6 +75,10 @@ export default async function Account() {
               <strong>
                 {canManageClinical ? "Autorisée" : "Non accordée"}
               </strong>
+            </div>
+            <div className="admin-capability">
+              <span>Gestion du catalogue vaccinal</span>
+              <strong>{canManageCatalog ? "Autorisée" : "Non accordée"}</strong>
             </div>
             <p className="fine">
               Les permissions de chaque rubrique sont vérifiées à son ouverture.

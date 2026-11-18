@@ -54,7 +54,9 @@ export async function requireClinicalPermissionManager() {
   const { data, error } = await result.supabase.rpc(
     "can_manage_clinical_permissions",
   );
-  if (error || data !== true) redirect("/account");
+  if (error)
+    throw new Error("Impossible de vérifier les habilitations d’administration.");
+  if (data !== true) redirect("/admin/access?section=permissions");
   return result;
 }
 
@@ -67,6 +69,8 @@ export async function requireVaccineCatalog() {
   if (error)
     throw new Error("Impossible de vérifier les permissions du catalogue.");
   const permissions = data as { manage: boolean; review: boolean };
+  if (result.profile.role === "admin" && !permissions.manage)
+    redirect("/admin/access?section=catalog");
   if (!["doctor", "nurse"].includes(result.profile.role) && !permissions.manage)
     redirect("/account");
   return { ...result, permissions };

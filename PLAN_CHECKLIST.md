@@ -250,7 +250,7 @@ Current owner request resumes parent website work; APK/iOS stay paused. See [DAS
 - [x] Shared admin shell, overview, queue/detail, professional cards, permission labels, catalogue/account framing and loading states implemented in draft PR #5.
 - [x] Source tests, TypeScript and lint pass; permission/evidence/action boundaries preserved.
 - [ ] Authenticated visual and interaction review after existing admin sign-in.
-- [ ] Publish accepted admin update to canonical production and synchronize cloud main.
+- [x] Publish combined admin update in PR #5: d7330e4 / READY production dpl_H2RtBgUm5eP34WadkUd2KGzrB339; cloud main synchronized.
 
 ## Combined UI follow-up
 
@@ -259,3 +259,10 @@ Current owner request resumes parent website work; APK/iOS stay paused. See [DAS
 - [x] Admin search/status and accurate clinical-permission expiry labels implemented.
 - [x] Relevant checks and owner-approved three-account fixture retirement completed.
 - [ ] Complete the full signed-in computer-use audit when the session/viewer tooling is available.
+
+## Admin access feedback follow-up
+
+- [x] Diagnose existing permission flags without modifying accounts.
+- [x] Explain denied clinical-permission/catalogue access inside administration; remove clinician skeleton from shared account/catalogue routes.
+- [x] Fifteen focused regression checks and targeted lint pass; no unrelated suites or new fixtures.
+- [ ] Required Vercel compilation and canonical publication; deployment receipt recorded on the follow-up PR.
