@@ -152,19 +152,61 @@ export default function Home() {
                 carnet.
               </p>
             </header>
-            <div className="home-feature-panels">
-              <HomeFeatureAnimation
-                name="vaccinations"
-                description="Consulter une dose documentée"
-              />
-              <HomeFeatureAnimation
-                name="croissance"
-                description="Voir la courbe de croissance"
-              />
-              <HomeFeatureAnimation
-                name="agenda"
-                description="Ouvrir le calendrier des rendez-vous"
-              />
+            <div className="home-demo-audiences">
+              <section
+                className="home-demo-audience"
+                aria-labelledby="demos-parent"
+              >
+                <div className="home-demo-audience-copy">
+                  <BookOpen aria-hidden="true" />
+                  <h3 id="demos-parent">Espace parent</h3>
+                  <p>
+                    Consultez les informations enregistrées dans le carnet de
+                    votre enfant.
+                  </p>
+                  <Link href="/login" className="home-demo-entry">
+                    Accéder à l’espace parent{" "}
+                    <ArrowUpRight aria-hidden="true" />
+                  </Link>
+                </div>
+                <div className="home-feature-panels">
+                  <HomeFeatureAnimation
+                    name="vaccinations"
+                    description="Consulter les vaccinations de mon enfant"
+                  />
+                  <HomeFeatureAnimation
+                    name="croissance"
+                    description="Suivre sa courbe de croissance"
+                  />
+                </div>
+              </section>
+              <section
+                className="home-demo-audience home-demo-audience-clinical"
+                aria-labelledby="demos-clinician"
+              >
+                <div className="home-demo-audience-copy">
+                  <Stethoscope aria-hidden="true" />
+                  <h3 id="demos-clinician">Espace soignant</h3>
+                  <p>
+                    Médecins et infirmiers organisent leur agenda et renseignent
+                    les carnets auxquels ils ont accès.
+                  </p>
+                  <Link href={clinicianLogin} className="home-demo-entry">
+                    Accéder à l’espace soignant{" "}
+                    <ArrowUpRight aria-hidden="true" />
+                  </Link>
+                </div>
+                <div className="home-feature-panels">
+                  <HomeFeatureAnimation
+                    name="agenda"
+                    description="Consulter l’agenda du cabinet"
+                  />
+                  <HomeFeatureAnimation
+                    name="saisie-vaccination"
+                    description="Documenter une vaccination"
+                  />
+                </div>
+              </section>
             </div>
           </div>
         </section>
