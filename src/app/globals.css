@@ -1,21 +1,11 @@
 @import "tailwindcss";
 :root {
   color-scheme: light;
-  --ink: #202825;
-  --muted: #647067;
-  --teal: #087f5b;
-  --action: #087f5b;
-  --pale: #f0f2f0;
-  --line: #dfe4df;
-  --paper: #f8f9f7;
-  --card: #fff;
-  --nav: #fff;
   --attention: #e97872;
   --attention-surface: #fcece9;
   --attention-ink: #703c37;
   --error-surface: #fff0ed;
   --error-ink: #9e3427;
-  --focus: #087f5b;
   --surface: var(--pale);
   --border: var(--line);
   --font-sans: "Instrument Sans", Arial, sans-serif;
@@ -2752,7 +2742,7 @@ select:focus-visible,
 /* Update 5: clinician workspace only; parent screens retain their own layout. */
 .soignant-workspace {
   min-height: 100dvh;
-  background: #f8f9f7;
+  background: var(--paper);
   --soignant-sidebar: 264px;
 }
 .soignant-sidebar {
@@ -2790,7 +2780,7 @@ select:focus-visible,
 }
 .soignant-sidebar nav > a[aria-current],
 .soignant-mobile-menu nav > a[aria-current] {
-  background: #087f5b;
+  background: var(--action);
   color: white;
   font-weight: 600;
 }
