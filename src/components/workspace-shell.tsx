@@ -14,6 +14,7 @@ import {
   Building2,
   UserRound,
   LogOut,
+  BookOpen,
 } from "lucide-react";
 import {
   NavigationFeedback,
@@ -39,6 +40,7 @@ const icons = {
   account: UserRound,
   notifications: Bell,
   invitation: ShieldCheck,
+  guide: BookOpen,
 };
 type Item = {
   key: keyof typeof icons;
@@ -88,6 +90,7 @@ export function WorkspaceShell({
           label: "Partage & accès",
           href: "/parent?view=access",
         },
+        { key: "guide", label: "Guide et aide", href: "/parent/guide" },
         { key: "settings", label: "Paramètres", href: "/parent/settings" },
         { key: "requests", label: "Mes demandes", href: "/parent/requests" },
         {
@@ -298,7 +301,7 @@ export function WorkspaceShell({
       <main className="workspace-content">
         {children}
         <p className="workspace-development fine">
-          Environnement de développement · Données fictives uniquement
+          Bêta de test · Données fictives uniquement
         </p>
       </main>
       {!parent && (

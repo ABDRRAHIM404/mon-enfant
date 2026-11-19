@@ -31,9 +31,7 @@ export function ProvisionalHeader({ profile }: { profile: Professional }) {
           <strong>Dossiers : Non vérifiés / provisoires.</strong> Privés à leur
           auteur. La vérification du compte ne les valide ni ne les publie.
         </p>
-        <p className="fine">
-          Environnement de développement · Données fictives uniquement.
-        </p>
+        <p className="fine">Bêta de test · Données fictives uniquement.</p>
       </section>
     </>
   );

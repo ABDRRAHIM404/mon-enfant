@@ -1419,3 +1419,32 @@ tbody tr:focus-within {
     color: black;
   }
 }
+
+.auth-password-field {
+  position: relative;
+}
+
+.auth-form .auth-password-field input {
+  width: 100%;
+  padding-inline-end: 52px;
+}
+
+.auth-password-toggle {
+  position: absolute;
+  inset-inline-end: 3px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: transparent;
+  color: var(--teal);
+  border: 0;
+  border-radius: var(--radius-control);
+}
+
+.auth-password-toggle:hover:not(:disabled) {
+  background: var(--pale);
+}

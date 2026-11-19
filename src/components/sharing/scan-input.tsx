@@ -75,7 +75,7 @@ export function ShareScanner({
       }
       stream.current = media;
       if (!video.current) {
-        media.getTracks().forEach((track) => track.stop());
+        stop();
         return;
       }
       video.current.srcObject = media;
@@ -138,42 +138,47 @@ export function ShareScanner({
       setMessage("Choisissez une image PNG, JPEG ou WebP de 4 Mio maximum.");
       return;
     }
+    const objectUrl = URL.createObjectURL(file);
     try {
-      const bitmap = await createImageBitmap(file, {
-        resizeWidth: 1000,
-        resizeHeight: 1000,
-        resizeQuality: "low",
-      });
-      try {
-        const canvas = document.createElement("canvas");
-        canvas.width = bitmap.width;
-        canvas.height = bitmap.height;
-        canvas.getContext("2d")?.drawImage(bitmap, 0, 0);
-        if (!(await decode(canvas, attempt)) && attempt === generation.current)
-          setMessage(
-            "Aucun code de partage valide trouvé. Essayez une image plus nette ou collez le lien.",
-          );
-      } finally {
-        bitmap.close();
-      }
+      const photo = new Image();
+      photo.src = objectUrl;
+      await photo.decode();
+      if (attempt !== generation.current) return;
+      const scale = Math.min(
+        1,
+        1000 / Math.max(photo.naturalWidth, photo.naturalHeight),
+      );
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(photo.naturalWidth * scale));
+      canvas.height = Math.max(1, Math.round(photo.naturalHeight * scale));
+      canvas
+        .getContext("2d")
+        ?.drawImage(photo, 0, 0, canvas.width, canvas.height);
+      if (!(await decode(canvas, attempt)) && attempt === generation.current)
+        setMessage(
+          "Aucun code de partage valide trouvé. Essayez une image plus nette ou collez le lien.",
+        );
     } catch {
       if (attempt !== generation.current) return;
       setMessage("Image illisible. Collez le lien de partage.");
+    } finally {
+      URL.revokeObjectURL(objectUrl);
     }
   }
   return (
     <section className="share-scanner">
+      <p>Placez le QR temporaire du parent devant la caméra.</p>
       <div className="actions">
         <button
           type="button"
-          className="button secondary"
+          className="button primary"
           onClick={() => {
             void start();
           }}
           disabled={running || requesting}
         >
           <Camera size={18} aria-hidden="true" />
-          Scanner le QR
+          {requesting ? "Ouverture de la caméra…" : "Scanner avec la caméra"}
         </button>
         {(running || requesting) && (
           <button type="button" className="button secondary" onClick={stop}>
@@ -203,7 +208,7 @@ export function ShareScanner({
       <p className="fine">
         L’image est lue sur cet appareil et n’est pas envoyée au serveur.
       </p>
-      {message && <p role="status">{message}</p>}
+      <p role="status">{message}</p>
     </section>
   );
 }

@@ -19,6 +19,7 @@ import {
   QrCode,
   KeyRound,
   Wrench,
+  BookOpen,
 } from "lucide-react";
 import { SidebarToggle } from "@/components/sidebar-toggle";
 import { Brand } from "@/components/brand";
@@ -39,15 +40,11 @@ export type ClinicianSection =
   | "growth"
   | "documents"
   | "account"
+  | "sharing"
+  | "guide"
   | "tools";
 export type ClinicianTool =
-  | "followup"
-  | "practices"
-  | "access"
-  | "registry"
-  | "parents"
-  | "sharing"
-  | "permissions";
+  "followup" | "practices" | "access" | "registry" | "parents" | "permissions";
 export async function ClinicianShell({
   active,
   provisional = false,
@@ -108,6 +105,22 @@ export async function ClinicianShell({
       href: base + "/documents",
       icon: FileText,
     },
+    ...(!provisional
+      ? [
+          {
+            key: "sharing",
+            label: "Scanner un QR parent",
+            href: "/share",
+            icon: QrCode,
+          },
+        ]
+      : []),
+    {
+      key: "guide",
+      label: "Guide et aide",
+      href: provisional ? "/provisional/guide" : "/guide-soignant",
+      icon: BookOpen,
+    },
     {
       key: "account",
       label: "Mon compte soignant",
@@ -161,12 +174,6 @@ export async function ClinicianShell({
       label: "Demandes des parents",
       href: "/parent-requests",
       icon: MessageSquare,
-    },
-    {
-      key: "sharing",
-      label: "Lire un partage parent",
-      href: "/share",
-      icon: QrCode,
     },
     {
       key: "permissions",
@@ -281,7 +288,7 @@ export async function ClinicianShell({
       <main className="soignant-main">
         {children}
         <p className="soignant-development">
-          Environnement de développement · Données fictives uniquement
+          Bêta de test · Données fictives uniquement
         </p>
       </main>
     </div>

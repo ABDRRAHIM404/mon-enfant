@@ -338,7 +338,7 @@ export default function Home() {
       <footer className="homepage-shell homepage-footer">
         <div>
           <strong>Mon Enfant</strong>
-          <p>En développement · Données de santé fictives uniquement</p>
+          <p>Bêta de test · Données de santé fictives uniquement</p>
         </div>
         <nav aria-label="Liens utiles">
           <a href="#securite">Confidentialité et partage</a>

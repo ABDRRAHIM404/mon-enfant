@@ -218,8 +218,7 @@ export default async function Account() {
             </p>
           )}
         <p className="fine">
-          Environnement de développement · Données et documents fictifs
-          uniquement
+          Bêta de test · Données et documents fictifs uniquement
         </p>
       </section>
     </section>
