@@ -40,3 +40,7 @@ The visual pass does not alter database migrations, vaccine reference rows, prot
 The homepage now opens with editorial family and clinic images, followed by vaccination and growth photography and an illustrated appointment calendar. The parent booklet and clinician worklist have equal space with clearly labeled example data and existing sign-in routes. The generated images depict illustrative scenes. The original founders’ photo remains in the founders section.
 
 The signed-in clinical home now starts with the Casablanca work date and a group of four icon-led shortcuts for consultation, vaccination, growth and appointment work. Each shortcut is shown only for the existing clinical capability and leads to the existing authorized workflow. The daily worklist retains its appointment details and refresh control. The existing doctor and nurse authorization logic serves both roles.
+
+## Software-first homepage
+
+The hero now shows fictional interface previews of the parent booklet and clinician agenda. The feature section uses software views of the vaccine record, growth and appointment calendar. The copy identifies Mon Enfant as tracking software and assigns the provision of care to the family’s own health professionals. The opt-in GIF uses these fictional product views.

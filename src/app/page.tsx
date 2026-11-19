@@ -5,6 +5,7 @@ import {
   ArrowUpRight,
   BookOpen,
   CalendarDays,
+  CheckCircle2,
   ChartNoAxesCombined,
   Mail,
   LockKeyhole,
@@ -21,31 +22,15 @@ import "./homepage.css";
 export const metadata: Metadata = {
   title: "Mon Enfant · Le carnet de santé de votre enfant",
   description:
-    "Découvrez Mon Enfant, un carnet de santé numérique pour le suivi des vaccinations, de la croissance et des rendez-vous. Un projet de deux cofondateurs originaires de Belfaa.",
+    "Mon Enfant est un logiciel de suivi pour les familles et leurs professionnels de santé. Retrouvez les vaccinations, les mesures de croissance et les rendez-vous dans le carnet numérique.",
 };
 
 const clinicianLogin = "/login?audience=clinician";
-
-const features = [
-  {
-    title: "Vaccinations",
-    photo: "/brand/home-vaccination.webp",
-    alt: "Une infirmière prépare un vaccin pendant qu’un parent rassure son enfant",
-    Icon: Syringe,
-  },
-  {
-    title: "Croissance",
-    photo: "/brand/home-growth.webp",
-    alt: "Un soignant mesure la taille d’un enfant à l’aide d’une toise",
-    Icon: ChartNoAxesCombined,
-  },
-];
 
 const audiences = [
   {
     title: "Espace parent",
     label: "Carnet de mon enfant",
-    href: "/login",
     Icon: BookOpen,
     entries: [
       { Icon: Syringe, label: "Vaccinations documentées", detail: "12 nov." },
@@ -55,8 +40,7 @@ const audiences = [
   },
   {
     title: "Espace soignant",
-    label: "Ma journée de soins",
-    href: clinicianLogin,
+    label: "Agenda du soignant",
     Icon: Stethoscope,
     entries: [
       { Icon: CalendarDays, label: "Consultation de suivi", detail: "09:00" },
@@ -72,14 +56,22 @@ const audiences = [
 
 function AudiencePreviews() {
   return (
-    <div className="home-audience-grid">
-      {audiences.map(({ title, label, href, Icon, entries }) => (
+    <div
+      className="homepage-hero-visual home-product-stage"
+      aria-label="Aperçus du logiciel Mon Enfant"
+    >
+      {audiences.map(({ title, label, Icon, entries }) => (
         <article key={title} className="home-audience">
           <div className="home-audience-screen">
+            <div className="home-window-bar" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+            </div>
             <header>
               <Icon size={22} aria-hidden="true" />
-              <h3>{label}</h3>
-              <small>Exemple</small>
+              <h2>{label}</h2>
+              <small>Exemple fictif</small>
             </header>
             <ul>
               {entries.map(({ Icon: EntryIcon, label: entryLabel, detail }) => (
@@ -91,9 +83,7 @@ function AudiencePreviews() {
               ))}
             </ul>
           </div>
-          <Link href={href} className="home-audience-link">
-            {title} <ArrowUpRight aria-hidden="true" />
-          </Link>
+          <p className="home-audience-label">{title}</p>
         </article>
       ))}
     </div>
@@ -131,8 +121,12 @@ export default function Home() {
           <div className="homepage-hero-copy">
             <p className="homepage-kicker">Carnet de santé numérique · Maroc</p>
             <h1 id="main-content" tabIndex={-1}>
-              Le carnet de santé <em>qui grandit avec eux.</em>
+              Son carnet de santé, <em>en ligne.</em>
             </h1>
+            <p className="homepage-intro">
+              Le logiciel de suivi qui réunit les informations enregistrées par
+              vos professionnels de santé.
+            </p>
             <div className="homepage-actions">
               <Link href="/login" className="button primary">
                 <BookOpen aria-hidden="true" /> Espace parent
@@ -142,34 +136,7 @@ export default function Home() {
               </Link>
             </div>
           </div>
-          <div className="homepage-hero-visual home-photo-pair">
-            <figure>
-              <Image
-                src="/brand/home-parent.webp"
-                width={768}
-                height={512}
-                priority
-                sizes="(max-width: 800px) 47vw, 27vw"
-                alt="Une mère et sa fille regardent leur téléphone ensemble"
-              />
-              <figcaption>
-                <BookOpen aria-hidden="true" /> Le carnet en famille
-              </figcaption>
-            </figure>
-            <figure>
-              <Image
-                src="/brand/home-clinician.webp"
-                width={768}
-                height={512}
-                priority
-                sizes="(max-width: 800px) 47vw, 27vw"
-                alt="Une soignante consulte une tablette avec un parent et son enfant au cabinet"
-              />
-              <figcaption>
-                <Stethoscope aria-hidden="true" /> Le suivi au cabinet
-              </figcaption>
-            </figure>
-          </div>
+          <AudiencePreviews />
         </section>
 
         <section
@@ -179,23 +146,56 @@ export default function Home() {
         >
           <div className="homepage-shell">
             <header className="homepage-section-heading">
-              <h2 id="feature-heading">Les soins, en un coup d’œil</h2>
+              <h2 id="feature-heading">Le suivi, en un coup d’œil</h2>
+              <p>
+                Vos professionnels de santé assurent les soins et renseignent le
+                carnet.
+              </p>
+              <a className="home-demo-link" href="/brand/mon-enfant-demo.gif">
+                Voir la démo animée <ArrowUpRight aria-hidden="true" />
+              </a>
             </header>
-            <div className="home-feature-photos">
-              {features.map(({ Icon, alt, photo, title }) => (
-                <figure key={title}>
-                  <Image
-                    src={photo}
-                    alt={alt}
-                    width={768}
-                    height={512}
-                    sizes="(max-width: 540px) 92vw, (max-width: 900px) 47vw, 29vw"
-                  />
-                  <figcaption>
-                    <Icon aria-hidden="true" /> {title}
-                  </figcaption>
-                </figure>
-              ))}
+            <div className="home-feature-panels">
+              <figure>
+                <div className="home-dose-demo" aria-hidden="true">
+                  <span>
+                    <CheckCircle2 /> <strong>Dose enregistrée</strong>
+                    <time>12 nov.</time>
+                  </span>
+                  <span>
+                    <CheckCircle2 /> <strong>Dose enregistrée</strong>
+                    <time>21 oct.</time>
+                  </span>
+                  <span>
+                    <Syringe /> <strong>Référence à vérifier</strong>
+                  </span>
+                </div>
+                <figcaption>
+                  <Syringe aria-hidden="true" /> Carnet vaccinal
+                </figcaption>
+              </figure>
+              <figure>
+                <div className="home-growth-demo" aria-hidden="true">
+                  <strong>71 cm</strong>
+                  <div className="home-growth-bars">
+                    {[42, 51, 63, 75, 86, 100].map((height, index) => (
+                      <span
+                        key={height}
+                        style={{ height: `${height}%` }}
+                        data-latest={index === 5}
+                      />
+                    ))}
+                  </div>
+                  <div className="home-growth-dates">
+                    <span>Juin</span>
+                    <span>Novembre</span>
+                  </div>
+                </div>
+                <figcaption>
+                  <ChartNoAxesCombined aria-hidden="true" /> Mesures de
+                  croissance
+                </figcaption>
+              </figure>
               <figure className="home-calendar-visual">
                 <div aria-hidden="true" className="home-calendar-demo">
                   <CalendarDays size={32} />
@@ -214,11 +214,10 @@ export default function Home() {
                   </div>
                 </div>
                 <figcaption>
-                  <CalendarDays aria-hidden="true" /> Rendez-vous
+                  <CalendarDays aria-hidden="true" /> Calendrier des rendez-vous
                 </figcaption>
               </figure>
             </div>
-            <AudiencePreviews />
           </div>
         </section>
 
