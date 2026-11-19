@@ -20,6 +20,10 @@ export default function SharePage() {
             avec votre compte médecin vérifié. Vous pourrez consulter le dossier
             et ajouter des soins selon vos habilitations.
           </p>
+          <p>
+            Pour une nouvelle fiche parent, le QR préremplit le nom et la date
+            de naissance dans le formulaire d’inscription.
+          </p>
           <ShareEntry />
         </section>
       </main>

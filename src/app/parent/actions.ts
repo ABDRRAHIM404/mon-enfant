@@ -8,6 +8,66 @@ import { requireApprovedDoctor } from "@/lib/auth";
 const uuid = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
 export type ParentState = { error?: string; success?: boolean };
 export type InvitationState = ParentState & { invitationUrl?: string };
+export async function addParentChildDraft(
+  _: ParentState,
+  form: FormData,
+): Promise<ParentState> {
+  const { supabase } = await requireUser();
+  const text = (key: string) => String(form.get(key) ?? "").trim();
+  const operation = text("operationId");
+  const given = text("givenName");
+  const family = text("familyName");
+  const birth = text("birthDate");
+  if (
+    !uuid.test(operation) ||
+    !given ||
+    !family ||
+    given.length > 100 ||
+    family.length > 100 ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(birth)
+  )
+    return { error: "Vérifiez le prénom, le nom et la date de naissance." };
+  const { data, error } = await supabase.rpc("add_parent_child_draft", {
+    p_operation_id: operation,
+    p_given_name: given,
+    p_family_name: family,
+    p_birth_date: birth,
+  });
+  if (
+    error?.code === "22023" ||
+    error?.code === "22007" ||
+    error?.code === "22008"
+  )
+    return { error: "Saisissez une date de naissance valide." };
+  if (error || typeof data !== "string" || !uuid.test(data))
+    return failure(error?.code);
+  revalidatePath("/parent");
+  revalidatePath("/parent/add-child");
+  redirect(`/parent/add-child?added=${data}#fiche-${data}`);
+}
+
+export async function issueParentChildDraft(
+  draftId: string,
+): Promise<{ url?: string; expiresAt?: string; error?: string }> {
+  const { supabase } = await requireUser();
+  const base = new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://mon-enfant.vercel.app",
+  );
+  if (
+    !uuid.test(draftId) ||
+    (base.protocol !== "https:" && process.env.NODE_ENV !== "development")
+  )
+    return { error: "Cette fiche est indisponible." };
+  const { data, error } = await supabase.rpc("issue_parent_child_draft", {
+    p_draft_id: draftId,
+    p_consent: true,
+  });
+  if (error || !data?.token || !data.expires_at) return failure(error?.code);
+  return {
+    url: `${base.origin}/share#draft=${data.token}`,
+    expiresAt: data.expires_at,
+  };
+}
 function failure(code: string | undefined) {
   if (code === "42501" || code === "PT409")
     return {

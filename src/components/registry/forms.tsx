@@ -5,7 +5,7 @@ import {
   reviewRegistration,
   resumeRegistration,
 } from "@/app/patients/actions";
-import type { Facility } from "@/lib/registry/types";
+import type { Facility, ParentChildIntake } from "@/lib/registry/types";
 function ActionForm({
   kind,
   operationId,
@@ -206,10 +206,12 @@ export function RegistrationForm({
   operationId,
   facilities,
   paper,
+  intake,
 }: {
   operationId: string;
   facilities: Facility[];
   paper: boolean;
+  intake?: ParentChildIntake;
 }) {
   return (
     <ActionForm
@@ -217,6 +219,7 @@ export function RegistrationForm({
       operationId={operationId}
       label="Créer le dossier et le numéro local"
     >
+      {intake && <input type="hidden" name="parentDraft" value="on" />}
       <input
         type="hidden"
         name="source_type"
@@ -231,7 +234,7 @@ export function RegistrationForm({
         Certitude de l’identité
         <select
           name="name_status"
-          defaultValue={paper ? "unknown" : "confirmed"}
+          defaultValue={paper && !intake ? "unknown" : "confirmed"}
         >
           <option value="confirmed">Noms confirmés</option>
           <option value="provisional">Noms provisoires</option>
@@ -240,13 +243,23 @@ export function RegistrationForm({
           </option>
         </select>
       </label>
-      <Field name="given_name" label="Prénom (si connu)" />
-      <Field name="family_name" label="Nom (si connu)" />
+      <Field
+        name="given_name"
+        label="Prénom (si connu)"
+        defaultValue={intake?.given_name}
+        required={!!intake}
+      />
+      <Field
+        name="family_name"
+        label="Nom (si connu)"
+        defaultValue={intake?.family_name}
+        required={!!intake}
+      />
       <label>
         Certitude de la naissance
         <select
           name="birth_date_precision"
-          defaultValue={paper ? "unknown" : "exact"}
+          defaultValue={paper && !intake ? "unknown" : "exact"}
         >
           <option value="exact">Date exacte</option>
           <option value="estimated">Date estimée</option>
@@ -257,6 +270,8 @@ export function RegistrationForm({
         name="birth_date"
         label="Date de naissance (si connue)"
         type="date"
+        defaultValue={intake?.birth_date}
+        required={!!intake}
       />
       <label>
         Sexe
@@ -318,6 +333,12 @@ export function RegistrationForm({
         <input name="syntheticOnly" type="checkbox" required /> Données
         entièrement fictives pour cet environnement de test.
       </label>
+      {intake && (
+        <label className="checkbox-label">
+          <input name="draftIdentityChecked" type="checkbox" required />
+          J’ai vérifié l’identité et la date de naissance de cet enfant.
+        </label>
+      )}
     </ActionForm>
   );
 }
