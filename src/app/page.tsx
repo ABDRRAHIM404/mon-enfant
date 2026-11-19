@@ -5,7 +5,6 @@ import {
   ArrowUpRight,
   BookOpen,
   CalendarDays,
-  CheckCircle2,
   ChartNoAxesCombined,
   Mail,
   LockKeyhole,
@@ -17,6 +16,7 @@ import {
   Syringe,
 } from "lucide-react";
 import { PublicHeader } from "@/components/public-header";
+import { HomeFeatureAnimation } from "@/components/home-feature-animation";
 import "./homepage.css";
 
 export const metadata: Metadata = {
@@ -151,72 +151,20 @@ export default function Home() {
                 Vos professionnels de santé assurent les soins et renseignent le
                 carnet.
               </p>
-              <a className="home-demo-link" href="/brand/mon-enfant-demo.gif">
-                Voir la démo animée <ArrowUpRight aria-hidden="true" />
-              </a>
             </header>
             <div className="home-feature-panels">
-              <figure>
-                <div className="home-dose-demo" aria-hidden="true">
-                  <span>
-                    <CheckCircle2 /> <strong>Dose enregistrée</strong>
-                    <time>12 nov.</time>
-                  </span>
-                  <span>
-                    <CheckCircle2 /> <strong>Dose enregistrée</strong>
-                    <time>21 oct.</time>
-                  </span>
-                  <span>
-                    <Syringe /> <strong>Référence à vérifier</strong>
-                  </span>
-                </div>
-                <figcaption>
-                  <Syringe aria-hidden="true" /> Carnet vaccinal
-                </figcaption>
-              </figure>
-              <figure>
-                <div className="home-growth-demo" aria-hidden="true">
-                  <strong>71 cm</strong>
-                  <div className="home-growth-bars">
-                    {[42, 51, 63, 75, 86, 100].map((height, index) => (
-                      <span
-                        key={height}
-                        style={{ height: `${height}%` }}
-                        data-latest={index === 5}
-                      />
-                    ))}
-                  </div>
-                  <div className="home-growth-dates">
-                    <span>Juin</span>
-                    <span>Novembre</span>
-                  </div>
-                </div>
-                <figcaption>
-                  <ChartNoAxesCombined aria-hidden="true" /> Mesures de
-                  croissance
-                </figcaption>
-              </figure>
-              <figure className="home-calendar-visual">
-                <div aria-hidden="true" className="home-calendar-demo">
-                  <CalendarDays size={32} />
-                  <div className="home-calendar-days">
-                    {[8, 9, 10, 11, 12, 13, 14].map((day) => (
-                      <span key={day} data-highlight={day === 10}>
-                        {day}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="home-calendar-slot">
-                    <span>09:00</span> Consultation
-                  </div>
-                  <div className="home-calendar-slot">
-                    <span>10:30</span> Vaccination
-                  </div>
-                </div>
-                <figcaption>
-                  <CalendarDays aria-hidden="true" /> Calendrier des rendez-vous
-                </figcaption>
-              </figure>
+              <HomeFeatureAnimation
+                name="vaccinations"
+                description="Consulter une dose documentée"
+              />
+              <HomeFeatureAnimation
+                name="croissance"
+                description="Voir la courbe de croissance"
+              />
+              <HomeFeatureAnimation
+                name="agenda"
+                description="Ouvrir le calendrier des rendez-vous"
+              />
             </div>
           </div>
         </section>
