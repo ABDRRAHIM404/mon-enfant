@@ -1,7 +1,7 @@
 "use client";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, LoaderCircle } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, LoaderCircle } from "lucide-react";
 import { signIn, signUp } from "@/app/auth/actions";
 export function AuthForm({
   mode,
@@ -16,8 +16,17 @@ export function AuthForm({
     mode === "login" ? signIn : signUp,
     {},
   );
+  const [showPassword, setShowPassword] = useState(false);
+  // React resets submitted forms when the action returns a result.
+  const [rememberOnRetry, setRememberOnRetry] = useState(false);
+  const RevealIcon = showPassword ? EyeOff : Eye;
   return (
-    <form action={action} className="auth-form" aria-busy={pending}>
+    <form
+      action={action}
+      className="auth-form"
+      aria-busy={pending}
+      onSubmit={() => setShowPassword(false)}
+    >
       <input type="hidden" name="destination" value={destination} />
       {mode === "signup" && destination === "account" && (
         <>
@@ -43,29 +52,51 @@ export function AuthForm({
         id="email"
         name="email"
         type="email"
-        autoComplete="email"
+        autoComplete={mode === "login" ? "username" : "email"}
         placeholder={"exemple@email.ma"}
         required
         maxLength={254}
         disabled={!configured}
       />
       <label htmlFor="password">Mot de passe</label>
-      <input
-        id="password"
-        name="password"
-        type="password"
-        autoComplete={mode === "login" ? "current-password" : "new-password"}
-        minLength={8}
-        maxLength={128}
-        required
-        placeholder="8 caractères minimum"
-        disabled={!configured}
-      />
+      <div className="auth-password-field">
+        <input
+          id="password"
+          name="password"
+          type={showPassword ? "text" : "password"}
+          autoComplete={mode === "login" ? "current-password" : "new-password"}
+          minLength={8}
+          maxLength={128}
+          required
+          placeholder="8 caractères minimum"
+          disabled={!configured}
+        />
+        <button
+          type="button"
+          className="auth-password-toggle"
+          aria-label={
+            showPassword
+              ? "Masquer le mot de passe"
+              : "Afficher le mot de passe"
+          }
+          aria-controls="password"
+          disabled={!configured}
+          onClick={() => setShowPassword((visible) => !visible)}
+        >
+          <RevealIcon size={19} aria-hidden="true" />
+        </button>
+      </div>
       {mode === "login" && (
         <div className="auth-options">
           <label className="remember-option">
-            <input type="checkbox" name="remember" disabled={!configured} />
-            Se souvenir de moi
+            <input
+              type="checkbox"
+              name="remember"
+              defaultChecked={rememberOnRetry}
+              onChange={(event) => setRememberOnRetry(event.target.checked)}
+              disabled={!configured}
+            />
+            Rester connecté sur cet appareil
           </label>
           <Link className="text-link" href="/forgot-password">
             Mot de passe oublié ?

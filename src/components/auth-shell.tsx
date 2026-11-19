@@ -118,8 +118,7 @@ export function AuthShell({
             )}
           </div>
           <p className="fine auth-bottom">
-            <LockKeyhole size={13} /> Environnement de développement · Données
-            fictives uniquement
+            <LockKeyhole size={13} /> Bêta de test · Données fictives uniquement
           </p>
         </section>
       </main>

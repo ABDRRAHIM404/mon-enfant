@@ -8,6 +8,7 @@ import {
   ChartNoAxesCombined,
   ClipboardPlus,
   FolderPlus,
+  QrCode,
 } from "lucide-react";
 import { requireApprovedDoctor } from "@/lib/auth";
 import { ClinicianShell } from "@/components/clinician/shell";
@@ -121,9 +122,14 @@ export default async function Dashboard() {
             Ma journée de soins
           </h1>
         </div>
-        <Link className="button secondary" href="/patients/new">
-          <FolderPlus aria-hidden="true" /> Ajouter un enfant
-        </Link>
+        <div className="actions">
+          <Link className="button secondary" href="/patients/new">
+            <FolderPlus aria-hidden="true" /> Ajouter un enfant
+          </Link>
+          <Link className="button secondary" href="/share">
+            <QrCode aria-hidden="true" /> Scanner un QR parent
+          </Link>
+        </div>
       </div>
       <section
         className="clinical-start"
@@ -264,7 +270,6 @@ export default async function Dashboard() {
           <Link href="/registration-reviews">Revues d’inscription</Link>
           <Link href="/parent-requests">Demandes des parents</Link>
           <Link href="/practices">Lieux d’exercice</Link>
-          <Link href="/share">Lire un partage parent</Link>
           <Link href="/provisional">Mes dossiers provisoires</Link>
         </div>
         <p className="fine">
