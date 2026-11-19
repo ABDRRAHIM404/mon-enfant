@@ -414,12 +414,13 @@
   gap: var(--space-2);
   align-items: center;
   justify-content: space-between;
-  padding: 7px 12px 7px 16px;
+  padding: 12px 16px;
   font-weight: 600;
   font-size: 14px;
 }
 
 .home-feature-media {
+  display: block;
   overflow: hidden;
 }
 
@@ -429,28 +430,76 @@
   height: auto;
 }
 
-.home-feature-animation button {
-  display: grid;
-  place-items: center;
-  flex: 0 0 44px;
-  width: 44px;
-  height: 44px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-control);
-  background: var(--pale);
-  color: var(--teal);
-}
-
-.home-feature-animation button:hover {
-  background: var(--seafoam);
-}
-
 .home-feature-section {
   background: white;
 }
 
-.home-feature-panels {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+.home-demo-audiences {
+  display: grid;
+  gap: clamp(16px, 3vw, 32px);
+  margin-top: var(--space-6);
+}
+
+.home-demo-audience {
+  display: grid;
+  grid-template-columns: minmax(175px, 0.65fr) minmax(0, 2fr);
+  gap: clamp(16px, 3vw, 32px);
+  align-items: start;
+  border-radius: var(--radius-panel);
+  padding: clamp(14px, 3vw, 30px);
+  background: var(--pale);
+}
+
+.home-demo-audience-clinical {
+  background: var(--ocean-ink);
+}
+
+.home-demo-audience-copy {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.home-demo-audience-copy > svg,
+.home-demo-entry {
+  color: var(--teal);
+}
+
+.home-demo-audience-copy h3 {
+  margin: 0;
+  font-size: clamp(22px, 2vw, 28px);
+  font-weight: 600;
+}
+
+.home-demo-audience-copy p {
+  color: var(--secondary);
+  font-size: 14px;
+  margin: 0;
+}
+
+.home-demo-audience-clinical h3 {
+  color: white;
+}
+
+.home-demo-audience-clinical .home-demo-audience-copy p,
+.home-demo-audience-clinical .home-demo-audience-copy > svg,
+.home-demo-audience-clinical .home-demo-entry {
+  color: var(--seafoam);
+}
+
+.home-demo-audience-clinical .home-demo-entry:focus-visible {
+  outline-color: var(--seafoam);
+}
+
+.home-demo-entry {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .home-audience {
@@ -530,13 +579,11 @@
   color: var(--seafoam);
 }
 
-@media (max-width: 900px) {
-  .home-feature-panels {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 @media (max-width: 800px) {
+  .home-demo-audience {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .homepage-hero,
   .homepage-privacy-layout {
     grid-template-columns: minmax(0, 1fr);
