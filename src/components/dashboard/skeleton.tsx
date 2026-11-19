@@ -13,7 +13,13 @@ import {
 } from "lucide-react";
 export type SkeletonArea = "parent" | "clinician" | "provisional" | "neutral";
 export type SkeletonVariant =
-  "overview" | "list" | "form" | "clinical" | "calendar" | "documents";
+  | "overview"
+  | "booklet"
+  | "list"
+  | "form"
+  | "clinical"
+  | "calendar"
+  | "documents";
 export function DashboardSkeleton({
   variant = "overview",
   label = "Chargement de votre espace…",

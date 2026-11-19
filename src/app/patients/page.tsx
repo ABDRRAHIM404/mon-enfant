@@ -90,21 +90,37 @@ export default async function Patients({
         <p className="fine">{result.total} dossier(s) · 30 par page</p>
         {result.items.length ? (
           <div className="table-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th>Enfant</th>
-                  <th>Naissance</th>
-                  <th>Mon registre</th>
-                  <th>Historique</th>
-                  <th>Dernier soin documenté</th>
-                  <th>Mon prochain rendez-vous</th>
+            <table
+              className="registry-patient-table"
+              role="table"
+              aria-label="Dossiers du registre"
+            >
+              <thead role="rowgroup">
+                <tr role="row">
+                  <th role="columnheader" scope="col">
+                    Enfant
+                  </th>
+                  <th role="columnheader" scope="col">
+                    Naissance
+                  </th>
+                  <th role="columnheader" scope="col">
+                    Mon registre
+                  </th>
+                  <th role="columnheader" scope="col">
+                    Historique
+                  </th>
+                  <th role="columnheader" scope="col">
+                    Dernier soin documenté
+                  </th>
+                  <th role="columnheader" scope="col">
+                    Mon prochain rendez-vous
+                  </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody role="rowgroup">
                 {result.items.map((p) => (
-                  <tr key={p.id}>
-                    <td>
+                  <tr role="row" key={p.id}>
+                    <td role="cell" data-label="Enfant">
                       <Link className="text-link" href={`/patients/${p.id}`}>
                         {patientName(p)}
                       </Link>
@@ -112,17 +128,23 @@ export default async function Patients({
                         <p className="fine">Identité provisoire</p>
                       )}
                     </td>
-                    <td>{birthLabel(p)}</td>
-                    <td>
+                    <td role="cell" data-label="Naissance">
+                      {birthLabel(p)}
+                    </td>
+                    <td role="cell" data-label="Mon registre">
                       {p.registers.map((r, i) => (
                         <p key={i}>
                           {r.number} · {r.year} / {r.book} · {r.facility_name}
                         </p>
                       ))}
                     </td>
-                    <td>{historyLabels[p.history_status]}</td>
-                    <td>{p.last_documented_care || "Non documenté"}</td>
-                    <td>
+                    <td role="cell" data-label="Historique">
+                      {historyLabels[p.history_status]}
+                    </td>
+                    <td role="cell" data-label="Dernier soin documenté">
+                      {p.last_documented_care || "Non documenté"}
+                    </td>
+                    <td role="cell" data-label="Mon prochain rendez-vous">
                       {p.next_own_appointment
                         ? appointmentTime(p.next_own_appointment.starts_at)
                         : "Non planifié"}

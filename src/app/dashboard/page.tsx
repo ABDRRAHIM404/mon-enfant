@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { UsersRound, Stethoscope, Syringe, CalendarDays } from "lucide-react";
+import {
+  UsersRound,
+  Stethoscope,
+  Syringe,
+  CalendarDays,
+  ArrowUpRight,
+} from "lucide-react";
 import { requireApprovedDoctor } from "@/lib/auth";
 import { ClinicianShell, ClinicianHeading } from "@/components/clinician/shell";
 import { AppointmentCard } from "@/components/appointments/card";
@@ -49,19 +55,25 @@ export default async function Dashboard() {
     }[];
   };
   const allowed = capabilities.data as string[];
-  const tiles: [number, string, string][] = [
-    [counts.patients, "Enfants de mon registre", "/patients"],
-    [recent.total, "Consultations documentées", "/consultations"],
-    [
-      refs.counts.potentially_overdue_unconfirmed || 0,
-      "Références vaccinales à revoir",
-      "/follow-up?mode=vaccines",
-    ],
-    [
-      visits.counts.today || 0,
-      "Rendez-vous aujourd’hui",
-      "/follow-up?bucket=today",
-    ],
+  const summaries = [
+    {
+      count: counts.patients,
+      label: "Enfants de mon registre",
+      href: "/patients",
+      Icon: UsersRound,
+    },
+    {
+      count: recent.total,
+      label: "Consultations documentées",
+      href: "/consultations",
+      Icon: Stethoscope,
+    },
+    {
+      count: refs.counts.potentially_overdue_unconfirmed ?? 0,
+      label: "Références vaccinales à revoir",
+      href: "/follow-up?mode=vaccines",
+      Icon: Syringe,
+    },
   ];
   return (
     <ClinicianShell active="home" profile={profile}>
@@ -90,29 +102,39 @@ export default async function Dashboard() {
         )}
       </div>
       <LiveRefresh />
-      <div className="soignant-stats">
-        {tiles.map(([count, label, href], index) => {
-          const Icon = [UsersRound, Stethoscope, Syringe, CalendarDays][index];
-          return (
-            <Link className="panel stat-card" href={href} key={label}>
-              <Icon size={28} aria-hidden="true" />
-              <div>
-                <strong>{count}</strong>
-                <span>{label}</span>
-              </div>
-            </Link>
-          );
-        })}
-      </div>
-      <details className="dashboard-explanation">
-        <summary>Comprendre les suivis vaccinaux</summary>
-        <p>
-          Une référence non confirmée n’est pas un rendez-vous manqué. Les soins
-          enregistrés par un autre soignant autorisé recalculent les suivis
-          vaccinaux, sans annuler les consultations indépendantes.
-        </p>
-      </details>
-      <div className="soignant-daily-grid">
+      <nav
+        className="clinical-overview-summary"
+        aria-label="Dossiers et suivis"
+      >
+        {summaries.map(({ count, label, href, Icon }) => (
+          <Link href={href} key={href}>
+            <Icon size={18} aria-hidden="true" />
+            <span>{label}</span>
+            <strong>{count}</strong>
+            <ArrowUpRight size={16} aria-hidden="true" />
+          </Link>
+        ))}
+      </nav>
+      <div className="soignant-daily-grid clinical-priority-grid">
+        <section className="panel">
+          <div className="clinical-section-header">
+            <CalendarDays size={20} aria-hidden="true" />
+            <h2>Rendez-vous du jour</h2>
+            <span className="workspace-chip">{visits.total}</span>
+          </div>
+          {visits.items.length ? (
+            visits.items.map((appointment) => (
+              <AppointmentCard key={appointment.id} appointment={appointment} />
+            ))
+          ) : (
+            <p className="empty-state">
+              Aucun rendez-vous en attente aujourd’hui.
+            </p>
+          )}
+          <Link className="text-link" href="/follow-up?bucket=today">
+            Ouvrir la file du jour
+          </Link>
+        </section>
         <section className="panel">
           <h2>Dernières consultations documentées</h2>
           <p className="fine">
@@ -158,20 +180,15 @@ export default async function Dashboard() {
             Consulter les historiques
           </Link>
         </section>
-        <section className="panel">
-          <h2>Aujourd’hui ({visits.total})</h2>
-          {visits.items.length ? (
-            visits.items.map((appointment) => (
-              <AppointmentCard key={appointment.id} appointment={appointment} />
-            ))
-          ) : (
-            <p>Aucun rendez-vous en attente aujourd’hui.</p>
-          )}
-          <Link className="text-link" href="/follow-up?bucket=today">
-            Toute la file du jour (30 rendez-vous par page)
-          </Link>
-        </section>
       </div>
+      <details className="dashboard-explanation">
+        <summary>Comprendre les suivis vaccinaux</summary>
+        <p>
+          Une référence non confirmée n’est pas un rendez-vous manqué. Les soins
+          enregistrés par un autre soignant autorisé recalculent les suivis
+          vaccinaux, sans annuler les consultations indépendantes.
+        </p>
+      </details>
       <section className="panel">
         <h2>Continuer votre travail</h2>
         <p className="fine">
