@@ -8,6 +8,10 @@
 
 .homepage {
   --home-paper: var(--paper);
+  --home-coral: #ffb8aa;
+  --home-coral-hover: #ffa797;
+  --home-coral-tint: #fff1ed;
+  --home-coral-border: #a75045;
   --home-deep: var(--ocean-ink);
   --home-line: var(--line);
   --home-display: "Instrument Serif", Georgia, "Times New Roman", serif;
@@ -75,6 +79,32 @@
 
 .homepage-actions .button {
   min-height: 48px;
+}
+
+.homepage
+  :is(
+    .public-actions .button.primary,
+    .homepage-actions .button,
+    .home-demo-entry
+  ) {
+  background: var(--home-coral);
+  border-color: var(--home-coral-border);
+  color: var(--ocean-ink);
+}
+
+.homepage .homepage-actions .button.secondary {
+  background: var(--home-coral-tint);
+}
+
+.homepage
+  :is(
+    .public-actions .button.primary,
+    .homepage-actions .button,
+    .home-demo-entry
+  ):hover {
+  background: var(--home-coral-hover);
+  border-color: var(--home-coral-border);
+  color: var(--ocean-ink);
 }
 
 .homepage-footer nav a {
@@ -461,8 +491,7 @@
   min-width: 0;
 }
 
-.home-demo-audience-copy > svg,
-.home-demo-entry {
+.home-demo-audience-copy > svg {
   color: var(--teal);
 }
 
@@ -483,8 +512,7 @@
 }
 
 .home-demo-audience-clinical .home-demo-audience-copy p,
-.home-demo-audience-clinical .home-demo-audience-copy > svg,
-.home-demo-audience-clinical .home-demo-entry {
+.home-demo-audience-clinical .home-demo-audience-copy > svg {
   color: var(--seafoam);
 }
 
@@ -497,9 +525,12 @@
   align-items: center;
   gap: var(--space-2);
   min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid;
+  border-radius: var(--radius-control);
   font-size: 13px;
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  font-weight: 600;
+  text-decoration: none;
 }
 
 .home-audience {
