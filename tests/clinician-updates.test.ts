@@ -1,7 +1,9 @@
 import { beforeAll, afterAll, describe, it, expect } from "vitest";
 import { randomUUID } from "node:crypto";
+import { readFileSync } from "node:fs";
 import type { PGlite } from "@electric-sql/pglite";
 import { clinicianUpdatesDatabase, sessionActing } from "./helpers/database";
+import { clinicalCapabilities } from "../src/lib/clinical/types";
 let db: PGlite;
 type Actor = { id: string; session: string };
 async function actor(role?: string, status = "unverified"): Promise<Actor> {
@@ -66,6 +68,94 @@ afterAll(async () => {
   await db?.close();
 });
 describe("requested clinician update on complete current PostgreSQL schema", () => {
+  it("grants and audits a batch atomically, enforcing eligibility and idempotency", async () => {
+    await db.exec(
+      readFileSync(
+        "supabase/migrations/20261119140847_bulk_clinical_permissions.sql",
+        "utf8",
+      ),
+    );
+    const manager = await actor("admin", "approved");
+    const nurse = await actor("nurse", "approved");
+    const doctor = await actor("doctor", "approved");
+    await db.query(
+      "insert into private.staff_permissions(user_id,can_manage_clinical_permissions) values($1,true)",
+      [manager.id],
+    );
+    const operation = randomUUID();
+    const args = [
+      operation,
+      nurse.id,
+      clinicalCapabilities,
+      true,
+      "2090-01-01T23:59:59Z",
+      "Source fictive de qualification",
+      "Motif fictif d’attribution",
+      true,
+    ];
+    const name = "set_clinical_capabilities";
+    await expect(rpc(doctor, name, args)).rejects.toMatchObject({
+      code: "42501",
+    });
+    await expect(
+      rpc(manager, name, [...args.slice(0, -1), false]),
+    ).rejects.toMatchObject({ code: "22023" });
+    await expect(rpc(manager, name, args)).resolves.toBe(nurse.id);
+    await expect(
+      rpc(manager, name, [
+        operation,
+        nurse.id,
+        [...clinicalCapabilities].reverse(),
+        ...args.slice(3),
+      ]),
+    ).resolves.toBe(nurse.id);
+    await expect(
+      rpc(manager, name, [
+        operation,
+        nurse.id,
+        ["appointment"],
+        ...args.slice(3),
+      ]),
+    ).rejects.toMatchObject({ code: "22023" });
+    const status = await db.query(
+      "select capability, enabled, expires_at from public.professional_capabilities where professional_id=$1 order by capability",
+      [nurse.id],
+    );
+    expect(status.rows).toEqual(
+      [...clinicalCapabilities].sort().map((capability) => ({
+        capability,
+        enabled: true,
+        expires_at: new Date("2090-01-01T23:59:59Z"),
+      })),
+    );
+    const history = await db.query(
+      "select capability from public.capability_changes where professional_id=$1 order by capability",
+      [nurse.id],
+    );
+    expect(history.rows).toEqual(
+      [...clinicalCapabilities].sort().map((capability) => ({ capability })),
+    );
+
+    // Force the last permission to fail after the first has been processed.
+    const blockedOperation = randomUUID();
+    await db.query(
+      "insert into private.operation_receipts(actor_id, operation_id, kind, payload, result_id) values($1, md5('clinical_permission_batch:' || $2 || ':vaccination')::uuid, 'fixture', '{}'::jsonb, $3)",
+      [manager.id, blockedOperation, doctor.id],
+    );
+    await expect(
+      rpc(manager, name, [
+        blockedOperation,
+        doctor.id,
+        ["consultation", "vaccination"],
+        ...args.slice(3),
+      ]),
+    ).rejects.toMatchObject({ code: "22023" });
+    const failed = await db.query(
+      "select capability from public.professional_capabilities where professional_id=$1 union all select capability from public.capability_changes where professional_id=$1",
+      [doctor.id],
+    );
+    expect(failed.rows).toEqual([]);
+  });
   it("enrolls only own declared doctor/nurse, never approval, admin or self role changes", async () => {
     const a = await actor();
     await rpc(a, "enroll_clinician", ["nurse"]);

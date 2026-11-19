@@ -13,6 +13,12 @@ export const clinicalLabels: Record<ClinicalKind, string> = {
   growth: "Mesures de croissance",
   vaccination: "Vaccination",
 };
+export const clinicalCapabilities = [...clinicalKinds, "appointment"] as const;
+export type ClinicalCapability = (typeof clinicalCapabilities)[number];
+export const clinicalCapabilityLabels: Record<ClinicalCapability, string> = {
+  ...clinicalLabels,
+  appointment: "Gestion des rendez-vous",
+};
 export type ClinicalEntry = {
   id: string;
   root_id: string;

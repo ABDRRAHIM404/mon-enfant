@@ -18,7 +18,7 @@ import {
   type VaccineItemExport,
 } from "@/lib/vaccines/patient-types";
 import type { ClinicalEntry } from "@/lib/clinical/types";
-import { clinicalKinds } from "@/lib/clinical/types";
+import { clinicalCapabilities, clinicalKinds } from "@/lib/clinical/types";
 export type ClinicalState = {
   error?: string;
   success?: boolean;
@@ -209,17 +209,28 @@ export async function changeClinicalPermission(
 ): Promise<ClinicalState> {
   const { supabase } = await requireClinicalPermissionManager();
   const text = (key: string) => String(form.get(key) ?? "").trim();
+  const decision = text("decision");
   if (
     !uuidPattern.test(text("operationId")) ||
     !uuidPattern.test(text("professionalId")) ||
-    !["enable", "disable"].includes(text("decision"))
+    !["enable", "disable"].includes(decision)
   )
     return { error: "Vérifiez le professionnel et la décision." };
-  const { error } = await supabase.rpc("set_clinical_capability", {
+  const submitted = form.getAll("capability");
+  const capabilities = clinicalCapabilities.filter((capability) =>
+    submitted.includes(capability),
+  );
+  if (
+    !capabilities.length ||
+    capabilities.length !== submitted.length ||
+    (decision === "disable" && capabilities.length !== 1)
+  )
+    return { error: "Vérifiez les habilitations sélectionnées." };
+  const { error } = await supabase.rpc("set_clinical_capabilities", {
     p_operation_id: text("operationId"),
     p_professional_id: text("professionalId"),
-    p_capability: text("capability"),
-    p_enabled: text("decision") === "enable",
+    p_capabilities: capabilities,
+    p_enabled: decision === "enable",
     p_expires_at: text("expires_at") ? `${text("expires_at")}T23:59:59Z` : null,
     p_evidence_reference: text("evidence_reference"),
     p_reason: text("reason"),
@@ -232,7 +243,7 @@ export async function changeClinicalPermission(
           "Indiquez la source contrôlée, le motif et une échéance future. L’attestation est obligatoire pour accorder une habilitation.",
       };
     const ref = reportOperationalEvent("clinical_permission_failed");
-    return { error: `L’habilitation n’a pas été modifiée. Référence : ${ref}` };
+    return { error: `La décision n’a pas été enregistrée. Référence : ${ref}` };
   }
   revalidatePath("/admin/clinical-permissions");
   return { success: true };

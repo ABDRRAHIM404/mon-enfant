@@ -243,6 +243,9 @@ describe("admin presentation preserves review and permission boundaries", () => 
     });
     expect(html).toContain('name="operationId"');
     expect(html).toContain('name="verified"');
+    expect(html).toContain("Tout sélectionner");
+    expect(html.match(/type="checkbox" name="capability"/g)).toHaveLength(6);
+    expect(html).toContain('value="appointment"');
     expect(html).toContain("Nadia Benali");
     expect(html).toContain("nadia@example.invalid");
     expect(html).toContain("E-mail, prénom, nom ou identifiant professionnel");
