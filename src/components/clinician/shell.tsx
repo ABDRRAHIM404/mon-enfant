@@ -245,11 +245,7 @@ export async function ClinicianShell({
             type="search"
             name="q"
             maxLength={100}
-            placeholder={
-              provisional
-                ? "Rechercher dans mes dossiers privés…"
-                : "Rechercher dans mes dossiers autorisés…"
-            }
+            placeholder={provisional ? "Dossier privé…" : "Nom, registre…"}
           />
           <button type="submit">Rechercher</button>
         </form>

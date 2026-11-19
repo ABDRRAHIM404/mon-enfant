@@ -151,8 +151,7 @@ export default function Home() {
             </h1>
             <p className="homepage-intro">
               Retrouvez ses vaccinations, ses mesures de croissance et ses
-              rendez-vous au même endroit, du premier suivi aux prochaines
-              visites.
+              rendez-vous, du premier suivi aux prochaines visites.
             </p>
             <div className="homepage-actions">
               <Link href="/login" className="button primary">

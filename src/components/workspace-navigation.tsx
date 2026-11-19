@@ -24,8 +24,8 @@ export function NavigationFeedback() {
       const url = new URL(link.href);
       const target = url.pathname + "/" + (url.searchParams.get("view") ?? "");
       const variant: SkeletonVariant =
-        url.pathname === "/admin"
-          ? "overview"
+        url.pathname === "/parent" && !url.searchParams.has("view")
+          ? "booklet"
           : /settings|account|\/new|\/admin\/verifications\/[0-9a-f-]{36}/.test(
                 target,
               )

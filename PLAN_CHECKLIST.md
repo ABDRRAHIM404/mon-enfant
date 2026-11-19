@@ -1,3 +1,5 @@
+> Mon Enfant 2027 · The shared palette, public booklet preview, role-based landing pages and responsive rails are implemented. The [verification record](docs/design-qa/mon-enfant-2027/review.md) identifies tested flows and the remaining authenticated browser checks. Existing clinical, privacy and mobile acceptance gates carry forward.
+
 > Current dashboard checkpoint (18 November): owner-requested parent/clinician integration and final closeout are published in application 6b6f215 / READY canonical production dpl_2MWuubdsABzcoDTAxi4pgjdR35cG. Interrupted saves and overlapping child links are fixed; targeted source and canonical browser checks pass; the one fresh unprivileged parent fixture is RETIRED. See DASHBOARD_HANDOFF.md and PROGRESS.md. Historical clinician acceptance remains valid. APK/iOS remain paused.
 
 # Full plan execution and completion audit

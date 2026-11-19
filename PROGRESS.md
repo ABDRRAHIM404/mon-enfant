@@ -1,5 +1,7 @@
 # Mon Enfant — Implementation progress
 
+> Mon Enfant 2027 · 19 November 2026. Editorial homepage, child-led parent home, daily clinical workspace and operational review console implemented. The 83 focused checks, type checking, lint and the correct-project Vercel preview passed. See [design and verification](docs/design-qa/mon-enfant-2027/review.md) and [PR #10](https://github.com/ABDRRAHIM404/mon-enfant/pull/10). Android remains paused.
+
 Updated: 15 November 2026. Execution follows `PROJECT_PLAN.md` in order. Current development focus: full Phase 8 mobile; Update 3 public/protected UI and temporary sharing are software-accepted and canonically published. Updates 1–2 and the canonical Vercel account switch have hosted technical acceptance. See `UPDATE_WORK_PLAN.md`. Actual parent invitation/follow-up email delivery remains open. The user prioritized app feature completion before minor hardening; unfinished Phase 6 checks/operations remain open. Major authentication, authorization, data-integrity and build checks continue with feature work. Foundation, professional review, registry, clinical/vaccine records and appointments have technical verification. Remaining notification, qualified clinical/source and external readiness gates remain open. Full-scope audit: [PLAN_CHECKLIST.md](PLAN_CHECKLIST.md).
 
 ## Phase 0 — Requirements and source validation

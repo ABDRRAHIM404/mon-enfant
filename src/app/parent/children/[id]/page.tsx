@@ -108,7 +108,10 @@ export default async function ChildBooklet({
           soins restent attribués à leurs professionnels et sources.
         </p>
         {entries.length ? (
-          <ol className="booklet-timeline booklet-clinical-timeline">
+          <ol
+            className="booklet-timeline booklet-clinical-timeline"
+            role="list"
+          >
             {entries.map((entry) => (
               <li key={entry.id}>
                 <EntryCard entry={entry} link={false} />

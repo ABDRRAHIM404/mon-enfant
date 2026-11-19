@@ -172,7 +172,7 @@ export default async function ParentWorkspace({
             <div className="parent-recent">
               <h3>Dernières entrées au carnet</h3>
               {recent.length ? (
-                <ol className="booklet-timeline">
+                <ol className="booklet-timeline" role="list">
                   {recent.map((entry) => (
                     <li key={entry.id}>
                       <div>
