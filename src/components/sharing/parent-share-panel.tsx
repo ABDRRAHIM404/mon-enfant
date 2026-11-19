@@ -7,13 +7,16 @@ import {
   shareLabels,
   type ShareList,
   type ShareReceipt,
+  type ShareScope,
 } from "@/lib/sharing/types";
 export function ParentSharePanel({
   childId,
   list,
+  defaultScope = "vaccination_read",
 }: {
   childId: string;
   list: ShareList;
+  defaultScope?: ShareScope;
 }) {
   const router = useRouter();
   const [issued, setIssued] = useState<
@@ -23,6 +26,8 @@ export function ParentSharePanel({
     [error, setError] = useState(""),
     [seconds, setSeconds] = useState(0);
   const [pending, startTransition] = useTransition();
+  const [scope, setScope] = useState<ShareScope>(defaultScope);
+  const [consent, setConsent] = useState(false);
   useEffect(() => {
     if (!issued) return;
     const timer = setInterval(() => {
@@ -66,6 +71,7 @@ export function ParentSharePanel({
             ...result.share,
             offset: Date.parse(result.share.server_now) - Date.now(),
           });
+          setConsent(false);
         } else setError(result.error ?? "Partage indisponible.");
         router.refresh();
       } catch {
@@ -102,8 +108,8 @@ export function ParentSharePanel({
     >
       <h2 id="parent-share-heading">Partager le carnet</h2>
       <p className="muted">
-        Un code temporaire autorise un soignant vérifié à lire les informations
-        que vous choisissez, sans les modifier.
+        Lors d’une visite, montrez le QR au médecin. Vous choisissez s’il peut
+        ajouter les soins de la visite au dossier.
       </p>
       {error && (
         <p role="alert" className="form-error">
@@ -171,9 +177,16 @@ export function ParentSharePanel({
           <select
             id="share-scope"
             name="scope"
-            defaultValue="vaccination_read"
+            value={scope}
+            onChange={(event) => {
+              setScope(event.target.value as ShareScope);
+              setConsent(false);
+            }}
             disabled={!list.can_share || pending}
           >
+            <option value="care_visit">
+              Dossier complet et ajout des soins de la visite
+            </option>
             <option value="vaccination_read">
               Vaccinations et références — suivi vaccinal
             </option>
@@ -186,10 +199,13 @@ export function ParentSharePanel({
               type="checkbox"
               name="consent"
               required
+              checked={consent}
+              onChange={(event) => setConsent(event.target.checked)}
               disabled={!list.can_share || pending}
             />
-            J’autorise un soignant vérifié à lire ces informations pendant cinq
-            minutes maximum.
+            {scope === "care_visit"
+              ? "J’autorise ce médecin vérifié à consulter le dossier et à y ajouter les soins de cette visite pendant une heure maximum."
+              : "J’autorise un soignant vérifié à lire ces informations pendant cinq minutes maximum."}
           </label>
           <button
             className="button primary"
@@ -207,10 +223,9 @@ export function ParentSharePanel({
         </p>
       )}
       <p className="fine">
-        Code à usage unique. Le premier soignant vérifié qui le présente obtient
-        une lecture liée à sa session, jusqu’à l’échéance indiquée. Montrez-le
-        en privé. Un nouveau code remplace l’ancien code inutilisé. Vous pouvez
-        révoquer l’accès à tout moment.
+        Le QR peut être scanné une seule fois dans les cinq minutes. Les soins
+        ajoutés restent dans le dossier et sont visibles par les médecins qui y
+        ont déjà accès. Vous pouvez révoquer le partage à tout moment.
       </p>
       {list.items.length > 0 && (
         <details className="share-status">

@@ -12,15 +12,13 @@ export default function SharePage() {
             Ouvrir un carnet partagé
           </h1>
           <p>
-            Le responsable de l’enfant choisit les informations et le motif du
-            partage. Votre compte doit être vérifié. L’accès est en lecture
-            seule et expire à l’échéance du code, au plus tard cinq minutes
-            après sa création.
+            Scannez le QR présenté par le parent. Le code est à usage unique et
+            expire cinq minutes après sa création.
           </p>
           <p>
-            Si un médecin vous a invité à assurer le suivi, ouvrez son QR avec
-            votre compte médecin vérifié. Vous pourrez ajouter des soins selon
-            vos habilitations.
+            Si le parent vous autorise à documenter la visite, ouvrez le code
+            avec votre compte médecin vérifié. Vous pourrez consulter le dossier
+            et ajouter des soins selon vos habilitations.
           </p>
           <ShareEntry />
         </section>

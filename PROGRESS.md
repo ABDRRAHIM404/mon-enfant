@@ -1045,3 +1045,7 @@ Clinical permission managers can select any of the six permissions or select all
 ### 19 November 2026 — doctor-to-doctor care QR
 
 An approved doctor who manages a child's clinical access can issue a one-use QR for a named approved doctor. The code expires in five minutes. The recipient opens the existing record and can document care under their own clinical permissions for up to an hour. The issuer can cancel an unused invitation or revoke granted access from the record. Parent QR sharing still uses the existing read-only workflow. The Supabase migration `20261119150616_doctor_care_qr` is applied. Thirteen targeted scanner and database checks passed with fictional data, including the original child ID, recipient authorship, role and capability denials, cancellation, expiry, replay and revocation.
+
+### 19 November 2026 — parent QR for an in-person care visit
+
+A parent with verified sharing authority can show a one-use QR to their new verified doctor. The doctor's current session can open the existing child record and add care using their own clinical habilitations for up to one hour. The original doctor continues to see that record and its new entries. The parent can revoke the visit access without removing saved care. The superseded doctor-to-doctor QR form, scanner path and RPC access are retired. Supabase migration `20261119152628_parent_care_visit_qr` is applied. Thirty-two focused checks passed, including persistent same-record care, denied unverified and nurse redemption, session binding, revocation and existing read-only shares.

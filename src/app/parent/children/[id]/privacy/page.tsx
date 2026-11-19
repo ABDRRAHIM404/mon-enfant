@@ -151,7 +151,11 @@ export default async function Privacy({
           </Link>
         )}
       </nav>
-      <ParentSharePanel childId={id} list={shares.data as ShareList} />
+      <ParentSharePanel
+        childId={id}
+        list={shares.data as ShareList}
+        defaultScope="care_visit"
+      />
       <p>
         Pour signaler une activité qui vous surprend,{" "}
         <Link href={`/parent/children/${id}/requests`}>

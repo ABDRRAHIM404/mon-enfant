@@ -4,6 +4,8 @@ Implementation contract; source and hosted migration implemented and source-veri
 
 ## Parent consent and authority
 
+The website also offers **Dossier complet et ajout des soins de la visite**. An authorized guardian explicitly consents and shows a one-use QR in person. It must be opened within five minutes by a verified doctor. The doctor's current session can open the original clinical record for up to one hour under the existing practice and clinical capability checks. The doctor can document new care and correct their own entries. This visit access ends on revocation, expiration or loss of the issuing or receiving session. Saved entries remain in the original record. The remaining read-only contract applies to the vaccination and booklet shares.
+
 A confirmed active parent with a live Auth session may issue a share only for a currently verified, non-revoked, unexpired guardian link that explicitly permits export. This export permission was separately granted by the existing authorized guardian reviewer; a self-declared profile, relationship, email or child identifier is insufficient. A temporary share is a controlled read of information that this parent is already permitted to export. It never gives authority to administer, amend, prescribe, approve or manage access.
 
 The parent explicitly chooses the purpose and information scope before displaying a code. The vaccination screen defaults to vaccination history/references; a separate explicit selection may share the permitted booklet for a consultation. The UI describes exactly which data is included and how to revoke it. Both scopes preserve dates, uncertainty, authorship, amendments and source-review status; no unsupported vaccine coverage/catch-up is generated.

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { Camera, CameraOff } from "lucide-react";
-import { scanShareCode } from "@/lib/sharing/types";
+import { shareToken } from "@/lib/sharing/types";
 export function ShareScanner({
   onToken,
 }: {
@@ -42,7 +42,7 @@ export function ShareScanner({
       inversionAttempts: "attemptBoth",
     });
     if (!result) return false;
-    const token = scanShareCode(result.data, window.location.origin);
+    const token = shareToken(result.data, window.location.origin);
     if (!token) {
       setMessage("Ce QR n’est pas un partage temporaire de cette application.");
       return false;

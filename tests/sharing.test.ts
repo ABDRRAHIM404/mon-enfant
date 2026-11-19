@@ -1,5 +1,6 @@
 import { beforeAll, afterAll, describe, it, expect } from "vitest";
 import { randomUUID, randomBytes, createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
 import type { PGlite } from "@electric-sql/pglite";
 import { sharingDatabase, sessionActing } from "./helpers/database";
 import {
@@ -172,11 +173,128 @@ async function consume(a: Actor, r: Receipt) {
 const denied = { code: "42501" };
 beforeAll(async () => {
   db = await sharingDatabase();
+  await db.exec("create role service_role nologin");
+  for (const migration of [
+    "20261119150616_doctor_care_qr.sql",
+    "20261119152628_parent_care_visit_qr.sql",
+  ]) {
+    await db.exec(readFileSync(`supabase/migrations/${migration}`, "utf8"));
+  }
 });
 afterAll(async () => {
   await db?.close();
 });
 describe("temporary sharing on complete schema", () => {
+  it("lets a verified doctor add visit care to the existing record through the parent QR", async () => {
+    const f = await linked();
+    const visitor = await actor("doctor");
+    const nurse = await actor("nurse");
+    const unverified = await actor("doctor", "unverified");
+    const workplace = await rpc(visitor, "create_facility", [
+      randomUUID(),
+      "Centre fictif de la visite",
+      "Rabat",
+    ]);
+    const capability = async (a: Actor) =>
+      db.query(
+        "insert into public.professional_capabilities(professional_id,capability,enabled,granted_by) values($1,'consultation',true,$1)",
+        [a.id],
+      );
+    const addCare = (a: Actor, place: unknown, root?: string) =>
+      rpc<string>(a, "write_clinical_entry", [
+        randomUUID(),
+        f.child,
+        "consultation",
+        place,
+        "2026-01-02",
+        "exact",
+        "observed",
+        null,
+        false,
+        { reason: "Soin fictif de la visite" },
+        ...(root ? [root, 1, reason] : []),
+      ]);
+    await capability(f.doctor);
+    const original = await addCare(f.doctor, f.facility);
+    await expect(
+      rpc(visitor, "get_child_profile", [f.child]),
+    ).rejects.toMatchObject(denied);
+    await expect(
+      rpc(f.parent, "issue_clinician_share", [f.child, "care_visit", false]),
+    ).rejects.toMatchObject({ code: "22023" });
+    const receipt = await issue(f, "care_visit");
+    await expect(
+      rpc(nurse, "redeem_clinician_share", [receipt.token]),
+    ).resolves.toEqual({ accepted: false });
+    await expect(
+      rpc(unverified, "redeem_clinician_share", [receipt.token]),
+    ).rejects.toMatchObject(denied);
+    await expect(
+      rpc(visitor, "redeem_clinician_share", [receipt.token]),
+    ).resolves.toMatchObject({
+      accepted: true,
+      child_id: f.child,
+      scope: "care_visit",
+    });
+    await expect(
+      rpc(visitor, "redeem_clinician_share", [receipt.token]),
+    ).resolves.toEqual({ accepted: false });
+    await expect(
+      rpc(visitor, "get_child_profile", [f.child]),
+    ).resolves.toMatchObject({ id: f.child, can_manage_access: false });
+    await expect(
+      rpc(visitor, "has_standard_child_access", [f.child]),
+    ).resolves.toBe(false);
+    const otherSession = randomUUID();
+    await db.query("insert into auth.sessions(id,user_id) values($1,$2)", [
+      otherSession,
+      visitor.id,
+    ]);
+    await expect(
+      rpc({ ...visitor, session: otherSession }, "get_child_profile", [
+        f.child,
+      ]),
+    ).rejects.toMatchObject(denied);
+    await expect(addCare(visitor, workplace)).rejects.toMatchObject(denied);
+    await capability(visitor);
+    await expect(addCare(visitor, workplace, original)).rejects.toMatchObject(
+      denied,
+    );
+    const entry = await addCare(visitor, workplace);
+    const timeline = await rpc(f.doctor, "clinical_timeline", [
+      f.child,
+      1,
+      "all",
+    ]);
+    expect(timeline).toMatchObject({
+      items: expect.arrayContaining([
+        expect.objectContaining({ id: entry, author_id: visitor.id }),
+      ]),
+    });
+    const list = await rpc<{
+      items: { id: string; active: boolean; expires_at: string }[];
+    }>(f.parent, "list_clinician_shares", [f.child]);
+    expect(list.items[0]).toMatchObject({ id: receipt.id, active: true });
+    expect(Date.parse(list.items[0].expires_at)).toBeGreaterThan(
+      Date.parse(receipt.expires_at),
+    );
+    await rpc(f.parent, "revoke_clinician_share", [receipt.id]);
+    await expect(addCare(visitor, workplace)).rejects.toMatchObject(denied);
+    await expect(
+      rpc(visitor, "get_child_profile", [f.child]),
+    ).rejects.toMatchObject(denied);
+    expect(
+      await rpc(f.doctor, "clinical_timeline", [f.child, 1, "all"]),
+    ).toEqual(timeline);
+    await expect(
+      rpc(f.doctor, "issue_doctor_care_qr", [
+        f.child,
+        `QA-${visitor.id}`,
+        reason,
+        true,
+      ]),
+    ).rejects.toMatchObject(denied);
+  });
   it("keeps original parent projections and audits unchanged while isolating read-only scopes", async () => {
     const f = await linked(),
       reader = await actor("nurse");
