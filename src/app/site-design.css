@@ -8,12 +8,6 @@
 }
 
 :root {
-  --teal: #066c4d;
-  --secondary: #4d5a53;
-  --muted: #647067;
-  --radius-control: 8px;
-  --radius-card: 12px;
-  --radius-panel: 16px;
   --workspace-feedback-easing: cubic-bezier(0.22, 1, 0.36, 1);
 }
 body {
@@ -89,7 +83,7 @@ p {
   border-color: transparent;
 }
 .button.primary:hover:not(:disabled) {
-  background: #076347;
+  background: var(--jade-strong);
 }
 .button.secondary {
   background: var(--card);
@@ -219,13 +213,13 @@ label {
 
 /* Public pages: the family illustration is the single rich visual. */
 .public-site {
-  background: #faf9f5;
+  background: var(--paper);
 }
 .public-header {
   height: 80px;
   padding: 16px 40px;
   gap: 32px;
-  background: #faf9f5;
+  background: var(--paper);
 }
 .brand,
 .admin-topbar .brand {
@@ -418,7 +412,7 @@ label {
 }
 .auth-story {
   padding: 48px;
-  background: #f0f2ed;
+  background: var(--pale);
   border-inline-end: 1px solid var(--line);
 }
 .auth-story .story-copy {

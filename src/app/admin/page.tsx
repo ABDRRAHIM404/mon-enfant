@@ -35,21 +35,18 @@ export default async function Admin() {
       value: pending.count ?? 0,
       icon: ClipboardCheck,
       href: "/admin/verifications?status=under_review",
-      tone: "mint",
     },
     {
       label: "Compléments demandés",
       value: additional.count ?? 0,
       icon: CircleHelp,
       href: "/admin/verifications?status=needs_more_evidence",
-      tone: "amber",
     },
     {
       label: "Comptes professionnels",
       value: professionals.count ?? 0,
       icon: UsersRound,
       href: "/admin/professionals",
-      tone: "coral",
     },
   ];
   const tasks = [
@@ -89,41 +86,45 @@ export default async function Admin() {
         title="Vue d’ensemble"
         description="Les demandes et les outils de votre espace d’administration."
       />
-      <div className="admin-metrics">
-        {metrics.map(({ label, value, icon: Icon, href, tone }) => (
-          <Link href={href} className="admin-metric panel" key={label}>
-            <span className="admin-metric-icon" data-tone={tone}>
-              <Icon size={23} aria-hidden="true" />
-            </span>
-            <div>
-              <strong>{value}</strong>
-              <span>{label}</span>
-            </div>
-            <ArrowUpRight size={17} aria-hidden="true" />
-          </Link>
-        ))}
-      </div>
-      <div className="admin-section-title">
-        <div>
-          <h2>À votre disposition</h2>
-          <p className="muted">Retrouvez chaque outil dans sa rubrique.</p>
-        </div>
-      </div>
-      <div className="admin-task-grid">
-        {tasks.map(({ title, description, href, icon: Icon }) => (
-          <Link className="panel admin-task" href={href} key={href}>
-            <span className="admin-task-icon">
-              <Icon size={24} aria-hidden="true" />
-            </span>
-            <div>
-              <h3>{title}</h3>
-              <p>{description}</p>
-              <span className="text-link">
-                Ouvrir la rubrique <ArrowUpRight size={15} aria-hidden="true" />
-              </span>
-            </div>
-          </Link>
-        ))}
+      <div className="operations-grid">
+        <section
+          className="panel operations-panel"
+          aria-labelledby="operations-queue"
+        >
+          <h2 id="operations-queue">File de revue</h2>
+          <ul>
+            {metrics.map(({ label, value, icon: Icon, href }) => (
+              <li key={href}>
+                <Link href={href} className="operations-row">
+                  <Icon size={19} aria-hidden="true" />
+                  <span>{label}</span>
+                  <strong className="operations-count">{value}</strong>
+                  <ArrowUpRight size={17} aria-hidden="true" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+        <section
+          className="panel operations-panel"
+          aria-labelledby="operations-tools"
+        >
+          <h2 id="operations-tools">Gestion et configuration</h2>
+          <ul>
+            {tasks.map(({ title, description, href, icon: Icon }) => (
+              <li key={href}>
+                <Link href={href} className="operations-row">
+                  <Icon size={19} aria-hidden="true" />
+                  <span>
+                    <strong>{title}</strong>
+                    <small>{description}</small>
+                  </span>
+                  <ArrowUpRight size={17} aria-hidden="true" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
       </div>
       <aside className="admin-context-note">
         <ShieldCheck size={22} aria-hidden="true" />

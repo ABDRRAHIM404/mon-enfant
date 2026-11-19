@@ -108,18 +108,23 @@ export default async function ChildBooklet({
           soins restent attribués à leurs professionnels et sources.
         </p>
         {entries.length ? (
-          entries.map((entry) => (
-            <div key={entry.id}>
-              <EntryCard entry={entry} link={false} />
-              <p className="no-print">
-                <Link
-                  href={`/parent/children/${id}/requests?entry=${entry.id}`}
-                >
-                  Demander une correction pour ce soin
-                </Link>
-              </p>
-            </div>
-          ))
+          <ol
+            className="booklet-timeline booklet-clinical-timeline"
+            role="list"
+          >
+            {entries.map((entry) => (
+              <li key={entry.id}>
+                <EntryCard entry={entry} link={false} />
+                <p className="no-print">
+                  <Link
+                    href={`/parent/children/${id}/requests?entry=${entry.id}`}
+                  >
+                    Demander une correction pour ce soin
+                  </Link>
+                </p>
+              </li>
+            ))}
+          </ol>
         ) : (
           <p>Aucun soin documenté sur cette page.</p>
         )}

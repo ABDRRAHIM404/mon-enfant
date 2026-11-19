@@ -13,11 +13,13 @@ import {
   ClipboardList,
   Building2,
   UserRound,
+  LogOut,
 } from "lucide-react";
 import {
   NavigationFeedback,
   WorkspaceMobileMenu,
 } from "./workspace-navigation";
+import { SidebarToggle } from "./sidebar-toggle";
 import { Brand } from "./brand";
 import { signOut } from "@/app/auth/actions";
 
@@ -185,10 +187,11 @@ export function WorkspaceShell({
       <Link
         key={item.key}
         href={item.href}
+        title={item.label}
         aria-current={active === item.key ? "page" : undefined}
       >
         <Icon size={17} aria-hidden="true" />
-        {item.label}
+        <span className="rail-label">{item.label}</span>
         <NavigationFeedback />
       </Link>
     );
@@ -197,6 +200,7 @@ export function WorkspaceShell({
     <div className="workspace-site">
       <header className="workspace-topbar">
         <Brand />
+        <SidebarToggle controls="workspace-navigation-rail" />
         <nav className="workspace-discovery" aria-label="Découvrir Mon Enfant">
           <Link href="/">Accueil</Link>
           <Link href="/#fonctionnalites">Fonctionnalités</Link>
@@ -261,24 +265,32 @@ export function WorkspaceShell({
             </Link>
           )}
           <form action={signOut}>
-            <button className="text-link workspace-signout">
-              Se déconnecter
+            <button
+              className="text-link workspace-signout"
+              title="Se déconnecter"
+            >
+              <LogOut size={17} aria-hidden="true" />
+              <span className="rail-label">Se déconnecter</span>
             </button>
           </form>
         </nav>
       </WorkspaceMobileMenu>
-      <aside className="workspace-sidebar">
+      <aside id="workspace-navigation-rail" className="workspace-sidebar">
         <nav aria-label={parent ? "Navigation parent" : "Espace soignant"}>
           {items.map(navigationItem)}
           {!parent && !provisional && (
-            <Link href="/share">
+            <Link href="/share" title="Lire un partage parent">
               <ShieldCheck size={17} aria-hidden="true" />
-              Lire un partage parent
+              <span className="rail-label">Lire un partage parent</span>
             </Link>
           )}
           <form action={signOut}>
-            <button className="text-link workspace-signout">
-              Se déconnecter
+            <button
+              className="text-link workspace-signout"
+              title="Se déconnecter"
+            >
+              <LogOut size={17} aria-hidden="true" />
+              <span className="rail-label">Se déconnecter</span>
             </button>
           </form>
         </nav>

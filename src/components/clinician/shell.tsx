@@ -18,7 +18,9 @@ import {
   MessageSquare,
   QrCode,
   KeyRound,
+  Wrench,
 } from "lucide-react";
+import { SidebarToggle } from "@/components/sidebar-toggle";
 import { Brand } from "@/components/brand";
 import {
   WorkspaceMobileMenu,
@@ -118,10 +120,11 @@ export async function ClinicianShell({
       <Link
         key={key}
         href={href}
+        title={label}
         aria-current={active === key ? "page" : undefined}
       >
         <Icon size={21} aria-hidden="true" />
-        <span>
+        <span className="rail-label">
           {label}
           {key === "documents" && <small>Bientôt disponible</small>}
         </span>
@@ -175,16 +178,20 @@ export async function ClinicianShell({
   const toolsMenu = () =>
     !provisional && (
       <details className="soignant-tools" open={Boolean(tool)}>
-        <summary>Outils et accès</summary>
+        <summary title="Outils et accès">
+          <Wrench size={18} aria-hidden="true" />
+          <span className="rail-label">Outils et accès</span>
+        </summary>
         <nav aria-label="Outils du suivi clinique">
           {tools.map(({ key, label, href, icon: Icon }) => (
             <Link
               key={key}
               href={href}
+              title={label}
               aria-current={tool === key ? "page" : undefined}
             >
               <Icon size={18} aria-hidden="true" />
-              <span>{label}</span>
+              <span className="rail-label">{label}</span>
               <NavigationFeedback />
             </Link>
           ))}
@@ -193,15 +200,18 @@ export async function ClinicianShell({
     );
   const logout = () => (
     <form action={signOut}>
-      <button className="soignant-logout">
+      <button
+        className="soignant-logout"
+        title="Se déconnecter de l’espace soignant"
+      >
         <LogOut size={18} aria-hidden="true" />
-        Se déconnecter de l’espace soignant
+        <span className="rail-label">Se déconnecter de l’espace soignant</span>
       </button>
     </form>
   );
   return (
     <div className="soignant-workspace">
-      <aside className="soignant-sidebar">
+      <aside id="clinician-navigation-rail" className="soignant-sidebar">
         <Brand />
         <nav aria-label="Espace soignant">{links()}</nav>
         {toolsMenu()}
@@ -216,6 +226,7 @@ export async function ClinicianShell({
         </div>
       </aside>
       <header className="soignant-header">
+        <SidebarToggle controls="clinician-navigation-rail" />
         <div className="soignant-mobile-brand">
           <Brand />
         </div>
@@ -234,11 +245,7 @@ export async function ClinicianShell({
             type="search"
             name="q"
             maxLength={100}
-            placeholder={
-              provisional
-                ? "Rechercher dans mes dossiers privés…"
-                : "Rechercher dans mes dossiers autorisés…"
-            }
+            placeholder={provisional ? "Dossier privé…" : "Nom, registre…"}
           />
           <button type="submit">Rechercher</button>
         </form>

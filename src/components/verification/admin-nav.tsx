@@ -13,6 +13,7 @@ import {
   ShieldCheck,
   LogOut,
 } from "lucide-react";
+import { SidebarToggle } from "@/components/sidebar-toggle";
 import { Brand } from "@/components/brand";
 import {
   NavigationFeedback,
@@ -63,17 +64,18 @@ export function AdminNav({ active = "home" }: { active?: AdminSection }) {
         <Link
           key={key}
           href={href}
+          title={label}
           aria-current={active === key ? "page" : undefined}
         >
           <Icon size={19} aria-hidden="true" />
-          <span>{label}</span>
+          <span className="rail-label">{label}</span>
           <NavigationFeedback />
         </Link>
       ))}
       <form action={signOut} className="admin-signout">
-        <button>
+        <button title="Se déconnecter">
           <LogOut size={18} aria-hidden="true" />
-          Se déconnecter
+          <span className="rail-label">Se déconnecter</span>
         </button>
       </form>
     </nav>
@@ -91,6 +93,7 @@ export function AdminShell({
     <div className="admin-workspace">
       <header className="admin-topbar">
         <Brand />
+        <SidebarToggle controls="admin-navigation-rail" />
         <div className="admin-topbar-context">
           <ShieldCheck size={17} aria-hidden="true" />
           <span>Console d’administration</span>
@@ -101,7 +104,7 @@ export function AdminShell({
           <span>Mon compte</span>
         </Link>
       </header>
-      <aside className="admin-sidebar">
+      <aside id="admin-navigation-rail" className="admin-sidebar">
         <AdminNav active={active} />
         <div className="admin-sidebar-note">
           <ShieldCheck size={20} aria-hidden="true" />

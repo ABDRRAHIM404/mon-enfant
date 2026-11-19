@@ -1,6 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
-import { documentsIllustration } from "@/components/dashboard/art";
+import { FileText } from "lucide-react";
 import { redirect } from "next/navigation";
 import { getProfessional, requireApprovedDoctor } from "@/lib/auth";
 import { ClinicianShell, ClinicianHeading } from "./shell";
@@ -29,16 +28,9 @@ export async function ClinicianDocuments({
         description="Gestion des documents de votre espace soignant."
       />
       <section className="panel soignant-coming-soon">
-        <Image
-          className="dashboard-document-art"
-          src={documentsIllustration}
-          placeholder={documentsIllustration.blurDataURL ? "blur" : "empty"}
-          priority
-          width={360}
-          height={260}
-          alt=""
-          sizes="(max-width: 700px) 220px, 320px"
-        />
+        <span className="document-status-icon">
+          <FileText size={24} aria-hidden="true" />
+        </span>
         <h2>Bientôt disponible</h2>
         <p>
           La gestion centralisée des documents n’est pas encore disponible.

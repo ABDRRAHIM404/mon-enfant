@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ParentSection } from "@/components/parents/section";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import {
   UsersRound,
   Plus,
@@ -10,17 +10,19 @@ import {
   CalendarDays,
   FileText,
   Bell,
-  ClipboardList,
+  ShieldCheck,
 } from "lucide-react";
 import { patientName, birthLabel } from "@/lib/registry/types";
-import type { ParentWorkspaceData } from "@/lib/parents/types";
+import type { ParentBooklet, ParentWorkspaceData } from "@/lib/parents/types";
 import type { AppointmentRow } from "@/lib/appointments/types";
+import { clinicalLabels } from "@/lib/clinical/types";
 import { appointmentTime } from "@/lib/appointments/calendar";
 import { WorkspaceShell } from "@/components/workspace-shell";
 import {
   ParentProfileForm,
   ParentProfileDisclosure,
 } from "@/components/parents/profile-form";
+import { NavigationFeedback } from "@/components/workspace-navigation";
 import { requireUser } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
@@ -36,26 +38,27 @@ const quickLinks = [
   {
     view: "vaccinations",
     title: "Vaccinations",
-    description: "Références et doses documentées",
     Icon: Syringe,
   },
   {
     view: "growth",
     title: "Croissance",
-    description: "Poids et taille",
     Icon: ChartNoAxesCombined,
   },
   {
     view: "appointments",
     title: "Rendez-vous",
-    description: "Suivi des consultations",
     Icon: CalendarDays,
   },
   {
     view: "documents",
     title: "Documents",
-    description: "Bientôt disponible",
     Icon: FileText,
+  },
+  {
+    view: "access",
+    title: "Partage & accès",
+    Icon: ShieldCheck,
   },
 ];
 export default async function ParentWorkspace({
@@ -91,200 +94,173 @@ export default async function ParentWorkspace({
       </WorkspaceShell>
     );
   }
+  const selected = query.child
+    ? children.find((child) => child.id === query.child)
+    : children[0];
+  if (query.child && !selected) notFound();
+
+  let recent: ParentBooklet["entries"] = [];
+  if (selected) {
+    const booklet = await supabase.rpc("parent_child_booklet", {
+      p_child_id: selected.id,
+      p_page: 1,
+    });
+    if (booklet.error?.code === "42501" || (!booklet.data && !booklet.error))
+      notFound();
+    if (booklet.error)
+      throw new Error("Impossible de charger l’activité du carnet.");
+    recent = (booklet.data as ParentBooklet).entries.slice(0, 4);
+  }
+  const nextChild =
+    next && children.find((child) => child.id === next.child_id);
+
   return (
     <WorkspaceShell area="parent" active="home" unread={unread}>
       <section className="workspace-heading parent-welcome">
         <div>
           <span className="eyebrow">Espace parent</span>
           <h1 id="main-content" tabIndex={-1}>
-            Le suivi de mes enfants
+            Mes carnets de santé
           </h1>
           <p className="muted">
-            Retrouvez l’essentiel du suivi de vos enfants.
+            L’activité de vos carnets et les prochains rendez-vous.
           </p>
         </div>
+        <Link className="button secondary" href="/parent/invitation">
+          <Plus size={17} aria-hidden="true" /> Relier un carnet
+        </Link>
       </section>
-      <div className="parent-summary-grid">
-        <Link
-          href="/parent?view=children"
-          className="workspace-surface parent-summary-card"
-        >
-          <UsersRound size={28} aria-hidden="true" />
-          <div>
-            <strong>{children.length}</strong>
-            <span>
-              Carnet{children.length > 1 ? "s" : ""} relié
-              {children.length > 1 ? "s" : ""}
-            </span>
-          </div>
-        </Link>
-        <Link
-          href="/parent/notifications"
-          className="workspace-surface parent-summary-card"
-        >
-          <Bell size={28} aria-hidden="true" />
-          <div>
-            <strong>{unread}</strong>
-            <span>
-              Mise{unread > 1 ? "s" : ""} à jour non lue{unread > 1 ? "s" : ""}
-            </span>
-          </div>
-        </Link>
-        <Link
-          href="/parent?view=appointments"
-          className="workspace-surface parent-summary-card"
-        >
-          <CalendarDays size={28} aria-hidden="true" />
-          <div>
-            <strong className="parent-summary-date">
-              {next ? appointmentTime(next.starts_at) : "Aucun à venir"}
-            </strong>
-            <span>Prochain rendez-vous enregistré</span>
-          </div>
-        </Link>
-        <Link
-          href="/parent/invitation"
-          className="workspace-surface parent-summary-card"
-        >
-          <ClipboardList size={28} aria-hidden="true" />
-          <div>
-            <strong>
-              {claims.filter((claim) => claim.state === "pending").length}
-            </strong>
-            <span>Demandes en cours</span>
-          </div>
-        </Link>
-      </div>
-      <div className="parent-home-layout">
-        <section className="workspace-section" id="children">
-          <div className="workspace-section-heading">
-            <h2>Mes enfants</h2>
-            <Link href="/parent?view=children">Gérer mes enfants →</Link>
-          </div>
-          <div className="workspace-child-grid">
-            {children.map((child) => (
-              <article className="workspace-child-card" key={child.id}>
-                <UsersRound
-                  className="workspace-avatar"
-                  size={54}
-                  aria-hidden="true"
-                />
-                <div>
-                  <h3>
-                    <Link href={`/parent/children/${child.id}`}>
-                      {patientName(child)}
-                    </Link>
-                  </h3>
-                  <p className="muted">{birthLabel(child)}</p>
-                  <span className="workspace-chip">Accès vérifié</span>
-                  <p className="sr-only">
-                    {child.universal_id} · Accès jusqu’au{" "}
-                    {new Date(child.expires_at).toLocaleDateString("fr-MA", {
-                      timeZone: "Africa/Casablanca",
-                    })}
-                  </p>
-                </div>
-                <ChevronRight size={17} aria-hidden="true" />
-              </article>
-            ))}
-            <article className="workspace-child-card workspace-add-child">
+
+      {selected ? (
+        <div className="parent-living-layout">
+          <section
+            className="parent-current-booklet workspace-surface"
+            aria-labelledby="selected-child-heading"
+          >
+            {children.length > 1 && (
+              <form className="parent-booklet-picker" action="/parent">
+                <label>
+                  Carnet à afficher
+                  <select name="child" defaultValue={selected.id}>
+                    {children.map((child) => (
+                      <option key={child.id} value={child.id}>
+                        {patientName(child)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button type="submit" className="button secondary">
+                  Afficher
+                </button>
+              </form>
+            )}
+            <div className="parent-booklet-heading">
+              <span className="parent-booklet-avatar" aria-hidden="true">
+                {patientName(selected).slice(0, 1)}
+              </span>
               <div>
-                <Plus
-                  className="workspace-avatar"
-                  size={44}
-                  aria-hidden="true"
-                />
-                <h3>
-                  <Link href="/parent/invitation">Ajouter un enfant</Link>
-                </h3>
-                <p className="muted">À partir d’une invitation sécurisée.</p>
+                <h2 id="selected-child-heading">{patientName(selected)}</h2>
+                <p>{birthLabel(selected)}</p>
               </div>
-            </article>
-          </div>
-          {!children.length && (
-            <p className="workspace-empty">
-              Aucun carnet relié pour le moment. Une demande en attente ne donne
-              pas encore accès aux informations de l’enfant.
-            </p>
-          )}
-        </section>
-        <section className="workspace-surface dashboard-guide">
-          <h2>Que pouvez-vous faire ici ?</h2>
-          <div>
-            {quickLinks.map(({ view, title, description, Icon }) => (
-              <Link key={view} href={`/parent?view=${view}`}>
-                <span className={`dashboard-guide-icon guide-${view}`}>
-                  <Icon size={24} aria-hidden="true" />
-                </span>
-                <span>
-                  <strong>{title}</strong>
-                  <small>{description}</small>
-                </span>
-                <ChevronRight size={18} aria-hidden="true" />
+              <Link
+                className="button primary"
+                href={`/parent/children/${selected.id}`}
+              >
+                Ouvrir le carnet <ChevronRight size={17} aria-hidden="true" />
               </Link>
-            ))}
-          </div>
-        </section>
-      </div>
-      {!focusedSection && (
-        <>
-          <div className="workspace-overview-grid">
-            <section className="workspace-surface workspace-next-appointment">
-              <span className="eyebrow">PROCHAIN RENDEZ-VOUS</span>
-              {next ? (
+            </div>
+            <div className="parent-recent">
+              <h3>Dernières entrées au carnet</h3>
+              {recent.length ? (
+                <ol className="booklet-timeline" role="list">
+                  {recent.map((entry) => (
+                    <li key={entry.id}>
+                      <div>
+                        <strong>{clinicalLabels[entry.kind]}</strong>
+                        {entry.facility_name && <p>{entry.facility_name}</p>}
+                      </div>
+                      <span className="fine">
+                        {entry.occurred_on || "Date inconnue"}
+                        {entry.occurrence_precision === "estimated"
+                          ? " (estimée)"
+                          : ""}
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <p className="empty-state">
+                  Aucune entrée de soins documentée dans ce carnet.
+                </p>
+              )}
+            </div>
+            <nav
+              className="parent-booklet-links"
+              aria-label="Rubriques du carnet affiché"
+            >
+              {quickLinks.map(({ view, title, Icon }) => (
+                <Link
+                  key={view}
+                  href={`/parent?view=${view}&child=${selected.id}`}
+                >
+                  <Icon size={17} aria-hidden="true" /> {title}
+                  <NavigationFeedback />
+                </Link>
+              ))}
+            </nav>
+          </section>
+          <aside
+            className="parent-family-overview"
+            aria-label="Suivi de la famille"
+          >
+            <section className="workspace-surface">
+              <CalendarDays size={21} aria-hidden="true" />
+              <h2>Prochain rendez-vous de la famille</h2>
+              {next && nextChild ? (
                 <>
-                  <h3>{next.purpose_label}</h3>
+                  <p>
+                    <strong>{next.purpose_label}</strong>
+                  </p>
                   <p className="muted">
-                    {[next.child_given_name, next.child_family_name]
-                      .filter(Boolean)
-                      .join(" ") || "Enfant au nom inconnu"}{" "}
-                    · {appointmentTime(next.starts_at)}
+                    {patientName(nextChild)} · {appointmentTime(next.starts_at)}
                   </p>
                   <Link
-                    className="workspace-chip"
+                    className="text-link"
                     href={`/parent/children/${next.child_id}/appointments`}
                   >
-                    <CalendarDays size={14} aria-hidden="true" />
-                    Voir le détail →
+                    Consulter le calendrier
                   </Link>
                 </>
               ) : (
-                <>
-                  <h3>Aucun rendez-vous à venir enregistré</h3>
-                  <p className="muted">
-                    Consultez le carnet de l’enfant ou contactez son soignant
-                    pour confirmer le prochain suivi.
-                  </p>
-                </>
+                <p className="muted">Aucun rendez-vous à venir enregistré.</p>
               )}
             </section>
-            <section
-              className={
-                unread
-                  ? "workspace-surface workspace-attention"
-                  : "workspace-surface"
-              }
-            >
-              <span className="eyebrow">
-                {unread ? "NOUVELLES DU CARNET" : "VOTRE SUIVI"}
-              </span>
-              <h3>
-                {unread
-                  ? `${unread} mise${unread > 1 ? "s" : ""} à jour non lue${unread > 1 ? "s" : ""}`
-                  : "Vos informations restent à jour dans le carnet"}
-              </h3>
+            <section className="workspace-surface">
+              <Bell size={21} aria-hidden="true" />
+              <h2>Notifications</h2>
               <p className="muted">
-                Les notifications concernent les dossiers qui vous sont
-                autorisés. Aucune vaccination n’est déduite d’une information
-                absente.
+                {unread
+                  ? `${unread} mise${unread > 1 ? "s" : ""} à jour non lue${unread > 1 ? "s" : ""}.`
+                  : "Aucune mise à jour non lue."}
               </p>
               <Link className="text-link" href="/parent/notifications">
-                <Bell size={15} aria-hidden="true" />
-                Consulter les notifications →
+                Consulter les notifications
               </Link>
             </section>
-          </div>
-        </>
+          </aside>
+        </div>
+      ) : (
+        <section className="workspace-surface parent-empty-state">
+          <UsersRound size={38} aria-hidden="true" />
+          <h2>Aucun carnet relié</h2>
+          <p>
+            Utilisez l’invitation remise par un soignant. Le carnet devient
+            accessible après vérification de votre demande.
+          </p>
+          <Link className="button primary" href="/parent/invitation">
+            Utiliser mon invitation
+          </Link>
+        </section>
       )}
       {claims.length > 0 && (
         <section className="workspace-surface workspace-secondary">

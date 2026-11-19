@@ -1,9 +1,7 @@
 import Link from "next/link";
-import Image from "next/image";
-import { documentsIllustration } from "@/components/dashboard/art";
 import { DashboardHeading } from "@/components/dashboard/heading";
 import { notFound } from "next/navigation";
-import { Plus, ShieldCheck, UsersRound } from "lucide-react";
+import { FileText, Plus, ShieldCheck, UsersRound } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { patientName, birthLabel } from "@/lib/registry/types";
 import type { ParentWorkspaceData, ParentBooklet } from "@/lib/parents/types";
@@ -65,16 +63,9 @@ export async function ParentSection({
       <>
         {heading}
         <section className="workspace-surface parent-coming-soon">
-          <Image
-            className="dashboard-document-art"
-            src={documentsIllustration}
-            placeholder={documentsIllustration.blurDataURL ? "blur" : "empty"}
-            priority
-            width={360}
-            height={260}
-            alt=""
-            sizes="(max-width: 700px) 220px, 320px"
-          />
+          <span className="document-status-icon">
+            <FileText size={24} aria-hidden="true" />
+          </span>
           <span className="workspace-chip">Bientôt disponible</span>
           <h2>Vos documents, au même endroit</h2>
           <p>

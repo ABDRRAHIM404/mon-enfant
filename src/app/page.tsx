@@ -2,18 +2,19 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  ArrowDown,
   ArrowRight,
   ArrowUpRight,
   BookOpen,
   CalendarDays,
   ChartNoAxesCombined,
-  ClipboardList,
   Link2,
   Mail,
+  LockKeyhole,
   MapPin,
   MessageCircle,
+  QrCode,
   ShieldCheck,
+  Stethoscope,
   Syringe,
   UserRoundPlus,
 } from "lucide-react";
@@ -47,29 +48,73 @@ const steps = [
   },
 ];
 
-const services = [
+const sampleEntries = [
   {
     Icon: Syringe,
-    title: "Vaccinations",
-    description: "Doses documentées et repères du calendrier vaccinal",
+    title: "Vaccination",
+    detail: "Dose documentée par le soignant",
+    date: "12 nov.",
+    tone: "jade",
   },
   {
     Icon: ChartNoAxesCombined,
-    title: "Croissance",
-    description:
-      "Évolution du poids, de la taille et autres mesures enregistrées",
-  },
-  {
-    Icon: ClipboardList,
-    title: "Consultations",
-    description: "Historique des visites et informations de suivi partagées",
+    title: "Mesures de croissance",
+    detail: "8,4 kg · 71 cm",
+    date: "12 nov.",
+    tone: "seafoam",
   },
   {
     Icon: CalendarDays,
-    title: "Rendez-vous",
-    description: "Dates et informations des rendez-vous enregistrés",
+    title: "Consultation de suivi",
+    detail: "Rendez-vous enregistré",
+    date: "10 déc.",
+    tone: "apricot",
   },
 ];
+
+function BookletPreview() {
+  return (
+    <figure className="homepage-hero-visual">
+      <div className="preview-mat">
+        <div className="preview-book">
+          <div className="preview-book-header">
+            <span>
+              <BookOpen aria-hidden="true" /> Mon Enfant
+            </span>
+            <span className="preview-sample">Données fictives</span>
+          </div>
+          <div className="preview-child">
+            <span className="preview-avatar" aria-hidden="true">
+              N
+            </span>
+            <div>
+              <h2>Carnet de Nour</h2>
+              <p>Vaccinations · Croissance · Rendez-vous</p>
+            </div>
+          </div>
+          <ul
+            className="preview-entries"
+            aria-label="Exemples d’entrées du carnet"
+          >
+            {sampleEntries.map(({ Icon, title, detail, date, tone }) => (
+              <li key={title}>
+                <span className="preview-entry-icon" data-tone={tone}>
+                  <Icon aria-hidden="true" />
+                </span>
+                <div>
+                  <strong>{title}</strong>
+                  <p>{detail}</p>
+                </div>
+                <span className="preview-date">{date}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <figcaption>Aperçu du carnet numérique</figcaption>
+    </figure>
+  );
+}
 
 const founders = [
   {
@@ -102,37 +147,24 @@ export default function Home() {
           <div className="homepage-hero-copy">
             <p className="homepage-kicker">Carnet de santé numérique · Maroc</p>
             <h1 id="main-content" tabIndex={-1}>
-              Un carnet de santé qui <em>grandit avec votre enfant</em>
+              Toute son histoire de santé. <em>Au même endroit.</em>
             </h1>
             <p className="homepage-intro">
               Retrouvez ses vaccinations, ses mesures de croissance et ses
-              rendez-vous au même endroit, du premier suivi aux prochaines
-              visites.
+              rendez-vous, du premier suivi aux prochaines visites.
             </p>
             <div className="homepage-actions">
               <Link href="/login" className="button primary">
                 Espace parent <ArrowRight aria-hidden="true" />
               </Link>
-              <a href="#fonctionnalites" className="homepage-jump">
-                Voir comment ça marche <ArrowDown aria-hidden="true" />
-              </a>
             </div>
             <p className="homepage-care-link">
               <Link href="/login?audience=clinician">
-                Accéder à l’espace soignant <ArrowUpRight aria-hidden="true" />
+                Médecins et infirmier(e)s <ArrowUpRight aria-hidden="true" />
               </Link>
             </p>
           </div>
-          <figure className="homepage-hero-visual">
-            <Image
-              src="/brand/family.png"
-              alt="Une mère serre son enfant dans ses bras"
-              width={560}
-              height={476}
-              sizes="(max-width: 800px) 92vw, 45vw"
-              priority
-            />
-          </figure>
+          <BookletPreview />
         </section>
 
         <section
@@ -141,7 +173,7 @@ export default function Home() {
           aria-labelledby="journey-title"
         >
           <div className="homepage-shell">
-            <header className="homepage-section-heading homepage-reveal">
+            <header className="homepage-section-heading">
               <p className="homepage-kicker">Le parcours parent</p>
               <h2 id="journey-title">Du compte au carnet, en trois étapes</h2>
               <p>
@@ -151,7 +183,7 @@ export default function Home() {
             </header>
             <ol className="homepage-steps" role="list">
               {steps.map(({ Icon, title, description }, index) => (
-                <li className="homepage-step homepage-reveal" key={title}>
+                <li className="homepage-step" key={title}>
                   <div className="homepage-step-marker" aria-hidden="true">
                     <Icon />
                     <span>0{index + 1}</span>
@@ -161,30 +193,84 @@ export default function Home() {
                 </li>
               ))}
             </ol>
-            <div className="homepage-ledger homepage-reveal">
-              <h3>Dans le carnet</h3>
-              <ul role="list">
-                {services.map(({ Icon, title, description }) => (
-                  <li key={title}>
-                    <Icon aria-hidden="true" />
-                    <div>
-                      <h4>{title}</h4>
-                      <p>{description}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <aside className="homepage-access" id="securite">
-              <ShieldCheck aria-hidden="true" />
+          </div>
+        </section>
+
+        <section
+          className="homepage-shell homepage-section homepage-benefits"
+          aria-labelledby="benefits-title"
+        >
+          <header className="homepage-section-heading">
+            <h2 id="benefits-title">Un carnet qui relie les visites</h2>
+          </header>
+          <div className="homepage-audiences">
+            <article>
+              <BookOpen aria-hidden="true" />
+              <h3>Pour les parents</h3>
               <p>
-                <strong>Des accès vérifiés.</strong> La création d’un compte
-                parent ne crée pas de dossier médical.
+                Préparez la prochaine visite avec les rendez-vous, les mesures
+                de croissance et les vaccinations déjà documentées.
               </p>
               <Link href="/signup" className="homepage-inline-link">
                 Créer un compte parent <ArrowRight aria-hidden="true" />
               </Link>
-            </aside>
+            </article>
+            <article>
+              <Stethoscope aria-hidden="true" />
+              <h3>Pour les soignants</h3>
+              <p>
+                Retrouvez les dossiers auxquels vous avez accès, documentez vos
+                consultations et confrontez les repères vaccinaux calculés à vos
+                registres.
+              </p>
+              <Link
+                href="/login?audience=clinician"
+                className="homepage-inline-link"
+              >
+                Accéder à l’espace soignant <ArrowRight aria-hidden="true" />
+              </Link>
+            </article>
+          </div>
+        </section>
+
+        <section
+          className="homepage-section homepage-privacy"
+          id="securite"
+          aria-labelledby="privacy-title"
+        >
+          <div className="homepage-shell homepage-privacy-layout">
+            <header className="homepage-section-heading">
+              <p className="homepage-kicker">Confidentialité</p>
+              <h2 id="privacy-title">Vous décidez quand partager le carnet</h2>
+              <p>
+                Un parent autorisé peut ouvrir un partage temporaire pour un
+                professionnel habilité et le révoquer depuis son espace.
+              </p>
+            </header>
+            <ul>
+              <li>
+                <LockKeyhole aria-hidden="true" />
+                <span>
+                  <strong>Accès lié à une invitation</strong>Le soignant vérifie
+                  votre qualité de responsable avant d’ouvrir le carnet.
+                </span>
+              </li>
+              <li>
+                <QrCode aria-hidden="true" />
+                <span>
+                  <strong>QR temporaire</strong>Le QR ouvre la procédure de
+                  partage. Le professionnel doit s’identifier pour accéder aux
+                  informations autorisées.
+                </span>
+              </li>
+              <li>
+                <ShieldCheck aria-hidden="true" />
+                <span>
+                  <strong>Accès consultables</strong>Retrouvez vos partages
+                  actifs dans « Partage & accès ».
+                </span>
+              </li>
+            </ul>
           </div>
         </section>
 
@@ -194,22 +280,19 @@ export default function Home() {
           aria-labelledby="founders-title"
         >
           <div className="homepage-founder-copy">
-            <header className="homepage-section-heading homepage-reveal">
+            <header className="homepage-section-heading">
               <p className="homepage-kicker">Les fondateurs</p>
               <h2 id="founders-title">Deux métiers, des racines à Belfaa</h2>
               <p>
                 Originaires de Belfaa, dans la province de Chtouka-Aït Baha,
                 nous réunissons le développement et le soin autour d’une même
-                idée : aider les familles à retrouver les informations utiles au
-                suivi de leur enfant.
+                idée. Nous aidons les familles à retrouver les informations
+                utiles au suivi de leur enfant.
               </p>
             </header>
             <div className="homepage-founder-bios">
               {founders.map(({ name, role, bio }) => (
-                <article
-                  className="homepage-founder homepage-reveal"
-                  key={name}
-                >
+                <article className="homepage-founder" key={name}>
                   <p className="homepage-founder-role">{role}</p>
                   <h3>{name}</h3>
                   <p>{bio}</p>
@@ -217,7 +300,7 @@ export default function Home() {
               ))}
             </div>
           </div>
-          <figure className="homepage-founder-visual homepage-reveal">
+          <figure className="homepage-founder-visual">
             <Image
               src="/brand/fondateurs-mon-enfant.webp"
               alt="Les deux cofondateurs de Mon Enfant, côte à côte dans un couloir"
@@ -237,7 +320,7 @@ export default function Home() {
           aria-labelledby="contact-title"
         >
           <div className="homepage-shell homepage-contact-layout">
-            <header className="homepage-section-heading homepage-reveal">
+            <header className="homepage-section-heading">
               <p className="homepage-kicker">Contact</p>
               <h2 id="contact-title">Parlons de Mon Enfant</h2>
               <p>
@@ -249,7 +332,7 @@ export default function Home() {
                 médicales par e-mail ou WhatsApp.
               </p>
             </header>
-            <address className="homepage-contact-links homepage-reveal">
+            <address className="homepage-contact-links">
               {founders.map(({ name, whatsapp, phone }) => (
                 <a
                   key={name}
@@ -282,6 +365,8 @@ export default function Home() {
           <p>En développement · Données de santé fictives uniquement</p>
         </div>
         <nav aria-label="Liens utiles">
+          <a href="#securite">Confidentialité et partage</a>
+          <a href="#aide">Contact</a>
           <Link href="/forgot-password">Retrouver l’accès à mon compte</Link>
           <Link href="/login?audience=clinician">
             Espace soignant <ArrowUpRight aria-hidden="true" />
