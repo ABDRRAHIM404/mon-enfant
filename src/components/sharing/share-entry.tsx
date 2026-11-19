@@ -9,7 +9,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ShareScanner } from "./scan-input";
-import { scanShareCode } from "@/lib/sharing/types";
+import { shareToken } from "@/lib/sharing/types";
 import { redeemShare } from "@/app/share/actions";
 export function ShareEntry() {
   const tokenInput = useRef<HTMLInputElement>(null);
@@ -20,14 +20,14 @@ export function ShareEntry() {
   useEffect(() => {
     const hash = window.location.hash;
     if (!hash) return;
-    const token = scanShareCode(window.location.href, window.location.origin);
+    const token = shareToken(window.location.href, window.location.origin);
     window.history.replaceState(null, "", window.location.pathname);
     if (token && tokenInput.current) tokenInput.current.value = token;
   }, []);
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const raw = String(new FormData(event.currentTarget).get("token") ?? "");
-    const token = scanShareCode(raw, window.location.origin);
+    const token = shareToken(raw, window.location.origin);
     if (!token) {
       setError("Présentez un code ou un lien de partage temporaire valide.");
       return;
@@ -75,8 +75,7 @@ export function ShareEntry() {
           required
         />
         <p className="fine">
-          Chaque code est à usage unique. Une invitation de soins doit être
-          ouverte avec le compte du médecin destinataire.
+          Le partage de soins s’ouvre avec un compte médecin vérifié.
         </p>
         {error && (
           <p role="alert" className="form-error">

@@ -72,6 +72,14 @@ export default async function ChildBooklet({
         className="care-page-actions no-print"
         aria-label="Dans cette page du carnet"
       >
+        {link.can_export && (
+          <Link
+            className="button primary"
+            href={`/parent/children/${id}/privacy#parent-share-heading`}
+          >
+            Montrer le QR au médecin
+          </Link>
+        )}
         <a className="button secondary" href="#visits">
           Soins enregistrés
         </a>

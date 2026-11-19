@@ -18,20 +18,33 @@ export default async function ClinicalHistory({
 }: {
   params: Promise<{ id: string; root: string }>;
 }) {
-  const { supabase } = await requireApprovedDoctor();
+  const { supabase, user } = await requireApprovedDoctor();
   const { id, root } = await params;
   if (!uuidPattern.test(id) || !uuidPattern.test(root)) notFound();
-  const [history, facilities, capabilities] = await Promise.all([
-    supabase.rpc("clinical_entry_history", { p_child_id: id, p_root_id: root }),
-    supabase.rpc("my_facilities"),
-    supabase.rpc("my_clinical_capabilities"),
-  ]);
+  const [history, facilities, capabilities, standardAccess] = await Promise.all(
+    [
+      supabase.rpc("clinical_entry_history", {
+        p_child_id: id,
+        p_root_id: root,
+      }),
+      supabase.rpc("my_facilities"),
+      supabase.rpc("my_clinical_capabilities"),
+      supabase.rpc("has_standard_child_access", { p_child_id: id }),
+    ],
+  );
   if (history.error?.code === "42501") notFound();
-  if (history.error || facilities.error || capabilities.error)
+  if (
+    history.error ||
+    facilities.error ||
+    capabilities.error ||
+    standardAccess.error
+  )
     throw new Error("Impossible de charger l’historique clinique.");
   const entries = history.data as ClinicalEntry[];
   if (!entries.length) notFound();
   const latest = entries[entries.length - 1];
+  const canCorrect =
+    standardAccess.data === true || latest.author_id === user.id;
   const allowed = (capabilities.data as string[]).includes(latest.kind);
   const places = facilities.data as Facility[];
   const vaccineItems =
@@ -77,7 +90,7 @@ export default async function ClinicalHistory({
       ))}
       <section className="panel">
         <h2>Corriger / retirer la dernière version</h2>
-        {allowed && places.length ? (
+        {canCorrect && allowed && places.length ? (
           <ClinicalForm
             childId={id}
             operationId={randomUUID()}
@@ -92,8 +105,9 @@ export default async function ClinicalHistory({
           />
         ) : (
           <p className="notice">
-            Une habilitation active pour ce type de soin et un lieu d’exercice
-            déclaré sont nécessaires pour ajouter une révision.
+            {canCorrect
+              ? "Une habilitation active pour ce type de soin et un lieu d’exercice déclaré sont nécessaires pour ajouter une révision."
+              : "Avec le QR de visite, vous pouvez ajouter des soins et corriger vos propres saisies."}
           </p>
         )}
       </section>
