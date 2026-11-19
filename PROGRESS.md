@@ -1041,3 +1041,7 @@ The web workspace is labeled as a test beta for fictional data. Sign-in explains
 ### 19 November 2026 — bulk clinical permissions
 
 Clinical permission managers can select any of the six permissions or select all six for one professional. A grant shares one qualification reference, reason and expiration date. Individual revocation remains available. Migration `20261119140847_bulk_clinical_permissions` applies the existing guarded grant operation in a single transaction and preserves one audit entry per permission. Hosted checks confirmed the RPC is restricted to authenticated callers and still checks manager authority internally. The focused tests cover the admin form and target selection, plus database authorization, rollback and retry behavior with fictional professionals.
+
+### 19 November 2026 — doctor-to-doctor care QR
+
+An approved doctor who manages a child's clinical access can issue a one-use QR for a named approved doctor. The code expires in five minutes. The recipient opens the existing record and can document care under their own clinical permissions for up to an hour. The issuer can cancel an unused invitation or revoke granted access from the record. Parent QR sharing still uses the existing read-only workflow. The Supabase migration `20261119150616_doctor_care_qr` is applied. Thirteen targeted scanner and database checks passed with fictional data, including the original child ID, recipient authorship, role and capability denials, cancellation, expiry, replay and revocation.

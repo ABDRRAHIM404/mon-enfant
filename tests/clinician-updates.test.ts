@@ -16,7 +16,12 @@ async function actor(role?: string, status = "unverified"): Promise<Actor> {
   if (role)
     await db.query(
       "insert into public.professional_profiles(user_id,role,verification_status,professional_id) values($1,$2,$3,$4)",
-      [a.id, role, status, status === "approved" ? `QA-${a.id}` : null],
+      [
+        a.id,
+        role,
+        status,
+        status === "approved" ? `QA-${a.id.toUpperCase()}` : null,
+      ],
     );
   return a;
 }
@@ -68,6 +73,103 @@ afterAll(async () => {
   await db?.close();
 });
 describe("requested clinician update on complete current PostgreSQL schema", () => {
+  it("opens the same child for a named verified doctor and retains care permissions", async () => {
+    await db.exec(
+      readFileSync(
+        "supabase/migrations/20261119150616_doctor_care_qr.sql",
+        "utf8",
+      ),
+    );
+    const issuer = await actor("doctor", "approved");
+    const recipient = await actor("doctor", "approved");
+    const stranger = await actor("doctor", "approved");
+    const nurse = await actor("nurse", "approved");
+    const unverified = await actor("doctor");
+    const practice = (a: Actor) =>
+      rpc(a, "create_facility", [randomUUID(), "Centre fictif", "Rabat"]);
+    const facility = await practice(issuer);
+    const recipientFacility = await practice(recipient);
+    const payload = {
+      ...identity(),
+      facility_id: facility,
+      register_year: 2026,
+      register_book: "A",
+      local_number: "1",
+    };
+    const op = randomUUID();
+    await rpc(issuer, "prepare_child_registration", [op, payload]);
+    const childId = await rpc(issuer, "register_child", [op, payload]);
+    const issue = (a: Actor, target: Actor) =>
+      rpc<{ id: string; token: string }>(a, "issue_doctor_care_qr", [
+        childId,
+        `QA-${target.id}`,
+        "Suivi clinique entièrement fictif.",
+        true,
+      ]);
+    const redeem = (a: Actor, token: string) =>
+      rpc(a, "redeem_doctor_care_qr", [token]);
+    await expect(issue(stranger, recipient)).rejects.toMatchObject({
+      code: "42501",
+    });
+    await expect(issue(issuer, nurse)).rejects.toMatchObject({ code: "42501" });
+    const cancelled = await issue(issuer, recipient);
+    await expect(
+      rpc(issuer, "cancel_doctor_care_qr", [cancelled.id]),
+    ).resolves.toBe(true);
+    await expect(redeem(recipient, cancelled.token)).resolves.toBeNull();
+    const expired = await issue(issuer, recipient);
+    await db.query(
+      "update private.doctor_care_invitations set expires_at=now() where id=$1",
+      [expired.id],
+    );
+    await expect(redeem(recipient, expired.token)).resolves.toBeNull();
+    const { token } = await issue(issuer, recipient);
+    await expect(redeem(nurse, token)).rejects.toMatchObject({ code: "42501" });
+    await expect(redeem(unverified, token)).rejects.toMatchObject({
+      code: "42501",
+    });
+    await expect(redeem(stranger, token)).resolves.toBeNull();
+    await expect(redeem(recipient, token)).resolves.toBe(childId);
+    await expect(redeem(recipient, token)).resolves.toBeNull();
+    const grant = await db.query(
+      "select expires_at = granted_at + interval '1 hour' as temporary from public.access_grants where child_id=$1 and professional_id=$2",
+      [childId, recipient.id],
+    );
+    expect(grant.rows).toEqual([{ temporary: true }]);
+    await expect(
+      rpc(recipient, "get_child_profile", [childId]),
+    ).resolves.toMatchObject({ id: childId, can_manage_access: false });
+    const write = () =>
+      rpc(recipient, "write_clinical_entry", [
+        randomUUID(),
+        childId,
+        "consultation",
+        recipientFacility,
+        "2026-01-02",
+        "exact",
+        "observed",
+        null,
+        false,
+        { reason: "Suivi fictif après invitation" },
+      ]);
+    await expect(write()).rejects.toMatchObject({ code: "42501" });
+    await db.query(
+      "insert into public.professional_capabilities(professional_id,capability,enabled,granted_by) values($1,'consultation',true,$1)",
+      [recipient.id],
+    );
+    const entry = await write();
+    const rows = await db.query(
+      "select child_id, author_id from public.clinical_entries where id=$1",
+      [entry],
+    );
+    expect(rows.rows).toEqual([{ child_id: childId, author_id: recipient.id }]);
+    await rpc(issuer, "revoke_child_access", [
+      childId,
+      recipient.id,
+      "Fin du suivi clinique fictif.",
+    ]);
+    await expect(write()).rejects.toMatchObject({ code: "42501" });
+  });
   it("grants and audits a batch atomically, enforcing eligibility and idempotency", async () => {
     await db.exec(
       readFileSync(

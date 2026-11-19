@@ -139,7 +139,7 @@ const clinician: Step[] = [
     id: "qr",
     title: "Scanner le QR d’un parent",
     steps: [
-      "Connectez-vous avec votre compte soignant vérifié. Cliquez sur Scanner un QR parent, puis sur Scanner avec la caméra.",
+      "Connectez-vous avec votre compte soignant vérifié. Cliquez sur Scanner un QR partagé, puis sur Scanner avec la caméra.",
       "Autorisez la caméra et cadrez le QR. Vous pouvez aussi importer une image du QR ou coller le lien.",
       "Cliquez sur Ouvrir le partage. Le contenu est limité aux informations choisies par le parent et à la durée du partage.",
     ],

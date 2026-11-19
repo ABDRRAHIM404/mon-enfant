@@ -3,6 +3,7 @@ import { clinicianLookupUrl } from "@/lib/qr/symbol";
 import { appointmentTime } from "@/lib/appointments/calendar";
 import { notFound } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
+import { DoctorCareQr } from "@/components/sharing/doctor-care-qr";
 import {
   ChildCareActions,
   ClinicalWorkspace,
@@ -22,7 +23,7 @@ export default async function PatientProfile({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { supabase } = await requireApprovedDoctor();
+  const { supabase, profile } = await requireApprovedDoctor();
   const { id } = await params;
   if (!uuidPattern.test(id)) notFound();
   const [{ data, error }, visits, capabilities] = await Promise.all([
@@ -169,6 +170,9 @@ export default async function PatientProfile({
           label="Identification du dossier — accès professionnel vérifié à l’ouverture"
         />
       </section>
+      {child.can_manage_access && profile?.role === "doctor" && (
+        <DoctorCareQr key={id} childId={id} />
+      )}
       {child.can_manage_access && (
         <section className="panel">
           <h2>Autorisations du dossier</h2>

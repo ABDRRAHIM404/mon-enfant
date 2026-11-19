@@ -167,7 +167,7 @@ export function ParentSharePanel({
       ) : (
         <form onSubmit={issue} className="auth-form" aria-busy={pending}>
           <input type="hidden" name="childId" value={childId} />
-          <label htmlFor="share-scope">Informations et motif du partage</label>
+          <label htmlFor="share-scope">Informations à partager</label>
           <select
             id="share-scope"
             name="scope"
@@ -177,7 +177,9 @@ export function ParentSharePanel({
             <option value="vaccination_read">
               Vaccinations et références — suivi vaccinal
             </option>
-            <option value="booklet_read">Carnet — consultation</option>
+            <option value="booklet_read">
+              Carnet de santé — soins, croissance et rendez-vous
+            </option>
           </select>
           <label className="checkbox">
             <input
