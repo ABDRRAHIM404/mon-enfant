@@ -4873,6 +4873,29 @@ select:focus-visible,
 .admin-content .auth-form .fine {
   font-size: 12px;
 }
+.admin-content .auth-form .admin-capability-picker {
+  gap: 8px;
+}
+.admin-capability-picker legend {
+  padding: 0 0 8px;
+  font-weight: 600;
+}
+.admin-capability-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  gap: 8px;
+}
+.admin-content .auth-form .admin-capability-picker .checkbox-label {
+  align-items: center;
+  min-height: 44px;
+  font-size: 14px;
+}
+.admin-capability-picker .checkbox-label input {
+  margin-top: 0;
+}
+.admin-content .auth-form .admin-capability-all {
+  font-weight: 700;
+}
 .admin-content .registry-filters {
   align-items: end;
   grid-template-columns: minmax(0, 1fr) auto;

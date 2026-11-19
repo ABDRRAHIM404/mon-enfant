@@ -3,7 +3,7 @@ import {
   clinicalPermissionStatusLabels,
 } from "@/lib/clinical/permission-status";
 import { statusLabels, type VerificationState } from "@/lib/authorization";
-import { clinicalLabels } from "@/lib/clinical/types";
+import { clinicalCapabilityLabels } from "@/lib/clinical/types";
 import Link from "next/link";
 import { randomUUID } from "node:crypto";
 import { requireClinicalPermissionManager } from "@/lib/auth";
@@ -118,12 +118,9 @@ export default async function ClinicalPermissions({
               {p.capabilities.map((c) => (
                 <p className="admin-capability" key={c.capability}>
                   <span>
-                    {clinicalLabels[
-                      c.capability as keyof typeof clinicalLabels
-                    ] ??
-                      (c.capability === "appointment"
-                        ? "Gestion des rendez-vous"
-                        : c.capability)}
+                    {clinicalCapabilityLabels[
+                      c.capability as keyof typeof clinicalCapabilityLabels
+                    ] ?? c.capability}
                   </span>
                   <span>
                     {
@@ -163,7 +160,7 @@ export default async function ClinicalPermissions({
         <section className="panel">
           <div className="admin-section-title">
             <div>
-              <h2>Modifier une habilitation</h2>
+              <h2>Gérer les habilitations</h2>
               <p className="muted">
                 {selected.display_name ||
                   selected.email ||
@@ -174,6 +171,7 @@ export default async function ClinicalPermissions({
             </div>
           </div>
           <PermissionForm
+            key={selected.user_id}
             professionalId={selected.user_id}
             operationId={randomUUID()}
           />
@@ -197,12 +195,9 @@ export default async function ClinicalPermissions({
             ).map((h) => (
               <article key={h.id}>
                 <strong>
-                  {clinicalLabels[
-                    h.capability as keyof typeof clinicalLabels
-                  ] ??
-                    (h.capability === "appointment"
-                      ? "Gestion des rendez-vous"
-                      : h.capability)}{" "}
+                  {clinicalCapabilityLabels[
+                    h.capability as keyof typeof clinicalCapabilityLabels
+                  ] ?? h.capability}{" "}
                   — {h.enabled ? "accordée" : "révoquée"}
                 </strong>
                 <p>{h.reason}</p>

@@ -1037,3 +1037,7 @@ Implemented, migrated, cloud-verified and deployed from `feature/professional-ve
 ### 19 November 2026 — private web beta
 
 The web workspace is labeled as a test beta for fictional data. Sign-in explains session retention and includes a password visibility control. The clinician dashboard and menu link directly to the browser QR scanner. The role-specific guides contain fictional GIF walkthroughs and a bug-report link. The [beta testing checklist](BETA_TESTING.md) covers signed-out, parent, clinician and staff journeys and records the boundaries for the pilot.
+
+### 19 November 2026 — bulk clinical permissions
+
+Clinical permission managers can select any of the six permissions or select all six for one professional. A grant shares one qualification reference, reason and expiration date. Individual revocation remains available. Migration `20261119140847_bulk_clinical_permissions` applies the existing guarded grant operation in a single transaction and preserves one audit entry per permission. Hosted checks confirmed the RPC is restricted to authenticated callers and still checks manager authority internally. The focused tests cover the admin form and target selection, plus database authorization, rollback and retry behavior with fictional professionals.
