@@ -17,7 +17,8 @@ export function AuthForm({
     {},
   );
   const [showPassword, setShowPassword] = useState(false);
-  const [remember, setRemember] = useState(false);
+  // React resets submitted forms when the action returns a result.
+  const [rememberOnRetry, setRememberOnRetry] = useState(false);
   const RevealIcon = showPassword ? EyeOff : Eye;
   return (
     <form
@@ -91,8 +92,8 @@ export function AuthForm({
             <input
               type="checkbox"
               name="remember"
-              checked={remember}
-              onChange={(event) => setRemember(event.target.checked)}
+              defaultChecked={rememberOnRetry}
+              onChange={(event) => setRememberOnRetry(event.target.checked)}
               disabled={!configured}
             />
             Rester connecté sur cet appareil
