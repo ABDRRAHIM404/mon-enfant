@@ -109,7 +109,7 @@ export async function ClinicianShell({
       ? [
           {
             key: "sharing",
-            label: "Scanner un QR parent",
+            label: "Scanner un QR partagé",
             href: "/share",
             icon: QrCode,
           },

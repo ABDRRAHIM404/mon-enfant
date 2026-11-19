@@ -9,7 +9,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ShareScanner } from "./scan-input";
-import { shareToken } from "@/lib/sharing/types";
+import { scanShareCode } from "@/lib/sharing/types";
 import { redeemShare } from "@/app/share/actions";
 export function ShareEntry() {
   const tokenInput = useRef<HTMLInputElement>(null);
@@ -20,14 +20,14 @@ export function ShareEntry() {
   useEffect(() => {
     const hash = window.location.hash;
     if (!hash) return;
-    const token = shareToken(window.location.href, window.location.origin);
+    const token = scanShareCode(window.location.href, window.location.origin);
     window.history.replaceState(null, "", window.location.pathname);
     if (token && tokenInput.current) tokenInput.current.value = token;
   }, []);
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const raw = String(new FormData(event.currentTarget).get("token") ?? "");
-    const token = shareToken(raw, window.location.origin);
+    const token = scanShareCode(raw, window.location.origin);
     if (!token) {
       setError("Présentez un code ou un lien de partage temporaire valide.");
       return;
@@ -38,7 +38,10 @@ export function ShareEntry() {
     startTransition(async () => {
       try {
         const result = await redeemShare(form);
-        if (result.share) {
+        if (result.childId) {
+          if (tokenInput.current) tokenInput.current.value = "";
+          router.replace(`/patients/${result.childId}`);
+        } else if (result.share) {
           if (tokenInput.current) tokenInput.current.value = "";
           router.replace(`/share/view/${result.share.id}`);
         } else {
@@ -72,8 +75,8 @@ export function ShareEntry() {
           required
         />
         <p className="fine">
-          Ce code est à usage unique. Il ne remplace ni un accès permanent au
-          dossier, ni une autorisation de soins.
+          Chaque code est à usage unique. Une invitation de soins doit être
+          ouverte avec le compte du médecin destinataire.
         </p>
         {error && (
           <p role="alert" className="form-error">

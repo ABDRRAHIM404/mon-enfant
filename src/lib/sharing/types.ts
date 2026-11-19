@@ -4,7 +4,7 @@ import type { PatientVaccineItem } from "@/lib/vaccines/patient-types";
 export type ShareScope = "vaccination_read" | "booklet_read";
 export const shareLabels: Record<ShareScope, string> = {
   vaccination_read: "Vaccinations et références",
-  booklet_read: "Carnet pour une consultation",
+  booklet_read: "Carnet de santé",
 };
 export type ShareItem = {
   id: string;
@@ -57,4 +57,25 @@ export function shareToken(value: string, origin: string): string | null {
   } catch {
     return null;
   }
+}
+
+export function scanShareCode(value: string, origin: string): string | null {
+  const text = value.trim();
+  if (/^care:[A-Za-z0-9_-]{43}$/.test(text)) return text;
+  const parentToken = shareToken(text, origin);
+  if (parentToken) return parentToken;
+  try {
+    const url = new URL(text);
+    const token = /^#care=([A-Za-z0-9_-]{43})$/.exec(url.hash);
+    if (
+      url.origin === origin &&
+      url.pathname === "/share" &&
+      !url.search &&
+      token
+    )
+      return `care:${token[1]}`;
+  } catch {
+    return null;
+  }
+  return null;
 }

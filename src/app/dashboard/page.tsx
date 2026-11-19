@@ -127,7 +127,7 @@ export default async function Dashboard() {
             <FolderPlus aria-hidden="true" /> Ajouter un enfant
           </Link>
           <Link className="button secondary" href="/share">
-            <QrCode aria-hidden="true" /> Scanner un QR parent
+            <QrCode aria-hidden="true" /> Scanner un QR partagé
           </Link>
         </div>
       </div>
