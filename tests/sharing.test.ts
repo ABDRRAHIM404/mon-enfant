@@ -177,6 +177,7 @@ beforeAll(async () => {
   for (const migration of [
     "20261119150616_doctor_care_qr.sql",
     "20261119152628_parent_care_visit_qr.sql",
+    "20261119164356_parent_child_drafts.sql",
   ]) {
     await db.exec(readFileSync(`supabase/migrations/${migration}`, "utf8"));
   }
@@ -185,6 +186,160 @@ afterAll(async () => {
   await db?.close();
 });
 describe("temporary sharing on complete schema", () => {
+  it("turns a private parent draft into the verified doctor's carnet and guardian claim", async () => {
+    const parent = await actor();
+    const otherParent = await actor();
+    const doctor = await actor("doctor");
+    const nurse = await actor("nurse");
+    const unverified = await actor("doctor", "unverified");
+    const operation = randomUUID();
+    const given = "Enfant fictif";
+    const family = randomUUID();
+    const birth = "2025-05-15";
+    const draft = await rpc<string>(parent, "add_parent_child_draft", [
+      operation,
+      given,
+      family,
+      birth,
+    ]);
+    await expect(
+      rpc(parent, "add_parent_child_draft", [operation, given, family, birth]),
+    ).resolves.toBe(draft);
+    await expect(rpc(otherParent, "list_parent_child_drafts")).resolves.toEqual(
+      { items: [] },
+    );
+    await expect(
+      rpc(otherParent, "issue_parent_child_draft", [draft, true]),
+    ).rejects.toMatchObject(denied);
+    await expect(
+      rpc(doctor, "get_parent_child_intake", [draft]),
+    ).resolves.toBeNull();
+    const qr = await rpc<{ token: string }>(
+      parent,
+      "issue_parent_child_draft",
+      [draft, true],
+    );
+    await expect(
+      rpc(nurse, "redeem_parent_child_draft", [qr.token]),
+    ).resolves.toBeNull();
+    await expect(
+      rpc(unverified, "redeem_parent_child_draft", [qr.token]),
+    ).rejects.toMatchObject(denied);
+    await expect(
+      rpc(doctor, "redeem_parent_child_draft", [qr.token]),
+    ).resolves.toBe(draft);
+    await expect(
+      rpc(doctor, "redeem_parent_child_draft", [qr.token]),
+    ).resolves.toBeNull();
+    await expect(
+      rpc(doctor, "get_parent_child_intake", [draft]),
+    ).resolves.toEqual({
+      given_name: given,
+      family_name: family,
+      birth_date: birth,
+    });
+    const secondSession = randomUUID();
+    await db.query("insert into auth.sessions(id,user_id) values($1,$2)", [
+      secondSession,
+      doctor.id,
+    ]);
+    await expect(
+      rpc({ ...doctor, session: secondSession }, "get_parent_child_intake", [
+        draft,
+      ]),
+    ).resolves.toBeNull();
+    const facility = await rpc(doctor, "create_facility", [
+      randomUUID(),
+      "Centre fictif de consultation",
+      "Rabat",
+    ]);
+    const payload = {
+      facility_id: facility,
+      register_year: 2026,
+      register_book: "QA",
+      local_number: "013",
+      given_name: given,
+      family_name: family,
+      birth_date: birth,
+      sex: "unknown",
+      name_status: "confirmed",
+      birth_date_precision: "exact",
+      parent_draft_identity_checked: true,
+    };
+    await expect(
+      rpc(doctor, "prepare_child_registration", [draft, payload]),
+    ).resolves.toMatchObject({ state: "ready" });
+    await expect(
+      rpc({ ...doctor, session: secondSession }, "register_child", [
+        draft,
+        payload,
+      ]),
+    ).rejects.toMatchObject(denied);
+    const child = await rpc<string>(doctor, "register_child", [draft, payload]);
+    await expect(rpc(doctor, "register_child", [draft, payload])).resolves.toBe(
+      child,
+    );
+    await expect(
+      rpc(parent, "parent_child_booklet", [child, 1]),
+    ).rejects.toMatchObject(denied);
+    await expect(
+      rpc(parent, "list_parent_child_drafts"),
+    ).resolves.toMatchObject({
+      items: [{ id: draft, status: "awaiting_review", child_id: null }],
+    });
+    const claim = await db.query<{ claim_id: string }>(
+      "select claim_id from private.parent_child_drafts where id=$1",
+      [draft],
+    );
+    const expiry = (
+      await db.query<{ day: string }>(
+        "select ((now() at time zone 'Africa/Casablanca')::date+30)::text as day",
+      )
+    ).rows[0].day;
+    await rpc(doctor, "review_guardian_claim", [
+      randomUUID(),
+      claim.rows[0].claim_id,
+      1,
+      "approved",
+      "mother",
+      reason,
+      reason,
+      true,
+      true,
+      expiry,
+      true,
+    ]);
+    await db.query(
+      "insert into public.professional_capabilities(professional_id,capability,enabled,granted_by) values($1,'consultation',true,$1)",
+      [doctor.id],
+    );
+    const entry = await rpc(doctor, "write_clinical_entry", [
+      randomUUID(),
+      child,
+      "consultation",
+      facility,
+      "2026-01-01",
+      "exact",
+      "observed",
+      null,
+      false,
+      { reason: "Consultation fictive du carnet" },
+    ]);
+    await expect(
+      rpc(parent, "parent_child_booklet", [child, 1]),
+    ).resolves.toMatchObject({
+      child: { id: child, given_name: given, birth_date: birth },
+      entries: [{ id: entry }],
+    });
+    await expect(
+      rpc(parent, "list_parent_child_drafts"),
+    ).resolves.toMatchObject({
+      items: [{ id: draft, status: "linked", child_id: child }],
+    });
+    await expect(
+      rpc(parent, "issue_parent_child_draft", [draft, true]),
+    ).rejects.toMatchObject(denied);
+  });
   it("lets a verified doctor add visit care to the existing record through the parent QR", async () => {
     const f = await linked();
     const visitor = await actor("doctor");

@@ -57,6 +57,13 @@ export async function registryAction(
       fields.map((key) => [key, text(key)]),
     );
     payload.register_year = Number(text("register_year"));
+    if (text("parentDraft") === "on") {
+      if (text("draftIdentityChecked") !== "on")
+        return {
+          error: "Confirmez l’identité et la date de naissance de l’enfant.",
+        };
+      payload.parent_draft_identity_checked = true;
+    }
     const prepared = await supabase.rpc("prepare_child_registration", {
       p_operation_id: operation,
       p_payload: payload,
@@ -185,8 +192,13 @@ export async function registryAction(
     (kind === "register" || kind === "link") &&
     typeof data === "string" &&
     uuidPattern.test(data)
-  )
+  ) {
+    if (kind === "register" && text("parentDraft") === "on") {
+      revalidatePath("/parent/add-child");
+      redirect(`/patients/${data}/guardians`);
+    }
     redirect(`/patients/${data}`);
+  }
   return { success: true };
 }
 
@@ -276,5 +288,9 @@ export async function resumeRegistration(
   revalidatePath("/patients");
   revalidatePath("/dashboard");
   revalidatePath("/registration-reviews");
+  if (item.payload.parent_draft_identity_checked === true) {
+    revalidatePath("/parent/add-child");
+    redirect(`/patients/${result.data}/guardians`);
+  }
   redirect(`/patients/${result.data}`);
 }

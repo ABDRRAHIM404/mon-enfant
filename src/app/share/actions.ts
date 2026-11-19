@@ -15,6 +15,7 @@ export type ShareActionState = {
   share?: ShareReceipt & { url?: string };
   success?: boolean;
   childId?: string;
+  draftId?: string;
 };
 const unavailable =
   "Partage indisponible, expiré ou non autorisé. Demandez un nouveau code au responsable.";
@@ -80,6 +81,17 @@ export async function redeemShare(form: FormData): Promise<ShareActionState> {
       needsLogin: true,
     };
   const token = String(form.get("token") ?? "");
+  if (/^draft:[A-Za-z0-9_-]{43}$/.test(token)) {
+    const { data, error } = await supabase.rpc("redeem_parent_child_draft", {
+      p_token: token.slice("draft:".length),
+    });
+    if (error || typeof data !== "string" || !uuidPattern.test(data))
+      return {
+        error:
+          "Fiche indisponible. Utilisez votre compte médecin vérifié et demandez un nouveau QR au parent.",
+      };
+    return { draftId: data };
+  }
   if (!/^[A-Za-z0-9_-]{43}$/.test(token)) return { error: unavailable };
   const { data, error } = await supabase.rpc("redeem_clinician_share", {
     p_token: token,

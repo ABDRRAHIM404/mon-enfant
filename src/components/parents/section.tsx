@@ -118,6 +118,14 @@ export async function ParentSection({
           ))}
           <Link
             className="workspace-surface parent-invite-card"
+            href="/parent/add-child"
+          >
+            <Plus size={32} aria-hidden="true" />
+            <strong>Ajouter un enfant</strong>
+            <span>Préparer sa fiche pour le médecin</span>
+          </Link>
+          <Link
+            className="workspace-surface parent-invite-card"
             href="/parent/invitation"
           >
             <Plus size={32} aria-hidden="true" />
@@ -127,8 +135,8 @@ export async function ParentSection({
         </div>
         {!childrenList.length && (
           <p className="workspace-empty">
-            Aucun carnet relié pour le moment. Votre invitation doit être
-            vérifiée avant l’ouverture du carnet.
+            Aucun carnet relié pour le moment. Vous pouvez préparer une fiche ou
+            utiliser une invitation.
           </p>
         )}
       </>

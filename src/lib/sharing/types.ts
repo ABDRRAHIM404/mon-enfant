@@ -44,7 +44,7 @@ export type SharedView = ShareReceipt & {
 };
 export function shareToken(value: string, origin: string): string | null {
   const text = value.trim();
-  if (/^[A-Za-z0-9_-]{43}$/.test(text)) return text;
+  if (/^(?:draft:)?[A-Za-z0-9_-]{43}$/.test(text)) return text;
   try {
     const url = new URL(text);
     if (
@@ -54,8 +54,11 @@ export function shareToken(value: string, origin: string): string | null {
     )
       return null;
     const entries = [...new URLSearchParams(url.hash.slice(1))];
-    if (entries.length !== 1 || entries[0][0] !== "share") return null;
-    return /^[A-Za-z0-9_-]{43}$/.test(entries[0][1]) ? entries[0][1] : null;
+    if (entries.length !== 1) return null;
+    const [purpose, token] = entries[0];
+    if (!/^[A-Za-z0-9_-]{43}$/.test(token)) return null;
+    if (purpose === "draft") return `draft:${token}`;
+    return purpose === "share" ? token : null;
   } catch {
     return null;
   }

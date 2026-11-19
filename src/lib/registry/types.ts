@@ -83,3 +83,8 @@ export function birthLabel(
 }
 export const uuidPattern =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+export type ParentChildIntake = {
+  given_name: string;
+  family_name: string;
+  birth_date: string;
+};

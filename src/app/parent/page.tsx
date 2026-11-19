@@ -126,9 +126,14 @@ export default async function ParentWorkspace({
             L’activité de vos carnets et les prochains rendez-vous.
           </p>
         </div>
-        <Link className="button secondary" href="/parent/invitation">
-          <Plus size={17} aria-hidden="true" /> Relier un carnet
-        </Link>
+        <div className="actions">
+          <Link className="button primary" href="/parent/add-child">
+            <Plus size={17} aria-hidden="true" /> Ajouter un enfant
+          </Link>
+          <Link className="button secondary" href="/parent/invitation">
+            Relier un carnet
+          </Link>
+        </div>
       </section>
 
       {selected ? (
@@ -254,8 +259,8 @@ export default async function ParentWorkspace({
           <UsersRound size={38} aria-hidden="true" />
           <h2>Aucun carnet relié</h2>
           <p>
-            Utilisez l’invitation remise par un soignant. Le carnet devient
-            accessible après vérification de votre demande.
+            Ajoutez une fiche à présenter au médecin ou reliez un carnet
+            existant avec l’invitation d’un soignant.
           </p>
           <Link className="button primary" href="/parent/invitation">
             Utiliser mon invitation

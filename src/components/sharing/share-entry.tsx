@@ -38,7 +38,10 @@ export function ShareEntry() {
     startTransition(async () => {
       try {
         const result = await redeemShare(form);
-        if (result.childId) {
+        if (result.draftId) {
+          if (tokenInput.current) tokenInput.current.value = "";
+          router.replace(`/patients/new?draft=${result.draftId}`);
+        } else if (result.childId) {
           if (tokenInput.current) tokenInput.current.value = "";
           router.replace(`/patients/${result.childId}`);
         } else if (result.share) {
