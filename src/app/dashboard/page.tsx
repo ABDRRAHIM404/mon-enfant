@@ -5,9 +5,12 @@ import {
   Syringe,
   CalendarDays,
   ArrowUpRight,
+  ChartNoAxesCombined,
+  ClipboardPlus,
+  FolderPlus,
 } from "lucide-react";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { ClinicianShell, ClinicianHeading } from "@/components/clinician/shell";
+import { ClinicianShell } from "@/components/clinician/shell";
 import { AppointmentCard } from "@/components/appointments/card";
 import { LiveRefresh } from "@/components/appointments/live-refresh";
 import type { AppointmentPage } from "@/lib/appointments/types";
@@ -75,33 +78,86 @@ export default async function Dashboard() {
       Icon: Syringe,
     },
   ];
+  const shortcuts = [
+    {
+      label: "Consultation",
+      detail: "Ouvrir le dossier de l’enfant",
+      href: "/consultations",
+      kind: "consultation",
+      Icon: ClipboardPlus,
+    },
+    {
+      label: "Vaccination",
+      detail: "Documenter une dose",
+      href: "/vaccinations",
+      kind: "vaccination",
+      Icon: Syringe,
+    },
+    {
+      label: "Croissance",
+      detail: "Ajouter une mesure",
+      href: "/growth",
+      kind: "growth",
+      Icon: ChartNoAxesCombined,
+    },
+    {
+      label: "Rendez-vous",
+      detail: "Planifier un créneau",
+      href: "/appointments/new",
+      kind: "appointment",
+      Icon: CalendarDays,
+    },
+  ].filter(({ kind }) => allowed.includes(kind));
+  const workDate = new Intl.DateTimeFormat("fr-MA", {
+    dateStyle: "full",
+    timeZone: "Africa/Casablanca",
+  }).format(new Date());
   return (
     <ClinicianShell active="home" profile={profile}>
-      <ClinicianHeading
-        title="Tableau de bord"
-        description="Vos dossiers autorisés, rendez-vous et suivis au même endroit."
-      />
-      <div className="soignant-heading-actions">
-        <Link className="button primary" href="/patients/new">
-          Ajouter un enfant
+      <div className="clinical-day-banner">
+        <div>
+          <p>{workDate}</p>
+          <h1 id="main-content" tabIndex={-1}>
+            Ma journée de soins
+          </h1>
+        </div>
+        <Link className="button secondary" href="/patients/new">
+          <FolderPlus aria-hidden="true" /> Ajouter un enfant
         </Link>
-        {allowed.includes("consultation") && (
-          <Link className="button secondary" href="/consultations">
-            Nouvelle consultation
-          </Link>
-        )}
-        {allowed.includes("vaccination") && (
-          <Link className="button secondary" href="/vaccinations">
-            Enregistrer une vaccination
-          </Link>
-        )}
-        {allowed.includes("appointment") && (
-          <Link className="button secondary" href="/appointments/new">
-            Planifier un rendez-vous
-          </Link>
-        )}
       </div>
-      <LiveRefresh />
+      <section
+        className="clinical-start"
+        aria-labelledby="clinical-start-heading"
+      >
+        <div className="clinical-start-heading">
+          <h2 id="clinical-start-heading">Démarrer un soin</h2>
+          <Link className="text-link" href="/account/clinical-permissions">
+            Mes habilitations
+          </Link>
+        </div>
+        {shortcuts.length ? (
+          <ul className="clinical-shortcuts" role="list">
+            {shortcuts.map(({ label, detail, href, Icon }) => (
+              <li key={href}>
+                <Link href={href}>
+                  <span className="clinical-shortcut-icon">
+                    <Icon size={22} aria-hidden="true" />
+                  </span>
+                  <span>
+                    <strong>{label}</strong>
+                    <small>{detail}</small>
+                  </span>
+                  <ArrowUpRight size={16} aria-hidden="true" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="empty-state">
+            La saisie des soins dépend de vos habilitations cliniques.
+          </p>
+        )}
+      </section>
       <nav
         className="clinical-overview-summary"
         aria-label="Dossiers et suivis"
@@ -122,6 +178,7 @@ export default async function Dashboard() {
             <h2>Rendez-vous du jour</h2>
             <span className="workspace-chip">{visits.total}</span>
           </div>
+          <LiveRefresh />
           {visits.items.length ? (
             visits.items.map((appointment) => (
               <AppointmentCard key={appointment.id} appointment={appointment} />
@@ -197,7 +254,6 @@ export default async function Dashboard() {
           {counts.facilities} lieu(x) d’exercice déclaré(s).
         </p>
         <div className="tabs">
-          <Link href="/patients/new">Ajouter un enfant</Link>
           <Link href="/patients/new?source=paper">
             Transcrire un dossier papier
           </Link>

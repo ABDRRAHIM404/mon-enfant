@@ -3,7 +3,7 @@ import { Menu } from "lucide-react";
 import { Brand } from "./brand";
 
 const sections = [
-  { href: "/#fonctionnalites", label: "Le parcours" },
+  { href: "/#fonctionnalites", label: "Fonctionnalités" },
   { href: "/#fondateurs", label: "Les fondateurs" },
   { href: "/#aide", label: "Contact" },
 ];

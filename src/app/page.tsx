@@ -7,7 +7,6 @@ import {
   BookOpen,
   CalendarDays,
   ChartNoAxesCombined,
-  Link2,
   Mail,
   LockKeyhole,
   MapPin,
@@ -16,7 +15,6 @@ import {
   ShieldCheck,
   Stethoscope,
   Syringe,
-  UserRoundPlus,
 } from "lucide-react";
 import { PublicHeader } from "@/components/public-header";
 import "./homepage.css";
@@ -27,92 +25,79 @@ export const metadata: Metadata = {
     "Découvrez Mon Enfant, un carnet de santé numérique pour le suivi des vaccinations, de la croissance et des rendez-vous. Un projet de deux cofondateurs originaires de Belfaa.",
 };
 
-const steps = [
-  {
-    Icon: UserRoundPlus,
-    title: "Créez votre espace parent",
-    description:
-      "Inscrivez-vous et confirmez votre adresse e-mail pour accéder à votre espace.",
-  },
-  {
-    Icon: Link2,
-    title: "Reliez le carnet de votre enfant",
-    description:
-      "Utilisez l’invitation remise par un soignant autorisé. Le carnet s’ouvre après vérification de votre qualité de responsable.",
-  },
-  {
-    Icon: BookOpen,
-    title: "Retrouvez son suivi au fil des visites",
-    description:
-      "Consultez les informations enregistrées par les soignants autorisés et retrouvez les prochains rendez-vous.",
-  },
-];
+const clinicianLogin = "/login?audience=clinician";
 
-const sampleEntries = [
+const features = [
   {
+    title: "Vaccinations",
+    photo: "/brand/home-vaccination.webp",
+    alt: "Une infirmière prépare un vaccin pendant qu’un parent rassure son enfant",
     Icon: Syringe,
-    title: "Vaccination",
-    detail: "Dose documentée par le soignant",
-    date: "12 nov.",
-    tone: "jade",
   },
   {
+    title: "Croissance",
+    photo: "/brand/home-growth.webp",
+    alt: "Un soignant mesure la taille d’un enfant à l’aide d’une toise",
     Icon: ChartNoAxesCombined,
-    title: "Mesures de croissance",
-    detail: "8,4 kg · 71 cm",
-    date: "12 nov.",
-    tone: "seafoam",
-  },
-  {
-    Icon: CalendarDays,
-    title: "Consultation de suivi",
-    detail: "Rendez-vous enregistré",
-    date: "10 déc.",
-    tone: "apricot",
   },
 ];
 
-function BookletPreview() {
+const audiences = [
+  {
+    title: "Espace parent",
+    label: "Carnet de mon enfant",
+    href: "/login",
+    Icon: BookOpen,
+    entries: [
+      { Icon: Syringe, label: "Vaccinations documentées", detail: "12 nov." },
+      { Icon: ChartNoAxesCombined, label: "Dernière mesure", detail: "71 cm" },
+      { Icon: CalendarDays, label: "Prochain rendez-vous", detail: "10 déc." },
+    ],
+  },
+  {
+    title: "Espace soignant",
+    label: "Ma journée de soins",
+    href: clinicianLogin,
+    Icon: Stethoscope,
+    entries: [
+      { Icon: CalendarDays, label: "Consultation de suivi", detail: "09:00" },
+      { Icon: Syringe, label: "Rendez-vous vaccinal", detail: "10:30" },
+      {
+        Icon: ChartNoAxesCombined,
+        label: "Suivi de croissance",
+        detail: "11:15",
+      },
+    ],
+  },
+];
+
+function AudiencePreviews() {
   return (
-    <figure className="homepage-hero-visual">
-      <div className="preview-mat">
-        <div className="preview-book">
-          <div className="preview-book-header">
-            <span>
-              <BookOpen aria-hidden="true" /> Mon Enfant
-            </span>
-            <span className="preview-sample">Données fictives</span>
+    <div className="home-audience-grid">
+      {audiences.map(({ title, label, href, Icon, entries }) => (
+        <article key={title} className="home-audience">
+          <div className="home-audience-screen">
+            <header>
+              <Icon size={22} aria-hidden="true" />
+              <h3>{label}</h3>
+              <small>Exemple</small>
+            </header>
+            <ul>
+              {entries.map(({ Icon: EntryIcon, label: entryLabel, detail }) => (
+                <li key={entryLabel}>
+                  <EntryIcon size={17} aria-hidden="true" />
+                  <span>{entryLabel}</span>
+                  <strong>{detail}</strong>
+                </li>
+              ))}
+            </ul>
           </div>
-          <div className="preview-child">
-            <span className="preview-avatar" aria-hidden="true">
-              N
-            </span>
-            <div>
-              <h2>Carnet de Nour</h2>
-              <p>Vaccinations · Croissance · Rendez-vous</p>
-            </div>
-          </div>
-          <ul
-            className="preview-entries"
-            aria-label="Exemples d’entrées du carnet"
-          >
-            {sampleEntries.map(({ Icon, title, detail, date, tone }) => (
-              <li key={title}>
-                <span className="preview-entry-icon" data-tone={tone}>
-                  <Icon aria-hidden="true" />
-                </span>
-                <div>
-                  <strong>{title}</strong>
-                  <p>{detail}</p>
-                </div>
-                <span className="preview-date">{date}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-      <figcaption>Aperçu du carnet numérique</figcaption>
-    </figure>
+          <Link href={href} className="home-audience-link">
+            {title} <ArrowUpRight aria-hidden="true" />
+          </Link>
+        </article>
+      ))}
+    </div>
   );
 }
 
@@ -147,89 +132,94 @@ export default function Home() {
           <div className="homepage-hero-copy">
             <p className="homepage-kicker">Carnet de santé numérique · Maroc</p>
             <h1 id="main-content" tabIndex={-1}>
-              Toute son histoire de santé. <em>Au même endroit.</em>
+              Le carnet de santé <em>qui grandit avec eux.</em>
             </h1>
-            <p className="homepage-intro">
-              Retrouvez ses vaccinations, ses mesures de croissance et ses
-              rendez-vous, du premier suivi aux prochaines visites.
-            </p>
             <div className="homepage-actions">
               <Link href="/login" className="button primary">
-                Espace parent <ArrowRight aria-hidden="true" />
+                <BookOpen aria-hidden="true" /> Espace parent
+              </Link>
+              <Link href={clinicianLogin} className="button secondary">
+                <Stethoscope aria-hidden="true" /> Espace soignant
               </Link>
             </div>
-            <p className="homepage-care-link">
-              <Link href="/login?audience=clinician">
-                Médecins et infirmier(e)s <ArrowUpRight aria-hidden="true" />
-              </Link>
-            </p>
           </div>
-          <BookletPreview />
+          <div className="homepage-hero-visual home-photo-pair">
+            <figure>
+              <Image
+                src="/brand/home-parent.webp"
+                width={768}
+                height={512}
+                priority
+                sizes="(max-width: 800px) 47vw, 27vw"
+                alt="Une mère et sa fille regardent leur téléphone ensemble"
+              />
+              <figcaption>
+                <BookOpen aria-hidden="true" /> Le carnet en famille
+              </figcaption>
+            </figure>
+            <figure>
+              <Image
+                src="/brand/home-clinician.webp"
+                width={768}
+                height={512}
+                priority
+                sizes="(max-width: 800px) 47vw, 27vw"
+                alt="Une soignante consulte une tablette avec un parent et son enfant au cabinet"
+              />
+              <figcaption>
+                <Stethoscope aria-hidden="true" /> Le suivi au cabinet
+              </figcaption>
+            </figure>
+          </div>
         </section>
 
         <section
-          className="homepage-section homepage-journey"
+          className="homepage-section home-feature-section"
           id="fonctionnalites"
-          aria-labelledby="journey-title"
+          aria-labelledby="feature-heading"
         >
           <div className="homepage-shell">
             <header className="homepage-section-heading">
-              <p className="homepage-kicker">Le parcours parent</p>
-              <h2 id="journey-title">Du compte au carnet, en trois étapes</h2>
-              <p>
-                Une fois le carnet relié, gardez les informations de suivi à
-                portée de main entre les visites.
-              </p>
+              <h2 id="feature-heading">Les soins, en un coup d’œil</h2>
             </header>
-            <ol className="homepage-steps" role="list">
-              {steps.map(({ Icon, title, description }, index) => (
-                <li className="homepage-step" key={title}>
-                  <div className="homepage-step-marker" aria-hidden="true">
-                    <Icon />
-                    <span>0{index + 1}</span>
-                  </div>
-                  <h3>{title}</h3>
-                  <p>{description}</p>
-                </li>
+            <div className="home-feature-photos">
+              {features.map(({ Icon, alt, photo, title }) => (
+                <figure key={title}>
+                  <Image
+                    src={photo}
+                    alt={alt}
+                    width={768}
+                    height={512}
+                    sizes="(max-width: 540px) 92vw, (max-width: 900px) 47vw, 29vw"
+                  />
+                  <figcaption>
+                    <Icon aria-hidden="true" /> {title}
+                  </figcaption>
+                </figure>
               ))}
-            </ol>
-          </div>
-        </section>
-
-        <section
-          className="homepage-shell homepage-section homepage-benefits"
-          aria-labelledby="benefits-title"
-        >
-          <header className="homepage-section-heading">
-            <h2 id="benefits-title">Un carnet qui relie les visites</h2>
-          </header>
-          <div className="homepage-audiences">
-            <article>
-              <BookOpen aria-hidden="true" />
-              <h3>Pour les parents</h3>
-              <p>
-                Préparez la prochaine visite avec les rendez-vous, les mesures
-                de croissance et les vaccinations déjà documentées.
-              </p>
-              <Link href="/signup" className="homepage-inline-link">
-                Créer un compte parent <ArrowRight aria-hidden="true" />
-              </Link>
-            </article>
-            <article>
-              <Stethoscope aria-hidden="true" />
-              <h3>Pour les soignants</h3>
-              <p>
-                Retrouvez les dossiers auxquels vous avez accès, documentez vos
-                consultations et confrontez les repères vaccinaux calculés à vos
-                registres.
-              </p>
-              <Link
-                href="/login?audience=clinician"
-                className="homepage-inline-link"
-              >
-                Accéder à l’espace soignant <ArrowRight aria-hidden="true" />
-              </Link>
-            </article>
+              <figure className="home-calendar-visual">
+                <div aria-hidden="true" className="home-calendar-demo">
+                  <CalendarDays size={32} />
+                  <div className="home-calendar-days">
+                    {[8, 9, 10, 11, 12, 13, 14].map((day) => (
+                      <span key={day} data-highlight={day === 10}>
+                        {day}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="home-calendar-slot">
+                    <span>09:00</span> Consultation
+                  </div>
+                  <div className="home-calendar-slot">
+                    <span>10:30</span> Vaccination
+                  </div>
+                </div>
+                <figcaption>
+                  <CalendarDays aria-hidden="true" /> Rendez-vous
+                </figcaption>
+              </figure>
+            </div>
+            <AudiencePreviews />
           </div>
         </section>
 
@@ -251,23 +241,21 @@ export default function Home() {
               <li>
                 <LockKeyhole aria-hidden="true" />
                 <span>
-                  <strong>Accès lié à une invitation</strong>Le soignant vérifie
-                  votre qualité de responsable avant d’ouvrir le carnet.
+                  <strong>Invitation vérifiée</strong>
                 </span>
               </li>
               <li>
                 <QrCode aria-hidden="true" />
                 <span>
-                  <strong>QR temporaire</strong>Le QR ouvre la procédure de
-                  partage. Le professionnel doit s’identifier pour accéder aux
-                  informations autorisées.
+                  <strong>QR temporaire</strong>Accès réservé au professionnel
+                  identifié.
                 </span>
               </li>
               <li>
                 <ShieldCheck aria-hidden="true" />
                 <span>
-                  <strong>Accès consultables</strong>Retrouvez vos partages
-                  actifs dans « Partage & accès ».
+                  <strong>Partages révocables</strong>Depuis « Partage & accès
+                  ».
                 </span>
               </li>
             </ul>
