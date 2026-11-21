@@ -1,6 +1,6 @@
 "use client";
 import { useActionState, useState } from "react";
-import { saveAppointment } from "@/app/appointments/actions";
+import { saveAppointment } from "@/app/(soignant)/(verified)/appointments/actions";
 import {
   localAppointmentInput,
   localAppointmentOffset,

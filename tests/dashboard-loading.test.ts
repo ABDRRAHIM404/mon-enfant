@@ -41,7 +41,9 @@ describe("dashboard loading and public cache boundaries", () => {
         if (item.isDirectory()) visit(path);
         else if (item.name === "page.tsx")
           expect(readFileSync(join(dir, "loading.tsx"), "utf8")).toMatch(
-            /DashboardLoading|AdminLoading/,
+            dir.includes("(soignant)")
+              ? /DashboardSkeleton/
+              : /DashboardLoading|AdminLoading/,
           );
       }
     }

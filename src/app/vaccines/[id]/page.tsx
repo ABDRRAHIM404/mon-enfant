@@ -44,7 +44,7 @@ export default async function VaccineVersion({
   const selected = v.rules.find((r) => r.dose_code === query.dose);
   const formProps = { versionId: id, revision: v.revision };
   return (
-    <CatalogWorkspace admin={profile?.role === "admin"}>
+    <CatalogWorkspace profile={profile}>
       <div className="page-heading">
         <Link href="/vaccines" className="text-link">
           Toutes les versions

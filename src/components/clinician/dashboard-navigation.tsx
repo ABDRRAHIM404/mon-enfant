@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import {
   CalendarDays,
   ChevronDown,
@@ -14,7 +13,8 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, type ReactNode } from "react";
 import { useFormStatus } from "react-dom";
-import { NavigationFeedback } from "@/components/workspace-navigation";
+import { usePathname } from "next/navigation";
+import { ClinicianNavLink, useClinicianSelection } from "./navigation-state";
 
 export function DashboardAccount({
   role,
@@ -28,6 +28,10 @@ export function DashboardAccount({
   children: ReactNode;
 }) {
   const menu = useRef<HTMLDetailsElement>(null);
+  const pathname = usePathname();
+  useEffect(() => {
+    if (menu.current) menu.current.open = false;
+  }, [pathname]);
   useEffect(() => {
     function dismiss(event: PointerEvent) {
       const details = menu.current;
@@ -109,34 +113,50 @@ export function DashboardLogout() {
 
 export function DashboardMobileNavigation({
   children,
+  provisional,
 }: {
   children: ReactNode;
+  provisional: boolean;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const start = useRef<{ x: number; y: number } | null>(null);
+  const { section } = useClinicianSelection();
+  const pathname = usePathname();
+  useEffect(() => {
+    if (dialog.current?.open) dialog.current.close();
+  }, [pathname]);
+  const base = provisional ? "/provisional" : "";
   const close = () => dialog.current?.close();
   return (
     <div className="care-mobile-navigation">
       <nav aria-label="Navigation principale soignant">
-        <Link href="/dashboard" aria-current="page">
+        <ClinicianNavLink
+          href={provisional ? base : "/dashboard"}
+          section="home"
+        >
           <Home size={22} aria-hidden="true" />
           Tableau de bord
-          <NavigationFeedback />
-        </Link>
-        <Link href="/patients">
+        </ClinicianNavLink>
+        <ClinicianNavLink
+          href={provisional ? base + "/children" : "/patients"}
+          section="children"
+        >
           <UsersRound size={22} aria-hidden="true" />
           Enfants
-          <NavigationFeedback />
-        </Link>
-        <Link href="/appointments">
+        </ClinicianNavLink>
+        <ClinicianNavLink href={base + "/appointments"} section="appointments">
           <CalendarDays size={22} aria-hidden="true" />
           Rendez-vous
-          <NavigationFeedback />
-        </Link>
+        </ClinicianNavLink>
         <button
           type="button"
           aria-controls="care-feature-drawer"
           aria-haspopup="dialog"
+          data-current={
+            ["home", "children", "appointments", "account"].includes(section)
+              ? undefined
+              : ""
+          }
           onClick={() => dialog.current?.showModal()}
         >
           <Menu size={22} aria-hidden="true" />

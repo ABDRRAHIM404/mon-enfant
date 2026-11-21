@@ -11,7 +11,6 @@ import {
   UserRound,
   Search,
   Bell,
-  LogOut,
   ShieldCheck,
   Building2,
   ClipboardList,
@@ -29,43 +28,25 @@ import {
   DashboardMobileNavigation,
 } from "./dashboard-navigation";
 import {
-  WorkspaceMobileMenu,
-  NavigationFeedback,
-} from "@/components/workspace-navigation";
-import { getProfessional } from "@/lib/auth";
-import { statusLabels, type Professional } from "@/lib/authorization";
+  ClinicianNavLink,
+  ClinicianNavigationState,
+  ClinicianToolMenu,
+} from "./navigation-state";
+import type { Professional } from "@/lib/authorization";
+import { statusLabels } from "@/lib/authorization";
 import { signOut } from "@/app/auth/actions";
 import { redirect } from "next/navigation";
-export type ClinicianSection =
-  | "home"
-  | "children"
-  | "consultations"
-  | "vaccinations"
-  | "appointments"
-  | "growth"
-  | "documents"
-  | "account"
-  | "sharing"
-  | "guide"
-  | "tools";
-export type ClinicianTool =
-  "followup" | "practices" | "access" | "registry" | "parents" | "permissions";
-export async function ClinicianShell({
-  active,
+import type { ClinicianSection } from "./routes";
+
+export function ClinicianShell({
   provisional = false,
-  profile: provided,
-  tool,
-  dashboard = false,
+  profile,
   children,
 }: {
-  active: ClinicianSection;
   provisional?: boolean;
-  profile?: Professional | null;
-  tool?: ClinicianTool;
-  dashboard?: boolean;
+  profile: Professional | null;
   children: React.ReactNode;
 }) {
-  const profile = provided ?? (await getProfessional()).profile;
   if (!profile || !["doctor", "nurse"].includes(profile.role))
     redirect("/account");
   const base = provisional ? "/provisional" : "";
@@ -139,19 +120,18 @@ export async function ClinicianShell({
     items
       .filter(({ key }) => !featuresOnly || key !== "account")
       .map(({ key, label, href, icon: Icon }) => (
-        <Link
+        <ClinicianNavLink
           key={key}
           href={href}
+          section={key as ClinicianSection}
           title={label}
-          aria-current={active === key ? "page" : undefined}
         >
           <Icon size={21} aria-hidden="true" />
           <span className="rail-label">
             {label}
             {key === "documents" && <small>Bientôt disponible</small>}
           </span>
-          <NavigationFeedback />
-        </Link>
+        </ClinicianNavLink>
       ));
   const tools = [
     {
@@ -191,165 +171,139 @@ export async function ClinicianShell({
       icon: KeyRound,
     },
   ];
-  const toolsMenu = (featuresOnly = false) =>
+  const toolsMenu = (desktop = false) =>
     !provisional && (
-      <details className="soignant-tools" open={Boolean(tool)}>
-        <summary title="Outils et accès">
-          <Wrench size={18} aria-hidden="true" />
-          <span className="rail-label">Outils et accès</span>
-        </summary>
-        <nav aria-label="Outils du suivi clinique">
-          {tools
-            .filter(({ key }) => !featuresOnly || key !== "permissions")
-            .map(({ key, label, href, icon: Icon }) => (
-              <Link
-                key={key}
-                href={href}
-                title={label}
-                aria-current={tool === key ? "page" : undefined}
-              >
-                <Icon size={18} aria-hidden="true" />
-                <span className="rail-label">{label}</span>
-                <NavigationFeedback />
-              </Link>
-            ))}
-        </nav>
-      </details>
-    );
-  const logout = () => (
-    <form action={signOut}>
-      <button
-        className="soignant-logout"
-        title="Se déconnecter de l’espace soignant"
+      <ClinicianToolMenu
+        desktop={desktop}
+        heading={
+          <>
+            <Wrench size={18} aria-hidden="true" />
+            <span className="rail-label">Outils et accès</span>
+          </>
+        }
       >
-        <LogOut size={18} aria-hidden="true" />
-        <span className="rail-label">Se déconnecter de l’espace soignant</span>
-      </button>
-    </form>
-  );
+        {tools
+          .filter(({ key }) => key !== "permissions")
+          .map(({ key, label, href, icon: Icon }) => (
+            <ClinicianNavLink key={key} href={href} tool title={label}>
+              <Icon size={18} aria-hidden="true" />
+              <span className="rail-label">{label}</span>
+            </ClinicianNavLink>
+          ))}
+        <ClinicianNavLink href="/vaccines" tool title="Référentiel vaccinal">
+          <BookOpen size={18} aria-hidden="true" />
+          <span className="rail-label">Référentiel vaccinal</span>
+        </ClinicianNavLink>
+        {!desktop && (
+          <>
+            <ClinicianNavLink href="/patients/new?source=paper">
+              <FileText size={18} aria-hidden="true" />
+              Transcrire un dossier papier
+            </ClinicianNavLink>
+            <ClinicianNavLink href="/patients/link">
+              <UsersRound size={18} aria-hidden="true" />
+              Rattacher un dossier existant
+            </ClinicianNavLink>
+            <ClinicianNavLink href="/provisional">
+              <FileText size={18} aria-hidden="true" />
+              Mes dossiers provisoires
+            </ClinicianNavLink>
+          </>
+        )}
+      </ClinicianToolMenu>
+    );
+  const role = profile.role === "nurse" ? "Infirmier(e)" : "Médecin";
+  const status = statusLabels[profile.verification_status];
+  const verified = profile.verification_status === "approved";
   return (
-    <div
-      className={
-        dashboard
-          ? "soignant-workspace soignant-workspace--overview"
-          : "soignant-workspace"
-      }
-    >
-      <aside id="clinician-navigation-rail" className="soignant-sidebar">
-        <Brand clinician={dashboard} />
-        <nav aria-label="Espace soignant">{links()}</nav>
-        {!dashboard && toolsMenu()}
-        <div className="soignant-sidebar-footer">
-          <ShieldCheck size={18} aria-hidden="true" />
-          <p>
-            {provisional
-              ? "Dossiers privés à leur auteur"
-              : "Dossiers explicitement autorisés"}
-          </p>
-          {logout()}
-        </div>
-      </aside>
-      <header className="soignant-header">
-        <SidebarToggle controls="clinician-navigation-rail" />
-        <div className="soignant-mobile-brand">
-          <Brand clinician={dashboard} />
-        </div>
-        <form
-          action={provisional ? base + "/children" : "/patients"}
-          className="soignant-search"
-        >
-          <Search size={20} aria-hidden="true" />
-          <label className="sr-only" htmlFor="soignant-search">
-            {provisional
-              ? "Rechercher dans mes dossiers provisoires"
-              : "Rechercher dans mes dossiers autorisés"}
-          </label>
-          <input
-            id="soignant-search"
-            type="search"
-            name="q"
-            maxLength={100}
-            placeholder={
-              dashboard
-                ? "Rechercher un enfant, un dossier…"
-                : provisional
-                  ? "Dossier privé…"
-                  : "Nom, registre…"
-            }
-          />
-          <button type="submit" aria-label="Rechercher">
-            {dashboard ? <kbd>Ctrl + K</kbd> : "Rechercher"}
-          </button>
-        </form>
-        <div className="soignant-account">
-          <Link
-            href={provisional ? base + "/appointments" : "/follow-up"}
-            aria-label="Rendez-vous et suivis"
+    <ClinicianNavigationState>
+      <div className="soignant-workspace soignant-workspace--shared">
+        <aside id="clinician-navigation-rail" className="soignant-sidebar">
+          <Brand clinician />
+          <nav aria-label="Espace soignant">{links()}</nav>
+          {toolsMenu(true)}
+          <div className="soignant-sidebar-footer">
+            <form action={signOut}>
+              <DashboardLogout />
+            </form>
+          </div>
+        </aside>
+        <header className="soignant-header">
+          <SidebarToggle controls="clinician-navigation-rail" />
+          <div className="soignant-mobile-brand">
+            <Brand clinician />
+          </div>
+          <form
+            action={provisional ? base + "/children" : "/patients"}
+            className="soignant-search"
           >
-            <Bell size={22} />
-          </Link>
-          {dashboard ? (
-            <DashboardAccount
-              role={profile.role === "nurse" ? "Infirmier(e)" : "Médecin"}
-              status={statusLabels[profile.verification_status]}
-              verified={profile.verification_status === "approved"}
+            <Search size={20} aria-hidden="true" />
+            <label className="sr-only" htmlFor="soignant-search">
+              {provisional
+                ? "Rechercher dans mes dossiers provisoires"
+                : "Rechercher dans mes dossiers autorisés"}
+            </label>
+            <input
+              id="soignant-search"
+              type="search"
+              name="q"
+              maxLength={100}
+              placeholder={
+                provisional
+                  ? "Rechercher un dossier provisoire…"
+                  : "Rechercher un enfant, un dossier…"
+              }
+            />
+            <button type="submit" aria-label="Rechercher">
+              <kbd>Ctrl + K</kbd>
+            </button>
+          </form>
+          <div className="soignant-account">
+            <Link
+              href={provisional ? base + "/appointments" : "/follow-up"}
+              aria-label="Rendez-vous et suivis"
             >
+              <Bell size={22} aria-hidden="true" />
+            </Link>
+            <DashboardAccount role={role} status={status} verified={verified}>
               <nav aria-label="Options du compte soignant">
                 <Link href="/account">
                   <UserRound size={18} aria-hidden="true" />
                   Mon compte soignant
                 </Link>
+                <Link href="/account#soignant-settings">
+                  <Wrench size={18} aria-hidden="true" />
+                  Paramètres
+                </Link>
                 <Link href="/verification">
                   <ShieldCheck size={18} aria-hidden="true" />
                   Vérification du compte
                 </Link>
-                <Link href="/account/clinical-permissions">
-                  <KeyRound size={18} aria-hidden="true" />
-                  Mes habilitations
-                </Link>
+                {!provisional && (
+                  <Link href="/account/clinical-permissions">
+                    <KeyRound size={18} aria-hidden="true" />
+                    Mes habilitations
+                  </Link>
+                )}
               </nav>
               <form action={signOut}>
                 <DashboardLogout />
               </form>
             </DashboardAccount>
-          ) : (
-            <Link
-              href="/account"
-              aria-label="Compte soignant"
-              className="soignant-account-status"
-            >
-              <UserRound size={24} aria-hidden="true" />
-              <span>
-                {profile.role === "nurse" ? "Infirmier(e)" : "Médecin"}
-                <small>{statusLabels[profile.verification_status]}</small>
-              </span>
-            </Link>
-          )}
-        </div>
-      </header>
-      {dashboard ? (
-        <DashboardMobileNavigation>
+          </div>
+        </header>
+        <DashboardMobileNavigation provisional={provisional}>
           <nav aria-label="Toutes les rubriques soignant">{links(true)}</nav>
-          {toolsMenu(true)}
+          {toolsMenu()}
         </DashboardMobileNavigation>
-      ) : (
-        <div className="soignant-mobile-menu">
-          <WorkspaceMobileMenu label="Menu soignant">
-            <nav aria-label="Toutes les rubriques soignant">
-              {links()}
-              {toolsMenu()}
-              {logout()}
-            </nav>
-          </WorkspaceMobileMenu>
-        </div>
-      )}
-      <main className="soignant-main">
-        {children}
-        <p className="soignant-development">
-          Bêta de test · Données fictives uniquement
-        </p>
-      </main>
-    </div>
+        <main className="soignant-main">
+          {children}
+          <p className="soignant-development">
+            Bêta de test · Données fictives uniquement
+          </p>
+        </main>
+      </div>
+    </ClinicianNavigationState>
   );
 }
 export function ClinicianHeading({

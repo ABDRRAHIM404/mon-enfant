@@ -4,7 +4,7 @@ import {
   registryAction,
   reviewRegistration,
   resumeRegistration,
-} from "@/app/patients/actions";
+} from "@/app/(soignant)/(verified)/patients/actions";
 import type { Facility, ParentChildIntake } from "@/lib/registry/types";
 function ActionForm({
   kind,

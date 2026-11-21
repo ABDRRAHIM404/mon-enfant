@@ -10,12 +10,9 @@ import { ParentWorkflow } from "../src/components/parents/workflow";
 import type { ChildProfile } from "../src/lib/registry/types";
 const { rpc, guard } = vi.hoisted(() => ({ rpc: vi.fn(), guard: vi.fn() }));
 vi.mock("@/lib/auth", () => ({ requireApprovedDoctor: guard }));
-vi.mock("@/components/clinician/shell", () => ({
-  ClinicianShell: ({ children }: { children: React.ReactNode }) =>
-    createElement("main", null, children),
-}));
 vi.mock("@/app/auth/actions", () => ({ signOut: async () => ({}) }));
 vi.mock("next/navigation", () => ({
+  usePathname: () => "/patients/fictional/records",
   notFound: () => {
     throw Error("NOT_FOUND");
   },

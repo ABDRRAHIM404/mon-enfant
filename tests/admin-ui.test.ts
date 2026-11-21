@@ -32,7 +32,7 @@ vi.mock("@/app/admin/actions", () => ({
   retryApprovalNotice: async () => ({}),
 }));
 vi.mock("@/app/auth/actions", () => ({ signOut: async () => ({}) }));
-vi.mock("@/app/patients/clinical-actions", () => ({
+vi.mock("@/app/(soignant)/(verified)/patients/clinical-actions", () => ({
   changeClinicalPermission: async () => ({}),
 }));
 vi.mock("next/navigation", () => ({

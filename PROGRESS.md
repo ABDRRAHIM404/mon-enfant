@@ -1061,3 +1061,7 @@ The vaccination form now links each administration value to its certainty and en
 ### 21 November 2026 — soignant dashboard redesign
 
 The clinician dashboard uses the existing logo and guarded backend projections in the desktop and mobile reference layouts. The daily calendar projection includes actual canceled and completed appointments. The three existing statistics, documented consultation source states, four capability-dependent shortcuts, nine management tools, mobile drawer and separate account panel are available. Targeted lint, nine scoped existing tests and isolated Chromium layout/navigation checks at desktop, tablet and two phone widths passed. The broad skeleton test exposes a pre-existing missing parent add-child loading file. The dashboard redesign is staged for owner visual review.
+
+### 21 November 2026 — shared soignant navigation
+
+The approved desktop and mobile clinician shell is inherited by all 41 clinician-only pages, with role-sensitive reuse on five shared URLs. The [route inventory](docs/design-qa/soignant-shared-navigation.md) records the routes, active-state behavior and focused checks. Owner requests direct production release for web updates.

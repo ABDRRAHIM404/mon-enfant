@@ -23,7 +23,7 @@ export default async function Vaccines({
     total: number;
   };
   return (
-    <CatalogWorkspace admin={profile?.role === "admin"}>
+    <CatalogWorkspace profile={profile}>
       <div className="page-heading">
         <h1 id="main-content" tabIndex={-1}>
           Catalogue vaccinal

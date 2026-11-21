@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { ClinicianShell } from "@/components/clinician/shell";
+import { canAccessClinicalWorkspace } from "@/lib/authorization";
 import { Brand } from "@/components/brand";
 import { getProfessional } from "@/lib/auth";
 import { requestStatusLabels } from "@/lib/verification/validation";
@@ -19,14 +21,17 @@ export default async function Verification() {
     profile &&
     ["doctor", "nurse"].includes(profile.role) &&
     ["unverified", "rejected"].includes(profile.verification_status);
-  return (
-    <main className="account-page">
-      <header>
-        <Brand />
-        <Link className="button secondary" href="/account">
-          Mon compte
-        </Link>
-      </header>
+  const clinician = profile?.role === "doctor" || profile?.role === "nurse";
+  const content = (
+    <>
+      {!clinician && (
+        <header>
+          <Brand />
+          <Link className="button secondary" href="/account">
+            Mon compte
+          </Link>
+        </header>
+      )}
       <section className="panel">
         <span className="eyebrow">VÉRIFICATION PROFESSIONNELLE</span>
         <h1 id="main-content" tabIndex={-1}>
@@ -84,6 +89,18 @@ export default async function Verification() {
           </div>
         )}
       </section>
-    </main>
+    </>
+  );
+  return clinician ? (
+    <ClinicianShell
+      profile={profile}
+      provisional={!canAccessClinicalWorkspace(profile)}
+    >
+      <div className="soignant-account-content">
+        <div className="account-page">{content}</div>
+      </div>
+    </ClinicianShell>
+  ) : (
+    <main className="account-page">{content}</main>
   );
 }

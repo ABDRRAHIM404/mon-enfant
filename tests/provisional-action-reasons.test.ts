@@ -10,7 +10,7 @@ vi.mock("next/navigation", () => ({
     throw new Error("test-redirect");
   },
 }));
-import { writeProvisional } from "@/app/provisional/actions";
+import { writeProvisional } from "@/app/(soignant)/provisional/actions";
 function form(correction = false) {
   const f = new FormData();
   Object.entries({

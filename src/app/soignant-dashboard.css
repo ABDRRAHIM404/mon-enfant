@@ -1,4 +1,4 @@
-.soignant-workspace--overview {
+.soignant-workspace--shared {
   --paper: var(--theme-blue-mist);
   --card: var(--theme-white-card);
   --ink: var(--theme-light-text);
@@ -9,19 +9,19 @@
   color: var(--ink);
 }
 
-.soignant-workspace--overview :where(a, button, input, summary):focus-visible {
+.soignant-workspace--shared :where(a, button, input, summary):focus-visible {
   outline: 2px solid var(--theme-green-ink);
   outline-offset: 4px;
 }
 
-.soignant-workspace--overview .soignant-sidebar {
+.soignant-workspace--shared .soignant-sidebar {
   padding: 18px 16px 20px;
   border-color: var(--care-line);
   background: #f7fbfc;
   box-shadow: 3px 0 18px rgb(51 113 124 / 6%);
 }
 
-.soignant-workspace--overview .soignant-sidebar::before {
+.soignant-workspace--shared .soignant-sidebar::before {
   content: "";
   position: fixed;
   inset: auto auto 0 0;
@@ -33,23 +33,23 @@
   pointer-events: none;
 }
 
-.soignant-workspace--overview:has(.sidebar-toggle[aria-pressed="true"])
+.soignant-workspace--shared:has(.sidebar-toggle[aria-pressed="true"])
   .soignant-sidebar::before {
   display: none;
 }
 
-.soignant-workspace--overview .soignant-sidebar > * {
+.soignant-workspace--shared .soignant-sidebar > * {
   position: relative;
 }
-.soignant-workspace--overview .soignant-sidebar .brand-group {
+.soignant-workspace--shared .soignant-sidebar .brand-group {
   padding: 0 4px 24px;
 }
-.soignant-workspace--overview .brand {
+.soignant-workspace--shared .brand {
   font-size: clamp(21px, 1.85vw, 30px);
   font-weight: 800;
   letter-spacing: -0.055em;
 }
-.soignant-workspace--overview .brand-sub {
+.soignant-workspace--shared .brand-sub {
   display: block;
   font-size: 15px;
   font-weight: 500;
@@ -57,10 +57,10 @@
   letter-spacing: 0;
   text-transform: none;
 }
-.soignant-workspace--overview .soignant-sidebar nav {
+.soignant-workspace--shared .soignant-sidebar nav {
   gap: 3px;
 }
-.soignant-workspace--overview .soignant-sidebar nav > a {
+.soignant-workspace--shared .soignant-sidebar nav > a {
   min-height: 45px;
   padding: 9px 13px;
   border-inline-start: 4px solid transparent;
@@ -70,80 +70,80 @@
     border-color var(--motion-feedback),
     color var(--motion-feedback);
 }
-.soignant-workspace--overview .soignant-sidebar nav > a svg {
+.soignant-workspace--shared .soignant-sidebar nav > a svg {
   color: var(--theme-green-ink);
 }
-.soignant-workspace--overview .soignant-sidebar nav > a[aria-current] {
+.soignant-workspace--shared .soignant-sidebar nav > a[aria-current] {
   background: #cdeee5;
   border-inline-start-color: var(--theme-soft-coral);
   box-shadow: var(--theme-soft-shadow);
   color: var(--ink);
   font-weight: 750;
 }
-.soignant-workspace--overview .soignant-sidebar-footer {
+.soignant-workspace--shared .soignant-sidebar-footer {
   margin-top: 12px;
   padding-block: 10px;
 }
-.soignant-workspace--overview .soignant-sidebar-footer > :is(svg, p) {
+.soignant-workspace--shared .soignant-sidebar-footer > :is(svg, p) {
   display: none;
 }
 
-.soignant-workspace--overview .soignant-header,
-.soignant-workspace--overview .soignant-main {
+.soignant-workspace--shared .soignant-header,
+.soignant-workspace--shared .soignant-main {
   padding-inline: clamp(16px, 1.4vw, 24px);
 }
-.soignant-workspace--overview .soignant-header {
+.soignant-workspace--shared .soignant-header {
   min-height: 70px;
   padding-block: 10px;
   border: 0;
   gap: 13px;
   background: var(--paper);
 }
-.soignant-workspace--overview .soignant-header > .sidebar-toggle {
+.soignant-workspace--shared .soignant-header > .sidebar-toggle {
   order: 1;
   margin-left: auto;
 }
-.soignant-workspace--overview .soignant-header > .soignant-account {
+.soignant-workspace--shared .soignant-header > .soignant-account {
   order: 2;
 }
-.soignant-workspace--overview .soignant-search {
+.soignant-workspace--shared .soignant-search {
   padding: 3px 6px 3px 14px;
   border-color: var(--care-line);
   min-height: 45px;
   border-radius: 999px;
   box-shadow: var(--theme-soft-shadow);
 }
-.soignant-workspace--overview .soignant-search input {
+.soignant-workspace--shared .soignant-search input {
   box-shadow: none;
   color: var(--ink);
   font: inherit;
   font-size: 14px;
 }
-.soignant-workspace--overview .soignant-search input::placeholder {
+.soignant-workspace--shared .soignant-search input::placeholder {
   color: #3d4b53;
   opacity: 1;
 }
-.soignant-workspace--overview .soignant-search button {
+.soignant-workspace--shared .soignant-search button {
   min-height: 34px;
   padding: 4px 12px;
   border-radius: 999px;
   background: var(--theme-neutral-surface);
   color: var(--ink);
 }
-.soignant-workspace--overview .soignant-search kbd {
+.soignant-workspace--shared .soignant-search kbd {
   font: inherit;
   white-space: nowrap;
 }
-.soignant-workspace--overview .soignant-account {
+.soignant-workspace--shared .soignant-account {
   gap: clamp(10px, 1.4vw, 22px);
 }
-.soignant-workspace--overview .soignant-account > a {
+.soignant-workspace--shared .soignant-account > a {
   display: grid;
   place-items: center;
   width: 44px;
   min-height: 44px;
 }
-.soignant-workspace--overview .soignant-main {
+.soignant-workspace--shared .soignant-main:has(> .care-day) {
   padding-block: 4px 22px;
   display: grid;
   gap: 11px;
@@ -324,7 +324,7 @@
   outline-color: var(--theme-green-text);
 }
 
-.soignant-workspace--overview
+.soignant-workspace--shared
   :is(.care-start-heading, .care-panel, .care-tools)
   h2 {
   margin: 0;
@@ -676,31 +676,33 @@
   }
 }
 @media (max-width: 900px) {
-  .soignant-workspace--overview .soignant-sidebar,
-  .soignant-workspace--overview .soignant-header > .sidebar-toggle {
+  .soignant-workspace--shared .soignant-sidebar,
+  .soignant-workspace--shared .soignant-header > .sidebar-toggle {
     display: none;
   }
-  .soignant-workspace--overview .soignant-mobile-brand {
+  .soignant-workspace--shared .soignant-mobile-brand {
     display: block;
   }
-  .soignant-workspace--overview .soignant-header,
-  .soignant-workspace--overview .soignant-main {
+  .soignant-workspace--shared .soignant-header,
+  .soignant-workspace--shared .soignant-main {
     margin-inline-start: 0;
   }
-  .soignant-workspace--overview .soignant-header {
+  .soignant-workspace--shared .soignant-header {
     flex-wrap: wrap;
     column-gap: 12px;
     row-gap: 8px;
   }
-  .soignant-workspace--overview .soignant-header > .soignant-account {
+  .soignant-workspace--shared .soignant-header > .soignant-account {
     margin-inline-start: auto;
   }
-  .soignant-workspace--overview .soignant-search {
+  .soignant-workspace--shared .soignant-search {
     order: 3;
     max-width: none;
     flex-basis: 100%;
   }
-  .soignant-workspace--overview .soignant-main {
+  .soignant-workspace--shared .soignant-main,
+  .soignant-workspace--shared .soignant-main:has(> .care-day) {
+    margin-left: 0;
     padding-bottom: calc(88px + env(safe-area-inset-bottom));
   }
   .care-mobile-navigation {
@@ -739,7 +741,7 @@
     text-align: center;
     cursor: pointer;
   }
-  .care-mobile-navigation > nav > [aria-current] {
+  .care-mobile-navigation > nav > :is([aria-current], [data-current]) {
     color: var(--theme-green-ink);
     background: var(--theme-green-surface);
   }
@@ -831,21 +833,21 @@
   }
 }
 @media (max-width: 650px) {
-  .soignant-workspace--overview .soignant-header,
-  .soignant-workspace--overview .soignant-main {
+  .soignant-workspace--shared .soignant-header,
+  .soignant-workspace--shared .soignant-main {
     padding-inline: 12px;
   }
-  .soignant-workspace--overview .soignant-search {
+  .soignant-workspace--shared .soignant-search {
     margin-bottom: 3px;
   }
-  .soignant-workspace--overview .soignant-search button {
+  .soignant-workspace--shared .soignant-search button {
     font-size: 0;
     padding-inline: 6px;
   }
-  .soignant-workspace--overview .soignant-search button kbd {
+  .soignant-workspace--shared .soignant-search button kbd {
     display: none;
   }
-  .soignant-workspace--overview .soignant-search button::after {
+  .soignant-workspace--shared .soignant-search button::after {
     content: "OK";
     font-size: 12px;
     font-weight: 700;
@@ -853,7 +855,7 @@
   .care-account-label {
     display: none;
   }
-  .soignant-workspace--overview .soignant-account {
+  .soignant-workspace--shared .soignant-account {
     gap: 4px;
   }
   .care-day {
@@ -953,7 +955,7 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .soignant-workspace--overview
+  .soignant-workspace--shared
     :is(a, button, summary, dialog, .care-account-panel, svg),
   .care-tools::details-content {
     animation: none !important;

@@ -1,6 +1,6 @@
 "use client";
 import { useActionState } from "react";
-import { changePatientVaccineItem } from "@/app/patients/vaccine-actions";
+import { changePatientVaccineItem } from "@/app/(soignant)/(verified)/patients/vaccine-actions";
 import type { Facility } from "@/lib/registry/types";
 import type { CatalogRule } from "@/lib/vaccines/types";
 import { ageLabel } from "@/lib/vaccines/types";

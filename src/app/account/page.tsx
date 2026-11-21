@@ -89,16 +89,18 @@ export default async function Account() {
       </AdminShell>
     );
   }
-  const AccountTitle =
-    profile && ["doctor", "nurse"].includes(profile.role) ? "h2" : "h1";
+  const clinician = profile?.role === "doctor" || profile?.role === "nurse";
+  const AccountTitle = clinician ? "h2" : "h1";
   const content = (
     <section className="account-page">
-      <header>
-        <Brand />
-        <form action={signOut}>
-          <button className="button secondary">Se déconnecter</button>
-        </form>
-      </header>
+      {!clinician && (
+        <header>
+          <Brand />
+          <form action={signOut}>
+            <button className="button secondary">Se déconnecter</button>
+          </form>
+        </header>
+      )}
       <section className="account-card">
         <span className="round-icon">
           <ShieldCheck />
@@ -121,7 +123,7 @@ export default async function Account() {
           qualifications et de vos autorisations.
         </p>
         {profile && ["doctor", "nurse"].includes(profile.role) && (
-          <section className="panel">
+          <section className="panel" id="soignant-settings">
             <h2>Mon profil soignant</h2>
             <dl className="details">
               <div>
@@ -223,10 +225,9 @@ export default async function Account() {
       </section>
     </section>
   );
-  if (profile && ["doctor", "nurse"].includes(profile.role)) {
+  if (clinician) {
     return (
       <ClinicianShell
-        active="account"
         provisional={!canAccessClinicalWorkspace(profile)}
         profile={profile}
       >
