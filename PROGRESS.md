@@ -1071,3 +1071,7 @@ The approved desktop and mobile clinician shell is inherited by all 41 clinician
 The authorized Enfants directory follows the desktop and mobile references with illustrated actions, registry filters, compact record cards, list and grid views, and pagination. Newest-first is the registry order. Alphabetical sorting applies to the current page. The same avatars appear in the clinical workspace and child selectors, using recorded sex and a neutral fallback. The current registry has no authorized custom photo source.
 
 Chromium captures compared the implemented directory against the supplied layouts at desktop and phone widths. A second comparison confirmed the search icon no longer overlaps the text and loading feedback no longer creates extra card height. Tablet and 320 px overflow checks, filtering, pagination, sorting, refresh, all three avatars, and record links passed with fictional data. Changed-file lint and 82 focused tests passed, including the existing registry authorization tests. Signed-in production verification remains open.
+
+### 21 November 2026 — Enfants filter controls
+
+Historique and Âge now share a keyboard-accessible desktop popup and a modal phone sheet. The existing options and Rechercher submission work as before. Chromium verified selection, focus, outside dismissal, swipe dismissal, scroll lock, reduced motion, and URL persistence with fictional records. Changed-file lint and 56 focused tests passed.

@@ -1,0 +1,279 @@
+.registry-filter-select {
+  --filter-motion: 200ms var(--motion-ease, ease);
+  position: relative;
+  display: grid;
+  gap: 8px;
+  min-inline-size: 0;
+}
+
+.registry-filter-label {
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.registry-filter-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-block-size: 46px;
+  inline-size: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--directory-border);
+  border-radius: 11px;
+  background: #f8fbfc;
+  color: var(--theme-light-text);
+  font-size: 1rem;
+  font-weight: 650;
+  text-align: start;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    background-color var(--filter-motion),
+    border-color var(--filter-motion);
+}
+
+.registry-filter-trigger[aria-expanded="true"] {
+  background: var(--theme-white-card);
+  border-color: var(--theme-green-ink);
+}
+
+.registry-filter-trigger svg {
+  flex: none;
+  color: var(--theme-green-ink);
+  transition: transform var(--filter-motion);
+}
+
+.registry-filter-trigger[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
+.registry-filter-dialog {
+  position: absolute;
+  inset: calc(100% + 8px) 0 auto;
+  z-index: 12;
+  display: none;
+  inline-size: 100%;
+  max-inline-size: none;
+  max-block-size: var(--filter-room, 260px);
+  margin: 0;
+  padding: 5px;
+  overflow: hidden;
+  border: 1px solid var(--directory-border);
+  border-radius: 15px;
+  background: var(--theme-white-card);
+  box-shadow:
+    0 12px 24px rgb(43 105 121 / 18%),
+    0 3px 7px rgb(43 105 121 / 8%);
+  color: var(--theme-light-text);
+  opacity: 0;
+  transform: translateY(-5px);
+  transition:
+    opacity var(--filter-motion),
+    transform var(--filter-motion),
+    display var(--filter-motion) allow-discrete,
+    overlay var(--filter-motion) allow-discrete;
+}
+
+.registry-filter-dialog[data-placement="above"][data-presentation="popover"] {
+  inset: auto 0 calc(100% + 8px);
+}
+
+.registry-filter-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@starting-style {
+  .registry-filter-dialog[open] {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+}
+
+.registry-filter-options {
+  display: grid;
+  gap: 3px;
+  min-block-size: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.registry-filter-options:focus-visible {
+  outline: 2px solid var(--theme-green-ink);
+  outline-offset: -2px;
+  border-radius: 10px;
+}
+
+.registry-filter-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-block-size: 44px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font-size: 0.9375rem;
+  line-height: 1.25;
+  cursor: pointer;
+  transition:
+    background-color var(--filter-motion),
+    border-color var(--filter-motion);
+}
+
+.registry-filter-option[aria-selected="true"] {
+  background: color-mix(
+    in srgb,
+    var(--theme-sea-green) 19%,
+    var(--theme-white-card)
+  );
+  color: var(--theme-green-ink);
+  font-weight: 750;
+}
+
+.registry-filter-option svg {
+  flex: none;
+}
+
+.registry-filter-options:focus-visible .registry-filter-option[data-active] {
+  border-color: var(--theme-green-ink);
+}
+
+.registry-filter-option:active {
+  background: color-mix(
+    in srgb,
+    var(--theme-sea-green) 28%,
+    var(--theme-white-card)
+  );
+}
+
+@media (hover: hover) {
+  .registry-filter-trigger:hover,
+  .registry-filter-option[aria-selected="false"]:hover {
+    background: var(--theme-blue-mist);
+  }
+}
+
+/* A modal sits in the top layer, above the existing fixed bottom bar. */
+.registry-filter-dialog[data-presentation="sheet"] {
+  position: fixed;
+  inset: auto 0 0;
+  inline-size: 100%;
+  max-block-size: calc(100% - 28px);
+  max-block-size: calc(100dvh - 28px);
+  padding: 0 14px max(14px, env(safe-area-inset-bottom));
+  border: 0;
+  border-radius: 23px 23px 0 0;
+  box-shadow: 0 -9px 35px rgb(21 67 76 / 19%);
+  transition:
+    transform var(--filter-motion),
+    display var(--filter-motion) allow-discrete,
+    overlay var(--filter-motion) allow-discrete;
+}
+
+.registry-filter-dialog:not([open]) {
+  pointer-events: none;
+}
+
+.registry-filter-dialog[data-presentation="sheet"]:not([open]) {
+  opacity: 1;
+  transform: translateY(100%);
+}
+
+.registry-filter-dialog::backdrop {
+  background: rgb(15 39 50 / 0%);
+  transition:
+    background-color 200ms ease,
+    display 200ms ease allow-discrete,
+    overlay 200ms ease allow-discrete;
+}
+
+.registry-filter-dialog:not([open])::backdrop {
+  pointer-events: none;
+}
+
+.registry-filter-dialog[open]::backdrop {
+  background: rgb(15 39 50 / 34%);
+}
+
+@starting-style {
+  .registry-filter-dialog[open][data-presentation="sheet"] {
+    opacity: 1;
+    transform: translateY(100%);
+  }
+
+  .registry-filter-dialog[open]::backdrop {
+    background: rgb(15 39 50 / 0%);
+  }
+}
+
+html:has(.registry-filter-dialog[open][data-presentation="sheet"]),
+body:has(.registry-filter-dialog[open][data-presentation="sheet"]) {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.registry-filter-sheet-heading {
+  position: relative;
+  display: flex;
+  min-block-size: 70px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 16px 0 6px 8px;
+  touch-action: none;
+}
+
+.registry-filter-sheet-heading h2 {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.registry-filter-grip {
+  position: absolute;
+  inset: 8px 0 auto;
+  inline-size: 36px;
+  block-size: 4px;
+  margin-inline: auto;
+  border-radius: 4px;
+  background: var(--directory-border);
+}
+
+.registry-filter-sheet-heading button {
+  display: grid;
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--theme-blue-mist);
+  color: var(--theme-green-ink);
+  cursor: pointer;
+}
+
+.registry-filter-dialog[data-presentation="sheet"] .registry-filter-option {
+  min-block-size: 52px;
+  padding-inline: 13px;
+  font-size: 1rem;
+}
+
+@media (max-width: 700px) {
+  .registry-filter-select {
+    gap: 5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .registry-filter-select .registry-filter-trigger,
+  .registry-filter-select .registry-filter-trigger svg,
+  .registry-filter-select .registry-filter-option,
+  .registry-filter-select .registry-filter-dialog,
+  .registry-filter-select .registry-filter-dialog::backdrop {
+    transition: none;
+    animation: none;
+  }
+}

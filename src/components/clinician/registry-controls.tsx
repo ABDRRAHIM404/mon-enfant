@@ -4,6 +4,20 @@ import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTransition, type FormEvent } from "react";
 import { historyLabels } from "@/lib/registry/types";
+import { RegistryFilterSelect } from "./registry-filter-select";
+import "./registry-filter-select.css";
+
+const historyOptions = [
+  { value: "all", label: "Tous les dossiers" },
+  ...Object.entries(historyLabels).map(([value, label]) => ({ value, label })),
+];
+const ageOptions = [
+  { value: "all", label: "Tous les âges" },
+  { value: "under1", label: "Moins de 1 an" },
+  { value: "1to5", label: "1 à 5 ans" },
+  { value: "over5", label: "6 ans et plus" },
+  { value: "unknown", label: "Date inconnue / estimée" },
+];
 
 export type RegistryQuery = {
   q: string;
@@ -57,35 +71,18 @@ export function RegistryFilters({ query }: { query: RegistryQuery }) {
           />
         </span>
       </label>
-      <label>
-        <span id="registry-history-label">Historique</span>
-        <select
-          name="history"
-          aria-labelledby="registry-history-label"
-          defaultValue={query.history}
-        >
-          <option value="all">Tous les dossiers</option>
-          {Object.entries(historyLabels).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label>
-        <span id="registry-age-label">Âge (date exacte)</span>
-        <select
-          name="age"
-          aria-labelledby="registry-age-label"
-          defaultValue={query.age}
-        >
-          <option value="all">Tous les âges</option>
-          <option value="under1">Moins de 1 an</option>
-          <option value="1to5">1 à 5 ans</option>
-          <option value="over5">6 ans et plus</option>
-          <option value="unknown">Date inconnue / estimée</option>
-        </select>
-      </label>
+      <RegistryFilterSelect
+        name="history"
+        label="Historique"
+        defaultValue={query.history}
+        options={historyOptions}
+      />
+      <RegistryFilterSelect
+        name="age"
+        label="Âge (date exacte)"
+        defaultValue={query.age}
+        options={ageOptions}
+      />
       <button
         type="submit"
         className="registry-directory-submit"
