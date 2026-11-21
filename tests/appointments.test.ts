@@ -1,8 +1,12 @@
 import { beforeAll, afterAll, describe, it, expect } from "vitest";
+import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import type { PGlite } from "@electric-sql/pglite";
-import { appointmentDatabase, sessionActing } from "./helpers/database";
-import { resolveAppointmentTime } from "../src/lib/appointments/calendar";
+import { sharingDatabase, sessionActing } from "./helpers/database";
+import {
+  resolveAppointmentTime,
+  todayCasablanca,
+} from "../src/lib/appointments/calendar";
 import { routineReference } from "../src/lib/vaccines/calendar";
 import type { CatalogSnapshot } from "../src/lib/vaccines/types";
 let db: PGlite, version: string, seed: string, editor: Actor, reviewer: Actor;
@@ -82,19 +86,28 @@ async function setup(dob: string | null = "2025-01-01", sex = "female") {
       "Centre de rendez-vous fictif",
       "Rabat",
     ]);
+  const operation = randomUUID();
+  const registration = {
+    facility_id: facility,
+    register_year: 2026,
+    register_book: "A",
+    local_number: "125",
+    given_name: "Enfant fictif",
+    family_name: randomUUID(),
+    birth_date: dob,
+    birth_date_precision: dob ? "exact" : "unknown",
+    sex,
+  };
+  await rpc(a, "prepare_child_registration", [
+    operation,
+    registration,
+    `Mère fictive ${randomUUID()}`,
+    "Maternité fictive",
+    false,
+  ]);
   const child = await rpc<string>(a, "register_child", [
-    randomUUID(),
-    {
-      facility_id: facility,
-      register_year: 2026,
-      register_book: "A",
-      local_number: "125",
-      given_name: "Enfant fictif",
-      family_name: randomUUID(),
-      birth_date: dob,
-      birth_date_precision: dob ? "exact" : "unknown",
-      sex,
-    },
+    operation,
+    registration,
   ]);
   return { a, facility, child };
 }
@@ -183,7 +196,15 @@ async function link(a: Actor, b: Actor, child: string) {
   );
 }
 beforeAll(async () => {
-  db = await appointmentDatabase();
+  db = await sharingDatabase();
+  await db.exec("create role service_role");
+  for (const file of [
+    "20261119150616_doctor_care_qr.sql",
+    "20261119152628_parent_care_visit_qr.sql",
+    "20261121174928_pni_hepatitis_b_birth_draft.sql",
+    "20261121183740_routine_appointment_proposals.sql",
+  ])
+    await db.exec(readFileSync(`supabase/migrations/${file}`, "utf8"));
   editor = await actor("admin");
   reviewer = await actor();
   await cap(reviewer, "vaccination");
@@ -224,6 +245,107 @@ beforeAll(async () => {
 afterAll(async () => {
   await db?.close();
 });
+describe("automatic routine offers and grouped booking", () => {
+  it("groups dates, enforces rights, confirms idempotently and preserves the recommendation", async () => {
+    const today = todayCasablanca();
+    const { a, child, facility } = await setup(today);
+    const outsider = await actor();
+    const unverified = await actor("doctor", "unverified");
+    type Proposals = {
+      version: string;
+      preview: boolean;
+      items: {
+        child_id: string;
+        recommended_on: string;
+        doses: { code: string }[];
+      }[];
+    };
+    const fetch = (who = a) =>
+      rpc<Proposals>(who, "routine_appointment_proposals");
+    const first = await fetch();
+    expect(first).toEqual(await fetch());
+    expect(first).toMatchObject({ version, preview: false });
+    const offer = first.items.find((entry) =>
+      entry.doses.some(({ code }) => code === "VPO1"),
+    )!;
+    expect(offer).toMatchObject({ child_id: child });
+    const codes = offer.doses.map(({ code }) => code);
+    expect(codes).toContain("VPO1");
+    expect(codes).not.toContain("HB1");
+    expect(codes).not.toContain("HBn");
+    expect(codes.length).toBeGreaterThan(1);
+    expect((await fetch(outsider)).items).toEqual([]);
+    await expect(fetch(unverified)).rejects.toThrow();
+    const date = new Date(`${offer.recommended_on}T12:00:00Z`);
+    date.setUTCDate(date.getUTCDate() + 2);
+    const modified = date.toISOString().slice(0, 10);
+    const args = [
+      randomUUID(),
+      child,
+      version,
+      offer.recommended_on,
+      codes,
+      facility,
+      resolveAppointmentTime(`${modified}T10:00`),
+      resolveAppointmentTime(`${modified}T10:30`),
+      reason,
+      true,
+    ];
+    const confirm = (input = args, who = a) =>
+      rpc<string>(who, "confirm_routine_appointment", input);
+    await expect(confirm(args, outsider)).rejects.toThrow(/child access/);
+    await expect(confirm()).rejects.toThrow(/Vaccination capability/);
+    await cap(a, "vaccination");
+    await expect(
+      confirm(args.map((arg, i) => (i === 4 ? ["VPO1"] : arg))),
+    ).rejects.toThrow(/Proposal changed/);
+    const appointment = await confirm();
+    expect(await confirm()).toBe(appointment);
+    await expect(
+      confirm(args.map((arg, i) => (i === 0 ? randomUUID() : arg))),
+    ).rejects.toThrow(/Proposal changed/);
+    expect(
+      (await fetch()).items.find(
+        (entry) => entry.recommended_on === offer.recommended_on,
+      ),
+    ).toBeUndefined();
+    const detail = await rpc<History>(a, "appointment_history", [
+      child,
+      appointment,
+    ]);
+    expect(detail.appointment).toMatchObject({
+      recommended_on: offer.recommended_on,
+      starts_on: modified,
+      dose_codes: codes,
+      state: "scheduled",
+    });
+    const groupedItems = await db.query<{ item_id: string; dose_code: string }>(
+      "select d.item_id,i.dose_code from private.appointment_routine_doses d join public.child_vaccine_items i on i.id=d.item_id where appointment_id=$1",
+      [appointment],
+    );
+    expect(groupedItems.rows).toHaveLength(codes.length);
+    const calendar = await rpc<Work>(a, "appointment_calendar", [
+      modified,
+      modified,
+    ]);
+    expect(calendar.items.map(({ id }) => id)).toEqual([appointment]);
+    const vpo = groupedItems.rows.find(
+      ({ dose_code }) => dose_code === "VPO1",
+    )!;
+    const record = dose(child, facility, vpo.item_id);
+    record[4] = today;
+    await rpc(a, "write_clinical_entry", record);
+    expect(
+      (await rpc<History>(a, "appointment_history", [child, appointment]))
+        .appointment.effective_state,
+    ).toBe("scheduled");
+    const available = await fetch();
+    expect(
+      available.items.flatMap((offer) => offer.doses).map(({ code }) => code),
+    ).not.toContain("VPO1");
+  });
+});
+
 describe("appointments, independent clinical permissions and cross-doctor continuity", () => {
   it("keeps all direct appointment data and projection helpers private with RLS", async () => {
     const { a } = await setup();
@@ -863,5 +985,37 @@ describe("appointments, independent clinical permissions and cross-doctor contin
     await expect(
       rpc(current.a, "change_appointment", decision(appointment, 1)),
     ).rejects.toThrow(/Active reviewed/);
+  });
+});
+
+describe("routine offers from the beta catalogue", () => {
+  it("offers an indicative revised beta date while refusing booking when no approved version exists", async () => {
+    const { a, child, facility } = await setup(todayCasablanca());
+    await cap(a, "vaccination");
+    const result = await rpc<{
+      version: string;
+      preview: boolean;
+      items: { recommended_on: string; doses: { code: string }[] }[];
+    }>(a, "routine_appointment_proposals");
+    expect(result).toMatchObject({
+      version: "0c504568-7c67-49bb-b43b-c8382439a850",
+      preview: true,
+    });
+    const offer = result.items[0];
+    expect(offer).toBeDefined();
+    await expect(
+      rpc(a, "confirm_routine_appointment", [
+        randomUUID(),
+        child,
+        result.version,
+        offer.recommended_on,
+        offer.doses.map(({ code }) => code),
+        facility,
+        resolveAppointmentTime(`${offer.recommended_on}T10:00`),
+        resolveAppointmentTime(`${offer.recommended_on}T10:30`),
+        reason,
+        true,
+      ]),
+    ).rejects.toThrow(/Approved reference changed or unavailable/);
   });
 });

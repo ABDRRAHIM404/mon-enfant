@@ -118,3 +118,82 @@ export async function saveAppointment(
     revalidatePath(path);
   redirect(`/patients/${child}/appointments/${id || result.data}`);
 }
+
+export async function confirmRoutineAppointment(
+  _: AppointmentFormState,
+  form: FormData,
+): Promise<AppointmentFormState> {
+  const { supabase } = await requireApprovedDoctor();
+  const field = (key: string) => String(form.get(key) ?? "").trim();
+  const child = field("child"),
+    version = field("version"),
+    facility = field("facility_id"),
+    operation = field("operation"),
+    recommended = field("recommended"),
+    date = field("date");
+  const doses = form.getAll("dose").map(String);
+  if (
+    ![child, version, facility, operation].every((id) =>
+      uuidPattern.test(id),
+    ) ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(recommended) ||
+    !doses.length ||
+    field("syntheticOnly") !== "on" ||
+    field("reviewed") !== "on"
+  )
+    return { error: "Vérifiez le lieu, la proposition et les attestations." };
+  let start, end;
+  try {
+    start = resolveAppointmentTime(
+      `${date}T${field("starts")}`,
+      field("offset"),
+    );
+    end = resolveAppointmentTime(`${date}T${field("ends")}`, field("offset"));
+  } catch (error) {
+    return {
+      error:
+        error instanceof RangeError ? error.message : "Vérifiez le créneau.",
+    };
+  }
+  const result = await supabase.rpc("confirm_routine_appointment", {
+    p_operation_id: operation,
+    p_child_id: child,
+    p_version_id: version,
+    p_recommended_on: recommended,
+    p_doses: doses,
+    p_facility_id: facility,
+    p_starts_at: start,
+    p_ends_at: end,
+    p_reason: field("reason"),
+    p_reviewed: true,
+  });
+  if (result.error) {
+    if (result.error.code === "PT409")
+      return {
+        error:
+          "La proposition a changé ou a déjà été confirmée. Actualisez les rendez-vous.",
+      };
+    if (result.error.code === "42501")
+      return {
+        error:
+          "Vérifiez les habilitations, le lieu et votre accès à ce dossier.",
+      };
+    if (result.error.code === "22023")
+      return {
+        error:
+          "Indiquez un motif et un créneau à venir, avec une heure de fin après le début.",
+      };
+    return {
+      error: `Enregistrement indisponible. Référence ${reportOperationalEvent("appointment_action_failed")}`,
+    };
+  }
+  for (const path of [
+    "/appointments",
+    "/follow-up",
+    "/dashboard",
+    "/vaccinations",
+    `/patients/${child}/appointments`,
+  ])
+    revalidatePath(path);
+  redirect(`/appointments?date=${date}&view=day&saved=1`);
+}

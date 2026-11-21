@@ -1,0 +1,504 @@
+.rdv-workspace {
+  --rdv-green: #007755;
+  --rdv-muted: #3d5262;
+  --rdv-line: #cbdde4;
+  --rdv-shadow: 0 7px 16px rgb(36 90 107 / 13%);
+  color: #111;
+  gap: 18px;
+}
+
+.rdv-hero {
+  position: relative;
+}
+.rdv-hero .rdv-heading {
+  min-block-size: 110px;
+  align-items: start;
+}
+.rdv-hero .rdv-heading img {
+  position: absolute;
+  inset: auto 0 0 auto;
+  width: min(42%, 600px);
+}
+.rdv-hero .consultation-heading-copy {
+  grid-column: 1;
+}
+.rdv-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  position: relative;
+  margin-block-start: 12px;
+}
+.rdv-action,
+.rdv-period a,
+.rdv-calendar-toggle > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-block-size: 44px;
+  padding: 8px 15px;
+  border: 1px solid var(--rdv-line);
+  border-radius: 13px;
+  background: #fff;
+  color: #111;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.91rem;
+  line-height: 1.25;
+  cursor: pointer;
+  transition:
+    background-color 200ms,
+    box-shadow 200ms,
+    transform 200ms;
+}
+.rdv-action:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+.rdv-action.rdv-primary {
+  background: var(--rdv-green);
+  border-color: var(--rdv-green);
+  color: #fff;
+}
+.rdv-action.rdv-coral {
+  border-color: #e97872;
+  color: #963229;
+  background: #fff7f5;
+}
+.rdv-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.44fr) minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  grid-template-areas: "filters proposals" "filters appointments";
+  align-items: start;
+  gap: 16px;
+}
+.rdv-panel,
+.routine-proposal {
+  min-inline-size: 0;
+  border: 1px solid rgb(255 255 255 / 85%);
+  border-radius: 21px;
+  padding: clamp(13px, 1.5vw, 22px);
+  background: #fff;
+  box-shadow: var(--rdv-shadow);
+}
+.rdv-panel h2,
+.routine-heading h2 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 13px;
+  font-size: clamp(1.12rem, 1.55vw, 1.52rem);
+  letter-spacing: -0.035em;
+  line-height: 1.2;
+}
+.rdv-panel h2 svg,
+.routine-date strong svg,
+.rdv-row-date svg,
+.rdv-row-child strong svg {
+  color: var(--rdv-green);
+  flex: none;
+}
+.rdv-filters {
+  grid-area: filters;
+}
+.rdv-filter-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  align-items: end;
+}
+.rdv-filter-form label {
+  display: grid;
+  gap: 4px;
+  font-size: 0.88rem;
+  font-weight: 650;
+  min-width: 0;
+}
+.rdv-filter-form input[type="date"] {
+  min-width: 0;
+  min-height: 44px;
+  padding: 7px 9px;
+  border-radius: 11px;
+  border: 1px solid var(--rdv-line);
+}
+.rdv-filter-form .registry-filter-label {
+  font-size: 0.88rem;
+}
+.rdv-filter-form .registry-filter-trigger > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rdv-period {
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+  gap: 4px;
+  align-items: center;
+  text-align: center;
+  margin: 14px 0 8px;
+}
+.rdv-period strong {
+  text-transform: capitalize;
+  line-height: 1.3;
+}
+.rdv-period a {
+  padding: 0;
+  min-block-size: 40px;
+}
+.rdv-calendar-toggle > button {
+  display: none;
+}
+.rdv-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 3px;
+  font-size: 0.86rem;
+  text-align: center;
+}
+.rdv-days--day {
+  grid-template-columns: 1fr;
+}
+.rdv-days > strong {
+  padding: 5px 0;
+  font-size: 0.71rem;
+}
+.rdv-days a {
+  position: relative;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  min-block-size: 42px;
+  color: #111;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  line-height: 1.1;
+  text-decoration: none;
+  transition:
+    background-color 200ms,
+    transform 200ms;
+}
+.rdv-days a[data-outside="true"] {
+  color: #526679;
+}
+.rdv-days a[data-today="true"] {
+  border-color: #238452;
+  font-weight: 750;
+}
+.rdv-days a[aria-current] {
+  background: var(--rdv-green);
+  color: #fff;
+}
+.rdv-days small {
+  border-radius: 10px;
+  background: #d4f1e6;
+  color: #135237;
+  padding: 0 4px;
+  font-size: 0.62rem;
+  margin-top: 2px;
+}
+
+.rdv-proposals {
+  grid-area: proposals;
+  display: grid;
+  gap: 10px;
+}
+.routine-proposal {
+  background: #fff3ef;
+  border-color: #f3c2b9;
+  box-shadow: none;
+}
+.routine-heading {
+  display: flex;
+  gap: 8px 14px;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-block-end: 13px;
+}
+.routine-heading h2 {
+  margin: 0;
+}
+.rdv-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: #fff1cc;
+  color: var(--rdv-green);
+}
+.routine-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+}
+.rdv-child,
+.rdv-row-child {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.rdv-child img,
+.rdv-row-child img {
+  border-radius: 50%;
+  flex: none;
+}
+.rdv-child small,
+.rdv-row-child small {
+  display: block;
+  color: var(--rdv-muted);
+  font-size: 0.83rem;
+}
+.routine-date {
+  padding-inline: 12px 3px;
+  border-inline-start: 1px solid #e5cfc9;
+}
+.routine-date strong,
+.rdv-row-date,
+.rdv-row-time,
+.rdv-row-child strong {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.routine-date ul,
+.rdv-list ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.routine-date ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-block-start: 8px;
+}
+.routine-date li,
+.rdv-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.rdv-status svg {
+  flex: none;
+}
+.routine-date li,
+.rdv-status--amber {
+  background: #fff0c8;
+  color: #714000;
+}
+.rdv-status--green {
+  background: #d4f5e5;
+  color: #07593a;
+}
+.rdv-status--neutral {
+  background: #e8edf0;
+  color: #425663;
+}
+.routine-actions {
+  display: grid;
+  gap: 7px;
+}
+.routine-note {
+  margin: 12px 0 0;
+  color: var(--rdv-muted);
+  font-size: 0.84rem;
+}
+.routine-form {
+  grid-column: 1 / -1;
+  margin-block-start: 4px;
+}
+.routine-form[hidden] {
+  display: none;
+}
+.routine-form .routine-actions,
+.routine-times {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.routine-form input,
+.routine-form select {
+  min-width: 0;
+}
+
+.rdv-list {
+  grid-area: appointments;
+}
+.rdv-list ul {
+  display: grid;
+  gap: 6px;
+}
+.rdv-row {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.3fr) minmax(0, 0.8fr) auto minmax(72px, auto)
+    auto;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid #dce8ec;
+  border-radius: 13px;
+  color: #111;
+  text-decoration: none;
+  font-size: 0.87rem;
+  transition:
+    background-color 200ms,
+    box-shadow 200ms,
+    transform 200ms;
+}
+.rdv-row .rdv-status {
+  justify-self: start;
+}
+.rdv-empty {
+  color: var(--rdv-muted);
+  margin: 0;
+}
+.rdv-empty p {
+  margin: 0;
+}
+.rdv-success {
+  margin: 0;
+  padding: 10px 14px;
+  background: #d4f5e5;
+  color: #07593a;
+  border-radius: 12px;
+}
+.rdv-workspace :is(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid #007755;
+  outline-offset: 3px;
+}
+@media (hover: hover) {
+  .rdv-action:not(:disabled):hover,
+  .rdv-period a:hover,
+  .rdv-row:hover,
+  .rdv-days a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgb(30 77 89 / 16%);
+  }
+  .rdv-row:hover,
+  .rdv-days a:not([aria-current]):hover {
+    background: #eaf4f8;
+  }
+}
+.rdv-action:not(:disabled):active,
+.rdv-row:active,
+.rdv-period a:active,
+.rdv-days a:active {
+  transform: translateY(1px);
+}
+
+@media (max-width: 1160px) {
+  .routine-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .routine-layout > .routine-actions {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .rdv-row {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+  .rdv-row-child {
+    grid-column: span 2;
+  }
+  .rdv-row-chevron {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
+  }
+}
+@media (max-width: 900px) {
+  .rdv-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+    grid-template-areas: "proposals" "filters" "appointments";
+  }
+  .rdv-calendar-toggle > button {
+    display: flex;
+    width: 100%;
+    margin-block-start: 10px;
+  }
+  .rdv-calendar-toggle > button svg:last-child {
+    margin-inline-start: auto;
+    transition: transform 200ms;
+  }
+  .rdv-calendar-toggle[data-expanded="true"] > button svg:last-child {
+    transform: rotate(180deg);
+  }
+  .rdv-calendar-toggle[data-expanded="false"] .rdv-calendar-content {
+    display: none;
+  }
+  .rdv-days a {
+    min-block-size: 44px;
+  }
+}
+@media (max-width: 540px) {
+  .rdv-hero .rdv-heading {
+    min-block-size: 100px;
+    grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
+  }
+  .rdv-hero .rdv-heading img {
+    position: static;
+    width: 100%;
+    align-self: end;
+  }
+  .rdv-hero-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+  }
+  .rdv-hero-actions .rdv-action {
+    padding-inline: 7px;
+    font-size: 0.82rem;
+  }
+  .routine-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .routine-date {
+    padding: 0;
+    border: 0;
+  }
+  .rdv-row {
+    gap: 7px;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+  .rdv-row .rdv-status {
+    font-size: 0.69rem;
+    padding-inline: 5px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rdv-workspace
+    :is(
+      .rdv-action,
+      .rdv-row,
+      .rdv-days a,
+      .rdv-period a,
+      .rdv-calendar-toggle svg
+    ) {
+    transition: none;
+    transform: none;
+  }
+}
+
+.rdv-workspace .dashboard-refresh {
+  justify-content: flex-start;
+  margin: 12px 0 0;
+}
+
+.rdv-panel h2,
+.routine-heading h2 {
+  font-weight: 750;
+}

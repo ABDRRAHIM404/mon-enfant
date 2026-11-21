@@ -56,6 +56,17 @@ export default async function History({
       </Link>
       <h2>Rendez-vous actuel</h2>
       <AppointmentCard appointment={data.appointment} link={false} />
+      {data.appointment.recommended_on && (
+        <div className="notice">
+          <p>
+            Date recommandée par le PNI :{" "}
+            <time dateTime={data.appointment.recommended_on}>
+              {data.appointment.recommended_on}
+            </time>
+          </p>
+          <p>Doses prévues : {data.appointment.dose_codes?.join(", ")}</p>
+        </div>
+      )}
       {data.events.map((event) => (
         <article className="panel" key={event.id}>
           <h2>

@@ -38,6 +38,9 @@ export type AppointmentRow = {
   was_missed: boolean;
   child_given_name: string | null;
   child_family_name: string | null;
+  child_sex?: string;
+  recommended_on?: string | null;
+  dose_codes?: string[] | null;
   universal_id: string;
   history_status: string;
   dose_code: string | null;
@@ -108,4 +111,22 @@ export const vaccineFollowupStates = {
   routine_future: "Référence de routine future",
   reference_review: "Référence ou données à réexaminer",
   documented: "Administration documentée et rapprochée",
+};
+
+export type RoutineAppointmentProposals = {
+  version: string | null;
+  preview: boolean;
+  total: number;
+  items: RoutineAppointmentProposal[];
+};
+
+export type RoutineAppointmentProposal = {
+  child_id: string;
+  given_name: string | null;
+  family_name: string | null;
+  sex: string;
+  birth_date: string;
+  recommended_on: string;
+  doses: { code: string; label: string }[];
+  requires_assignment: boolean;
 };
