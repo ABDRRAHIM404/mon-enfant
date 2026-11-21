@@ -55,6 +55,7 @@ export function provisionalRoutineRows(
     .filter(
       (r) =>
         r.dose_code !== "HB1" &&
+        r.dose_code !== "HBn" &&
         !(r.eligibility === "female" && child.sex === "male"),
     )
     .map((rule) => {
@@ -87,12 +88,16 @@ export function provisionalRoutineRows(
           a.reference.startOn.localeCompare(b.reference.startOn) ||
           a.dose_code.localeCompare(b.dose_code)
         );
-      const unit = { first_4_weeks: 0, weeks: 7, months: 31, years: 366 };
+      const unit = {
+        birth_24_hours: 0,
+        first_4_weeks: 0,
+        weeks: 7,
+        months: 31,
+        years: 366,
+      };
       return (
-        (a.age.unit === "first_4_weeks" ? 0 : a.age.value * unit[a.age.unit]) -
-          (b.age.unit === "first_4_weeks"
-            ? 0
-            : b.age.value * unit[b.age.unit]) ||
+        (a.age.value ?? 0) * unit[a.age.unit] -
+          (b.age.value ?? 0) * unit[b.age.unit] ||
         a.dose_code.localeCompare(b.dose_code)
       );
     });

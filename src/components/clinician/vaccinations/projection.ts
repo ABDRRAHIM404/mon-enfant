@@ -43,6 +43,15 @@ export function vaccinationProjection(
   const approved =
     catalog?.status === "approved" && catalog.review_verified ? catalog : null;
   const hb1 = active.filter((entry) => matches(entry, "HB", "HB1"));
+  const hbn = active.filter((entry) => matches(entry, "HB", "HBn"));
+  const birthDoseRecorded =
+    birth !== null &&
+    hbn.some(
+      (entry) =>
+        hasDocumentedDate(entry, today) &&
+        entry.occurred_on >= birth &&
+        entry.occurred_on <= addCivilDays(birth, 1),
+    );
   const hb1Window = birth ? addCivilDays(birth, 27) : null;
   const onTime = Boolean(
     birth &&
@@ -54,20 +63,18 @@ export function vaccinationProjection(
         entry.occurred_on <= hb1Window,
     ),
   );
-  const declaredHB1 = hb1.length > 0;
+  const missingAfterWindow =
+    child.history_status === "reviewed" &&
+    hb1Window !== null &&
+    today > hb1Window &&
+    approved?.rules.some(
+      (rule) => rule.dose_code === "HB1" && rule.age.unit === "first_4_weeks",
+    );
   const reviewHB1 =
     history !== null &&
-    !onTime &&
-    (declaredHB1 ||
-      (child.history_status === "reviewed" &&
-        Boolean(
-          hb1Window &&
-          today > hb1Window &&
-          approved?.rules.some(
-            (rule) =>
-              rule.dose_code === "HB1" && rule.age.unit === "first_4_weeks",
-          ),
-        )));
+    (hbn.length > 0
+      ? !birthDoseRecorded || hb1.length > 0
+      : !onTime && (hb1.length > 0 || missingAfterWindow === true));
 
   const vaccines = approved?.source_document.vaccines as
     Record<string, { label_fr?: string }> | undefined;
@@ -126,7 +133,7 @@ export function vaccinationProjection(
               a.rule.dose_code.localeCompare(b.rule.dose_code),
           );
 
-  return { upcoming, reviewHB1, declaredHB1, approved };
+  return { upcoming, reviewHB1, approved };
 }
 
 export function ageAtVaccination(child: Patient, entry: ClinicalEntry) {

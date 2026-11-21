@@ -25,6 +25,17 @@ export function CatalogRules({
               ? "Référence de routine après approbation"
               : "Calcul désactivé — référence uniquement"}
           </p>
+          {r.dose_code === "HBn" &&
+            typeof r.source_row.condition === "string" && (
+              <p>{r.source_row.condition}</p>
+            )}
+          {r.dose_code === "HB1" && (
+            <p>
+              À envisager avec le BCG dans les quatre premières semaines si le
+              registre confirme que HBn a été omise. Si le statut est incertain,
+              vérifier le registre.
+            </p>
+          )}
           <p className="fine">
             Diapositive {String(r.source_row.source_slide ?? "non précisée")} ·
             décision{" "}

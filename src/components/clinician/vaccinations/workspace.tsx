@@ -403,11 +403,11 @@ export function VaccinationsWorkspace({
                   <aside className="vaccination-guidance">
                     <TriangleAlert size={19} aria-hidden="true" />
                     <div>
-                      <strong>HB1 : historique à vérifier</strong>
+                      <strong>Hépatite B : historique à vérifier</strong>
                       <p>
-                        {overview.projection.declaredHB1
-                          ? "Vérifiez la date et la source au registre avant de décider du suivi."
-                          : "Aucune administration HB1 n’est documentée dans l’historique revu. Vérifiez le registre avant de décider du suivi."}
+                        Vérifiez la date et la source au registre. HB1 est
+                        envisagée seulement si le registre confirme que la dose
+                        de naissance HBn a été omise.
                       </p>
                       {canPlan && (
                         <Link

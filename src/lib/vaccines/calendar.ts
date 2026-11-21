@@ -59,6 +59,7 @@ export function addCalendarYears(date: CivilDate, years: number): CivilDate {
   return addCalendarMonths(date, years * 12);
 }
 export type RoutineAge =
+  | { unit: "birth_24_hours"; value?: never }
   | { unit: "first_4_weeks"; value?: never }
   | { unit: "weeks" | "months" | "years"; value: number };
 export type RoutineRule = {
@@ -118,7 +119,12 @@ function calculateRoutineReference(
     endOn: null,
     isWindow: false,
   });
-  if (rule.doseCode === "HB1" || !rule.automaticScheduling)
+  if (
+    rule.doseCode === "HB1" ||
+    rule.doseCode === "HBn" ||
+    rule.age.unit === "birth_24_hours" ||
+    !rule.automaticScheduling
+  )
     return empty("disabled_reference_only");
   if (
     rule.doseCode === "HPV" &&

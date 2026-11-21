@@ -400,4 +400,59 @@ describe("versioned vaccine catalog", () => {
       /Approved doctor/,
     );
   });
+
+  it("imports the revised HBn draft and keeps approval under independent review", async () => {
+    await db.exec(
+      readFileSync(
+        "supabase/migrations/20261121174928_pni_hepatitis_b_birth_draft.sql",
+        "utf8",
+      ),
+    );
+    const id = "0c504568-7c67-49bb-b43b-c8382439a850";
+    const reader = await actor("doctor");
+    const editor = await actor("admin", true);
+    const reviewer = await actor("doctor", false, true, true);
+    const { version } = await detail(reader, id);
+    expect(version).toMatchObject({
+      status: "draft",
+      review_verified: false,
+      revision: 1,
+    });
+    expect(version.rules).toHaveLength(26);
+    expect(
+      version.rules.find((rule) => rule.dose_code === "HBn"),
+    ).toMatchObject({
+      age: { unit: "birth_24_hours" },
+      automatic_scheduling: false,
+    });
+    expect(
+      version.rules.find((rule) => rule.dose_code === "HB1"),
+    ).toMatchObject({
+      age: { unit: "first_4_weeks" },
+      automatic_scheduling: false,
+    });
+    await expect(
+      change(editor, "edit", id, 1, {
+        dose_code: "HBn",
+        age: { unit: "birth_24_hours" },
+        eligibility: "all",
+        automatic_scheduling: true,
+      }),
+    ).rejects.toThrow(/constraint/);
+    await expect(change(editor, "approve", id, 1, reviewInput)).rejects.toThrow(
+      /permission/,
+    );
+    await expect(
+      change(reviewer, "approve", id, 1, {
+        ...reviewInput,
+        clinical_reviewed: false,
+      }),
+    ).rejects.toThrow(/clinical review/);
+    await change(reviewer, "approve", id, 1, reviewInput);
+    expect((await detail(reader, id)).version).toMatchObject({
+      status: "approved",
+      review_verified: true,
+      revision: 2,
+    });
+  });
 });

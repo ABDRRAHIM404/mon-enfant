@@ -36,7 +36,8 @@ export default async function Vaccines({
         <p className="notice">
           La transcription initiale reste un brouillon jusqu’à la revue d’un
           clinicien habilité indépendant. Les données manquantes ne prouvent pas
-          une dose manquée. Aucun rattrapage automatique ni programmation HB1.
+          une dose manquée. Aucun rattrapage automatique ni programmation de HBn
+          ou HB1.
         </p>
         <div className="record-list">
           {versions.map((v) => (

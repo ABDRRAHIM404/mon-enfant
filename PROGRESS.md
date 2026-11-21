@@ -1087,3 +1087,7 @@ Compared desktop and phone captures against the references and checked 1710, 820
 The Vaccinations page keeps the shared clinician shell, authorized child search, capability-gated recording and expandable vaccination history. The upcoming panel calculates dates from the approved, reviewed PNI version and distinguishes uncertain documentation from matched administrations. HB1 remains a manual review item. An exact day-17 HB1 entry keeps the contextual notice hidden. Existing appointment and routine-reference routes continue to handle their respective workflows.
 
 Desktop and mobile captures were compared with the references. Chromium checked four widths, search and selection, refresh, history detail, date rendering, permissions and the draft-only state using fictional records. Lint and 32 focused tests passed. A read-only production catalogue query found one draft and zero approved, reviewed versions, so the live page explains that state until a version is approved.
+
+### 21 November 2026 — revised PNI hepatitis B draft
+
+Prepared a separate 26-rule draft from the existing transcription and slides 67 and 73 of the supplied presentation. It preserves the original catalogue and adds HBn as the standalone birth dose, with HB1 shown as the manual fallback when omission is confirmed. A documented HBn suppresses the routine HB1 review notice. Uncertain or conflicting entries are flagged for review. The existing independent approval and appointment boundaries remain in force. The targeted catalogue, calendar and projection tests passed.

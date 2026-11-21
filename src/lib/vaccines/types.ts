@@ -44,6 +44,8 @@ export const catalogStatus = {
   retired: "Retirée",
 };
 export function ageLabel(age: RoutineAge): string {
+  if (age.unit === "birth_24_hours")
+    return "Dans les 24 heures suivant la naissance";
   if (age.unit === "first_4_weeks")
     return "Fenêtre des quatre premières semaines";
   return `${age.value} ${{ weeks: "semaines", months: "mois calendaires", years: "ans" }[age.unit]}`;

@@ -204,4 +204,37 @@ describe("clinician Vaccinations display", () => {
       reviewHB1: false,
     });
   });
+
+  it("withholds HB1 follow-up when the documented HBn birth dose is present", () => {
+    const birthDose = {
+      ...hb1,
+      occurred_on: "2026-10-16",
+      payload: { vaccine_code: "HB", dose_label: "HBn" },
+    };
+    const revised = {
+      ...catalog,
+      rules: [
+        ...catalog.rules,
+        rule("HBn", "HB", { unit: "birth_24_hours" }, false),
+      ],
+    };
+    const complete = vaccinationProjection(child, revised, [birthDose], today);
+    expect(complete.reviewHB1).toBe(false);
+    expect(
+      complete.upcoming.some(({ rule }) =>
+        ["HB1", "HBn"].includes(rule.dose_code),
+      ),
+    ).toBe(false);
+    expect(
+      vaccinationProjection(child, revised, [birthDose, hb1], today).reviewHB1,
+    ).toBe(true);
+    expect(
+      vaccinationProjection(
+        child,
+        revised,
+        [{ ...birthDose, occurrence_precision: "unknown", occurred_on: null }],
+        today,
+      ).reviewHB1,
+    ).toBe(true);
+  });
 });

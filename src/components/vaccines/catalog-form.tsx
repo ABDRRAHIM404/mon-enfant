@@ -35,6 +35,11 @@ export function CatalogForm({
             <label>
               Unité de l’âge configuré
               <select name="unit" defaultValue={rule.age.unit}>
+                {rule.age.unit === "birth_24_hours" && (
+                  <option value="birth_24_hours">
+                    Dans les 24 heures suivant la naissance
+                  </option>
+                )}
                 <option value="first_4_weeks">
                   Fenêtre des quatre premières semaines
                 </option>
@@ -51,9 +56,7 @@ export function CatalogForm({
                 min={1}
                 max={1040}
                 step={1}
-                defaultValue={
-                  rule.age.unit === "first_4_weeks" ? "" : rule.age.value
-                }
+                defaultValue={rule.age.value ?? ""}
               />
             </label>
             <label>
@@ -77,7 +80,7 @@ export function CatalogForm({
         {mode === "approve" && (
           <>
             <p className="notice">
-              La revue porte sur les 25 doses et toutes les décisions. La
+              La revue porte sur toutes les doses et toutes les décisions. La
               publication autorise uniquement les références de routine, sans
               prescrire de rendez-vous ni de rattrapage.
             </p>
@@ -87,9 +90,9 @@ export function CatalogForm({
             </label>
             <label className="checkbox-label">
               <input type="checkbox" name="clinical_reviewed" required />
-              J’ai effectué la revue clinique complète, notamment HB1 désactivé,
-              PCV1–4, rotavirus en mois calendaires et HPV à 11 ans pour les
-              filles.
+              J’ai effectué la revue clinique complète, notamment HBn et le
+              recours conditionnel à HB1, PCV1–4, rotavirus en mois calendaires
+              et HPV à 11 ans pour les filles.
             </label>
             <label className="checkbox-label">
               <input type="checkbox" name="birth_window_reviewed" required />

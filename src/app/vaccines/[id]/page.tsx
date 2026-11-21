@@ -59,14 +59,15 @@ export default async function VaccineVersion({
       <section className="panel">
         <h2>Provenance et limites</h2>
         <p>
-          25 doses transcrites du calendrier PNI 2025. La présentation originale
-          doit être authentifiée lors de la revue. Les fenêtres des quatre
-          premières semaines couvrent la naissance jusqu’à J+27 inclus ; leur
-          interprétation nécessite une validation clinique.
+          {v.rules.length} règles du calendrier PNI 2025. La présentation
+          originale doit être authentifiée lors de la revue. Les fenêtres des
+          quatre premières semaines couvrent la naissance jusqu’à J+27 inclus ;
+          leur interprétation nécessite une validation clinique.
         </p>
         <p>
-          Aucun rattrapage automatique. HB1 reste une référence conditionnelle
-          sans calcul ; aucune ligne HBn n’est ajoutée.
+          {v.rules.some((rule) => rule.dose_code === "HBn")
+            ? "HBn est une dose de naissance distincte. HB1 avec le BCG reste une option manuelle si le registre confirme l’omission de HBn."
+            : "Dans cette version, HB1 reste une référence manuelle et la dose de naissance HBn n’est pas représentée séparément."}
         </p>
         {v.reviewed_by && (
           <p>

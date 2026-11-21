@@ -28,10 +28,9 @@ export async function changeCatalog(
   if (action === "edit")
     Object.assign(input, {
       dose_code: text("dose_code"),
-      age:
-        text("unit") === "first_4_weeks"
-          ? { unit: "first_4_weeks" }
-          : { unit: text("unit"), value: Number(text("age_value")) },
+      age: ["first_4_weeks", "birth_24_hours"].includes(text("unit"))
+        ? { unit: text("unit") }
+        : { unit: text("unit"), value: Number(text("age_value")) },
       eligibility: text("eligibility"),
       automatic_scheduling: text("automatic_scheduling") === "on",
     });
@@ -62,7 +61,7 @@ export async function changeCatalog(
     if (["22023", "23514", "23502", "22P02"].includes(error.code ?? ""))
       return {
         error:
-          "Vérifiez le motif, la source contrôlée et les attestations. HB1 reste désactivé, les fenêtres de naissance, HPV et les mois du rotavirus doivent respecter les décisions confirmées.",
+          "Vérifiez le motif, la source contrôlée et les attestations. HBn et HB1 restent manuels, les fenêtres de naissance, HPV et les mois du rotavirus doivent respecter les décisions confirmées.",
       };
     const ref = reportOperationalEvent("vaccine_catalog_failed");
     return { error: `Le catalogue n’a pas été modifié. Référence : ${ref}` };
