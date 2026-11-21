@@ -1075,3 +1075,9 @@ Chromium captures compared the implemented directory against the supplied layout
 ### 21 November 2026 — Enfants filter controls
 
 Historique and Âge now share a keyboard-accessible desktop popup and a modal phone sheet. The existing options and Rechercher submission work as before. Chromium verified selection, focus, outside dismissal, swipe dismissal, scroll lock, reduced motion, and URL persistence with fictional records. Changed-file lint and 56 focused tests passed.
+
+### 21 November 2026 — soignant Consultations redesign
+
+The Consultations page uses the shared clinician navigation, a scoped child search, an illustrated patient panel, and a collapsible consultation timeline. The timeline keeps the recorded fields, provenance, attribution, revisions and correction links. New consultation remains gated by the existing clinical capability. The existing newest-first query and pagination are used, with an optional oldest-first view of the current page.
+
+Compared desktop and phone captures against the references and checked 1710, 820, 390 and 320 px widths in Chromium with fictional records. Search, selection, accordion keyboard controls, sorting, existing links, refresh, denied access and empty/error states passed. Changed-file lint and 84 focused tests passed, including the existing guarded consultation submission and immutable correction checks. Signed-in production verification remains open.

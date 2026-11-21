@@ -27,11 +27,13 @@ export function RegistryFilterSelect({
   label,
   defaultValue,
   options,
+  onValueChange,
 }: {
   name: string;
   label: string;
   defaultValue: string;
   options: readonly FilterOption[];
+  onValueChange?: (value: string) => void;
 }) {
   const fieldId = useId();
   const labelId = fieldId + "-label";
@@ -118,6 +120,7 @@ export function RegistryFilterSelect({
   function choose(index: number) {
     setSelected(index);
     dismiss(true);
+    onValueChange?.(options[index].value);
   }
 
   function listKey(event: KeyboardEvent<HTMLDivElement>) {
@@ -155,7 +158,10 @@ export function RegistryFilterSelect({
           id={fieldId}
           name={name}
           defaultValue={options[selected].value}
-          onChange={(event) => setSelected(event.currentTarget.selectedIndex)}
+          onChange={(event) => {
+            setSelected(event.currentTarget.selectedIndex);
+            onValueChange?.(event.currentTarget.value);
+          }}
         >
           {options.map((option) => (
             <option key={option.value} value={option.value}>

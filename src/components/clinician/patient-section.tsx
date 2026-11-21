@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ClinicianChildPicker } from "./child-picker";
+import { ConsultationsWorkspace } from "./consultations/workspace";
 import { requireApprovedDoctor } from "@/lib/auth";
 import {
   patientName,
@@ -17,7 +18,8 @@ const sections = {
   consultations: {
     title: "Consultations",
     kind: "consultation",
-    description: "Consultations et historique de vos enfants autorisés.",
+    description:
+      "Créer, consulter et suivre les consultations de vos enfants autorisés.",
     action: "Nouvelle consultation",
   },
   vaccinations: {
@@ -40,7 +42,7 @@ export async function PatientSection({
   query,
 }: {
   section: keyof typeof sections;
-  query: SectionQuery;
+  query: SectionQuery & { sort?: string };
 }) {
   const { supabase } = await requireApprovedDoctor();
   const config = sections[section],
@@ -71,7 +73,11 @@ export async function PatientSection({
     const result = await supabase.rpc("get_child_profile", {
       p_child_id: query.child,
     });
-    if (result.error?.code === "42501") notFound();
+    if (
+      result.error?.code === "42501" ||
+      (section === "consultations" && !result.data && !result.error)
+    )
+      notFound();
     if (result.error) throw new Error("Ce dossier est indisponible.");
     child = result.data as ChildProfile;
   }
@@ -119,6 +125,22 @@ export async function PatientSection({
     appointmentAllowed = (capabilities.data as string[]).includes(
       "appointment",
     );
+  if (section === "consultations") {
+    return (
+      <ConsultationsWorkspace
+        query={q}
+        child={child}
+        childrenPage={childPage}
+        childrenTotal={data.total}
+        matches={data.items}
+        history={history}
+        historyPage={page}
+        canWrite={allowed}
+        sort={query.sort === "oldest" ? "oldest" : "recent"}
+      />
+    );
+  }
+
   const href = (id: string, n = 1) =>
     `${base}?${new URLSearchParams({ child: id, page: String(n), childPage: String(childPage), q })}`;
   return (
@@ -167,18 +189,6 @@ export async function PatientSection({
                   >
                     Historique et corrections
                   </Link>
-                  {section === "consultations" && (
-                    <>
-                      <Link
-                        href={`/patients/${child.id}/records?kind=prescription`}
-                      >
-                        Traitements / prescriptions
-                      </Link>
-                      <Link href={`/patients/${child.id}/records?kind=risk`}>
-                        Risques et allergies
-                      </Link>
-                    </>
-                  )}
                 </div>
                 {!allowed && (
                   <p className="notice">
@@ -191,9 +201,7 @@ export async function PatientSection({
                 <h2>
                   {section === "vaccinations"
                     ? "Historique des vaccinations enregistrées"
-                    : section === "growth"
-                      ? "Historique des mesures"
-                      : "Historique des consultations"}
+                    : "Historique des mesures"}
                 </h2>
                 {history.items.length ? (
                   history.items.map((entry) =>

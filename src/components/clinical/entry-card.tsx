@@ -9,22 +9,31 @@ import {
 export function EntryCard({
   entry,
   link = true,
+  heading = true,
 }: {
   entry: ClinicalEntry;
   link?: boolean;
+  heading?: boolean;
 }) {
   return (
     <article className="panel clinical-entry">
-      <h3>
-        {clinicalLabels[entry.kind]}
-        {entry.entry_state === "withdrawn" ? " — retirée" : ""}
-      </h3>
-      <p className="fine">
-        {entry.occurred_on || "Date inconnue"}
-        {entry.occurrence_precision === "estimated" ? " (estimée)" : ""} ·{" "}
-        {sourceLabels[entry.source_type]} ·{" "}
-        {entry.source_verified ? "Source contrôlée" : "Source non confirmée"}
-      </p>
+      {heading && (
+        <>
+          <h3>
+            {clinicalLabels[entry.kind]}
+            {entry.entry_state === "withdrawn" ? " — retirée" : ""}
+          </h3>
+          <p className="fine">
+            {entry.occurred_on || "Date inconnue"}
+            {entry.occurrence_precision === "estimated"
+              ? " (estimée)"
+              : ""} · {sourceLabels[entry.source_type]} ·{" "}
+            {entry.source_verified
+              ? "Source contrôlée"
+              : "Source non confirmée"}
+          </p>
+        </>
+      )}
       <dl className="details">
         {Object.entries(entry.payload)
           .filter(([, value]) => value !== "")
