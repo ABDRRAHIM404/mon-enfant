@@ -6,9 +6,11 @@ import {
   CircleCheck,
   ClipboardList,
   Folder,
+  Pill,
   Plus,
   ShieldCheck,
   Stethoscope,
+  TriangleAlert,
   UserRound,
 } from "lucide-react";
 import { EntryCard } from "@/components/clinical/entry-card";
@@ -263,7 +265,11 @@ export function ConsultationsWorkspace({
                   className="consultation-actions"
                   aria-label="Actions du dossier enfant"
                 >
-                  <a href="#section-history" className="consultation-active">
+                  <a
+                    href="#section-history"
+                    className="consultation-active"
+                    aria-current="location"
+                  >
                     <Stethoscope size={20} aria-hidden="true" />
                     Consultations
                   </a>
@@ -286,18 +292,21 @@ export function ConsultationsWorkspace({
                   aria-label="Autres rubriques du dossier enfant"
                 >
                   <Link href={childPath} prefetch={false}>
+                    <UserRound size={17} aria-hidden="true" />
                     Profil de l’enfant
                   </Link>
                   <Link
                     href={`${childPath}/records?kind=prescription`}
                     prefetch={false}
                   >
+                    <Pill size={17} aria-hidden="true" />
                     Traitements / prescriptions
                   </Link>
                   <Link
                     href={`${childPath}/records?kind=risk`}
                     prefetch={false}
                   >
+                    <TriangleAlert size={17} aria-hidden="true" />
                     Risques et allergies
                   </Link>
                 </nav>

@@ -281,18 +281,80 @@
 }
 
 .consultation-extra-actions {
-  margin-block-start: 5px;
-  gap: 0 10px;
+  margin-block-start: 10px;
+  gap: 8px;
 }
 
-.consultation-extra-actions a {
+.consultation-extra-actions > a {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  gap: 7px;
+  max-inline-size: 100%;
   min-block-size: 44px;
-  padding-inline: 3px;
-  color: var(--theme-green-ink);
+  padding: 7px 13px;
+  border: 1px solid var(--consultation-line);
+  border-radius: 999px;
+  background: var(--theme-blue-mist);
+  color: var(--consultation-ink);
   font-size: 0.87rem;
-  font-weight: 650;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--consultation-motion),
+    border-color var(--consultation-motion),
+    color var(--consultation-motion),
+    box-shadow var(--consultation-motion),
+    transform var(--consultation-motion);
+}
+
+.consultation-extra-actions > a > svg {
+  flex: none;
+  color: var(--theme-green-ink);
+}
+
+.consultation-extra-actions > a:focus-visible,
+.consultation-extra-actions > a:active {
+  border-color: var(--theme-green-ink);
+  background: var(--theme-green-surface);
+}
+
+@media (hover: hover) {
+  .consultation-extra-actions > a:hover:not(:active) {
+    border-color: var(--theme-sea-green);
+    background: var(--theme-white-card);
+    box-shadow: 0 3px 9px rgb(43 105 121 / 14%);
+    color: var(--theme-green-ink);
+  }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .consultation-extra-actions > a:hover:not(:active) {
+    transform: translateY(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .consultation-extra-actions > a:active {
+    transform: translateY(1px);
+  }
+}
+
+@media (max-width: 520px) {
+  .consultation-extra-actions > a {
+    flex: 1 1 auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .consultation-extra-actions > a {
+    transition: none;
+  }
 }
 
 .consultation-permission {
