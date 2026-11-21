@@ -1057,3 +1057,7 @@ Parents can save a private child fiche with a name and birth date and show a sin
 ### 21 November 2026 — vaccination form validation
 
 The vaccination form now links each administration value to its certainty and enables the planned reference only for explicit matching. Expected validation errors identify the field or clinical documentation rule that failed, including date certainty and source, instead of showing a single generic alert. Three focused tests and changed-file lint passed.
+
+### 21 November 2026 — soignant dashboard redesign
+
+The clinician dashboard uses the existing logo and guarded backend projections in the desktop and mobile reference layouts. The daily calendar projection includes actual canceled and completed appointments. The three existing statistics, documented consultation source states, four capability-dependent shortcuts, nine management tools, mobile drawer and separate account panel are available. Targeted lint, nine scoped existing tests and isolated Chromium layout/navigation checks at desktop, tablet and two phone widths passed. The broad skeleton test exposes a pre-existing missing parent add-child loading file. The dashboard redesign is staged for owner visual review.
