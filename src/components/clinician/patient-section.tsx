@@ -11,7 +11,7 @@ import {
 import { type ClinicalEntry } from "@/lib/clinical/types";
 import { EntryCard } from "@/components/clinical/entry-card";
 import { GrowthChart } from "@/components/clinical/growth-chart";
-import { ClinicianShell, ClinicianHeading } from "./shell";
+import { ClinicianHeading } from "./shell";
 import type { SectionQuery } from "./provisional-section";
 const sections = {
   consultations: {
@@ -42,7 +42,7 @@ export async function PatientSection({
   section: keyof typeof sections;
   query: SectionQuery;
 }) {
-  const { profile, supabase } = await requireApprovedDoctor();
+  const { supabase } = await requireApprovedDoctor();
   const config = sections[section],
     base = `/${section}`,
     q = (query.q || "").slice(0, 100),
@@ -122,7 +122,7 @@ export async function PatientSection({
   const href = (id: string, n = 1) =>
     `${base}?${new URLSearchParams({ child: id, page: String(n), childPage: String(childPage), q })}`;
   return (
-    <ClinicianShell active={section} profile={profile}>
+    <>
       <ClinicianHeading title={config.title} description={config.description}>
         {child && allowed ? (
           <Link
@@ -368,6 +368,6 @@ export async function PatientSection({
           )}
         </div>
       </div>
-    </ClinicianShell>
+    </>
   );
 }

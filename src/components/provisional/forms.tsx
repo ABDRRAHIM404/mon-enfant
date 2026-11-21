@@ -6,7 +6,10 @@ import {
 import { useActionState, useState } from "react";
 import { VaccineSelection } from "@/components/vaccines/selection";
 import type { VaccineChoice } from "@/lib/vaccines/choices";
-import { createProvisional, writeProvisional } from "@/app/provisional/actions";
+import {
+  createProvisional,
+  writeProvisional,
+} from "@/app/(soignant)/provisional/actions";
 import {
   provisionalKinds,
   provisionalFields,

@@ -7,7 +7,7 @@ import { ClinicianChildPicker } from "./child-picker";
 import { ProvisionalVaccinationFollowup } from "./provisional-vaccination-followup";
 import type { ProvisionalFollowup } from "@/lib/vaccines/provisional-followup";
 import { getProfessional } from "@/lib/auth";
-import { ClinicianShell, ClinicianHeading } from "./shell";
+import { ClinicianHeading } from "./shell";
 import {
   provisionalKinds,
   type ProvisionalChild,
@@ -109,7 +109,7 @@ export async function ProvisionalSection({
   const href = (child: string, n = 1, cp = childPage) =>
     `${base}?${new URLSearchParams({ child, page: String(n), childPage: String(cp), q })}`;
   return (
-    <ClinicianShell active={section} provisional profile={profile}>
+    <>
       <ClinicianHeading title={config.title} description={config.description}>
         <Link className="button primary" href="/provisional?new=1#new-child">
           <Plus size={18} aria-hidden="true" />
@@ -423,6 +423,6 @@ export async function ProvisionalSection({
           )}
         </nav>
       )}
-    </ClinicianShell>
+    </>
   );
 }

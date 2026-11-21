@@ -2,7 +2,7 @@ import Link from "next/link";
 import { FileText } from "lucide-react";
 import { redirect } from "next/navigation";
 import { getProfessional, requireApprovedDoctor } from "@/lib/auth";
-import { ClinicianShell, ClinicianHeading } from "./shell";
+import { ClinicianHeading } from "./shell";
 export async function ClinicianDocuments({
   provisional = false,
 }: {
@@ -18,11 +18,7 @@ export async function ClinicianDocuments({
   )
     redirect("/account");
   return (
-    <ClinicianShell
-      active="documents"
-      provisional={provisional}
-      profile={profile}
-    >
+    <>
       <ClinicianHeading
         title="Documents"
         description="Gestion des documents de votre espace soignant."
@@ -48,6 +44,6 @@ export async function ClinicianDocuments({
           {provisional ? "Mes dossiers privés" : "Ouvrir mon registre"}
         </Link>
       </section>
-    </ClinicianShell>
+    </>
   );
 }

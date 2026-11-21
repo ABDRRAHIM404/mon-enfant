@@ -4,7 +4,7 @@ import Link from "next/link";
 import { VaccinationFields } from "@/components/vaccines/vaccination-fields";
 import type { VaccineItemExport } from "@/lib/vaccines/patient-types";
 import { useActionState } from "react";
-import { recordClinical } from "@/app/patients/clinical-actions";
+import { recordClinical } from "@/app/(soignant)/(verified)/patients/clinical-actions";
 import type { ClinicalEntry, ClinicalKind } from "@/lib/clinical/types";
 import type { Facility } from "@/lib/registry/types";
 export function ClinicalForm({

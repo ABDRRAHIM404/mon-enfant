@@ -1,6 +1,6 @@
 "use client";
 import { useActionState, useState } from "react";
-import { changeClinicalPermission } from "@/app/patients/clinical-actions";
+import { changeClinicalPermission } from "@/app/(soignant)/(verified)/patients/clinical-actions";
 import {
   clinicalCapabilities,
   clinicalCapabilityLabels,

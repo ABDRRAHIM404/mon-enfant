@@ -10,11 +10,8 @@ import {
   ShieldCheck,
   Syringe,
 } from "lucide-react";
-import {
-  ClinicianShell,
-  type ClinicianSection,
-  type ClinicianTool,
-} from "./shell";
+import { ClinicianSectionOverride } from "./navigation-state";
+import type { ClinicianSection } from "./routes";
 import { requireApprovedDoctor } from "@/lib/auth";
 import {
   patientName,
@@ -77,7 +74,6 @@ export async function ClinicalWorkspace({
   section = "overview",
   children,
   print = false,
-  tool,
 }: {
   active?: ClinicianSection;
   childId?: string;
@@ -85,7 +81,6 @@ export async function ClinicalWorkspace({
   section?: PatientSection;
   children: React.ReactNode;
   print?: boolean;
-  tool?: ClinicianTool;
 }) {
   let context = child;
   if (childId && !context) {
@@ -100,7 +95,8 @@ export async function ClinicalWorkspace({
     context = result.data as ChildProfile;
   }
   return (
-    <ClinicianShell active={active} tool={tool}>
+    <>
+      {section === "records" && <ClinicianSectionOverride section={active} />}
       <div className={`care-workflow${print ? " print-summary" : ""}`}>
         {childId && context && (
           <>
@@ -136,7 +132,7 @@ export async function ClinicalWorkspace({
         )}
         {children}
       </div>
-    </ClinicianShell>
+    </>
   );
 }
 
