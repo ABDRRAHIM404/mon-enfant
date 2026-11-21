@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requireApprovedDoctor } from "@/lib/auth";
+import { ChildAvatar } from "@/components/clinician/child-avatar";
 import { ClinicianHeading } from "@/components/clinician/shell";
 import { patientName, type Patient } from "@/lib/registry/types";
 export const dynamic = "force-dynamic";
@@ -47,6 +48,7 @@ export default async function NewAppointment({
           <div className="soignant-child-list">
             {data.items.map((c) => (
               <Link key={c.id} href={`/patients/${c.id}/appointments/new`}>
+                <ChildAvatar sex={c.sex} size={34} />
                 {patientName(c)}
               </Link>
             ))}

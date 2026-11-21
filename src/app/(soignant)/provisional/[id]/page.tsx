@@ -1,6 +1,7 @@
 import type { VaccineChoice } from "@/lib/vaccines/choices";
 import { clinicalFieldLabels, clinicalValueLabels } from "@/lib/clinical/types";
 import Link from "next/link";
+import { ChildAvatar } from "@/components/clinician/child-avatar";
 import { randomUUID } from "node:crypto";
 import { redirect, notFound } from "next/navigation";
 import { getProfessional } from "@/lib/auth";
@@ -145,7 +146,8 @@ export default async function ProvisionalBooklet({
     <main className="workspace">
       <ProvisionalHeader profile={profile} />
       <section className="page-heading">
-        <h1 id="main-content" tabIndex={-1}>
+        <h1 id="main-content" className="clinician-child-label" tabIndex={-1}>
+          <ChildAvatar sex={result.child.identity.sex} />
           {result.child.identity.given_name || "Prénom inconnu"}{" "}
           {result.child.identity.family_name || "Nom inconnu"}
         </h1>

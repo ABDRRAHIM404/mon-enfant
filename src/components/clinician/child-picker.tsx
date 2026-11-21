@@ -1,6 +1,11 @@
 import Link from "next/link";
-import { UsersRound } from "lucide-react";
-type Choice = { id: string; label: string; caption: string };
+import { ChildAvatar } from "./child-avatar";
+type Choice = {
+  id: string;
+  label: string;
+  caption: string;
+  sex?: string | null;
+};
 export function ClinicianChildPicker({
   base,
   q,
@@ -57,7 +62,7 @@ export function ClinicianChildPicker({
               href={childHref(c.id)}
               aria-current={current?.id === c.id ? "page" : undefined}
             >
-              <UsersRound size={25} aria-hidden="true" />
+              <ChildAvatar sex={c.sex} size={34} />
               <span>
                 {c.label}
                 <small>{c.caption}</small>

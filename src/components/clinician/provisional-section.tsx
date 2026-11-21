@@ -3,6 +3,7 @@ import { appointmentTime } from "@/lib/appointments/calendar";
 import { GrowthChart } from "@/components/clinical/growth-chart";
 import { notFound, redirect } from "next/navigation";
 import { Plus, FileClock } from "lucide-react";
+import { ChildAvatar } from "./child-avatar";
 import { ClinicianChildPicker } from "./child-picker";
 import { ProvisionalVaccinationFollowup } from "./provisional-vaccination-followup";
 import type { ProvisionalFollowup } from "@/lib/vaccines/provisional-followup";
@@ -161,7 +162,11 @@ export async function ProvisionalSection({
                 {data.children.map((c) => (
                   <tr key={c.id}>
                     <td>
-                      <Link className="text-link" href={`/provisional/${c.id}`}>
+                      <Link
+                        className="text-link clinician-child-label"
+                        href={`/provisional/${c.id}`}
+                      >
+                        <ChildAvatar sex={c.identity.sex} size={34} />
                         {name(c)}
                       </Link>
                     </td>
@@ -190,6 +195,7 @@ export async function ProvisionalSection({
             items={data.children.map((c) => ({
               id: c.id,
               label: name(c),
+              sex: c.identity.sex,
               caption: "Dossier privé · non vérifié",
             }))}
             current={

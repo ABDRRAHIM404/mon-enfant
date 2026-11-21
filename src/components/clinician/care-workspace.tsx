@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   Syringe,
 } from "lucide-react";
+import { ChildAvatar } from "./child-avatar";
 import { ClinicianSectionOverride } from "./navigation-state";
 import type { ClinicianSection } from "./routes";
 import { requireApprovedDoctor } from "@/lib/auth";
@@ -106,9 +107,7 @@ export async function ClinicalWorkspace({
               <Link href={`/patients/${childId}`}>Dossier enfant</Link>
             </nav>
             <div className="care-child-context">
-              <span className="care-child-symbol" aria-hidden="true">
-                {patientName(context).slice(0, 1)}
-              </span>
+              <ChildAvatar sex={context.sex} />
               <div>
                 <strong>{patientName(context)}</strong>
                 <span>

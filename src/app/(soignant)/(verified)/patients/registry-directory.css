@@ -1,0 +1,648 @@
+.soignant-workspace--shared .soignant-main:has(> .registry-directory) {
+  padding-block-start: 14px;
+}
+.registry-directory {
+  --directory-border: #c7dbe1;
+  --directory-muted: #354c5b;
+  --directory-white: var(--theme-white-card, #fff);
+  --directory-shadow: 0 7px 18px rgb(43 105 121 / 9%);
+  --directory-green: #007b57;
+  --directory-motion: 200ms var(--motion-ease);
+  display: grid;
+  gap: clamp(12px, 1.35vw, 22px);
+  min-inline-size: 0;
+  color: var(--theme-light-text, #111);
+}
+
+.registry-directory-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  align-items: center;
+  min-block-size: clamp(120px, 10.3vw, 175px);
+  gap: 8px;
+  margin-block: 8px 0;
+}
+
+.registry-directory-heading > div {
+  border-inline-start: 4px solid var(--directory-green);
+  padding: 5px 0 7px clamp(12px, 1.5vw, 24px);
+}
+
+.registry-directory-heading span {
+  font-weight: 600;
+  color: var(--directory-muted);
+}
+
+.registry-directory-heading h1 {
+  margin: 4px 0 5px;
+  font-size: clamp(2.2rem, 3.2vw, 3.12rem);
+  letter-spacing: -0.055em;
+  line-height: 1.12;
+}
+
+.registry-directory-heading p {
+  margin: 0;
+  color: var(--directory-muted);
+  font-size: clamp(0.9rem, 1.25vw, 1.15rem);
+  line-height: 1.45;
+}
+
+.registry-directory-heading img {
+  display: block;
+  inline-size: min(100%, 480px);
+  block-size: auto;
+  justify-self: end;
+  align-self: end;
+}
+
+.registry-directory-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.registry-directory-action {
+  --action-wash: #eaf8f2;
+  --action-icon-bg: #d3f2e4;
+  --action-ink: #007947;
+  display: flex;
+  border: 1px solid #ffffffa8;
+  border-radius: 21px;
+  background: var(--directory-white);
+  padding: clamp(6px, 0.9vw, 13px);
+  box-shadow: var(--directory-shadow);
+  min-inline-size: 0;
+}
+
+.registry-directory-action[data-tone="amber"] {
+  --action-wash: #fff6ec;
+  --action-icon-bg: #ffebd2;
+  --action-ink: #9e5100;
+}
+
+.registry-directory-action[data-tone="coral"] {
+  --action-wash: #fdf0f0;
+  --action-icon-bg: #fadddf;
+  --action-ink: #a72e2f;
+}
+
+.registry-directory-action > a {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(8px, 1.15vw, 17px);
+  flex: 1;
+  min-block-size: 76px;
+  padding: 9px clamp(8px, 1vw, 15px);
+  border-radius: 15px;
+  color: inherit;
+  text-decoration: none;
+  background: var(--action-wash);
+}
+
+.registry-directory-action-icon {
+  display: grid;
+  place-items: center;
+  inline-size: clamp(38px, 4.1vw, 60px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  color: var(--action-ink);
+  background: var(--action-icon-bg);
+}
+
+.registry-directory-action strong,
+.registry-directory-action small {
+  display: block;
+  line-height: 1.25;
+}
+
+.registry-directory-action strong {
+  font-size: clamp(0.88rem, 1.25vw, 1.12rem);
+  font-weight: 750;
+}
+
+.registry-directory-action small {
+  margin-block-start: 4px;
+  color: var(--directory-muted);
+  font-size: 0.9rem;
+}
+
+.registry-directory-action > a > svg {
+  color: var(--action-ink);
+}
+
+.registry-directory-action-icon > svg {
+  inline-size: 48%;
+  block-size: 48%;
+}
+
+.registry-directory-filters,
+.registry-directory-results {
+  border: 1px solid #ffffffa8;
+  border-radius: 22px;
+  background: var(--directory-white);
+  box-shadow: var(--directory-shadow);
+}
+
+.registry-directory-filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: clamp(10px, 1.5vw, 22px);
+  align-items: end;
+  padding: clamp(12px, 1.65vw, 24px);
+}
+
+.registry-directory label {
+  margin: 0;
+  color: inherit;
+}
+
+.registry-directory-filters label {
+  display: grid;
+  gap: 8px;
+  min-inline-size: 0;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.registry-directory :is(input[type="search"], select) {
+  inline-size: 100%;
+  min-inline-size: 0;
+  min-block-size: 46px;
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid var(--directory-border);
+  border-radius: 11px;
+  background-color: #f8fbfc;
+  color: inherit;
+  font-size: max(1rem, 16px);
+}
+
+.registry-directory select {
+  padding-inline-end: 8px;
+}
+
+.registry-directory-search {
+  position: relative;
+}
+
+.registry-directory-search > svg {
+  position: absolute;
+  inset-inline-start: 12px;
+  inset-block-start: 50%;
+  translate: 0 -50%;
+  color: var(--directory-muted);
+  pointer-events: none;
+}
+
+.registry-directory
+  .registry-directory-filters
+  .registry-directory-search
+  > input[type="search"] {
+  padding-inline-start: 42px;
+}
+
+.registry-directory-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-block-size: 46px;
+  margin: 0;
+  padding: 8px clamp(12px, 1.6vw, 22px);
+  border: 1px solid var(--directory-green);
+  border-radius: 11px;
+  background: var(--directory-green);
+  color: white;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.registry-directory-submit:disabled {
+  cursor: progress;
+  opacity: 0.75;
+}
+
+.registry-directory-results {
+  padding: clamp(12px, 1.35vw, 20px);
+  min-inline-size: 0;
+}
+
+.registry-directory-toolbar,
+.registry-directory-options {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.registry-directory-toolbar {
+  justify-content: space-between;
+  margin-block-end: clamp(10px, 1.5vw, 22px);
+  color: var(--directory-muted);
+}
+
+.registry-directory-toolbar p,
+.registry-directory-sort {
+  margin: 0;
+}
+
+.registry-directory-sort label {
+  display: flex;
+  white-space: nowrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.registry-directory-sort select {
+  inline-size: auto;
+  max-inline-size: 100%;
+  color: var(--theme-light-text, #111);
+}
+
+.registry-directory-views {
+  display: flex;
+  gap: 6px;
+}
+
+.registry-directory-views a,
+.registry-directory-pagination > :is(a, span) {
+  position: relative;
+  display: inline-flex;
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border-radius: 11px;
+  color: var(--directory-muted);
+  text-decoration: none;
+}
+
+.registry-directory-views a {
+  background: #eaf2f5;
+}
+
+.registry-directory-views a[aria-current],
+.registry-directory-pagination .registry-directory-page {
+  border-color: var(--directory-green);
+  background: var(--directory-green);
+  color: white;
+  font-weight: 750;
+}
+
+.registry-directory-records {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.registry-directory-records[data-view="grid"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.registry-directory-records > li {
+  min-inline-size: 0;
+  margin: 0;
+}
+
+.registry-directory-card {
+  position: relative;
+  display: grid;
+  grid-template-columns:
+    minmax(170px, 1.7fr) minmax(0, auto) minmax(0, auto)
+    minmax(0, auto) auto;
+  gap: 8px clamp(8px, 1.35vw, 20px);
+  align-items: center;
+  min-block-size: 79px;
+  padding: 10px 13px;
+  border: 1px solid var(--directory-border);
+  border-inline-start: 4px solid var(--theme-sea-green, #3cb371);
+  border-radius: 16px;
+  background: #f9fcfc;
+  color: inherit;
+  text-decoration: none;
+}
+
+.registry-directory-identity {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+.registry-directory-identity strong {
+  display: block;
+  font-size: clamp(1.05rem, 1.5vw, 1.3rem);
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.registry-directory-demographics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1px 8px;
+  margin-block-start: 3px;
+  color: var(--directory-muted);
+  font-size: 0.88rem;
+  line-height: 1.37;
+}
+
+.registry-directory-care,
+.registry-directory-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  min-inline-size: 0;
+  gap: 6px;
+  font-size: 0.86rem;
+  line-height: 1.22;
+}
+
+.registry-directory-care b,
+.registry-directory-badge b {
+  font-weight: 650;
+}
+
+.registry-directory-care svg,
+.registry-directory-badge svg {
+  flex: none;
+}
+
+.registry-directory-badge {
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: #edf1f4;
+  color: #3c4c57;
+}
+
+.registry-directory-badge[data-tone="reviewed"],
+.registry-directory-badge[data-tone="scheduled"] {
+  background: #d9f5e7;
+  color: #006538;
+}
+
+.registry-directory-badge[data-tone="partial"] {
+  background: #fff0c3;
+  color: #704800;
+}
+
+.registry-directory-card-arrow {
+  color: var(--directory-green);
+}
+
+.registry-directory-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-block: clamp(15px, 3vw, 44px) 3px;
+}
+
+.registry-directory-pagination > :is(a, span) {
+  border: 1px solid var(--directory-border);
+  padding-inline: 10px;
+  font-size: 0.87rem;
+  background: #f8fbfc;
+}
+
+.registry-directory-pagination [aria-disabled="true"] {
+  color: #647783;
+  border-color: #e0e9ed;
+  background: #f3f7f9;
+}
+
+.registry-directory-empty {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 30px 12px;
+  border: 1px dashed var(--directory-border);
+  border-radius: 16px;
+  color: var(--directory-muted);
+  text-align: center;
+}
+
+.registry-directory-empty p {
+  margin: 0;
+}
+
+.registry-directory :is(a, button, select) {
+  transition:
+    transform var(--directory-motion),
+    box-shadow var(--directory-motion),
+    background-color var(--directory-motion);
+}
+
+.registry-directory :is(a, button):active {
+  transform: translateY(1px);
+}
+
+.registry-directory :is(input, select, a, button):focus-visible {
+  outline: 2px solid var(--directory-green);
+  outline-offset: 3px;
+}
+
+/* The shared feedback indicator overlays its link without creating a grid track. */
+.registry-directory .workspace-nav-feedback {
+  position: absolute;
+  inset-inline-end: 10px;
+  inset-block-start: 7px;
+}
+
+.registry-directory-identity time,
+.registry-directory-care time {
+  white-space: nowrap;
+}
+
+.registry-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (hover: hover) {
+  .registry-directory
+    :is(
+      .registry-directory-action > a,
+      .registry-directory-card,
+      .registry-directory-submit:not(:disabled),
+      .registry-directory-views a,
+      .registry-directory-pagination a
+    ):hover:not(:active) {
+    transform: translateY(-2px);
+    box-shadow: var(--directory-shadow);
+  }
+
+  .registry-directory-submit:not(:disabled):hover:not(:active) {
+    background: #006a4a;
+  }
+}
+
+@media (max-width: 1350px) {
+  .registry-directory-card {
+    grid-template-columns: minmax(160px, 1.4fr) repeat(3, minmax(0, 1fr)) auto;
+  }
+}
+
+@media (max-width: 1120px) {
+  .registry-directory-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .registry-directory-card {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .registry-directory-identity,
+  .registry-directory-badge[data-tone="reviewed"],
+  .registry-directory-badge[data-tone="partial"],
+  .registry-directory-identity + .registry-directory-badge {
+    grid-column: 1 / -1;
+  }
+
+  .registry-directory-identity {
+    padding-inline-end: 20px;
+  }
+
+  .registry-directory-card-arrow {
+    position: absolute;
+    inset-inline-end: 10px;
+    inset-block-start: 18px;
+  }
+}
+
+@media (min-width: 1121px) {
+  .registry-directory-records[data-view="grid"] .registry-directory-card {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    height: 100%;
+  }
+
+  .registry-directory-records[data-view="grid"]
+    :is(
+      .registry-directory-identity,
+      .registry-directory-identity + .registry-directory-badge
+    ) {
+    grid-column: 1 / -1;
+  }
+
+  .registry-directory-records[data-view="grid"] .registry-directory-identity {
+    padding-inline-end: 20px;
+  }
+
+  .registry-directory-records[data-view="grid"] .registry-directory-card-arrow {
+    position: absolute;
+    inset-inline-end: 10px;
+    inset-block-start: 18px;
+  }
+}
+
+@media (max-width: 700px) {
+  .registry-directory-heading {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    min-block-size: auto;
+  }
+
+  .registry-directory-heading > div {
+    padding-block: 1px 2px;
+  }
+
+  .registry-directory-heading h1 {
+    font-size: 2.1rem;
+  }
+
+  .registry-directory-heading img {
+    align-self: center;
+  }
+
+  .registry-directory-actions,
+  .registry-directory-filters,
+  .registry-directory-records[data-view="grid"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .registry-directory-actions {
+    gap: 6px;
+  }
+
+  .registry-directory-action {
+    border-radius: 15px;
+  }
+
+  .registry-directory-action > a {
+    min-block-size: 55px;
+    border-radius: 11px;
+  }
+
+  .registry-directory-action strong {
+    font-size: 0.97rem;
+  }
+
+  .registry-directory-action small {
+    margin-block-start: 2px;
+  }
+
+  .registry-directory-filters {
+    gap: 9px;
+  }
+
+  .registry-directory-filters label {
+    gap: 5px;
+  }
+
+  .registry-directory-results {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .registry-directory-toolbar {
+    gap: 4px 8px;
+    font-size: 0.86rem;
+  }
+
+  .registry-directory-sort select {
+    inline-size: 134px;
+    min-block-size: 44px;
+  }
+
+  .registry-directory-views {
+    display: none;
+  }
+
+  .registry-directory-card {
+    box-shadow: var(--directory-shadow);
+  }
+
+  .registry-directory-demographics {
+    display: grid;
+    gap: 1px;
+  }
+}
+
+@media (max-width: 380px) {
+  .registry-directory-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .registry-directory :is(a, button, select) {
+    transition: none;
+  }
+
+  .registry-directory :is(a, button):is(:hover, :active) {
+    transform: none;
+  }
+}

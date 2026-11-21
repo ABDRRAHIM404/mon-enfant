@@ -146,6 +146,7 @@ export async function PatientSection({
           items={data.items.map((c) => ({
             id: c.id,
             label: patientName(c),
+            sex: c.sex,
             caption: c.birth_date || "Date de naissance inconnue",
           }))}
           current={child ? { id: child.id, label: patientName(child) } : null}

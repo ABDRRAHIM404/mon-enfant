@@ -1065,3 +1065,9 @@ The clinician dashboard uses the existing logo and guarded backend projections i
 ### 21 November 2026 — shared soignant navigation
 
 The approved desktop and mobile clinician shell is inherited by all 41 clinician-only pages, with role-sensitive reuse on five shared URLs. The [route inventory](docs/design-qa/soignant-shared-navigation.md) records the routes, active-state behavior and focused checks. Owner requests direct production release for web updates.
+
+### 21 November 2026 — soignant Enfants redesign
+
+The authorized Enfants directory follows the desktop and mobile references with illustrated actions, registry filters, compact record cards, list and grid views, and pagination. Newest-first is the registry order. Alphabetical sorting applies to the current page. The same avatars appear in the clinical workspace and child selectors, using recorded sex and a neutral fallback. The current registry has no authorized custom photo source.
+
+Chromium captures compared the implemented directory against the supplied layouts at desktop and phone widths. A second comparison confirmed the search icon no longer overlaps the text and loading feedback no longer creates extra card height. Tablet and 320 px overflow checks, filtering, pagination, sorting, refresh, all three avatars, and record links passed with fictional data. Changed-file lint and 82 focused tests passed, including the existing registry authorization tests. Signed-in production verification remains open.

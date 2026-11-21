@@ -675,3 +675,17 @@
   background: var(--seafoam);
   border-radius: var(--radius-control);
 }
+
+.clinician-child-avatar {
+  display: block;
+  flex: none;
+  border-radius: 50%;
+  background: #dcf3ec;
+  object-fit: cover;
+}
+
+.clinician-child-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
