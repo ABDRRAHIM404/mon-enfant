@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ClinicianChildPicker } from "./child-picker";
 import { ConsultationsWorkspace } from "./consultations/workspace";
+import { VaccinationsWorkspace } from "./vaccinations/workspace";
+import { readVaccinationOverview } from "./vaccinations/read-overview";
 import { requireApprovedDoctor } from "@/lib/auth";
 import {
   patientName,
@@ -81,50 +83,40 @@ export async function PatientSection({
     if (result.error) throw new Error("Ce dossier est indisponible.");
     child = result.data as ChildProfile;
   }
+  const assignedCapabilities = capabilities.data as string[];
+  if (section === "vaccinations") {
+    return (
+      <VaccinationsWorkspace
+        child={child}
+        matches={data.items}
+        q={q}
+        childPage={childPage}
+        childTotal={data.total}
+        page={page}
+        overview={
+          child ? await readVaccinationOverview(supabase, child, page) : null
+        }
+        capabilities={assignedCapabilities}
+      />
+    );
+  }
+
   let history: { items: ClinicalEntry[]; total: number } = {
     items: [],
     total: 0,
   };
-  let references: {
-    items: {
-      id: string;
-      dose_code: string;
-      vaccine_code: string;
-      state: string;
-      documented_entries: unknown[];
-    }[];
-    total: number;
-  } = { items: [], total: 0 };
   if (child) {
-    const [timeline, referenceResult] = await Promise.all([
-      supabase.rpc("clinical_timeline", {
-        p_child_id: child.id,
-        p_page: page,
-        p_kind: config.kind,
-      }),
-      section === "vaccinations"
-        ? supabase.rpc("patient_vaccine_items", {
-            p_child_id: child.id,
-            p_page: 1,
-          })
-        : Promise.resolve(null),
-    ]);
-    if (
-      timeline.error?.code === "42501" ||
-      referenceResult?.error?.code === "42501"
-    )
-      notFound();
+    const timeline = await supabase.rpc("clinical_timeline", {
+      p_child_id: child.id,
+      p_page: page,
+      p_kind: config.kind,
+    });
+    if (timeline.error?.code === "42501") notFound();
     if (timeline.error) throw new Error("Impossible de charger l’historique.");
-    if (referenceResult?.error)
-      throw new Error("Références vaccinales indisponibles.");
     history = timeline.data;
-    if (referenceResult) references = referenceResult.data;
   }
 
-  const allowed = (capabilities.data as string[]).includes(config.kind),
-    appointmentAllowed = (capabilities.data as string[]).includes(
-      "appointment",
-    );
+  const allowed = assignedCapabilities.includes(config.kind);
   if (section === "consultations") {
     return (
       <ConsultationsWorkspace
@@ -198,55 +190,11 @@ export async function PatientSection({
                 )}
               </section>
               <section className="panel" id="section-history">
-                <h2>
-                  {section === "vaccinations"
-                    ? "Historique des vaccinations enregistrées"
-                    : "Historique des mesures"}
-                </h2>
+                <h2>Historique des mesures</h2>
                 {history.items.length ? (
-                  history.items.map((entry) =>
-                    section === "vaccinations" ? (
-                      <details
-                        className="workspace-vaccine-record"
-                        key={entry.id}
-                      >
-                        <summary>
-                          <div>
-                            <h3>
-                              {String(
-                                entry.payload.vaccine_label || "Vaccination",
-                              )}{" "}
-                              ·{" "}
-                              {String(
-                                entry.payload.dose_label || "Dose non précisée",
-                              )}
-                            </h3>
-                            <p className="muted">
-                              {entry.occurred_on || "Date inconnue"} ·{" "}
-                              {entry.occurrence_precision === "exact"
-                                ? "Date déclarée exacte"
-                                : "Date incertaine"}
-                            </p>
-                            <p className="fine">
-                              {entry.source_verified
-                                ? "Source contrôlée"
-                                : "Source non confirmée"}{" "}
-                              · {entry.professional_id}
-                            </p>
-                          </div>
-                          <span className="workspace-chip">
-                            {entry.entry_state === "withdrawn"
-                              ? "Retirée · "
-                              : ""}
-                            Révision {entry.revision} · Voir le détail
-                          </span>
-                        </summary>
-                        <EntryCard entry={entry} />
-                      </details>
-                    ) : (
-                      <EntryCard key={entry.id} entry={entry} />
-                    ),
-                  )
+                  history.items.map((entry) => (
+                    <EntryCard key={entry.id} entry={entry} />
+                  ))
                 ) : (
                   <p className="empty-state">
                     Aucune saisie de cette rubrique pour cet enfant sur cette
@@ -254,76 +202,6 @@ export async function PatientSection({
                   </p>
                 )}
               </section>
-              {section === "vaccinations" && (
-                <>
-                  <section className="soignant-attention">
-                    <h2>Historique enregistré et suite du suivi</h2>
-                    <p>
-                      Une HB1 déclarée ne masque pas les autres références de
-                      routine. Pour une HB1 non administrée, incertaine ou un
-                      rattrapage, le suivi reste à décider manuellement. Une
-                      source non confirmée ne prouve pas une vaccination
-                      manquée.
-                    </p>
-                    <p>
-                      Les références de routine sont distinctes des
-                      administrations et des rendez-vous. Une saisie seule ne
-                      planifie aucun rendez-vous.
-                    </p>
-                    {appointmentAllowed && (
-                      <Link
-                        className="button secondary"
-                        href={`/patients/${child.id}/appointments/new`}
-                      >
-                        Planifier un suivi manuel
-                      </Link>
-                    )}
-                  </section>
-                  <section className="panel">
-                    <h2>Références de routine ({references.total})</h2>
-                    {!references.items.length ? (
-                      <p>
-                        Aucune référence assignée. L’historique enregistré
-                        ci-dessus est conservé indépendamment de la revue d’une
-                        source et de la planification du suivi.
-                      </p>
-                    ) : (
-                      references.items.map((item) => (
-                        <article key={item.id}>
-                          <h3>
-                            {item.dose_code} · {item.vaccine_code}
-                          </h3>
-                          <p>
-                            {item.state === "withdrawn"
-                              ? "Référence retirée"
-                              : item.documented_entries.length
-                                ? "Administration documentée et rapprochée"
-                                : "Administration non confirmée — aucune dose manquée déduite"}
-                          </p>
-                          <Link
-                            className="text-link"
-                            href={`/patients/${child.id}/vaccinations/${item.id}`}
-                          >
-                            Décisions et historique de la référence
-                          </Link>
-                        </article>
-                      ))
-                    )}
-                    <Link
-                      className="text-link"
-                      href={`/patients/${child.id}/vaccinations`}
-                    >
-                      Examiner les références, dates et versions approuvées
-                    </Link>
-                    {references.total > 20 && (
-                      <p className="fine">
-                        20 premières références ; la vue détaillée donne accès
-                        aux pages suivantes.
-                      </p>
-                    )}
-                  </section>
-                </>
-              )}
               {section === "growth" && (
                 <>
                   <div className="soignant-two-column">

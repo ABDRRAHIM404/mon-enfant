@@ -1081,3 +1081,9 @@ Historique and Âge now share a keyboard-accessible desktop popup and a modal ph
 The Consultations page uses the shared clinician navigation, a scoped child search, an illustrated patient panel, and a collapsible consultation timeline. The timeline keeps the recorded fields, provenance, attribution, revisions and correction links. New consultation remains gated by the existing clinical capability. The existing newest-first query and pagination are used, with an optional oldest-first view of the current page.
 
 Compared desktop and phone captures against the references and checked 1710, 820, 390 and 320 px widths in Chromium with fictional records. Search, selection, accordion keyboard controls, sorting, existing links, refresh, denied access and empty/error states passed. Changed-file lint and 84 focused tests passed, including the existing guarded consultation submission and immutable correction checks. Signed-in production verification remains open.
+
+### 21 November 2026 — soignant Vaccinations redesign
+
+The Vaccinations page keeps the shared clinician shell, authorized child search, capability-gated recording and expandable vaccination history. The upcoming panel calculates dates from the approved, reviewed PNI version and distinguishes uncertain documentation from matched administrations. HB1 remains a manual review item. An exact day-17 HB1 entry keeps the contextual notice hidden. Existing appointment and routine-reference routes continue to handle their respective workflows.
+
+Desktop and mobile captures were compared with the references. Chromium checked four widths, search and selection, refresh, history detail, date rendering, permissions and the draft-only state using fictional records. Lint and 32 focused tests passed. A read-only production catalogue query found one draft and zero approved, reviewed versions, so the live page explains that state until a version is approved.
