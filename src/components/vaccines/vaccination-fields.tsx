@@ -3,7 +3,52 @@ import { useState } from "react";
 import { VaccineSelection } from "./selection";
 import type { VaccineChoice } from "@/lib/vaccines/choices";
 import type { ClinicalEntry } from "@/lib/clinical/types";
-import type { VaccineItemExport } from "@/lib/vaccines/patient-types";
+import {
+  vaccinationDetails,
+  type VaccineItemExport,
+} from "@/lib/vaccines/patient-types";
+
+function AdministrationDetail({
+  detail,
+  data,
+}: {
+  detail: (typeof vaccinationDetails)[number];
+  data?: ClinicalEntry["payload"];
+}) {
+  const { status, field, label } = detail;
+  const [certainty, setCertainty] = useState(
+    String(data?.[status] ?? "unknown"),
+  );
+  return (
+    <div className="form-grid">
+      <label>
+        {label} : certitude
+        <select
+          name={status}
+          value={certainty}
+          onChange={(event) => setCertainty(event.target.value)}
+        >
+          <option value="unknown">Inconnu — laisser la valeur vide</option>
+          <option value="known">Connu — renseigner la valeur</option>
+          {status === "lot_status" && (
+            <option value="not_applicable">
+              Sans objet — laisser la valeur vide
+            </option>
+          )}
+        </select>
+      </label>
+      <label>
+        {label}
+        <input
+          name={field}
+          defaultValue={data?.[field] ?? ""}
+          maxLength={200}
+          disabled={certainty !== "known"}
+        />
+      </label>
+    </div>
+  );
+}
 export function VaccinationFields({
   previous,
   items,
@@ -31,43 +76,6 @@ export function VaccinationFields({
           item.dose_code === selected.dose,
       )
     : items;
-  function text(
-    name: string,
-    label: string,
-    required = false,
-    maxLength = 200,
-  ) {
-    return (
-      <label>
-        {label}
-        <input
-          name={name}
-          defaultValue={data?.[name] ?? ""}
-          maxLength={maxLength}
-          required={required}
-        />
-      </label>
-    );
-  }
-  function known(status: string, value: string, label: string, lot = false) {
-    return (
-      <div className="form-grid">
-        <label>
-          {label} : certitude
-          <select name={status} defaultValue={data?.[status] ?? "unknown"}>
-            <option value="unknown">Inconnu — laisser la valeur vide</option>
-            <option value="known">Connu — renseigner la valeur</option>
-            {lot && (
-              <option value="not_applicable">
-                Sans objet — laisser la valeur vide
-              </option>
-            )}
-          </select>
-        </label>
-        {text(value, label)}
-      </div>
-    );
-  }
   return (
     <>
       <h2>Administration documentée</h2>
@@ -89,18 +97,9 @@ export function VaccinationFields({
           setItemId("");
         }}
       />
-      {known("lot_status", "lot_number", "Numéro du lot", true)}
-      {known("site_status", "site", "Site d’administration")}
-      {known(
-        "provider_status",
-        "administered_by",
-        "Professionnel ayant administré le vaccin",
-      )}
-      {known(
-        "administration_facility_status",
-        "administration_facility",
-        "Lieu réel d’administration",
-      )}
+      {vaccinationDetails.map((detail) => (
+        <AdministrationDetail key={detail.status} detail={detail} data={data} />
+      ))}
       <p className="fine">
         Le professionnel et le lieu d’administration peuvent différer de
         l’auteur de cette transcription. Laissez les éléments inconnus vides.
@@ -129,6 +128,7 @@ export function VaccinationFields({
         <select
           name="schedule_item_id"
           value={itemId}
+          disabled={matching === "unmatched"}
           onChange={(event) => setItemId(event.target.value)}
         >
           <option value="">Aucune — conserver non rapprochée</option>

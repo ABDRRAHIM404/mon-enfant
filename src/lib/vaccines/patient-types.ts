@@ -42,6 +42,21 @@ export type VaccinationConflict = {
   vaccine_label: string;
   dose_label: string;
 };
+export const vaccinationDetails = [
+  { status: "lot_status", field: "lot_number", label: "Numéro du lot" },
+  { status: "site_status", field: "site", label: "Site d’administration" },
+  {
+    status: "provider_status",
+    field: "administered_by",
+    label: "Professionnel ayant administré le vaccin",
+  },
+  {
+    status: "administration_facility_status",
+    field: "administration_facility",
+    label: "Lieu réel d’administration",
+  },
+] as const;
+
 export const vaccinationFields = [
   "vaccine_code",
   "vaccine_label",
