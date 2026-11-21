@@ -455,4 +455,50 @@ describe("versioned vaccine catalog", () => {
       revision: 2,
     });
   });
+  it("lets a creator and editor with review permission approve and keeps their audit identity", async () => {
+    await db.exec(
+      readFileSync(
+        "supabase/migrations/20261121175829_allow_catalog_review_by_creator.sql",
+        "utf8",
+      ),
+    );
+    const reviewer = await actor("admin", true, true, true);
+    const id = await change(
+      reviewer,
+      "clone",
+      "0c504568-7c67-49bb-b43b-c8382439a850",
+      2,
+      { label: "Brouillon fictif avec revue" },
+    );
+    await change(reviewer, "edit", id, 1, {
+      dose_code: "VPO1",
+      age: { unit: "weeks", value: 8 },
+      eligibility: "all",
+      automatic_scheduling: true,
+    });
+    await expect(
+      change(reviewer, "approve", id, 2, reviewInput),
+    ).rejects.toThrow(/permission/);
+    await db.query(
+      "update public.professional_profiles set role='doctor' where user_id=$1",
+      [reviewer.id],
+    );
+    await expect(
+      change(reviewer, "approve", id, 2, {
+        ...reviewInput,
+        birth_window_reviewed: false,
+      }),
+    ).rejects.toThrow(/review/);
+    await change(reviewer, "approve", id, 2, reviewInput);
+    const result = await detail(reviewer, id);
+    expect(result.version).toMatchObject({
+      revision: 3,
+      status: "approved",
+      reviewed_by: reviewer.id,
+      review_verified: true,
+    });
+    expect(
+      result.history.find(({ action }) => action === "approve")?.snapshot,
+    ).toMatchObject({ reviewed_by: reviewer.id, review_verified: true });
+  });
 });

@@ -122,10 +122,10 @@ export default async function VaccineVersion({
       )}
       {permissions.review && v.status === "draft" && (
         <section className="panel">
-          <h2>Revue clinique indépendante</h2>
+          <h2>Revue clinique</h2>
           <p>
-            Le créateur et les éditeurs de cette version ne peuvent pas
-            l’approuver.
+            Les attestations, la référence et le compte qui approuve cette
+            version sont conservés dans l’historique.
           </p>
           <CatalogForm
             {...formProps}
