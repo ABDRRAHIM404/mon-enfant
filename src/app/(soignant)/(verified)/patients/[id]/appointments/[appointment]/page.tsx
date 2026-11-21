@@ -5,7 +5,10 @@ import { requireApprovedDoctor } from "@/lib/auth";
 import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
 import { AppointmentCard } from "@/components/appointments/card";
 import { AppointmentForm } from "@/components/appointments/form";
-import { appointmentTime } from "@/lib/appointments/calendar";
+import {
+  appointmentTime,
+  readableAppointmentDate,
+} from "@/lib/appointments/calendar";
 import type { AppointmentHistory } from "@/lib/appointments/types";
 import { uuidPattern } from "@/lib/registry/types";
 export const dynamic = "force-dynamic";
@@ -61,7 +64,7 @@ export default async function History({
           <p>
             Date recommandée par le PNI :{" "}
             <time dateTime={data.appointment.recommended_on}>
-              {data.appointment.recommended_on}
+              {readableAppointmentDate(data.appointment.recommended_on)}
             </time>
           </p>
           <p>Doses prévues : {data.appointment.dose_codes?.join(", ")}</p>

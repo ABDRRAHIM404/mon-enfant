@@ -130,3 +130,9 @@ export type RoutineAppointmentProposal = {
   doses: { code: string; label: string }[];
   requires_assignment: boolean;
 };
+
+export type AppointmentWorkspace = {
+  appointments: Pick<AppointmentPage, "items" | "total">;
+  proposals: RoutineAppointmentProposals;
+  days: { day: string; appointments: number; proposals: number }[];
+};

@@ -15,20 +15,21 @@ import {
 import { requireApprovedDoctor } from "@/lib/auth";
 import { ChildAvatar } from "@/components/clinician/child-avatar";
 import { RegistryFilterSelect } from "@/components/clinician/registry-filter-select";
-import { CalendarDisclosure } from "@/components/appointments/calendar-disclosure";
+import { FrenchDateInput } from "@/components/appointments/french-date-input";
 import { LiveRefresh } from "@/components/appointments/live-refresh";
 import { RoutineBooking } from "@/components/appointments/routine-booking";
 import {
-  calendarRange,
+  appointmentWorkspaceRange,
+  parseAppointmentDate,
+  readableAppointmentDate as displayDate,
   todayCasablanca,
   appointmentZone,
   type CalendarView,
 } from "@/lib/appointments/calendar";
 import {
   appointmentStates,
-  type AppointmentPage,
+  type AppointmentWorkspace,
   type AppointmentState,
-  type RoutineAppointmentProposals,
 } from "@/lib/appointments/types";
 import type { Facility } from "@/lib/registry/types";
 import "../consultations/consultations.css";
@@ -44,9 +45,12 @@ const views = [
 ];
 const states = [
   { value: "all", label: "Tous" },
+  { value: "pending", label: "À confirmer" },
+  { value: "indicative", label: "Dates indicatives" },
+  { value: "confirmed", label: "Confirmés" },
   ...Object.entries(appointmentStates).map(([value, label]) => ({
     value,
-    label,
+    label: value === "scheduled" ? "Planifiés et confirmés" : label,
   })),
 ];
 const status: Record<AppointmentState, { label: string; tone: string }> = {
@@ -57,10 +61,6 @@ const status: Record<AppointmentState, { label: string; tone: string }> = {
   reference_review: { label: "Référence à revoir", tone: "amber" },
   cancelled: { label: "Annulé", tone: "neutral" },
 };
-const fullDate = new Intl.DateTimeFormat("fr-MA", {
-  dateStyle: "long",
-  timeZone: "UTC",
-});
 const monthDate = new Intl.DateTimeFormat("fr-MA", {
   month: "long",
   year: "numeric",
@@ -71,8 +71,6 @@ const localTime = new Intl.DateTimeFormat("fr-MA", {
   minute: "2-digit",
   timeZone: appointmentZone,
 });
-const displayDate = (value: string) =>
-  fullDate.format(new Date(`${value}T12:00:00Z`));
 const proposalsPageSize = 3;
 const paginationNumber = (value?: string) =>
   Math.min(10000, Math.max(1, Math.floor(Number(value) || 1)));
@@ -95,51 +93,59 @@ export default async function Calendar({
   const view = (
     views.some(({ value }) => value === q.view) ? q.view : "month"
   ) as CalendarView;
-  let anchor = q.date || today;
-  let range;
-  try {
-    range = calendarRange(anchor, view);
-  } catch {
-    anchor = today;
-    range = calendarRange(anchor, view);
+  let anchor = today;
+  let dates = appointmentWorkspaceRange(today, view);
+  let invalidDate = false;
+  if (typeof q.date === "string" && q.date) {
+    try {
+      const selected = parseAppointmentDate(q.date);
+      dates = appointmentWorkspaceRange(selected, view);
+      anchor = selected;
+    } catch {
+      invalidDate = true;
+    }
   }
-  const state =
-    q.state && Object.hasOwn(appointmentStates, q.state) ? q.state : "all";
+  const { month, calendar, period } = dates;
+  const state = states.find(({ value }) => value === q.state)?.value ?? "all";
   const page = paginationNumber(q.page);
   const proposalsPage = paginationNumber(q.proposals);
-  const [response, capabilities, proposals, places] = await Promise.all([
-    supabase.rpc("appointment_calendar", {
-      p_from: range.from,
-      p_to: range.to,
+  const [response, capabilities, places] = await Promise.all([
+    supabase.rpc("appointment_workspace", {
+      p_from: period.from,
+      p_to: period.to,
+      p_month: month,
       p_page: page,
+      p_proposal_page: proposalsPage,
       p_state: state,
     }),
     supabase.rpc("my_clinical_capabilities"),
-    supabase.rpc("routine_appointment_proposals", { p_page: proposalsPage }),
     supabase.rpc("my_facilities"),
   ]);
   if (response.error || capabilities.error)
     throw new Error("Impossible de charger le calendrier.");
-  const data = response.data as AppointmentPage & {
-    days: { day: string; count: number }[];
-  };
-  const counts = new Map(data.days.map((day) => [day.day, day.count]));
+  const {
+    appointments: data,
+    proposals: routine,
+    days,
+  } = response.data as AppointmentWorkspace;
+  const counts = new Map(days.map((day) => [day.day, day]));
   const rights = capabilities.data as string[];
   const facilities = (places.data ?? []) as Facility[];
-  const routine = proposals.data as RoutineAppointmentProposals | null;
+  const showProposals = ["all", "pending", "indicative"].includes(state);
+  const monthLabel = monthDate.format(new Date(`${month}T12:00:00Z`));
   const href = (
     date = anchor,
     mode: CalendarView = view,
     list = 1,
-    pending = proposalsPage,
+    pending = 1,
   ) =>
     `/appointments?${new URLSearchParams({ date, view: mode, state, page: String(list), proposals: String(pending) })}`;
   const periodLabel =
     view === "month"
-      ? monthDate.format(new Date(`${anchor}T12:00:00Z`))
+      ? monthLabel
       : view === "day"
         ? displayDate(anchor)
-        : `${displayDate(range.from)} – ${displayDate(range.to)}`;
+        : `${displayDate(period.from)} – ${displayDate(period.to)}`;
 
   return (
     <div className="consultations-workspace rdv-workspace">
@@ -178,26 +184,152 @@ export default async function Calendar({
           Rendez-vous vaccinal confirmé.
         </p>
       )}
-      <div className="rdv-grid">
+      {invalidDate && (
+        <p className="form-error" role="alert">
+          Indiquez une date valide au format JJ/MM/AAAA. Le calendrier affiche
+          aujourd’hui.
+        </p>
+      )}
+      <a className="rdv-action rdv-results-link" href="#rdv-period-results">
+        Voir les rendez-vous de la période
+      </a>
+      <div className="rdv-grid" data-show-proposals={showProposals}>
+        <section
+          className="rdv-panel rdv-filters"
+          aria-labelledby="rdv-filter-title"
+        >
+          <h2 id="rdv-filter-title">
+            <Filter size={21} /> Filtres
+          </h2>
+          <form
+            action="/appointments"
+            className="rdv-filter-form"
+            key={`${anchor}-${view}-${state}`}
+          >
+            <label>
+              Date <FrenchDateInput date={anchor} />
+            </label>
+            <RegistryFilterSelect
+              name="view"
+              label="Vue"
+              defaultValue={view}
+              options={views}
+            />
+            <RegistryFilterSelect
+              name="state"
+              label="État"
+              defaultValue={state}
+              options={states}
+            />
+            <button className="rdv-action rdv-primary">
+              <Filter size={17} /> Afficher
+            </button>
+          </form>
+          <div className="rdv-calendar-content">
+            <nav className="rdv-period" aria-label="Période du calendrier">
+              <Link
+                href={href(calendar.previous)}
+                scroll={false}
+                aria-label="Mois précédent"
+              >
+                <ChevronLeft size={19} />
+              </Link>
+              <strong>{monthLabel}</strong>
+              <Link
+                href={href(calendar.next)}
+                scroll={false}
+                aria-label="Mois suivant"
+              >
+                <ChevronRight size={19} />
+              </Link>
+            </nav>
+            <div
+              className="rdv-days"
+              key={month}
+              role="group"
+              aria-label={`Calendrier de ${monthLabel}`}
+            >
+              {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map((day) => (
+                <strong key={day}>{day}</strong>
+              ))}
+              {calendar.days.map((day) => {
+                const outside = day.slice(0, 7) !== month.slice(0, 7);
+                const { appointments = 0, proposals = 0 } =
+                  counts.get(day) ?? {};
+                if (outside)
+                  return (
+                    <span
+                      className="rdv-outside-day"
+                      key={day}
+                      aria-hidden="true"
+                    >
+                      {Number(day.slice(8))}
+                    </span>
+                  );
+                return (
+                  <Link
+                    key={day}
+                    href={href(day, "day")}
+                    scroll={false}
+                    aria-current={day === anchor ? "date" : undefined}
+                    aria-label={`${displayDate(day)}${day === today ? ", aujourd’hui" : ""}, ${appointments} rendez-vous, ${proposals} ${routine.preview ? (proposals === 1 ? "date indicative" : "dates indicatives") : proposals === 1 ? "proposition" : "propositions"}`}
+                    data-today={day === today}
+                  >
+                    <span>{Number(day.slice(8))}</span>
+                    {(appointments > 0 || proposals > 0) && (
+                      <span className="rdv-day-badges" aria-hidden="true">
+                        {appointments > 0 && <small>{appointments}</small>}
+                        {proposals > 0 && (
+                          <small className="rdv-day-proposals">
+                            {proposals}
+                          </small>
+                        )}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+            <p className="rdv-calendar-legend">
+              <span>Rendez-vous</span>
+              {showProposals && (
+                <span>
+                  {routine.preview ? "Dates indicatives" : "Propositions"}
+                </span>
+              )}
+            </p>
+          </div>
+        </section>
+
         <section
           className="rdv-proposals"
+          hidden={!showProposals}
           aria-label="Propositions de rendez-vous vaccinaux"
         >
-          {(proposals.error || !routine?.items.length) && (
-            <div className="rdv-panel rdv-empty">
+          {showProposals && (
+            <header className="rdv-proposals-header">
               <h2>
-                <Syringe size={21} /> Rendez-vous vaccinaux
+                <Syringe size={18} />{" "}
+                {routine.preview
+                  ? "Dates vaccinales indicatives"
+                  : "Propositions vaccinales"}
               </h2>
-              <p>
-                {proposals.error
-                  ? "Les propositions sont momentanément indisponibles."
-                  : routine?.version
-                    ? "Aucune date de routine à proposer pour vos dossiers autorisés."
+              {routine.preview && (
+                <p>
+                  Le PNI est en attente de validation. Les dates sont
+                  consultables uniquement.
+                </p>
+              )}
+              {!routine.items.length && (
+                <p>
+                  {routine.version
+                    ? "Aucun résultat pour cette période et ce filtre."
                     : "Aucune version du calendrier PNI n’est disponible."}
-              </p>
-            </div>
+                </p>
+              )}
+            </header>
           )}
-          {routine?.items.map((proposal) => {
+          {routine.items.map((proposal) => {
             const canBook =
               !routine.preview &&
               routine.version &&
@@ -210,32 +342,20 @@ export default async function Calendar({
                 className="routine-proposal"
                 key={`${proposal.child_id}-${proposal.recommended_on}`}
               >
-                <div className="routine-heading">
-                  <h2>
-                    <span className="rdv-icon">
-                      <Syringe size={23} />
-                    </span>{" "}
-                    {routine.preview
-                      ? "Date vaccinale indicative"
-                      : "Rendez-vous vaccinal (automatique)"}
-                  </h2>
-                  <span className="rdv-status rdv-status--amber">
-                    <Clock size={15} />{" "}
-                    {routine.preview
-                      ? "Aperçu du PNI"
-                      : "En attente de confirmation"}
-                  </span>
-                </div>
                 <div className="routine-layout">
                   <div className="rdv-child">
-                    <ChildAvatar sex={proposal.sex} />
+                    <ChildAvatar sex={proposal.sex} size={36} />
                     <div>
                       <strong>
                         {[proposal.given_name, proposal.family_name]
                           .filter(Boolean)
                           .join(" ") || "Identité inconnue"}
                       </strong>
-                      <small>Né(e) le {displayDate(proposal.birth_date)}</small>
+                      <span
+                        className={`rdv-status rdv-status--${routine.preview ? "neutral" : "amber"}`}
+                      >
+                        {routine.preview ? "Indicative" : "À confirmer"}
+                      </span>
                     </div>
                   </div>
                   <div className="routine-date">
@@ -263,11 +383,9 @@ export default async function Calendar({
                     />
                   )}
                 </div>
-                {!canBook && (
+                {!canBook && !routine.preview && (
                   <p className="routine-note">
-                    {routine.preview ? (
-                      "Calendrier bêta en attente de validation. Date consultable uniquement."
-                    ) : places.error ? (
+                    {places.error ? (
                       "Impossible de charger les lieux d’exercice."
                     ) : !rights.includes("appointment") ||
                       (proposal.requires_assignment &&
@@ -285,104 +403,43 @@ export default async function Calendar({
               </article>
             );
           })}
-          {routine && routine.total > proposalsPageSize && (
-            <nav
-              className="pagination"
-              aria-label="Propositions de rendez-vous"
-            >
-              {proposalsPage > 1 && (
-                <Link href={href(anchor, view, page, proposalsPage - 1)}>
-                  Propositions précédentes
-                </Link>
-              )}
-              <span>Page {proposalsPage}</span>
-              {proposalsPage * proposalsPageSize < routine.total && (
-                <Link href={href(anchor, view, page, proposalsPage + 1)}>
-                  Propositions suivantes
-                </Link>
-              )}
-            </nav>
-          )}
-        </section>
-        <section
-          className="rdv-panel rdv-filters"
-          aria-labelledby="rdv-filter-title"
-        >
-          <h2 id="rdv-filter-title">
-            <Filter size={21} /> Filtres
-          </h2>
-          <form
-            action="/appointments"
-            className="rdv-filter-form"
-            key={`${anchor}-${view}-${state}`}
-          >
-            <label>
-              Date{" "}
-              <input type="date" name="date" required defaultValue={anchor} />
-            </label>
-            <RegistryFilterSelect
-              name="view"
-              label="Vue"
-              defaultValue={view}
-              options={views}
-            />
-            <RegistryFilterSelect
-              name="state"
-              label="État"
-              defaultValue={state}
-              options={states}
-            />
-            <button className="rdv-action rdv-primary">
-              <Filter size={17} /> Afficher
-            </button>
-          </form>
-          <CalendarDisclosure>
-            <nav className="rdv-period" aria-label="Période du calendrier">
-              <Link href={href(range.previous)} aria-label="Période précédente">
-                <ChevronLeft size={19} />
-              </Link>
-              <strong>{periodLabel}</strong>
-              <Link href={href(range.next)} aria-label="Période suivante">
-                <ChevronRight size={19} />
-              </Link>
-            </nav>
-            <div
-              className={`rdv-days rdv-days--${view}`}
-              role="group"
-              aria-label="Jours et rendez-vous"
-            >
-              {view !== "day" &&
-                ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map((day) => (
-                  <strong key={day}>{day}</strong>
-                ))}
-              {range.days.map((day) => {
-                const count = counts.get(day) ?? 0;
-                return (
+          {(proposalsPage > 1 || routine.total > proposalsPageSize) &&
+            showProposals && (
+              <nav
+                className="rdv-pagination"
+                aria-label="Propositions de rendez-vous"
+              >
+                {proposalsPage > 1 && (
                   <Link
-                    key={day}
-                    href={href(day, "day")}
-                    aria-current={day === anchor ? "date" : undefined}
-                    aria-label={`${displayDate(day)}${day === today ? ", aujourd’hui" : ""}, ${count} rendez-vous`}
-                    data-today={day === today}
-                    data-outside={
-                      view === "month" && day.slice(0, 7) !== anchor.slice(0, 7)
-                    }
+                    className="rdv-action"
+                    scroll={false}
+                    href={href(anchor, view, page, proposalsPage - 1)}
                   >
-                    <span>{Number(day.slice(8))}</span>
-                    {count > 0 && <small>{count}</small>}
+                    Propositions précédentes
                   </Link>
-                );
-              })}
-            </div>
-          </CalendarDisclosure>
+                )}
+                <span>Page {proposalsPage}</span>
+                {proposalsPage * proposalsPageSize < routine.total && (
+                  <Link
+                    className="rdv-action"
+                    scroll={false}
+                    href={href(anchor, view, page, proposalsPage + 1)}
+                  >
+                    Propositions suivantes
+                  </Link>
+                )}
+              </nav>
+            )}
         </section>
         <section
+          id="rdv-period-results"
           className="rdv-panel rdv-list"
           aria-labelledby="rdv-list-title"
         >
           <h2 id="rdv-list-title">
             <CalendarDays size={23} /> Rendez-vous de la période
           </h2>
+          <p className="rdv-period-label">{periodLabel}</p>
           {data.items.length ? (
             <ul>
               {data.items.map((appointment) => {
@@ -441,15 +498,28 @@ export default async function Calendar({
             </p>
           )}
           {(page > 1 || page * 50 < data.total) && (
-            <nav className="pagination" aria-label="Rendez-vous de la période">
+            <nav
+              className="rdv-pagination"
+              aria-label="Rendez-vous de la période"
+            >
               {page > 1 && (
-                <Link href={href(anchor, view, page - 1)}>
+                <Link
+                  className="rdv-action"
+                  scroll={false}
+                  href={href(anchor, view, page - 1, proposalsPage)}
+                >
                   Liste précédente
                 </Link>
               )}
               <span>Page {page}</span>
               {page * 50 < data.total && (
-                <Link href={href(anchor, view, page + 1)}>Liste suivante</Link>
+                <Link
+                  className="rdv-action"
+                  scroll={false}
+                  href={href(anchor, view, page + 1, proposalsPage)}
+                >
+                  Liste suivante
+                </Link>
               )}
             </nav>
           )}

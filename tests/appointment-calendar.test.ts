@@ -2,6 +2,9 @@ import { describe, it, expect } from "vitest";
 import {
   calendarRange,
   resolveAppointmentTime,
+  appointmentWorkspaceRange,
+  parseAppointmentDate,
+  frenchAppointmentDate,
   todayCasablanca,
   localAppointmentInput,
   localAppointmentOffset,
@@ -71,4 +74,24 @@ it("uses current Casablanca rules after the September 2026 UTC transition", () =
   expect(localAppointmentInput("2026-12-01T10:00:00Z")).toBe(
     "2026-12-01T10:00",
   );
+});
+
+it("keeps a full month on screen while filtering December 11 by French civil date", () => {
+  const anchor = parseAppointmentDate("11/12/2026");
+  expect(anchor).toBe("2026-12-11");
+  expect(frenchAppointmentDate(anchor)).toBe("11/12/2026");
+  expect(() => parseAppointmentDate("31/11/2026")).toThrow(RangeError);
+  const day = appointmentWorkspaceRange(anchor, "day");
+  expect(day.period).toMatchObject({ from: anchor, to: anchor });
+  expect(day.calendar.days).toContain("2026-12-25");
+  expect(appointmentWorkspaceRange(anchor, "week").period).toMatchObject({
+    from: "2026-12-07",
+    to: "2026-12-13",
+  });
+  expect(appointmentWorkspaceRange(anchor, "month").period).toEqual({
+    from: "2026-12-01",
+    to: "2026-12-31",
+  });
+  const midnight = resolveAppointmentTime(`${anchor}T00:15`);
+  expect(todayCasablanca(new Date(midnight))).toBe(anchor);
 });

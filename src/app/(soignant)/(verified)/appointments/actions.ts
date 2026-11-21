@@ -3,7 +3,10 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireApprovedDoctor } from "@/lib/auth";
 import { uuidPattern } from "@/lib/registry/types";
-import { resolveAppointmentTime } from "@/lib/appointments/calendar";
+import {
+  parseAppointmentDate,
+  resolveAppointmentTime,
+} from "@/lib/appointments/calendar";
 import { reportOperationalEvent } from "@/lib/operational-events";
 export type AppointmentFormState = { error?: string };
 export async function saveAppointment(
@@ -129,8 +132,7 @@ export async function confirmRoutineAppointment(
     version = field("version"),
     facility = field("facility_id"),
     operation = field("operation"),
-    recommended = field("recommended"),
-    date = field("date");
+    recommended = field("recommended");
   const doses = form.getAll("dose").map(String);
   if (
     ![child, version, facility, operation].every((id) =>
@@ -142,8 +144,9 @@ export async function confirmRoutineAppointment(
     field("reviewed") !== "on"
   )
     return { error: "Vérifiez le lieu, la proposition et les attestations." };
-  let start, end;
+  let date, start, end;
   try {
+    date = parseAppointmentDate(field("date"));
     start = resolveAppointmentTime(
       `${date}T${field("starts")}`,
       field("offset"),
@@ -195,5 +198,5 @@ export async function confirmRoutineAppointment(
     `/patients/${child}/appointments`,
   ])
     revalidatePath(path);
-  redirect(`/appointments?date=${date}&view=day&saved=1`);
+  return redirect(`/appointments?date=${date}&view=day&saved=1`);
 }

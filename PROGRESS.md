@@ -1,5 +1,7 @@
 # Mon Enfant — Implementation progress
 
+> Rendez-vous corrections · 21 November 2026. Supabase migration `20261121190310` serves the selected appointment and vaccination period with calendar counts. French date entry preserves Casablanca civil dates. Browser checks against disposable PostgreSQL reproduced 11 December, then verified both booking actions, reload persistence and duplicate rejection with fictional records. The live PNI remains a draft with no approved booking version.
+
 > Rendez-vous · 21 November 2026. Reworked the clinician calendar for desktop and mobile. Supabase migration `20261121183740` groups upcoming PNI dates for authorized child records, preserves the recommended date separately from confirmed slots, and prevents duplicate bookings. The revised PNI draft provides read-only beta dates. Standard appointment management remains available. Thirty focused tests, targeted lint and synthetic browser checks across four widths passed.
 
 > Mon Enfant 2027 · 19 November 2026. Editorial homepage, child-led parent home, daily clinical workspace and operational review console implemented. The 83 focused checks, type checking, lint and the correct-project Vercel preview passed. See [design and verification](docs/design-qa/mon-enfant-2027/review.md) and [PR #10](https://github.com/ABDRRAHIM404/mon-enfant/pull/10). Android remains paused.

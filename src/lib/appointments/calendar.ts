@@ -96,3 +96,37 @@ export function appointmentTime(instant: string) {
     timeZoneName: "shortOffset",
   }).format(new Date(instant));
 }
+
+export function parseAppointmentDate(value: string): string {
+  const french = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(value);
+  const iso = french ? `${french[3]}-${french[2]}-${french[1]}` : value;
+  try {
+    civilDay(iso);
+  } catch {
+    throw new RangeError("Indiquez une date valide au format JJ/MM/AAAA.");
+  }
+  return iso;
+}
+
+export function frenchAppointmentDate(iso: string): string {
+  return `${iso.slice(8, 10)}/${iso.slice(5, 7)}/${iso.slice(0, 4)}`;
+}
+
+export function appointmentWorkspaceRange(anchor: string, view: CalendarView) {
+  const calendar = calendarRange(anchor, "month");
+  const month = anchor.slice(0, 7) + "-01";
+  const monthEnd = addCivilDays(calendar.next, -1);
+  const period =
+    view === "month"
+      ? { from: month, to: monthEnd }
+      : calendarRange(anchor, view);
+  return { month, calendar, period };
+}
+
+const readableDate = new Intl.DateTimeFormat("fr-MA", {
+  dateStyle: "long",
+  timeZone: "UTC",
+});
+export function readableAppointmentDate(iso: string): string {
+  return readableDate.format(new Date(`${iso}T12:00:00Z`));
+}

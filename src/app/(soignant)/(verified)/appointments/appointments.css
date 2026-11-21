@@ -30,8 +30,7 @@
   margin-block-start: 12px;
 }
 .rdv-action,
-.rdv-period a,
-.rdv-calendar-toggle > button {
+.rdv-period a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -84,7 +83,7 @@
   box-shadow: var(--rdv-shadow);
 }
 .rdv-panel h2,
-.routine-heading h2 {
+.rdv-proposals-header h2 {
   display: flex;
   align-items: center;
   gap: 9px;
@@ -116,7 +115,7 @@
   font-weight: 650;
   min-width: 0;
 }
-.rdv-filter-form input[type="date"] {
+.rdv-filter-form input[name="date"] {
   min-width: 0;
   min-height: 44px;
   padding: 7px 9px;
@@ -126,7 +125,14 @@
 .rdv-filter-form .registry-filter-label {
   font-size: 0.88rem;
 }
+.rdv-filter-form .registry-filter-select {
+  grid-template-columns: minmax(0, 1fr);
+}
+.rdv-filter-form .registry-filter-trigger {
+  min-inline-size: 0;
+}
 .rdv-filter-form .registry-filter-trigger > span {
+  min-inline-size: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -147,18 +153,12 @@
   padding: 0;
   min-block-size: 40px;
 }
-.rdv-calendar-toggle > button {
-  display: none;
-}
 .rdv-days {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 3px;
   font-size: 0.86rem;
   text-align: center;
-}
-.rdv-days--day {
-  grid-template-columns: 1fr;
 }
 .rdv-days > strong {
   padding: 5px 0;
@@ -169,7 +169,7 @@
   display: grid;
   align-content: center;
   justify-items: center;
-  min-block-size: 42px;
+  min-block-size: 36px;
   color: #111;
   border: 1px solid transparent;
   border-radius: 10px;
@@ -179,16 +179,23 @@
     background-color 200ms,
     transform 200ms;
 }
-.rdv-days a[data-outside="true"] {
-  color: #526679;
+.rdv-outside-day {
+  display: grid;
+  place-items: center;
+  color: #576976;
 }
 .rdv-days a[data-today="true"] {
-  border-color: #238452;
+  box-shadow: inset 0 0 0 2px #238452;
   font-weight: 750;
 }
 .rdv-days a[aria-current] {
   background: var(--rdv-green);
   color: #fff;
+}
+.rdv-days a[aria-current][data-today="true"] {
+  box-shadow:
+    inset 0 0 0 2px #fff,
+    0 0 0 1px var(--rdv-green);
 }
 .rdv-days small {
   border-radius: 10px;
@@ -204,36 +211,26 @@
   display: grid;
   gap: 10px;
 }
+.rdv-proposals[hidden] {
+  display: none;
+}
 .routine-proposal {
-  background: #fff3ef;
-  border-color: #f3c2b9;
-  box-shadow: none;
+  padding: 9px 13px;
+  border-radius: 14px;
+  border-color: #e2ebef;
 }
-.routine-heading {
-  display: flex;
-  gap: 8px 14px;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-block-end: 13px;
+.rdv-proposals-header h2 {
+  margin-bottom: 4px;
 }
-.routine-heading h2 {
+.rdv-proposals-header p {
   margin: 0;
-}
-.rdv-icon {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 46px;
-  height: 46px;
-  border-radius: 12px;
-  background: #fff1cc;
-  color: var(--rdv-green);
+  color: var(--rdv-muted);
+  font-size: 0.85rem;
 }
 .routine-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
-  gap: 12px;
+  gap: 8px 12px;
   align-items: center;
 }
 .rdv-child,
@@ -249,7 +246,6 @@
   border-radius: 50%;
   flex: none;
 }
-.rdv-child small,
 .rdv-row-child small {
   display: block;
   color: var(--rdv-muted);
@@ -257,7 +253,7 @@
 }
 .routine-date {
   padding-inline: 12px 3px;
-  border-inline-start: 1px solid #e5cfc9;
+  border-inline-start: 1px solid #e2ebef;
 }
 .routine-date strong,
 .rdv-row-date,
@@ -277,7 +273,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  margin-block-start: 8px;
+  margin-block-start: 3px;
 }
 .routine-date li,
 .rdv-status {
@@ -293,7 +289,12 @@
 .rdv-status svg {
   flex: none;
 }
-.routine-date li,
+.routine-date li {
+  padding: 3px 6px;
+  background: #eef5f7;
+  color: #344c59;
+  font-size: 0.74rem;
+}
 .rdv-status--amber {
   background: #fff0c8;
   color: #714000;
@@ -307,7 +308,7 @@
   color: #425663;
 }
 .routine-actions {
-  display: grid;
+  display: flex;
   gap: 7px;
 }
 .routine-note {
@@ -423,25 +424,10 @@
   .rdv-grid {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto;
-    grid-template-areas: "proposals" "filters" "appointments";
-  }
-  .rdv-calendar-toggle > button {
-    display: flex;
-    width: 100%;
-    margin-block-start: 10px;
-  }
-  .rdv-calendar-toggle > button svg:last-child {
-    margin-inline-start: auto;
-    transition: transform 200ms;
-  }
-  .rdv-calendar-toggle[data-expanded="true"] > button svg:last-child {
-    transform: rotate(180deg);
-  }
-  .rdv-calendar-toggle[data-expanded="false"] .rdv-calendar-content {
-    display: none;
+    grid-template-areas: "filters" "proposals" "appointments";
   }
   .rdv-days a {
-    min-block-size: 44px;
+    min-block-size: 40px;
   }
 }
 @media (max-width: 540px) {
@@ -463,9 +449,6 @@
     padding-inline: 7px;
     font-size: 0.82rem;
   }
-  .routine-layout {
-    grid-template-columns: minmax(0, 1fr);
-  }
   .routine-date {
     padding: 0;
     border: 0;
@@ -480,14 +463,7 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .rdv-workspace
-    :is(
-      .rdv-action,
-      .rdv-row,
-      .rdv-days a,
-      .rdv-period a,
-      .rdv-calendar-toggle svg
-    ) {
+  .rdv-workspace :is(.rdv-action, .rdv-row, .rdv-days a, .rdv-period a) {
     transition: none;
     transform: none;
   }
@@ -499,6 +475,97 @@
 }
 
 .rdv-panel h2,
-.routine-heading h2 {
+.rdv-proposals-header h2 {
   font-weight: 750;
+}
+
+.rdv-grid[data-show-proposals="false"] {
+  grid-template-areas: "filters appointments";
+  grid-template-rows: auto;
+}
+.rdv-proposals-header svg {
+  color: var(--rdv-green);
+}
+.rdv-child .rdv-status {
+  display: table;
+  padding: 3px 7px;
+  margin-top: 2px;
+}
+.rdv-day-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1px;
+}
+.rdv-day-badges .rdv-day-proposals {
+  background: #fff0c8;
+  color: #714000;
+}
+.rdv-calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin: 8px 0 0;
+  color: var(--rdv-muted);
+  font-size: 0.75rem;
+}
+.rdv-calendar-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.rdv-calendar-legend span::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  background: #d4f1e6;
+  border: 1px solid #72a28a;
+}
+.rdv-calendar-legend span + span::before {
+  background: #fff0c8;
+  border-color: #ba8b42;
+}
+.rdv-period-label {
+  margin: -8px 0 10px;
+  color: var(--rdv-muted);
+  font-size: 0.86rem;
+}
+.rdv-results-link {
+  justify-self: start;
+  margin-block-end: -5px;
+}
+.rdv-list {
+  scroll-margin-top: 70px;
+}
+.rdv-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-block-start: 4px;
+}
+.rdv-pagination .rdv-action {
+  box-shadow: 0 2px 5px rgb(36 90 107 / 10%);
+}
+.rdv-days {
+  animation: rdv-month-in 180ms ease-out;
+}
+@keyframes rdv-month-in {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (max-width: 900px) {
+  .rdv-grid[data-show-proposals="false"] {
+    grid-template-areas: "filters" "appointments";
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rdv-days {
+    animation: none;
+  }
 }

@@ -4,6 +4,7 @@ import { Check, Pencil, X } from "lucide-react";
 import { useActionState, useState } from "react";
 import { confirmRoutineAppointment } from "@/app/(soignant)/(verified)/appointments/actions";
 import type { RoutineAppointmentProposal } from "@/lib/appointments/types";
+import { FrenchDateInput } from "./french-date-input";
 import type { Facility } from "@/lib/registry/types";
 
 export function RoutineBooking({
@@ -24,7 +25,6 @@ export function RoutineBooking({
     {},
   );
   const [mode, setMode] = useState<"confirm" | "modify" | null>(null);
-  const [date, setDate] = useState(proposal.recommended_on);
   return (
     <>
       <div className="routine-actions">
@@ -33,7 +33,6 @@ export function RoutineBooking({
           className="rdv-action rdv-primary"
           aria-expanded={mode === "confirm"}
           onClick={() => {
-            setDate(proposal.recommended_on);
             setMode(mode === "confirm" ? null : "confirm");
           }}
           disabled={pending}
@@ -75,14 +74,11 @@ export function RoutineBooking({
           </legend>
           <label>
             Date du rendez-vous
-            <input
-              type="date"
-              name="date"
-              value={date}
-              onChange={(event) => setDate(event.target.value)}
+            <FrenchDateInput
+              key={mode}
+              date={proposal.recommended_on}
               min={today}
               readOnly={mode === "confirm"}
-              required
             />
           </label>
           <div className="routine-times">

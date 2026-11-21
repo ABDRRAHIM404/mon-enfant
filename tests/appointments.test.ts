@@ -5,9 +5,11 @@ import type { PGlite } from "@electric-sql/pglite";
 import { sharingDatabase, sessionActing } from "./helpers/database";
 import {
   resolveAppointmentTime,
+  appointmentWorkspaceRange,
   todayCasablanca,
 } from "../src/lib/appointments/calendar";
 import { routineReference } from "../src/lib/vaccines/calendar";
+import type { AppointmentWorkspace } from "../src/lib/appointments/types";
 import type { CatalogSnapshot } from "../src/lib/vaccines/types";
 let db: PGlite, version: string, seed: string, editor: Actor, reviewer: Actor;
 type Actor = { id: string; session: string };
@@ -203,6 +205,7 @@ beforeAll(async () => {
     "20261119152628_parent_care_visit_qr.sql",
     "20261121174928_pni_hepatitis_b_birth_draft.sql",
     "20261121183740_routine_appointment_proposals.sql",
+    "20261121190310_appointment_workspace_filters.sql",
   ])
     await db.exec(readFileSync(`supabase/migrations/${file}`, "utf8"));
   editor = await actor("admin");
@@ -262,6 +265,23 @@ describe("automatic routine offers and grouped booking", () => {
     };
     const fetch = (who = a) =>
       rpc<Proposals>(who, "routine_appointment_proposals");
+    const read = (
+      date: string,
+      view: "day" | "week" | "month" = "day",
+      state = "all",
+      who = a,
+      proposalPage = 1,
+    ) => {
+      const { period, month } = appointmentWorkspaceRange(date, view);
+      return rpc<AppointmentWorkspace>(who, "appointment_workspace", [
+        period.from,
+        period.to,
+        month,
+        1,
+        proposalPage,
+        state,
+      ]);
+    };
     const first = await fetch();
     expect(first).toEqual(await fetch());
     expect(first).toMatchObject({ version, preview: false });
@@ -274,6 +294,49 @@ describe("automatic routine offers and grouped booking", () => {
     expect(codes).not.toContain("HB1");
     expect(codes).not.toContain("HBn");
     expect(codes.length).toBeGreaterThan(1);
+    const selected = await read(offer.recommended_on);
+    expect(selected.proposals.items).toHaveLength(1);
+    expect(selected.proposals.items[0]).toMatchObject({
+      child_id: child,
+      recommended_on: offer.recommended_on,
+    });
+    expect(selected.days).toContainEqual({
+      day: offer.recommended_on,
+      appointments: 0,
+      proposals: 1,
+    });
+    expect(selected.appointments.total).toBe(0);
+    for (const mode of ["week", "month"] as const) {
+      const result = await read(offer.recommended_on, mode);
+      const { period } = appointmentWorkspaceRange(offer.recommended_on, mode);
+      expect(
+        result.proposals.items.every(
+          (group) =>
+            group.recommended_on >= period.from &&
+            group.recommended_on <= period.to,
+        ),
+      ).toBe(true);
+      expect(result.proposals.total).toBeGreaterThan(0);
+    }
+    expect(
+      (await read(offer.recommended_on, "day", "pending")).proposals.total,
+    ).toBe(1);
+    expect(
+      (await read(offer.recommended_on, "day", "indicative")).proposals.total,
+    ).toBe(0);
+    expect(
+      (await read(offer.recommended_on, "day", "scheduled")).days.every(
+        ({ proposals }) => proposals === 0,
+      ),
+    ).toBe(true);
+    expect(
+      (await read(offer.recommended_on, "month", "all", outsider)).proposals
+        .total,
+    ).toBe(0);
+    await expect(
+      read(offer.recommended_on, "day", "all", unverified),
+    ).rejects.toThrow();
+
     expect((await fetch(outsider)).items).toEqual([]);
     await expect(fetch(unverified)).rejects.toThrow();
     const date = new Date(`${offer.recommended_on}T12:00:00Z`);
@@ -329,6 +392,47 @@ describe("automatic routine offers and grouped booking", () => {
       modified,
     ]);
     expect(calendar.items.map(({ id }) => id)).toEqual([appointment]);
+    expect((await read(offer.recommended_on)).proposals.items).toEqual([]);
+    const afterBooking = await read(modified, "day", "confirmed");
+    expect(afterBooking.appointments.items.map(({ id }) => id)).toEqual([
+      appointment,
+    ]);
+    expect(afterBooking.days).toContainEqual({
+      day: modified,
+      appointments: 1,
+      proposals: 0,
+    });
+    expect(await read(modified, "day", "confirmed")).toEqual(afterBooking);
+    expect((await read(modified, "day", "cancelled")).appointments.total).toBe(
+      0,
+    );
+    const sameDateOffer = (await fetch()).items[0];
+    expect(sameDateOffer).toBeDefined();
+    const sameDate = sameDateOffer.recommended_on;
+    const sameDateBooking = await confirm([
+      randomUUID(),
+      child,
+      version,
+      sameDate,
+      sameDateOffer.doses.map(({ code }) => code),
+      facility,
+      resolveAppointmentTime(`${sameDate}T15:00`),
+      resolveAppointmentTime(`${sameDate}T15:30`),
+      reason,
+      true,
+    ]);
+    expect(
+      (await read(sameDate, "day", "confirmed")).appointments.items,
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: sameDateBooking,
+          recommended_on: sameDate,
+          starts_on: sameDate,
+        }),
+      ]),
+    );
+
     const vpo = groupedItems.rows.find(
       ({ dose_code }) => dose_code === "VPO1",
     )!;
@@ -1003,6 +1107,26 @@ describe("routine offers from the beta catalogue", () => {
     });
     const offer = result.items[0];
     expect(offer).toBeDefined();
+    const day = offer.recommended_on;
+    const read = (state: string) =>
+      rpc<AppointmentWorkspace>(a, "appointment_workspace", [
+        day,
+        day,
+        day.slice(0, 7) + "-01",
+        1,
+        1,
+        state,
+      ]);
+    expect(await read("indicative")).toMatchObject({
+      proposals: {
+        preview: true,
+        total: 1,
+        items: [expect.objectContaining({ recommended_on: day })],
+      },
+      appointments: { total: 0, items: [] },
+    });
+    expect((await read("pending")).proposals.total).toBe(0);
+
     await expect(
       rpc(a, "confirm_routine_appointment", [
         randomUUID(),
