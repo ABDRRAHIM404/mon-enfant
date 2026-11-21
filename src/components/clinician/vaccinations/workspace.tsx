@@ -420,10 +420,17 @@ export function VaccinationsWorkspace({
                     </div>
                   </aside>
                 )}
+                {overview.projection.draftPreview && (
+                  <p className="notice">
+                    Bêta · Dates indicatives calculées à partir du calendrier
+                    PNI en brouillon. Données fictives uniquement. Aucun
+                    rendez-vous n’est créé.
+                  </p>
+                )}
                 {rows.length ? (
                   <>
                     <p className="consultation-muted">
-                      Dates calculées · {overview.projection.approved?.label} ·
+                      Dates calculées · {overview.projection.schedule?.label} ·
                       À vérifier au registre.
                     </p>
                     <ul className="vaccination-upcoming" role="list">
@@ -444,7 +451,7 @@ export function VaccinationsWorkspace({
                   <p className="consultation-muted">
                     {!overview.historyComplete
                       ? "Historique trop volumineux ou incomplet pour vérifier automatiquement les prochaines doses."
-                      : !overview.projection.approved
+                      : !overview.projection.schedule
                         ? overview.catalogSearchComplete
                           ? "Aucune version du calendrier PNI approuvée et vérifiée n’est disponible."
                           : "Aucune version approuvée dans les versions récentes. Consultez le catalogue pour examiner les autres versions."

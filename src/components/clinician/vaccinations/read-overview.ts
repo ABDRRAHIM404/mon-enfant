@@ -10,7 +10,19 @@ const historyPageSize = 30;
 const maxHistoryPages = 4;
 const maxCatalogPages = 4;
 
-async function approvedCatalog(supabase: Client) {
+// The clinician workspace is currently a fictional-data beta.
+const betaDraftId = "0c504568-7c67-49bb-b43b-c8382439a850";
+
+async function readScheduleCatalog(supabase: Client) {
+  let betaDraftVisible = false;
+
+  async function readVersion(id: string) {
+    const detail = await supabase.rpc("vaccine_catalog", { p_version_id: id });
+    if (detail.error)
+      throw new Error("Impossible de lire la version vaccinale.");
+    return (detail.data as { version: CatalogSnapshot }).version;
+  }
+
   for (let page = 1; page <= maxCatalogPages; page++) {
     const result = await supabase.rpc("vaccine_catalog", { p_page: page });
     if (result.error)
@@ -19,20 +31,24 @@ async function approvedCatalog(supabase: Client) {
     const latest = data.versions.find(
       (version) => version.status === "approved" && version.review_verified,
     );
-    if (latest) {
-      const detail = await supabase.rpc("vaccine_catalog", {
-        p_version_id: latest.id,
-      });
-      if (detail.error)
-        throw new Error("Impossible de lire la version vaccinale.");
+    if (latest)
       return {
-        catalog: (detail.data as { version: CatalogSnapshot }).version,
+        approved: await readVersion(latest.id),
+        betaDraft: null,
         complete: true,
       };
+
+    betaDraftVisible ||= data.versions.some(
+      (version) => version.id === betaDraftId && version.status === "draft",
+    );
+    if (page * 20 >= data.total) {
+      const version = betaDraftVisible ? await readVersion(betaDraftId) : null;
+      return version?.status === "approved" && version.review_verified
+        ? { approved: version, betaDraft: null, complete: true }
+        : { approved: null, betaDraft: version, complete: true };
     }
-    if (page * 20 >= data.total) return { catalog: null, complete: true };
   }
-  return { catalog: null, complete: false };
+  return { approved: null, betaDraft: null, complete: false };
 }
 
 export async function readVaccinationOverview(
@@ -54,7 +70,7 @@ export async function readVaccinationOverview(
   const [history, references, catalog] = await Promise.all([
     historyPage(page),
     supabase.rpc("patient_vaccine_items", { p_child_id: child.id, p_page: 1 }),
-    approvedCatalog(supabase),
+    readScheduleCatalog(supabase),
   ]);
   if (references.error?.code === "42501") notFound();
   if (references.error)
@@ -82,9 +98,10 @@ export async function readVaccinationOverview(
     references: references.data as VaccinationOverview["references"],
     projection: vaccinationProjection(
       child,
-      catalog.catalog,
+      catalog.approved,
       completeHistory,
       todayCasablanca(),
+      catalog.betaDraft,
     ),
     historyComplete: completeHistory !== null,
     catalogSearchComplete: catalog.complete,

@@ -3,6 +3,7 @@ import type { Patient } from "@/lib/registry/types";
 import {
   addCivilDays,
   civilDay,
+  routinePreviewReference,
   routineReference,
 } from "@/lib/vaccines/calendar";
 import type { CatalogSnapshot } from "@/lib/vaccines/types";
@@ -35,6 +36,7 @@ export function vaccinationProjection(
   catalog: CatalogSnapshot | null,
   history: ClinicalEntry[] | null,
   today: string,
+  betaDraft: CatalogSnapshot | null = null,
 ) {
   const birth =
     child.birth_date_precision === "exact" ? child.birth_date : null;
@@ -42,6 +44,11 @@ export function vaccinationProjection(
     history?.filter((entry) => entry.entry_state === "active") ?? [];
   const approved =
     catalog?.status === "approved" && catalog.review_verified ? catalog : null;
+  const draft =
+    !approved && betaDraft?.status === "draft" && !betaDraft.review_verified
+      ? betaDraft
+      : null;
+  const schedule = approved ?? draft;
   const hb1 = active.filter((entry) => matches(entry, "HB", "HB1"));
   const hbn = active.filter((entry) => matches(entry, "HB", "HBn"));
   const birthDoseRecorded =
@@ -76,34 +83,34 @@ export function vaccinationProjection(
       ? !birthDoseRecorded || hb1.length > 0
       : !onTime && (hb1.length > 0 || missingAfterWindow === true));
 
-  const vaccines = approved?.source_document.vaccines as
+  const vaccines = schedule?.source_document.vaccines as
     Record<string, { label_fr?: string }> | undefined;
   const upcoming =
-    !history || !birth || !approved
+    !history || !birth || !schedule
       ? []
-      : approved.rules
+      : schedule.rules
           .flatMap((rule) => {
-            const ref = routineReference(
-              {
-                doseCode: rule.dose_code,
-                vaccineCode: rule.vaccine_code,
-                age: rule.age,
-                eligibility: rule.eligibility,
-                automaticScheduling: rule.automatic_scheduling,
-              },
-              {
-                birthDate: birth,
-                birthPrecision: "exact",
-                sex:
-                  child.sex === "female" || child.sex === "male"
-                    ? child.sex
-                    : "unknown",
-              },
-              {
-                status: approved.status,
-                reviewVerified: approved.review_verified,
-              },
-            );
+            const routineRule = {
+              doseCode: rule.dose_code,
+              vaccineCode: rule.vaccine_code,
+              age: rule.age,
+              eligibility: rule.eligibility,
+              automaticScheduling: rule.automatic_scheduling,
+            };
+            const routineChild: Parameters<typeof routineReference>[1] = {
+              birthDate: birth,
+              birthPrecision: "exact",
+              sex:
+                child.sex === "female" || child.sex === "male"
+                  ? child.sex
+                  : "unknown",
+            };
+            const ref = approved
+              ? routineReference(routineRule, routineChild, {
+                  status: approved.status,
+                  reviewVerified: approved.review_verified,
+                })
+              : routinePreviewReference(routineRule, routineChild);
             if (!ref.startOn || !ref.endOn || ref.endOn < today) return [];
             const evidence = active.filter((entry) =>
               matches(entry, rule.vaccine_code, rule.dose_code),
@@ -133,7 +140,7 @@ export function vaccinationProjection(
               a.rule.dose_code.localeCompare(b.rule.dose_code),
           );
 
-  return { upcoming, reviewHB1, approved };
+  return { upcoming, reviewHB1, schedule, draftPreview: draft !== null };
 }
 
 export function ageAtVaccination(child: Patient, entry: ClinicalEntry) {

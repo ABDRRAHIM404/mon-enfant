@@ -237,4 +237,47 @@ describe("clinician Vaccinations display", () => {
       ).reviewHB1,
     ).toBe(true);
   });
+
+  it("calculates beta draft dates without starting HBn/HB1 or superseding approved dates", () => {
+    const beta = {
+      ...catalog,
+      label: "Brouillon fictif",
+      status: "draft" as const,
+      review_verified: false,
+      rules: [
+        ...catalog.rules,
+        rule("HBn", "HB", { unit: "birth_24_hours" }, false),
+      ],
+    };
+    expect(
+      vaccinationProjection(child, null, [hb1], today, beta),
+    ).toMatchObject({
+      draftPreview: true,
+      schedule: { label: "Brouillon fictif", status: "draft" },
+    });
+    expect(
+      vaccinationProjection(child, null, [hb1], today, beta).upcoming.map(
+        ({ rule, startOn }) => [rule.dose_code, startOn],
+      ),
+    ).toEqual([
+      ["Penta1", "2026-12-11"],
+      ["VPO1", "2026-12-11"],
+      ["Rota1", "2026-12-16"],
+    ]);
+    expect(
+      vaccinationProjection(child, null, null, today, beta).upcoming,
+    ).toEqual([]);
+    expect(
+      vaccinationProjection(child, null, [hb1], today, {
+        ...beta,
+        status: "retired",
+      }).upcoming,
+    ).toEqual([]);
+    expect(
+      vaccinationProjection(child, catalog, [hb1], today, beta),
+    ).toMatchObject({
+      draftPreview: false,
+      schedule: { status: "approved" },
+    });
+  });
 });
