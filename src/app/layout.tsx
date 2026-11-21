@@ -3,6 +3,7 @@ import "./globals.css";
 import "./design-tokens.css";
 import "./site-design.css";
 import "./workspaces-2027.css";
+import "./soignant-dashboard.css";
 import { Suspense } from "react";
 import { ParentMobileNav } from "@/components/parent-mobile-nav";
 export const metadata: Metadata = {

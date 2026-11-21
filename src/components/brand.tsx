@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-export function Brand() {
+export function Brand({ clinician = false }: { clinician?: boolean }) {
   return (
     <div className="brand-group">
       <Link href="/" className="brand">
@@ -15,8 +15,10 @@ export function Brand() {
           />
         </span>
         <span>
-          mon enfant
-          <span className="brand-sub">Le carnet qui grandit avec lui</span>
+          {clinician ? "Mon Enfant" : "mon enfant"}
+          <span className="brand-sub">
+            {clinician ? "Espace soignant" : "Le carnet qui grandit avec lui"}
+          </span>
           <span className="sr-only"> — Accueil</span>
         </span>
       </Link>
