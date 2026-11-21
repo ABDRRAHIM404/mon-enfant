@@ -19,6 +19,7 @@ import {
 } from "@/lib/vaccines/patient-types";
 import type { ClinicalEntry } from "@/lib/clinical/types";
 import { clinicalCapabilities, clinicalKinds } from "@/lib/clinical/types";
+import { vaccinationValidationMessage } from "@/lib/vaccines/record-validation";
 export type ClinicalState = {
   error?: string;
   success?: boolean;
@@ -147,6 +148,7 @@ export async function recordClinical(
     if (result.error)
       return {
         error:
+          vaccinationValidationMessage(result.error, input) ??
           "Vérifiez le vaccin et le rapprochement. Le contrôle des doublons est indisponible.",
       };
     return { checked: true, conflicts: result.data as VaccinationConflict[] };
@@ -175,6 +177,10 @@ export async function recordClinical(
         error:
           "L’accès au dossier, le lieu d’exercice ou votre habilitation ne permet plus cette saisie.",
       };
+    if (kind === "vaccination") {
+      const message = vaccinationValidationMessage(error, input);
+      if (message) return { error: message };
+    }
     if (
       ["22023", "23514", "23502", "22P02", "22007", "22008"].includes(
         error.code ?? "",

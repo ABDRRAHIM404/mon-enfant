@@ -1053,3 +1053,7 @@ A parent with verified sharing authority can show a one-use QR to their new veri
 ### 19 November 2026 — parent child intake
 
 Parents can save a private child fiche with a name and birth date and show a single-use, five-minute QR to a verified doctor. The doctor's current session can open the fiche and prefill the existing duplicate-checked clinical registration. Registration creates the official record and the pending parent access request in one transaction. The established guardian review still verifies identity and authority before opening the carnet to the parent. Migration `20261119164356_parent_child_drafts` is applied. Thirty-four focused checks passed, including a private draft becoming a clinical record with a consultation visible to the approved parent, one-use QR redemption, session binding, other-parent denial and unchanged visit QR sharing.
+
+### 21 November 2026 — vaccination form validation
+
+The vaccination form now links each administration value to its certainty and enables the planned reference only for explicit matching. Expected validation errors identify the field or clinical documentation rule that failed, including date certainty and source, instead of showing a single generic alert. Three focused tests and changed-file lint passed.
