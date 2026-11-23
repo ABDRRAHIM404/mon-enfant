@@ -88,7 +88,10 @@ export default async function ClinicalHistory({
       {entries.map((entry) => (
         <EntryCard key={entry.id} entry={entry} link={false} />
       ))}
-      <section className="panel">
+      <section
+        className="panel"
+        id={latest.kind === "growth" ? "growth-correction" : undefined}
+      >
         <h2>Corriger / retirer la dernière version</h2>
         {canCorrect && allowed && places.length ? (
           <ClinicalForm

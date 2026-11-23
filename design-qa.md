@@ -1,3 +1,13 @@
+# Croissance design comparison · 23 November 2026
+
+Final result: passed for the redesigned Croissance content.
+
+Compared the supplied desktop and phone references with Chromium captures at 1440, 820, 390, and 320 CSS pixels using fictional records. The page shows the desktop selector beside the child, form and chart, with a compact selector and stacked cards on mobile. The existing clinician navigation appears around both layouts. The first capture showed plot overflow, an English date placeholder, and excessive padding on phone history rows. Scoped CSS fixed the chart sizing and table density, and the measurement input now displays JJ/MM/AAAA. The final browser run checked plot bounds and horizontal overflow on all four widths.
+
+The isolated browser workflow exercised the existing PostgreSQL rules through the clinical action, including empty/single/multiple points, save and reload, all three measurement types, child selection, unknown-date provenance, denied child access, and correction with its original revision preserved. The source references contain example measurements. Browser checks used distinct fictional values and no hosted records.
+
+---
+
 # Update 3 design comparison
 
 Final result: passed

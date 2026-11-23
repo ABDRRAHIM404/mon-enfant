@@ -10,6 +10,7 @@ import {
   requireApprovedDoctor,
   requireClinicalPermissionManager,
 } from "@/lib/auth";
+import { parseAppointmentDate } from "@/lib/appointments/calendar";
 import { reportOperationalEvent } from "@/lib/operational-events";
 import { uuidPattern } from "@/lib/registry/types";
 import {
@@ -59,6 +60,10 @@ export async function recordClinical(
     if (kind === "growth") {
       if (text(key)) payload[key] = Number(text(key));
     } else payload[key] = text(key);
+  const inlineGrowth =
+    kind === "growth" && !root && text("returnTo") === "growth";
+  if (inlineGrowth && !Object.keys(payload).length)
+    return { error: "Renseignez au moins une mesure." };
   if (
     kind === "vaccination" &&
     form.has("vaccine_choice") &&
@@ -96,12 +101,20 @@ export async function recordClinical(
       };
     }
   }
+  let occurredOn = text("occurred_on") || null;
+  if (inlineGrowth && occurredOn) {
+    try {
+      occurredOn = parseAppointmentDate(occurredOn);
+    } catch {
+      return { error: "Indiquez une date valide au format JJ/MM/AAAA." };
+    }
+  }
   const input = {
     p_operation_id: operation,
     p_child_id: child,
     p_kind: kind,
     p_facility_id: text("facility_id"),
-    p_occurred_on: text("occurred_on") || null,
+    p_occurred_on: occurredOn,
     p_occurrence_precision: text("occurrence_precision"),
     p_source_type: text("source_type"),
     p_source_reference: text("source_reference") || null,
@@ -207,7 +220,24 @@ export async function recordClinical(
   revalidatePath(`/patients/${child}/vaccinations`);
   revalidatePath(`/patients/${child}/summary`);
   if (root) revalidatePath(`/patients/${child}/records/${root}`);
-  redirect(`/patients/${child}/records/${root || data}`);
+  if (kind === "growth") {
+    revalidatePath("/growth");
+    if (inlineGrowth) {
+      const params = new URLSearchParams({
+        child,
+        saved: "1",
+        q: text("growthQuery").slice(0, 100),
+        childPage: String(
+          Math.min(
+            10000,
+            Math.max(1, Math.floor(Number(text("growthChildPage")) || 1)),
+          ),
+        ),
+      });
+      return redirect(`/growth?${params}`);
+    }
+  }
+  return redirect(`/patients/${child}/records/${root || data}`);
 }
 export async function changeClinicalPermission(
   _: ClinicalState,

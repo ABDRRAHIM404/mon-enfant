@@ -1,5 +1,7 @@
 # Mon Enfant — Implementation progress
 
+> Croissance · 23 November 2026. Redesigned the clinician page with an inline form using the existing guarded clinical action, three interactive raw-measurement charts, and responsive history and correction links. Visual and workflow checks passed on four viewport widths with isolated fictional records, plus 16 focused clinical tests and scoped lint. No schema changes.
+
 > Rendez-vous corrections · 21 November 2026. Supabase migration `20261121190310` serves the selected appointment and vaccination period with calendar counts. French date entry preserves Casablanca civil dates. Browser checks against disposable PostgreSQL reproduced 11 December, then verified both booking actions, reload persistence and duplicate rejection with fictional records. The live PNI remains a draft with no approved booking version.
 
 > Rendez-vous · 21 November 2026. Reworked the clinician calendar for desktop and mobile. Supabase migration `20261121183740` groups upcoming PNI dates for authorized child records, preserves the recommended date separately from confirmed slots, and prevents duplicate bookings. The revised PNI draft provides read-only beta dates. Standard appointment management remains available. Thirty focused tests, targeted lint and synthetic browser checks across four widths passed.

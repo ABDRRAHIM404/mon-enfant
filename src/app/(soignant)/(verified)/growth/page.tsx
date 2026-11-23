@@ -1,10 +1,12 @@
 import { PatientSection } from "@/components/clinician/patient-section";
 import type { SectionQuery } from "@/components/clinician/provisional-section";
+import "../consultations/consultations.css";
+import "./growth.css";
 export const dynamic = "force-dynamic";
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<SectionQuery>;
+  searchParams: Promise<SectionQuery & { saved?: string }>;
 }) {
   return <PatientSection section="growth" query={await searchParams} />;
 }
