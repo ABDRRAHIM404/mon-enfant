@@ -53,10 +53,12 @@ export function VaccinationFields({
   previous,
   items,
   choices,
+  initialChoice,
 }: {
   previous?: ClinicalEntry;
   items: VaccineItemExport[];
   choices: VaccineChoice[];
+  initialChoice?: VaccineChoice;
 }) {
   const data = previous?.payload;
   const [matching, setMatching] = useState(
@@ -66,7 +68,11 @@ export function VaccinationFields({
   const [selected, setSelected] = useState<{
     choice: VaccineChoice | null;
     dose: string;
-  } | null>(null);
+  } | null>(
+    !previous && initialChoice
+      ? { choice: initialChoice, dose: initialChoice.dose_code }
+      : null,
+  );
   const eligibleItems = selected
     ? items.filter(
         (item) =>
@@ -89,7 +95,14 @@ export function VaccinationFields({
                   items.find((item) => item.id === data.schedule_item_id)
                     ?.version_id ?? "",
               }
-            : undefined
+            : initialChoice
+              ? {
+                  catalog_version_id: initialChoice.version_id,
+                  vaccine_code: initialChoice.vaccine_code,
+                  vaccine_label: initialChoice.vaccine_label,
+                  dose_label: initialChoice.dose_code,
+                }
+              : undefined
         }
         onSelectionChange={(choice, dose) => {
           setSelected({ choice, dose });
@@ -113,6 +126,12 @@ export function VaccinationFields({
           onChange={(event) => {
             setMatching(event.target.value);
             if (event.target.value === "unmatched") setItemId("");
+            else if (
+              initialChoice &&
+              eligibleItems.length === 1 &&
+              eligibleItems[0].changes.at(-1)?.state !== "withdrawn"
+            )
+              setItemId(eligibleItems[0].id);
           }}
         >
           <option value="unmatched">

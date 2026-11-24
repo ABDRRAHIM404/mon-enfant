@@ -257,6 +257,11 @@ export async function recordClinical(
       return redirect(`/growth?${params}`);
     }
   }
+  if (kind === "vaccination") {
+    revalidatePath("/vaccinations");
+    if (!root && text("returnTo") === "booklet")
+      return redirect(`/patients/${child}/vaccinations?saved=1`);
+  }
   return redirect(`/patients/${child}/records/${root || data}`);
 }
 export async function changeClinicalPermission(

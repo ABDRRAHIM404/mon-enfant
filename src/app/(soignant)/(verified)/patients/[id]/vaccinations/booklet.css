@@ -1,0 +1,625 @@
+.vaccination-booklet {
+  --booklet-ink: #111111;
+  --booklet-green: #006744;
+  --booklet-mint: #d7f5e6;
+  --booklet-line: #d8e7ee;
+  --booklet-shadow: 0 3px 4px #15394a12, 0 7px 18px #23617b12;
+  min-width: 0;
+  color: var(--booklet-ink);
+  container-type: inline-size;
+}
+.vaccination-booklet .care-breadcrumb {
+  margin-bottom: 4px;
+}
+.vaccination-booklet .care-child-context {
+  background: #fff;
+  padding: 12px 18px;
+}
+.vaccination-booklet .care-child-context strong {
+  font-size: 1.2rem;
+  font-weight: 750;
+}
+.vaccination-booklet .care-context-label,
+.booklet-child-sex {
+  color: var(--booklet-green);
+  background: #e4f8ee;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-weight: 650;
+}
+.booklet-child-sex {
+  display: inline-block;
+  margin-inline-start: 8px;
+}
+.vaccination-booklet .care-patient-nav {
+  padding: 0 8px;
+  margin-bottom: 12px;
+  box-shadow: var(--booklet-shadow);
+  gap: 1px;
+}
+.vaccination-booklet .care-patient-nav > a {
+  flex: 1 0 max-content;
+  min-height: 43px;
+}
+.vaccination-booklet .care-patient-nav > a[aria-current="page"] {
+  background: #e4f8ee;
+  color: var(--booklet-green);
+}
+.vaccination-booklet-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.booklet-mobile-heading {
+  display: none;
+}
+.booklet-metrics {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+.booklet-metric,
+.booklet-panel {
+  border-radius: 16px;
+  border: 1px solid var(--booklet-line);
+  background: white;
+  box-shadow: var(--booklet-shadow);
+}
+.booklet-metric {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  min-width: 0;
+  min-height: 90px;
+}
+.booklet-metric.is-completed,
+.booklet-metric.is-state {
+  background: #f4fbf8;
+}
+.booklet-metric.is-next {
+  background: #fff6f4;
+  border-color: #f4ccc5;
+}
+.booklet-metric.is-upcoming {
+  background: #fffcf5;
+}
+.booklet-metric.is-overdue {
+  background: #fff7f7;
+}
+.booklet-metric-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--booklet-mint);
+  color: var(--booklet-green);
+}
+.booklet-metric.is-next .booklet-metric-icon,
+.booklet-metric.is-upcoming .booklet-metric-icon {
+  color: #824000;
+  background: #fff0c9;
+}
+.booklet-metric.is-overdue .booklet-metric-icon {
+  color: #a3212d;
+  background: #ffe5e7;
+}
+.booklet-metric div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.booklet-metric div > span,
+.booklet-metric small {
+  font-size: 0.75rem;
+  line-height: 1.25;
+}
+.booklet-metric strong {
+  font-size: 0.98rem;
+  font-weight: 750;
+  line-height: 1.2;
+}
+.booklet-panel {
+  padding: 14px;
+  min-width: 0;
+}
+.booklet-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.booklet-title {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.booklet-title > svg {
+  color: var(--booklet-green);
+  flex: none;
+}
+.booklet-title h1 {
+  margin: 0;
+  font-size: 1.3rem;
+  line-height: 1.15;
+  font-weight: 750;
+}
+.booklet-title p,
+.booklet-mobile-heading p {
+  color: #2d495b;
+  font-size: 0.83rem;
+  margin: 4px 0 0;
+}
+.booklet-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.booklet-button {
+  display: inline-flex;
+  color: var(--booklet-green);
+  background: #f6fdf9;
+  border: 1px solid #58a782;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 44px;
+  border-radius: 11px;
+  padding: 7px 12px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  transition:
+    background-color 180ms,
+    box-shadow 180ms,
+    transform 180ms;
+}
+.booklet-button.is-primary {
+  background: #e97872;
+  color: #291313;
+  border-color: #db716a;
+}
+.booklet-button:hover {
+  background: #e4f8ee;
+  box-shadow: 0 4px 9px #1f534229;
+  transform: translateY(-1px);
+}
+.booklet-button.is-primary:hover {
+  background: #f18d86;
+}
+.booklet-button:active {
+  transform: translateY(1px);
+}
+.vaccination-booklet
+  :is(a, button, summary, input, textarea, .booklet-scroll):focus-visible {
+  outline: 2px solid #006744;
+  outline-offset: 2px;
+}
+.booklet-note,
+.booklet-save-notice {
+  margin: 0 0 10px;
+  background: #eaf4f8;
+  padding: 9px 12px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+}
+.booklet-save-notice {
+  background: #e4f8ee;
+  color: var(--booklet-green);
+}
+.booklet-note a,
+.booklet-foot a,
+.booklet-secondary li a,
+.booklet-row-action {
+  color: var(--booklet-green);
+  text-decoration: underline;
+}
+.booklet-scroll {
+  --booklet-age-width: 110px;
+  position: relative;
+  isolation: isolate;
+  min-width: 0;
+  width: 100%;
+  max-height: min(38rem, 72vh);
+  overflow: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-color: #829da9 #eaf4f8;
+  border: 1px solid var(--booklet-line);
+  border-radius: 10px;
+}
+.booklet-table {
+  width: 100%;
+  min-width: 1080px;
+  table-layout: fixed;
+  line-height: 1.34;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.82rem;
+  color: #142333;
+}
+.vaccination-booklet .booklet-table :is(th, td) {
+  text-align: start;
+  min-width: 0;
+  padding: 6px 9px;
+  border-inline-end: 1px solid var(--booklet-line);
+  border-bottom: 1px solid var(--booklet-line);
+  white-space: normal;
+  overflow-wrap: anywhere;
+  background: #fff;
+}
+.vaccination-booklet .booklet-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: #d7f5e6;
+  color: #111;
+  font-weight: 750;
+}
+.booklet-table thead th:nth-child(2) {
+  width: 142px;
+}
+.booklet-table thead th:nth-child(3) {
+  width: 122px;
+}
+.booklet-table thead th:nth-child(4) {
+  width: 100px;
+}
+.booklet-table thead th:nth-child(5) {
+  width: 64px;
+}
+.booklet-table thead th:nth-child(6) {
+  width: 80px;
+}
+.booklet-table thead th:nth-child(7) {
+  width: 152px;
+}
+.booklet-table thead th:nth-child(9) {
+  width: 151px;
+}
+.booklet-table .booklet-sticky-age {
+  position: sticky;
+  inset-inline-start: 0;
+  width: var(--booklet-age-width);
+}
+.booklet-table .booklet-sticky-dose {
+  position: sticky;
+  inset-inline-start: var(--booklet-age-width);
+  box-shadow: 2px 0 4px #20504711;
+}
+.booklet-table tbody .booklet-sticky-age {
+  background: #eaf8f0;
+  z-index: 2;
+  color: #111;
+  vertical-align: middle;
+}
+.booklet-table tbody .booklet-sticky-dose {
+  z-index: 2;
+}
+.booklet-table thead :is(.booklet-sticky-age, .booklet-sticky-dose) {
+  z-index: 4;
+}
+.booklet-table
+  tbody
+  tr:is(:hover, :focus-within)
+  :is(td, .booklet-sticky-dose) {
+  background: #f3faf7;
+}
+.booklet-table td small,
+.booklet-table th small {
+  display: block;
+  color: #425965;
+  line-height: 1.3;
+}
+.booklet-dose {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 28px;
+  color: #102925;
+  line-height: 1.2;
+}
+.booklet-dose strong {
+  font-weight: 750;
+}
+.booklet-dose:hover strong,
+.booklet-dose:focus-visible strong {
+  color: var(--booklet-green);
+  text-decoration: underline;
+}
+.booklet-dose:active {
+  opacity: 0.72;
+}
+.booklet-sticky-dose .booklet-condition {
+  font-size: 0.68rem;
+  padding-top: 3px;
+}
+.booklet-status {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  font-weight: 660;
+  line-height: 1.25;
+  background: #edf1f4;
+  color: #364b58;
+  border-radius: 9px;
+  padding: 4px 6px;
+}
+.booklet-status.is-completed {
+  background: #d9f6e3;
+  color: #075b35;
+}
+.booklet-status.is-upcoming {
+  background: #fff1cb;
+  color: #754000;
+}
+.booklet-status.is-overdue {
+  background: #ffe4e8;
+  color: #a0192a;
+}
+.booklet-reference-cell time {
+  white-space: nowrap;
+}
+.booklet-row-action,
+.booklet-dose-review summary {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.75rem;
+}
+.booklet-dose-review summary,
+.booklet-secondary > summary {
+  cursor: pointer;
+}
+.booklet-dose-review form {
+  display: grid;
+  gap: 7px;
+  margin-top: 6px;
+}
+.booklet-dose-review label {
+  display: grid;
+  gap: 4px;
+}
+.booklet-dose-review .booklet-review-check {
+  display: flex;
+  align-items: start;
+}
+.booklet-dose-review textarea {
+  min-width: 0;
+  padding: 5px;
+}
+.booklet-dose-review button {
+  min-height: 44px;
+  line-height: 1.15;
+  padding: 5px;
+  white-space: normal;
+}
+
+.booklet-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 9px 16px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  font-size: 0.75rem;
+  color: #284353;
+}
+.booklet-foot p {
+  margin: 0;
+}
+.booklet-secondary {
+  margin-top: 12px;
+}
+.booklet-secondary > summary {
+  font-weight: 750;
+  min-height: 32px;
+}
+.booklet-secondary p,
+.booklet-secondary form {
+  margin-block: 8px;
+}
+
+@media screen {
+  .booklet-scroll-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 30rem;
+    margin: 5px auto 0;
+  }
+  .booklet-scroll-controls button {
+    min-width: 44px;
+    min-height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    border: 1px solid var(--booklet-line);
+    background: #eaf4f8;
+    color: #203946;
+    cursor: pointer;
+  }
+  .booklet-scroll-controls button:disabled {
+    opacity: 0.46;
+    cursor: default;
+  }
+  .booklet-scroll-controls button:not(:disabled):active {
+    background: #cbe8da;
+  }
+  .booklet-scroll-track {
+    position: relative;
+    flex: 1;
+    height: 6px;
+    background: #e0e9ef;
+    border-radius: 8px;
+  }
+  .booklet-scroll-track span {
+    position: absolute;
+    height: 100%;
+    width: 25%;
+    border-radius: inherit;
+    background: #65818e;
+  }
+  .booklet-scroll-hint {
+    display: block;
+    text-align: center;
+    color: #284353;
+    font-size: 0.78rem;
+    margin: 4px 0 0;
+  }
+}
+@container (max-width: 900px) {
+  .booklet-metric {
+    flex-wrap: wrap;
+    align-content: center;
+    padding: 9px;
+    gap: 6px;
+  }
+  .booklet-metric-icon {
+    width: 34px;
+  }
+}
+@container (max-width: 580px) {
+  .vaccination-booklet .care-breadcrumb {
+    display: none;
+  }
+  .vaccination-booklet .care-child-context {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+  .vaccination-booklet .care-child-context img {
+    width: 40px;
+    height: 40px;
+  }
+  .vaccination-booklet .care-child-context strong {
+    font-size: 1rem;
+  }
+  .vaccination-booklet .care-context-label {
+    display: none;
+  }
+  .vaccination-booklet .care-patient-nav {
+    margin-bottom: 10px;
+    display: flex;
+    position: relative;
+    max-width: 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+  .vaccination-booklet .care-patient-nav > a {
+    white-space: nowrap;
+    min-height: 40px;
+    padding-inline: 8px;
+    gap: 4px;
+  }
+  .booklet-mobile-heading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    order: 0;
+  }
+  .booklet-mobile-heading > a {
+    display: grid;
+    min-width: 44px;
+    min-height: 44px;
+    place-items: center;
+  }
+  .booklet-mobile-heading .booklet-mobile-title {
+    color: #111;
+    font-size: 1.25rem;
+    font-weight: 750;
+    margin: 0;
+  }
+  .vaccination-booklet-content {
+    gap: 9px;
+  }
+  .vaccination-booklet-content > .booklet-panel {
+    display: contents;
+  }
+  .vaccination-booklet-content .booklet-heading {
+    order: 1;
+    margin-bottom: 0;
+    gap: 0;
+  }
+  .vaccination-booklet-content .booklet-title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .vaccination-booklet-content .booklet-actions {
+    width: 100%;
+  }
+  .vaccination-booklet-content .booklet-actions > a {
+    flex: 1 1 0;
+    text-align: center;
+    padding-inline: 5px;
+  }
+  .vaccination-booklet-content .booklet-note {
+    order: 2;
+    margin: 0;
+  }
+  .booklet-metrics {
+    order: 3;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .booklet-metric {
+    grid-column: span 2;
+    min-height: 78px;
+    align-items: start;
+    overflow-wrap: anywhere;
+  }
+  .booklet-metric:is(.is-upcoming, .is-state) {
+    grid-column: span 3;
+    order: 1;
+    min-height: 60px;
+  }
+  .booklet-metric div > span,
+  .booklet-metric small {
+    font-size: 0.7rem;
+  }
+  .booklet-scroll {
+    --booklet-age-width: 91px;
+    order: 4;
+    background: white;
+    box-shadow: var(--booklet-shadow);
+    max-height: min(32rem, 65vh);
+  }
+  .booklet-table {
+    min-width: 1000px;
+  }
+  .booklet-table thead th:nth-child(2) {
+    width: 105px;
+  }
+  .vaccination-booklet .booklet-table :is(th, td) {
+    padding: 5px 6px;
+  }
+  .booklet-dose {
+    min-height: 42px;
+  }
+  .booklet-scroll-controls {
+    order: 5;
+    margin: 0;
+    width: 100%;
+  }
+  .booklet-scroll-hint {
+    order: 6;
+    margin: 0;
+  }
+  .booklet-foot {
+    order: 7;
+    margin: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .booklet-button {
+    transition: none;
+  }
+}

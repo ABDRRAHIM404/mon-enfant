@@ -1,5 +1,7 @@
 # Mon Enfant — Implementation progress
 
+> Calendrier vaccinal de l’enfant · 24 November 2026. Added the complete responsive booklet with versioned PNI rows, administration age and attribution, existing optional-batch and correction workflows, and explicit audited overdue findings. Applied migration `20261124192109`. Scoped lint, 41 focused tests and a four-width browser workflow with fictional fixtures passed. Vaccine-specific catch-up remains manual pending structured approved criteria.
+
 > Mon compte soignant · 24 November 2026. Redesigned the clinician account and added editable display names, the existing password recovery action, and professional ID copy. Migration `20261124182847` provides authorized clinical attribution names while preserving audit identifiers. Scoped lint, type checks, 20 focused tests and a four-width isolated browser run passed.
 
 > Scanner un QR partagé · 24 November 2026. Redesigned the scanner content for desktop and mobile. User-initiated camera capture, local image decoding and manual redemption preserve the existing server authorization and registration destinations. Scoped lint, 36 focused tests, and four-width Chromium verification with fictional records passed.

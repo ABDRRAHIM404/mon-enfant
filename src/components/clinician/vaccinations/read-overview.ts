@@ -13,7 +13,7 @@ const maxCatalogPages = 4;
 // The clinician workspace is currently a fictional-data beta.
 const betaDraftId = "0c504568-7c67-49bb-b43b-c8382439a850";
 
-async function readScheduleCatalog(supabase: Client) {
+export async function readScheduleCatalog(supabase: Client) {
   let betaDraftVisible = false;
 
   async function readVersion(id: string) {

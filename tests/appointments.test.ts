@@ -206,6 +206,7 @@ beforeAll(async () => {
     "20261121174928_pni_hepatitis_b_birth_draft.sql",
     "20261121183740_routine_appointment_proposals.sql",
     "20261121190310_appointment_workspace_filters.sql",
+    "20261124192109_vaccination_booklet_reviews.sql",
   ])
     await db.exec(readFileSync(`supabase/migrations/${file}`, "utf8"));
   editor = await actor("admin");
@@ -248,6 +249,90 @@ beforeAll(async () => {
 afterAll(async () => {
   await db?.close();
 });
+it("audits and retracts explicit overdue findings without assuming missing history is a missed dose", async () => {
+  const { a, child, facility } = await setup();
+  const outsider = await actor();
+  const unverified = await actor("doctor", "unverified");
+  const read = (actor = a) =>
+    rpc<
+      {
+        id: string;
+        dose_code: string;
+        outstanding: boolean;
+        recommended_end: string;
+      }[]
+    >(actor, "vaccination_booklet_reviews", [child, version]);
+  const review = (
+    actor: Actor,
+    code: string,
+    outstanding: boolean,
+    previous: string | null = null,
+    operation = randomUUID(),
+  ) =>
+    rpc<string>(actor, "review_booklet_dose", [
+      operation,
+      child,
+      version,
+      code,
+      previous,
+      outstanding,
+      reason,
+    ]);
+
+  expect(await read()).toEqual([]);
+  await expect(read(outsider)).rejects.toMatchObject({ code: "42501" });
+  await expect(read(unverified)).rejects.toMatchObject({ code: "42501" });
+  await expect(review(a, "VPO1", true)).rejects.toMatchObject({
+    code: "42501",
+  });
+  await cap(a, "vaccination");
+  await expect(review(a, "HB1", true)).rejects.toMatchObject({ code: "22023" });
+  const operation = randomUUID();
+  const confirmed = await review(a, "VPO1", true, null, operation);
+  expect(await review(a, "VPO1", true, null, operation)).toEqual(confirmed);
+  expect(await read()).toEqual([
+    {
+      id: confirmed,
+      dose_code: "VPO1",
+      outstanding: true,
+      recommended_end: "2025-02-26",
+    },
+  ]);
+  await expect(review(a, "VPO1", true)).rejects.toMatchObject({
+    code: "PT409",
+  });
+  const retracted = await review(a, "VPO1", false, confirmed);
+  expect(await read()).toEqual([
+    {
+      id: retracted,
+      dose_code: "VPO1",
+      outstanding: false,
+      recommended_end: "2025-02-26",
+    },
+  ]);
+  await review(a, "VPO1", true, retracted);
+  const administration = dose(child, facility);
+  administration[9] = { ...payload(), dose_label: "VPO1" };
+  await rpc(a, "write_clinical_entry", administration);
+  const current = (await read())[0];
+  expect(current.outstanding).toBe(false);
+  await expect(review(a, "VPO1", true, current.id)).rejects.toMatchObject({
+    code: "PT409",
+  });
+  expect(
+    (
+      await db.query(
+        "select outstanding from private.vaccination_booklet_reviews where child_id=$1 order by recorded_at",
+        [child],
+      )
+    ).rows,
+  ).toEqual([
+    { outstanding: true },
+    { outstanding: false },
+    { outstanding: true },
+  ]);
+});
+
 describe("automatic routine offers and grouped booking", () => {
   it("groups dates, enforces rights, confirms idempotently and preserves the recommendation", async () => {
     const today = todayCasablanca();

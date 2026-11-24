@@ -15,6 +15,8 @@ export function ClinicalForm({
   previous,
   vaccineItems = [],
   vaccineChoices = [],
+  vaccineInitialChoice,
+  returnToBooklet = false,
 }: {
   childId: string;
   operationId: string;
@@ -23,6 +25,8 @@ export function ClinicalForm({
   previous?: ClinicalEntry;
   vaccineItems?: VaccineItemExport[];
   vaccineChoices?: VaccineChoice[];
+  vaccineInitialChoice?: VaccineChoice;
+  returnToBooklet?: boolean;
 }) {
   const [state, action, pending] = useActionState(recordClinical, {});
   const data = previous?.payload;
@@ -58,6 +62,9 @@ export function ClinicalForm({
       <input type="hidden" name="childId" value={childId} />
       <input type="hidden" name="operationId" value={operationId} />
       <input type="hidden" name="kind" value={kind} />
+      {returnToBooklet && (
+        <input type="hidden" name="returnTo" value="booklet" />
+      )}
       {previous && (
         <>
           <input type="hidden" name="rootId" value={previous.root_id} />
@@ -142,6 +149,7 @@ export function ClinicalForm({
             previous={previous}
             items={vaccineItems}
             choices={vaccineChoices}
+            initialChoice={vaccineInitialChoice}
           />
         )}
         {kind === "consultation" && [

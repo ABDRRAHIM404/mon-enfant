@@ -75,6 +75,7 @@ export async function ClinicalWorkspace({
   section = "overview",
   children,
   print = false,
+  childContextDetails,
 }: {
   active?: ClinicianSection;
   childId?: string;
@@ -82,6 +83,7 @@ export async function ClinicalWorkspace({
   section?: PatientSection;
   children: React.ReactNode;
   print?: boolean;
+  childContextDetails?: React.ReactNode;
 }) {
   let context = child;
   if (childId && !context) {
@@ -111,7 +113,7 @@ export async function ClinicalWorkspace({
               <div>
                 <strong>{patientName(context)}</strong>
                 <span>
-                  {birthLabel(context)}
+                  {childContextDetails ?? birthLabel(context)}
                   {context.name_status === "provisional"
                     ? " · Identité provisoire"
                     : ""}

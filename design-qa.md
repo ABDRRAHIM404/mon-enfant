@@ -1,3 +1,13 @@
+# Digital vaccination booklet design comparison · 24 November 2026
+
+Final result: passed for the child-record vaccination booklet.
+
+Compared the supplied desktop and mobile references with Chromium captures at 1440, 820, 390 and 320 CSS pixels. The existing navigation surrounds the booklet. The tablet and phone keep all nine columns, two pinned columns, sticky headers and horizontal controls. Images show only the existing child avatar art and fictional fixture data.
+
+The isolated browser run exercised the real booklet and dose form with stubbed RPCs for optional batch, saving and reloading, explicit overdue review and permissions. Isolated PostgreSQL tests separately verified persisted read and write behavior, audit history, and current appointment and vaccination workflows. The production PNI has a verified six-month PCV3 rule. The current catalogue does not encode approved vaccine-specific catch-up rules.
+
+---
+
 # Mon compte soignant design comparison · 24 November 2026
 
 Compared the desktop and mobile references with Chromium captures at 1440, 820, 390 and 320 CSS pixels. Desktop pairs the identity and verification cards and places security beside the account information. Mobile stacks the cards with the existing shared navigation. The account shows the verification and capability states from the fixture and places the identifier in a dedicated read-only row.

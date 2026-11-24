@@ -21,7 +21,12 @@ export default async function NewEntry({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ kind?: string }>;
+  searchParams: Promise<{
+    kind?: string;
+    version?: string;
+    dose?: string;
+    from?: string;
+  }>;
 }) {
   const { supabase } = await requireApprovedDoctor();
   const { id } = await params;
@@ -55,6 +60,20 @@ export default async function NewEntry({
       ? await supabase.rpc("vaccine_form_choices")
       : { data: [], error: null };
   if (vocabulary.error) throw new Error("Choix vaccinaux indisponibles.");
+  const items = vaccineItems.data as VaccineItemExport[];
+  const choices = choicesWithRecordVersions(
+    vocabulary.data as VaccineChoice[],
+    items,
+  );
+  const fromBooklet = kind === "vaccination" && query.from === "booklet";
+  const requestedDose = fromBooklet
+    ? choices.find(
+        (choice) =>
+          choice.status === "approved" &&
+          choice.version_id === query.version &&
+          choice.dose_code === query.dose,
+      )
+    : undefined;
   return (
     <ClinicalWorkspace
       active={
@@ -84,8 +103,13 @@ export default async function NewEntry({
           écriture ne remplace silencieusement un soin.
         </p>
       </div>
-      <Link className="text-link" href={`/patients/${id}/records`}>
-        Retour au dossier clinique
+      <Link
+        className="text-link"
+        href={`/patients/${id}/${fromBooklet ? "vaccinations" : "records"}`}
+      >
+        {fromBooklet
+          ? "Retour au calendrier vaccinal"
+          : "Retour au dossier clinique"}
       </Link>
       <section className="panel">
         {!allowed ? (
@@ -99,11 +123,10 @@ export default async function NewEntry({
             operationId={randomUUID()}
             kind={kind}
             facilities={places}
-            vaccineItems={vaccineItems.data as VaccineItemExport[]}
-            vaccineChoices={choicesWithRecordVersions(
-              vocabulary.data as VaccineChoice[],
-              vaccineItems.data as VaccineItemExport[],
-            )}
+            vaccineItems={items}
+            vaccineChoices={choices}
+            vaccineInitialChoice={requestedDose}
+            returnToBooklet={fromBooklet}
           />
         ) : (
           <p>
