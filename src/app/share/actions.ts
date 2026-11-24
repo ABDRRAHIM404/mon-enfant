@@ -97,7 +97,11 @@ export async function redeemShare(form: FormData): Promise<ShareActionState> {
     p_token: token,
   });
   const share = data as ShareReceipt | null;
-  if (error || !share?.accepted) return { error: unavailable };
+  if (error || !share?.accepted)
+    return {
+      error:
+        "Partage indisponible. Le code peut être invalide, expiré, déjà utilisé ou non autorisé. Demandez un nouveau code au parent.",
+    };
   if (share.scope !== "care_visit") return { share };
   if (!share.child_id || !uuidPattern.test(share.child_id))
     return { error: unavailable };

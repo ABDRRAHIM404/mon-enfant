@@ -1,3 +1,13 @@
+# Shared QR scanner design comparison · 24 November 2026
+
+Final result: passed for the shared QR scanner content.
+
+Compared the supplied desktop and phone references with Chromium captures at 1440, 820, 390 and 320 CSS pixels. Desktop shows the scanner beside the guide and manual form. On mobile the scanner, manual form and validity notice appear before the guide. The active frame uses the browser camera. Its inactive state is explicitly labelled, and hardware-only controls appear only when supported.
+
+Verified camera activation, denied and unavailable feedback, scan and track shutdown, local image decoding, manual entry, duplicate-submit prevention, and navigation for an existing share, authorized care visit and parent registration using an isolated database. The QR illustration contains no decodable payload.
+
+---
+
 # Croissance design comparison · 23 November 2026
 
 Final result: passed for the redesigned Croissance content.

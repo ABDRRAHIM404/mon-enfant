@@ -1,5 +1,7 @@
 # Mon Enfant — Implementation progress
 
+> Scanner un QR partagé · 24 November 2026. Redesigned the scanner content for desktop and mobile. User-initiated camera capture, local image decoding and manual redemption preserve the existing server authorization and registration destinations. Scoped lint, 36 focused tests, and four-width Chromium verification with fictional records passed.
+
 > Croissance · 23 November 2026. Redesigned the clinician page with an inline form using the existing guarded clinical action, three interactive raw-measurement charts, and responsive history and correction links. Visual and workflow checks passed on four viewport widths with isolated fictional records, plus 16 focused clinical tests and scoped lint. No schema changes.
 
 > Rendez-vous corrections · 21 November 2026. Supabase migration `20261121190310` serves the selected appointment and vaccination period with calendar counts. French date entry preserves Casablanca civil dates. Browser checks against disposable PostgreSQL reproduced 11 December, then verified both booking actions, reload persistence and duplicate rejection with fictional records. The live PNI remains a draft with no approved booking version.
