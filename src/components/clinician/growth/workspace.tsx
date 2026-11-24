@@ -1,3 +1,7 @@
+import {
+  clinicianName,
+  type ClinicalAttributions,
+} from "@/lib/clinical/attribution";
 import { randomUUID } from "node:crypto";
 import Image from "next/image";
 import Link from "next/link";
@@ -106,9 +110,11 @@ function MeasurementRows({
   child,
   entries,
   canCorrect,
+  attributions,
 }: {
   child: Patient;
   entries: ClinicalEntry[];
+  attributions: ClinicalAttributions;
   canCorrect: (entry: ClinicalEntry) => boolean;
 }) {
   return (
@@ -173,7 +179,9 @@ function MeasurementRows({
                 );
               })}
               <td className="growth-row-source" role="cell">
-                <strong>{entry.professional_id}</strong>
+                <strong>
+                  {clinicianName(attributions, entry.professional_id)}
+                </strong>
                 <details>
                   <summary>
                     {sourceLabels[entry.source_type] ?? entry.source_type}
@@ -230,6 +238,7 @@ export function GrowthWorkspace({
   userId,
   facilities,
   saved,
+  attributions,
 }: {
   child: Patient | null;
   matches: Patient[];
@@ -243,6 +252,7 @@ export function GrowthWorkspace({
   userId: string;
   facilities: Facility[];
   saved: boolean;
+  attributions: ClinicalAttributions;
 }) {
   const childPath = child ? `/patients/${child.id}` : "";
   const recordsHref = `${childPath}/records?kind=growth`;
@@ -467,6 +477,7 @@ export function GrowthWorkspace({
                 <MeasurementRows
                   child={child}
                   entries={history.items}
+                  attributions={attributions}
                   canCorrect={(entry) =>
                     canWrite &&
                     facilities.length > 0 &&

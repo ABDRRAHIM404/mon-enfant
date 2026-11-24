@@ -1,3 +1,4 @@
+import { readClinicalAttributions } from "@/lib/clinical/read-attribution";
 import {
   choicesWithRecordVersions,
   type VaccineChoice,
@@ -60,6 +61,11 @@ export default async function ClinicalHistory({
       ? await supabase.rpc("vaccine_form_choices")
       : { data: [], error: null };
   if (vocabulary.error) throw new Error("Choix vaccinaux indisponibles.");
+  const attributions = await readClinicalAttributions(
+    supabase,
+    entries.map((entry) => entry.professional_id),
+    { children: [id] },
+  );
   return (
     <ClinicalWorkspace
       active={
@@ -86,7 +92,12 @@ export default async function ClinicalHistory({
       </Link>
       <h2>Versions conservées</h2>
       {entries.map((entry) => (
-        <EntryCard key={entry.id} entry={entry} link={false} />
+        <EntryCard
+          key={entry.id}
+          entry={entry}
+          link={false}
+          attributions={attributions}
+        />
       ))}
       <section
         className="panel"

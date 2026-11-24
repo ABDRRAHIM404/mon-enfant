@@ -1,3 +1,7 @@
+import {
+  clinicianName,
+  type ClinicalAttributions,
+} from "@/lib/clinical/attribution";
 import Link from "next/link";
 import {
   clinicalLabels,
@@ -9,10 +13,12 @@ import {
 export function EntryCard({
   entry,
   link = true,
+  attributions,
   heading = true,
 }: {
   entry: ClinicalEntry;
   link?: boolean;
+  attributions?: ClinicalAttributions;
   heading?: boolean;
 }) {
   return (
@@ -75,8 +81,12 @@ export function EntryCard({
         </div>
       )}
       <p className="fine">
-        Saisi par {entry.professional_id} · {entry.facility_name} · le{" "}
-        {entry.recorded_at} · version {entry.revision}
+        Saisi par{" "}
+        {attributions
+          ? clinicianName(attributions, entry.professional_id)
+          : entry.professional_id}{" "}
+        · {entry.facility_name} · le {entry.recorded_at} · version{" "}
+        {entry.revision}
       </p>
       {entry.source_reference && (
         <p className="fine">Référence : {entry.source_reference}</p>

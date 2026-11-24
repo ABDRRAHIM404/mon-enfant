@@ -1,0 +1,439 @@
+.clinician-account {
+  --account-ink: #111;
+  --account-green: #007653;
+  --account-muted: #394f59;
+  --account-border: #d7e6ec;
+  --account-shadow:
+    0 5px 14px rgb(35 86 101 / 13%), 0 1px 2px rgb(32 76 95 / 8%);
+  --account-motion: 200ms var(--motion-ease, ease);
+  color: var(--account-ink);
+  display: grid;
+  gap: 13px;
+}
+.clinician-account-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(110px, 0.75fr);
+  align-items: center;
+  gap: 10px;
+}
+.clinician-account-heading > div {
+  border-inline-start: 4px solid var(--account-green);
+  padding: 3px 0 4px clamp(10px, 1.6vw, 22px);
+}
+.clinician-account-heading h1 {
+  margin: 3px 0 5px;
+  font-size: clamp(1.65rem, 3.2vw, 3rem);
+  letter-spacing: -0.045em;
+  line-height: 1.12;
+}
+.clinician-account-heading p {
+  margin: 0;
+  color: var(--account-muted);
+  font-size: clamp(0.87rem, 1.3vw, 1.12rem);
+}
+.clinician-account-heading p:first-child {
+  font-size: 0.87rem;
+  font-weight: 650;
+}
+.clinician-account-heading img {
+  width: min(100%, 300px);
+  height: auto;
+  align-self: end;
+  justify-self: end;
+}
+.clinician-account-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  grid-template-areas: "identity verification" "info security" "platform platform" "rights rights";
+  gap: clamp(10px, 1.35vw, 18px);
+}
+.clinician-account-card {
+  min-width: 0;
+  padding: clamp(12px, 1.5vw, 21px);
+  border-radius: 17px;
+  border: 1px solid #fff;
+  background: var(--theme-white-card, #fff);
+  box-shadow: var(--account-shadow);
+}
+.clinician-account-card :is(h2, h3) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  letter-spacing: -0.028em;
+  line-height: 1.2;
+  font-size: clamp(1.02rem, 1.65vw, 1.38rem);
+  overflow-wrap: anywhere;
+}
+.clinician-account-card :is(h2, h3) > svg {
+  width: 22px;
+  flex: none;
+  color: var(--account-green);
+}
+.clinician-account-card p {
+  margin: 4px 0 0;
+  color: var(--account-muted);
+}
+.clinician-account-identity {
+  grid-area: identity;
+  display: flex;
+  gap: 13px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: linear-gradient(105deg, #fff9f8, #fff, #fff0ef);
+}
+.clinician-account-identity img {
+  width: clamp(62px, 8.25vw, 109px);
+  height: auto;
+  flex: none;
+  border: 4px solid #fff;
+  border-radius: 50%;
+  background: #e4f6ee;
+  box-shadow: 0 3px 8px #66454426;
+}
+.clinician-account-identity h2 {
+  font-size: clamp(1.15rem, 2.1vw, 1.7rem);
+  line-height: 1.15;
+}
+.clinician-account-watermark {
+  position: absolute;
+  z-index: -1;
+  inset: auto 10px 5px auto;
+  width: 100px;
+  height: 100px;
+  color: #e9787240;
+}
+.clinician-identity-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.clinician-account-badge,
+.clinician-verification-icon {
+  background: #edf1f3;
+  color: #40515a;
+}
+.clinician-account-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  border-radius: 9px;
+  font-size: 0.82rem;
+  font-weight: 720;
+}
+.clinician-account [data-tone="active"],
+.clinician-account [data-tone="profession"] {
+  color: #07583c;
+  background: #dff6eb;
+}
+.clinician-account-badge[data-tone="active"] {
+  color: #fff;
+  background: var(--account-green);
+}
+.clinician-account [data-tone="pending"] {
+  color: #754500;
+  background: #fff2cc;
+}
+.clinician-account [data-tone="error"] {
+  color: #932d23;
+  background: #fee8e4;
+}
+.clinician-account-verification {
+  grid-area: verification;
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  background: #f5fcf8;
+}
+.clinician-verification-icon {
+  display: grid;
+  place-items: center;
+  min-width: 47px;
+  height: 47px;
+  border-radius: 13px;
+}
+.clinician-account-verification .clinician-account-button {
+  margin-top: 8px;
+}
+.clinician-account-information {
+  grid-area: info;
+}
+.clinician-account-fields {
+  margin: 8px 0 4px;
+}
+.clinician-account-fields > div {
+  display: grid;
+  grid-template-columns: minmax(0, 0.87fr) minmax(0, 1.13fr);
+  align-items: baseline;
+  gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px solid #e0ebef;
+  font-size: 0.88rem;
+}
+.clinician-account-fields dt {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.clinician-account-fields dt svg {
+  width: 17px;
+  color: var(--account-green);
+  flex: none;
+}
+.clinician-account-fields dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-weight: 650;
+}
+.clinician-account-small {
+  font-size: 0.76rem;
+}
+.clinician-account-security {
+  grid-area: security;
+}
+.clinician-account-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 7px 10px;
+  border: 1px solid var(--account-border);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--account-ink);
+  text-decoration: none;
+  text-align: center;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 710;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    transform var(--account-motion),
+    background-color var(--account-motion),
+    box-shadow var(--account-motion);
+}
+.clinician-account-button svg {
+  flex: none;
+}
+.clinician-account-button:disabled {
+  opacity: 0.65;
+  cursor: progress;
+}
+.clinician-account-emphasis {
+  border-color: #e97872;
+  background: #e97872;
+  color: #361616;
+}
+.clinician-security-link {
+  justify-content: flex-start;
+  width: 100%;
+  margin-top: 10px;
+  color: #932e25;
+  border-color: #efb5ac;
+  background: #fff2ef;
+}
+.clinician-security-link svg:last-child {
+  margin-inline-start: auto;
+}
+.clinician-name-edit {
+  margin-top: 8px;
+}
+.clinician-name-edit summary {
+  list-style: none;
+}
+.clinician-name-edit summary::-webkit-details-marker {
+  display: none;
+}
+.clinician-name-form {
+  display: grid;
+  justify-items: start;
+  gap: 7px;
+  margin-block-start: 8px;
+}
+.clinician-name-form fieldset {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.clinician-name-form label {
+  display: block;
+  font-weight: 650;
+}
+.clinician-name-form input,
+.clinician-account-id-controls input {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 7px 9px;
+  border: 1px solid var(--account-border);
+  border-radius: 8px;
+  background: white;
+  color: var(--account-ink);
+}
+.clinician-name-form fieldset p {
+  font-size: 0.8rem;
+}
+.clinician-account-platform {
+  grid-area: platform;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(100px, 0.9fr);
+  align-items: center;
+  gap: 8px 14px;
+  background: #eaf8f3;
+}
+.clinician-account-platform p {
+  font-size: 0.83rem;
+}
+.clinician-account-id-controls {
+  min-width: 0;
+  justify-self: end;
+  width: min(100%, 410px);
+}
+.clinician-account-id-actions {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+.clinician-id-toggle {
+  flex: 1;
+  min-width: 0;
+}
+.clinician-id-preview {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: ui-monospace, monospace;
+}
+.clinician-icon-button {
+  width: 44px;
+  flex: none;
+}
+.clinician-account-id-controls > div:not(:first-child) {
+  margin-top: 5px;
+}
+.clinician-copy-status {
+  color: #086244 !important;
+  font-size: 0.83rem;
+}
+.clinician-account-rights {
+  grid-area: rights;
+}
+.clinician-account-rights ul {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  list-style: none;
+  margin: 9px 0;
+  padding: 0;
+  gap: 7px;
+}
+.clinician-account-rights li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 8px;
+  border-radius: 11px;
+  border: 1px solid var(--account-border);
+  font-size: 0.82rem;
+  line-height: 1.26;
+  background: #f8fbfc;
+  overflow-wrap: anywhere;
+}
+.clinician-account-rights li > svg:first-child {
+  color: var(--account-green);
+  flex: none;
+}
+.clinician-right-active,
+.clinician-right-inactive {
+  border-radius: 50%;
+  flex: none;
+  padding: 2px;
+  margin-inline-start: auto;
+}
+.clinician-right-active {
+  background: var(--account-green);
+  color: #fff;
+}
+.clinician-right-inactive {
+  color: #51606a;
+  background: #e8edf0;
+}
+.clinician-account-rights li small {
+  display: block;
+  color: var(--account-muted);
+}
+.clinician-account-clinical {
+  border: 1px solid var(--account-border);
+  border-radius: 11px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 9px;
+}
+.clinician-account-clinical p {
+  font-size: 0.83rem;
+}
+.clinician-clinical-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.clinician-provisional-link {
+  color: #893329;
+  border-color: #efb5ac;
+  background: #fff5f2;
+}
+.clinician-account :is(a, button, input, summary):focus-visible {
+  outline: 2px solid var(--account-green);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .clinician-account-button:not(:disabled):hover {
+    box-shadow: var(--account-shadow);
+    transform: translateY(-1px);
+  }
+}
+.clinician-account-button:not(:disabled):active {
+  transform: translateY(1px);
+}
+@media (max-width: 950px) {
+  .clinician-account-rights ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .clinician-account-clinical {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 720px) {
+  .clinician-account-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "identity" "verification" "info" "platform" "security" "rights";
+  }
+  .clinician-account-heading {
+    grid-template-columns: minmax(0, 1.65fr) minmax(80px, 0.65fr);
+  }
+  .clinician-account-platform {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .clinician-account-id-controls {
+    justify-self: stretch;
+    width: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .clinician-account-button {
+    transition: none;
+  }
+  .clinician-account-button:is(:hover, :active) {
+    transform: none;
+  }
+}

@@ -1,3 +1,5 @@
+import { clinicianName } from "@/lib/clinical/attribution";
+import { readClinicalAttributions } from "@/lib/clinical/read-attribution";
 import { QrCode } from "@/components/qr/code";
 import { clinicianLookupUrl } from "@/lib/qr/symbol";
 import { appointmentTime } from "@/lib/appointments/calendar";
@@ -52,6 +54,14 @@ export default async function PatientProfile({
       throw new Error("Impossible de charger les autorisations.");
     grants = result.data as AccessGrant[];
   }
+  const attributions = await readClinicalAttributions(
+    supabase,
+    [
+      child.created_by_professional_id,
+      ...grants.map((grant) => grant.platform_id),
+    ],
+    { children: [id] },
+  );
   return (
     <ClinicalWorkspace
       active="children"
@@ -123,7 +133,9 @@ export default async function PatientProfile({
               </>
             )}
             <dt>Professionnel ayant créé le dossier</dt>
-            <dd>{child.created_by_professional_id}</dd>
+            <dd>
+              {clinicianName(attributions, child.created_by_professional_id)}
+            </dd>
           </dl>
           <p className="notice">
             Consultez le dossier clinique pour les soins enregistrés et leur
@@ -180,7 +192,7 @@ export default async function PatientProfile({
             {grants.map((g) => (
               <article key={g.professional_id}>
                 <strong>
-                  {g.platform_id}
+                  {clinicianName(attributions, g.platform_id)}
                   {g.is_self ? " (vous)" : ""}
                 </strong>
                 <p>

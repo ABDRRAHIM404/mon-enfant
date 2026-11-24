@@ -1,3 +1,5 @@
+import { clinicianName } from "@/lib/clinical/attribution";
+import { readClinicalAttributions } from "@/lib/clinical/read-attribution";
 import Link from "next/link";
 import { requireApprovedDoctor } from "@/lib/auth";
 import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
@@ -20,6 +22,11 @@ export default async function Requests() {
     rejected: "Refusée",
     withdrawn: "Retirée",
   };
+  const attributions = await readClinicalAttributions(
+    supabase,
+    queue.map((row) => row.requester_professional_id),
+    { children: queue.map((row) => row.child_id) },
+  );
   return (
     <ClinicalWorkspace active="tools">
       <div className="page-heading">
@@ -47,7 +54,8 @@ export default async function Requests() {
               <article key={r.id}>
                 <h3>{r.child_name || "Identité inconnue"}</h3>
                 <p>
-                  {r.requester_professional_id} · {r.facility_name}
+                  {clinicianName(attributions, r.requester_professional_id)} ·{" "}
+                  {r.facility_name}
                 </p>
                 <p>
                   Registre demandé : {r.number} · {r.year} / {r.book}

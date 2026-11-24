@@ -1,3 +1,4 @@
+import { readClinicalAttributions } from "@/lib/clinical/read-attribution";
 import { notFound } from "next/navigation";
 import { ConsultationsWorkspace } from "./consultations/workspace";
 import { GrowthWorkspace } from "./growth/workspace";
@@ -62,6 +63,17 @@ export async function PatientSection({
   }
   const assignedCapabilities = capabilities.data as string[];
   if (section === "vaccinations") {
+    const overview = child
+      ? await readVaccinationOverview(supabase, child, page)
+      : null;
+    const attributions =
+      child && overview
+        ? await readClinicalAttributions(
+            supabase,
+            overview.history.items.map((entry) => entry.professional_id),
+            { children: [child.id] },
+          )
+        : {};
     return (
       <VaccinationsWorkspace
         child={child}
@@ -70,9 +82,8 @@ export async function PatientSection({
         childPage={childPage}
         childTotal={data.total}
         page={page}
-        overview={
-          child ? await readVaccinationOverview(supabase, child, page) : null
-        }
+        overview={overview}
+        attributions={attributions}
         capabilities={assignedCapabilities}
       />
     );
@@ -102,6 +113,13 @@ export async function PatientSection({
     total: number;
   };
 
+  const attributions = child
+    ? await readClinicalAttributions(
+        supabase,
+        history.items.map((entry) => entry.professional_id),
+        { children: [child.id] },
+      )
+    : {};
   if (section === "consultations") {
     return (
       <ConsultationsWorkspace
@@ -113,6 +131,7 @@ export async function PatientSection({
         history={history}
         historyPage={page}
         canWrite={allowed}
+        attributions={attributions}
         sort={query.sort === "oldest" ? "oldest" : "recent"}
       />
     );
@@ -128,6 +147,7 @@ export async function PatientSection({
       history={history}
       page={page}
       canWrite={allowed}
+      attributions={attributions}
       standardAccess={access?.data === true}
       userId={user.id}
       facilities={(places?.data ?? []) as Facility[]}

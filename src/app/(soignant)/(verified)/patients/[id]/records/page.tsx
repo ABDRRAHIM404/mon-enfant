@@ -1,3 +1,4 @@
+import { readClinicalAttributions } from "@/lib/clinical/read-attribution";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
@@ -48,6 +49,11 @@ export default async function Records({
   function pageHref(n: number) {
     return `/patients/${id}/records?${new URLSearchParams({ kind, page: String(n) })}`;
   }
+  const attributions = await readClinicalAttributions(
+    supabase,
+    result.items.map((entry) => entry.professional_id),
+    { children: [id] },
+  );
   return (
     <ClinicalWorkspace
       active={
@@ -91,7 +97,9 @@ export default async function Records({
         </p>
       </section>
       {result.items.length ? (
-        result.items.map((entry) => <EntryCard key={entry.id} entry={entry} />)
+        result.items.map((entry) => (
+          <EntryCard key={entry.id} entry={entry} attributions={attributions} />
+        ))
       ) : (
         <p className="empty-state">
           Aucun soin documenté dans cette vue. Un historique absent reste

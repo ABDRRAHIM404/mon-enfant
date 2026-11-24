@@ -4,6 +4,8 @@ import {
   choicesWithRecordVersions,
   type VaccineChoice,
 } from "@/lib/vaccines/choices";
+import { clinicianName } from "@/lib/clinical/attribution";
+import { readClinicalAttributions } from "@/lib/clinical/read-attribution";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import {
@@ -24,7 +26,9 @@ import { vaccinationValidationMessage } from "@/lib/vaccines/record-validation";
 export type ClinicalState = {
   error?: string;
   success?: boolean;
-  conflicts?: VaccinationConflict[];
+  conflicts?: (Omit<VaccinationConflict, "professional_id"> & {
+    authorLabel: string;
+  })[];
   checked?: boolean;
 };
 export async function recordClinical(
@@ -149,6 +153,17 @@ export async function recordClinical(
     input.p_source_reference = latest.source_reference;
     input.p_source_verified = latest.source_verified;
   }
+  async function displayConflicts(conflicts: VaccinationConflict[]) {
+    const labels = await readClinicalAttributions(
+      supabase,
+      conflicts.map((item) => item.professional_id),
+      { children: [child] },
+    );
+    return conflicts.map(({ professional_id, ...item }) => ({
+      ...item,
+      authorLabel: clinicianName(labels, professional_id),
+    }));
+  }
   const checkDuplicates = () =>
     supabase.rpc("check_vaccination_duplicates", {
       p_child_id: child,
@@ -164,7 +179,10 @@ export async function recordClinical(
           vaccinationValidationMessage(result.error, input) ??
           "Vérifiez le vaccin et le rapprochement. Le contrôle des doublons est indisponible.",
       };
-    return { checked: true, conflicts: result.data as VaccinationConflict[] };
+    return {
+      checked: true,
+      conflicts: await displayConflicts(result.data as VaccinationConflict[]),
+    };
   }
   const { data, error } = await supabase.rpc("write_clinical_entry", input);
   if (error) {
@@ -177,7 +195,9 @@ export async function recordClinical(
       return {
         error:
           "Vaccination potentiellement en doublon. Relisez les événements ci-dessous et justifiez explicitement toute administration distincte.",
-        conflicts: result.error ? [] : (result.data as VaccinationConflict[]),
+        conflicts: result.error
+          ? []
+          : await displayConflicts(result.data as VaccinationConflict[]),
       };
     }
     if (["40001", "PT409"].includes(error.code ?? ""))

@@ -1,3 +1,11 @@
+# Mon compte soignant design comparison · 24 November 2026
+
+Compared the desktop and mobile references with Chromium captures at 1440, 820, 390 and 320 CSS pixels. Desktop pairs the identity and verification cards and places security beside the account information. Mobile stacks the cards with the existing shared navigation. The account shows the verification and capability states from the fixture and places the identifier in a dedicated read-only row.
+
+The isolated browser run checked profile editing after reload, ID copy, pending status, the existing recovery request, and record attribution including the missing-name fallback. Password recovery delivery and authenticated use on production were outside this browser run. Database tests exercised access to attribution names separately.
+
+---
+
 # Shared QR scanner design comparison · 24 November 2026
 
 Final result: passed for the shared QR scanner content.

@@ -1,3 +1,5 @@
+import { clinicianName } from "@/lib/clinical/attribution";
+import { readClinicalAttributions } from "@/lib/clinical/read-attribution";
 import Link from "next/link";
 import { AppointmentCard } from "@/components/appointments/card";
 import { appointmentTime } from "@/lib/appointments/calendar";
@@ -63,6 +65,25 @@ export default async function Summary({
     throw new Error("Impossible de générer le résumé.");
   const child = profile.data as ChildProfile,
     entries = ledger.data as ClinicalEntry[];
+  const vaccineItems = vaccines.data as VaccineItemExport[];
+  const appointmentRows = appointments.data as (AppointmentRow & {
+    events: AppointmentEvent[];
+  })[];
+  const attributions = await readClinicalAttributions(
+    supabase,
+    [
+      ...entries.map((entry) => entry.professional_id),
+      ...vaccineItems.flatMap((item) =>
+        item.changes.map((change) => change.professional_id),
+      ),
+      ...appointmentRows.flatMap((row) => [
+        row.professional_id,
+        row.documentation?.professional_id,
+        ...row.events.map((event) => event.professional_id),
+      ]),
+    ],
+    { children: [id] },
+  );
   return (
     <ClinicalWorkspace active="children" childId={id} section="summary" print>
       <div className="page-heading">
@@ -107,7 +128,8 @@ export default async function Summary({
                 <li key={change.id}>
                   Révision {change.revision} ·{" "}
                   {change.state === "active" ? "Active" : "Retirée"} ·{" "}
-                  {change.reason} · {change.professional_id} · lieu{" "}
+                  {change.reason} ·{" "}
+                  {clinicianName(attributions, change.professional_id)} · lieu{" "}
                   {change.facility_id} · {change.created_at}
                 </li>
               ))}
@@ -126,7 +148,11 @@ export default async function Summary({
           })[]
         ).map((appointment) => (
           <article key={appointment.id}>
-            <AppointmentCard appointment={appointment} link={false} />
+            <AppointmentCard
+              appointment={appointment}
+              link={false}
+              attributions={attributions}
+            />
             <ul>
               {appointment.events.map((event) => (
                 <li key={event.id}>
@@ -136,7 +162,8 @@ export default async function Summary({
                   {event.previous_starts_at
                     ? ` · ancien début ${appointmentTime(event.previous_starts_at)}`
                     : ""}{" "}
-                  · {event.reason} · {event.professional_id} ·{" "}
+                  · {event.reason} ·{" "}
+                  {clinicianName(attributions, event.professional_id)} ·{" "}
                   {event.recorded_at}
                 </li>
               ))}
@@ -149,7 +176,12 @@ export default async function Summary({
       </section>
       {entries.length ? (
         entries.map((entry) => (
-          <EntryCard key={entry.id} entry={entry} link={false} />
+          <EntryCard
+            key={entry.id}
+            entry={entry}
+            link={false}
+            attributions={attributions}
+          />
         ))
       ) : (
         <p className="empty-state">Aucun soin documenté dans ce module.</p>

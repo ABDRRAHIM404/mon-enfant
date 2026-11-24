@@ -1,3 +1,7 @@
+import {
+  clinicianName,
+  type ClinicalAttributions,
+} from "@/lib/clinical/attribution";
 import Form from "next/form";
 import Image from "next/image";
 import Link from "next/link";
@@ -61,9 +65,11 @@ function Pager({
 
 function HistoryRow({
   entry,
+  attributions,
   child,
 }: {
   entry: ClinicalEntry;
+  attributions: ClinicalAttributions;
   child: Patient;
 }) {
   const age = ageAtVaccination(child, entry);
@@ -103,7 +109,7 @@ function HistoryRow({
             {entry.source_verified
               ? "Source contrôlée"
               : "Source non confirmée"}{" "}
-            · {entry.professional_id}
+            · {clinicianName(attributions, entry.professional_id)}
           </small>
         </span>
         <span
@@ -118,7 +124,7 @@ function HistoryRow({
           aria-hidden="true"
         />
       </summary>
-      <EntryCard entry={entry} heading={false} />
+      <EntryCard entry={entry} heading={false} attributions={attributions} />
     </details>
   );
 }
@@ -132,6 +138,7 @@ export function VaccinationsWorkspace({
   page,
   overview,
   capabilities,
+  attributions,
 }: {
   child: Patient | null;
   matches: Patient[];
@@ -141,6 +148,7 @@ export function VaccinationsWorkspace({
   page: number;
   overview: VaccinationOverview | null;
   capabilities: string[];
+  attributions: ClinicalAttributions;
 }) {
   const base = { q, childPage: String(childPage) };
   const childPath = child ? `/patients/${child.id}` : "";
@@ -369,7 +377,12 @@ export function VaccinationsWorkspace({
                 </div>
                 {overview.history.items.length ? (
                   overview.history.items.map((entry) => (
-                    <HistoryRow key={entry.id} entry={entry} child={child} />
+                    <HistoryRow
+                      key={entry.id}
+                      entry={entry}
+                      child={child}
+                      attributions={attributions}
+                    />
                   ))
                 ) : (
                   <p className="consultation-muted">

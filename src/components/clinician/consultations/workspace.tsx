@@ -1,3 +1,4 @@
+import type { ClinicalAttributions } from "@/lib/clinical/attribution";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -68,9 +69,11 @@ function ConsultationPagination({
 function ConsultationEntry({
   entry,
   initiallyOpen,
+  attributions,
 }: {
   entry: ClinicalEntry;
   initiallyOpen: boolean;
+  attributions: ClinicalAttributions;
 }) {
   const withdrawn = entry.entry_state === "withdrawn";
   const source = sourceLabels[entry.source_type] ?? entry.source_type;
@@ -110,7 +113,7 @@ function ConsultationEntry({
             aria-hidden="true"
           />
         </summary>
-        <EntryCard entry={entry} heading={false} />
+        <EntryCard entry={entry} heading={false} attributions={attributions} />
       </details>
     </li>
   );
@@ -126,6 +129,7 @@ export function ConsultationsWorkspace({
   historyPage,
   canWrite,
   sort,
+  attributions,
 }: {
   query: string;
   child: Patient | null;
@@ -136,6 +140,7 @@ export function ConsultationsWorkspace({
   historyPage: number;
   canWrite: boolean;
   sort: Sort;
+  attributions: ClinicalAttributions;
 }) {
   const base = { q: query, sort, childPage: String(childrenPage) };
   const childPath = child ? `/patients/${child.id}` : "";
@@ -352,6 +357,7 @@ export function ConsultationsWorkspace({
                         key={entry.id}
                         entry={entry}
                         initiallyOpen={index === 0}
+                        attributions={attributions}
                       />
                     ))}
                   </ul>

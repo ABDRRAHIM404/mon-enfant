@@ -1,3 +1,7 @@
+import {
+  clinicianName,
+  type ClinicalAttributions,
+} from "@/lib/clinical/attribution";
 import Link from "next/link";
 import { appointmentTime } from "@/lib/appointments/calendar";
 import {
@@ -7,9 +11,11 @@ import {
 export function AppointmentCard({
   appointment,
   link = true,
+  attributions,
 }: {
   appointment: AppointmentRow;
   link?: boolean;
+  attributions?: ClinicalAttributions;
 }) {
   const a = appointment;
   return (
@@ -24,14 +30,21 @@ export function AppointmentCard({
         {appointmentTime(a.starts_at)} → {appointmentTime(a.ends_at)}
       </p>
       <p className="fine">
-        Responsable : {a.professional_id} · {a.facility_name}
+        Responsable :{" "}
+        {attributions
+          ? clinicianName(attributions, a.professional_id)
+          : a.professional_id}{" "}
+        · {a.facility_name}
         {a.dose_code ? ` · ${a.dose_code} · ${a.version_label}` : ""}
       </p>
       {a.effective_state === "dose_documented" && a.documentation && (
         <div className="notice">
           <p>
-            Dose enregistrée par {a.documentation.professional_id} le{" "}
-            {a.documentation.occurred_on}. La présence au rendez-vous initial
+            Dose enregistrée par{" "}
+            {attributions
+              ? clinicianName(attributions, a.documentation.professional_id)
+              : a.documentation.professional_id}{" "}
+            le {a.documentation.occurred_on}. La présence au rendez-vous initial
             n’est pas établie par ce rapprochement.
           </p>
           <Link

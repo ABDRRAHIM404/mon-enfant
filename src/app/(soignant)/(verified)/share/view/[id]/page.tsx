@@ -1,3 +1,5 @@
+import { clinicianName } from "@/lib/clinical/attribution";
+import { readClinicalAttributions } from "@/lib/clinical/read-attribution";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
@@ -56,6 +58,20 @@ export default async function SharedBooklet({
     : booklet
       ? page * 30 < booklet.entry_total || page * 30 < booklet.appointment_total
       : false;
+  const attributions = await readClinicalAttributions(
+    supabase,
+    [
+      ...(vaccinations?.history.items.map((entry) => entry.professional_id) ??
+        []),
+      ...(vaccinations?.references.items.flatMap((item) => [
+        item.professional_id,
+        ...item.documented_entries.map((entry) => entry.professional_id),
+      ]) ?? []),
+      ...(booklet?.entries.map((entry) => entry.professional_id) ?? []),
+      ...(booklet?.appointments.map((item) => item.professional_id) ?? []),
+    ],
+    { share: id, page },
+  );
   return (
     <>
       <TemporaryView
@@ -84,7 +100,12 @@ export default async function SharedBooklet({
               <h2>Historique vaccinal partagé</h2>
               {vaccinations.history.items.length ? (
                 vaccinations.history.items.map((entry) => (
-                  <EntryCard entry={entry} key={entry.id} link={false} />
+                  <EntryCard
+                    entry={entry}
+                    key={entry.id}
+                    link={false}
+                    attributions={attributions}
+                  />
                 ))
               ) : (
                 <p>
@@ -122,12 +143,13 @@ export default async function SharedBooklet({
                     {item.version_label} · {catalogStatus[item.version_status]}{" "}
                     · Âge configuré : {ageLabel(item.age)} · Source :{" "}
                     {ageLabel(item.source_age)} · Décision de{" "}
-                    {item.professional_id}, révision {item.revision}
+                    {clinicianName(attributions, item.professional_id)},
+                    révision {item.revision}
                   </p>
                   {item.documented_entries.map((entry) => (
                     <p key={entry.id}>
                       {entry.occurred_on || "Date inconnue"} ·{" "}
-                      {entry.professional_id}
+                      {clinicianName(attributions, entry.professional_id)}
                     </p>
                   ))}
                 </article>
@@ -141,7 +163,12 @@ export default async function SharedBooklet({
               <h2>Soins partagés</h2>
               {booklet.entries.length ? (
                 booklet.entries.map((entry) => (
-                  <EntryCard key={entry.id} entry={entry} link={false} />
+                  <EntryCard
+                    key={entry.id}
+                    entry={entry}
+                    link={false}
+                    attributions={attributions}
+                  />
                 ))
               ) : (
                 <p>Aucun soin documenté sur cette page.</p>
@@ -181,7 +208,8 @@ export default async function SharedBooklet({
                       {appointmentStates[item.effective_state]}
                     </p>
                     <p>
-                      {item.facility_name} · {item.professional_id}
+                      {item.facility_name} ·{" "}
+                      {clinicianName(attributions, item.professional_id)}
                     </p>
                   </article>
                 ))

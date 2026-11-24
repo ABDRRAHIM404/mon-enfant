@@ -1,3 +1,5 @@
+import { clinicianName } from "@/lib/clinical/attribution";
+import { readClinicalAttributions } from "@/lib/clinical/read-attribution";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { randomUUID } from "node:crypto";
@@ -29,6 +31,11 @@ export default async function ItemHistory({
     latest = changes.at(-1),
     places = facilities.data as Facility[];
   if (!latest) notFound();
+  const attributions = await readClinicalAttributions(
+    supabase,
+    changes.map((change) => change.professional_id),
+    { children: [id] },
+  );
   return (
     <ClinicalWorkspace
       active="vaccinations"
@@ -54,8 +61,8 @@ export default async function ItemHistory({
           </h2>
           <p>{change.reason}</p>
           <p className="fine">
-            {change.professional_id} · lieu {change.facility_id} ·{" "}
-            {change.created_at}
+            {clinicianName(attributions, change.professional_id)} · lieu{" "}
+            {change.facility_id} · {change.created_at}
           </p>
         </article>
       ))}

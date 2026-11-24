@@ -1,3 +1,5 @@
+import { clinicianName } from "@/lib/clinical/attribution";
+import { readClinicalAttributions } from "@/lib/clinical/read-attribution";
 import Link from "next/link";
 import { EntryCard } from "@/components/clinical/entry-card";
 import type { ClinicalEntry } from "@/lib/clinical/types";
@@ -129,6 +131,16 @@ export default async function Vaccinations({
   const approved = versions.versions.filter(
     (v) => v.status === "approved" && v.review_verified,
   );
+  const attributions = await readClinicalAttributions(
+    supabase,
+    [
+      ...history.items.map((entry) => entry.professional_id),
+      ...data.items.flatMap((item) =>
+        item.documented_entries.map((entry) => entry.professional_id),
+      ),
+    ],
+    { children: [id] },
+  );
   return (
     <ClinicalWorkspace
       active="vaccinations"
@@ -200,7 +212,7 @@ export default async function Vaccinations({
           </p>
         )}
         {history.items.map((entry) => (
-          <EntryCard key={entry.id} entry={entry} />
+          <EntryCard key={entry.id} entry={entry} attributions={attributions} />
         ))}
         <nav className="pagination" aria-label="Historique vaccinal">
           {historyPage > 1 && (
@@ -246,7 +258,9 @@ export default async function Vaccinations({
                   className="text-link"
                   href={`/patients/${id}/records/${entry.root_id}`}
                 >
-                  {entry.occurred_on} · {entry.professional_id} — voir la saisie
+                  {entry.occurred_on} ·{" "}
+                  {clinicianName(attributions, entry.professional_id)} — voir la
+                  saisie
                 </Link>
               </p>
             ))}

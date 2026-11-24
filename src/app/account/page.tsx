@@ -4,7 +4,10 @@ import {
   AdminStatus,
 } from "@/components/verification/admin-nav";
 import Link from "next/link";
-import { DashboardHeading } from "@/components/dashboard/heading";
+import { ClinicianAccountWorkspace } from "@/components/clinician/account/workspace";
+import { registeredAccountName } from "@/lib/clinical/account-display-name";
+import { readClinicalAttributions } from "@/lib/clinical/read-attribution";
+import "./clinician-account.css";
 import { ClinicianShell } from "@/components/clinician/shell";
 import { ShieldCheck, Clock3 } from "lucide-react";
 import { Brand } from "@/components/brand";
@@ -89,75 +92,58 @@ export default async function Account() {
       </AdminShell>
     );
   }
-  const clinician = profile?.role === "doctor" || profile?.role === "nurse";
-  const AccountTitle = clinician ? "h2" : "h1";
-  const content = (
-    <section className="account-page">
-      {!clinician && (
+  if (profile?.role === "doctor" || profile?.role === "nurse") {
+    const verified = canAccessClinicalWorkspace(profile);
+    const [names, capabilityResult] = await Promise.all([
+      readClinicalAttributions(supabase, [user.id]),
+      verified ? supabase.rpc("my_clinical_capabilities") : null,
+    ]);
+    const name =
+      registeredAccountName(user.user_metadata) ?? names[user.id]?.name ?? null;
+    const capabilities =
+      capabilityResult &&
+      !capabilityResult.error &&
+      Array.isArray(capabilityResult.data)
+        ? (capabilityResult.data as string[])
+        : null;
+    return (
+      <ClinicianShell provisional={!verified} profile={profile}>
+        <ClinicianAccountWorkspace
+          profile={profile}
+          name={name}
+          email={user.email ?? null}
+          capabilities={capabilities}
+        />
+      </ClinicianShell>
+    );
+  }
+
+  return (
+    <main>
+      <section className="account-page">
         <header>
           <Brand />
           <form action={signOut}>
             <button className="button secondary">Se déconnecter</button>
           </form>
         </header>
-      )}
-      <section className="account-card">
-        <span className="round-icon">
-          <ShieldCheck />
-        </span>
-        <span className="eyebrow">
-          Espace soignant · Médecins et infirmier(e)s
-        </span>
-        <AccountTitle
-          id={
-            profile && ["doctor", "nurse"].includes(profile.role)
-              ? undefined
-              : "main-content"
-          }
-          tabIndex={-1}
-        >
-          Votre statut de vérification
-        </AccountTitle>
-        <p className="muted">
-          L’accès à l’espace clinique dépend de la validation de vos
-          qualifications et de vos autorisations.
-        </p>
-        {profile && ["doctor", "nurse"].includes(profile.role) && (
-          <section className="panel" id="soignant-settings">
-            <h2>Mon profil soignant</h2>
-            <dl className="details">
-              <div>
-                <dt>Adresse e-mail du compte</dt>
-                <dd>{user.email || "Non disponible"}</dd>
-              </div>
-              <div>
-                <dt>Métier déclaré</dt>
-                <dd>{profile.role === "nurse" ? "Infirmier(e)" : "Médecin"}</dd>
-              </div>
-              <div>
-                <dt>Identifiant professionnel de la plateforme</dt>
-                <dd>{profile.professional_id || "Non attribué"}</dd>
-              </div>
-            </dl>
-            <p>
-              La vérification professionnelle et les habilitations cliniques
-              sont examinées séparément.
-            </p>
-            <Link
-              className="text-link"
-              href="/forgot-password?audience=clinician"
-            >
-              Changer ou récupérer mon mot de passe
-            </Link>
-          </section>
-        )}
-        <p className="status">
-          <Clock3 size={16} />
-          {profile
-            ? statusLabels[profile.verification_status]
-            : "Activation nécessaire"}
-        </p>
-        {!profile ? (
+        <section className="account-card">
+          <span className="round-icon">
+            <ShieldCheck />
+          </span>
+          <span className="eyebrow">
+            Espace soignant · Médecins et infirmier(e)s
+          </span>
+          <h1 id="main-content" tabIndex={-1}>
+            Votre statut de vérification
+          </h1>
+          <p className="muted">
+            L’accès à l’espace clinique dépend de la validation de vos
+            qualifications et de vos autorisations.
+          </p>
+          <p className="status">
+            <Clock3 size={16} /> Activation nécessaire
+          </p>
           <form action={initializeProfile}>
             <label htmlFor="role">Votre métier</label>
             <select id="role" name="role" required>
@@ -168,78 +154,11 @@ export default async function Account() {
               Activer mon espace soignant
             </button>
           </form>
-        ) : canReview ? (
-          <Link className="button primary" href="/admin/verifications">
-            Ouvrir l’administration
-          </Link>
-        ) : canManageClinical ? (
-          <Link className="button primary" href="/admin/clinical-permissions">
-            Gérer les habilitations cliniques
-          </Link>
-        ) : canAccessClinicalWorkspace(profile) ? (
-          <Link className="button primary" href="/dashboard">
-            Ouvrir mon espace
-          </Link>
-        ) : ["doctor", "nurse"].includes(profile.role) &&
-          profile.verification_status !== "suspended" ? (
-          <Link className="button primary" href="/verification">
-            {profile.verification_status === "under_review"
-              ? "Suivre ma demande"
-              : "Soumettre mes justificatifs"}
-          </Link>
-        ) : (
-          <div className="notice">
-            Votre compte ne dispose actuellement d’aucun accès clinique.
-            Contactez un administrateur habilité pour toute question sur votre
-            statut.
-          </div>
-        )}
-        {canReview && canManageClinical && (
-          <p>
-            <Link className="text-link" href="/admin/clinical-permissions">
-              Gérer les habilitations cliniques
-            </Link>
+          <p className="fine">
+            Bêta de test · Données et documents fictifs uniquement
           </p>
-        )}
-        {canAccessClinicalWorkspace(profile) && (
-          <p>
-            <Link className="text-link" href="/account/clinical-permissions">
-              Mes habilitations cliniques
-            </Link>
-          </p>
-        )}
-        {profile &&
-          ["doctor", "nurse"].includes(profile.role) &&
-          ["unverified", "under_review", "approved"].includes(
-            profile.verification_status,
-          ) && (
-            <p>
-              <Link className="button secondary" href="/provisional">
-                Ouvrir mes dossiers provisoires
-              </Link>
-            </p>
-          )}
-        <p className="fine">
-          Bêta de test · Données et documents fictifs uniquement
-        </p>
+        </section>
       </section>
-    </section>
+    </main>
   );
-  if (clinician) {
-    return (
-      <ClinicianShell
-        provisional={!canAccessClinicalWorkspace(profile)}
-        profile={profile}
-      >
-        <DashboardHeading
-          title="Mon compte soignant"
-          description="Votre profil, votre sécurité et vos autorisations."
-          section="settings"
-          clinician
-        />
-        <div className="soignant-account-content">{content}</div>
-      </ClinicianShell>
-    );
-  }
-  return <main>{content}</main>;
 }

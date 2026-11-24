@@ -1,3 +1,4 @@
+import { readClinicalAttributions } from "@/lib/clinical/read-attribution";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
@@ -33,6 +34,14 @@ export default async function PatientAppointments({
   if (profile.error || appointments.error || caps.error)
     throw new Error("Impossible de charger les rendez-vous.");
   const data = appointments.data as AppointmentPage;
+  const attributions = await readClinicalAttributions(
+    supabase,
+    data.items.flatMap((row) => [
+      row.professional_id,
+      row.documentation?.professional_id,
+    ]),
+    { children: [id] },
+  );
   return (
     <ClinicalWorkspace
       active="appointments"
@@ -72,7 +81,11 @@ export default async function PatientAppointments({
       <LiveRefresh />
       <h2>Rendez-vous conservés</h2>
       {data.items.map((appointment) => (
-        <AppointmentCard key={appointment.id} appointment={appointment} />
+        <AppointmentCard
+          key={appointment.id}
+          appointment={appointment}
+          attributions={attributions}
+        />
       ))}
       {!data.items.length && (
         <p className="empty-state">

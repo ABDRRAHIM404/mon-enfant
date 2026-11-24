@@ -1,3 +1,5 @@
+import { clinicianName } from "@/lib/clinical/attribution";
+import { readClinicalAttributions } from "@/lib/clinical/read-attribution";
 import Link from "next/link";
 import { requireApprovedDoctor } from "@/lib/auth";
 import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
@@ -51,6 +53,15 @@ export default async function FollowUp({
   const data = response.data as { items: unknown[]; total: number };
   const href = (n: number) =>
     `/follow-up?${new URLSearchParams({ mode, bucket, page: String(n) })}`;
+  const items = data.items as (Reference | AppointmentPage["items"][number])[];
+  const attributions = await readClinicalAttributions(
+    supabase,
+    items.flatMap((item) => [
+      "professional_id" in item ? item.professional_id : null,
+      item.documentation?.professional_id,
+    ]),
+    { children: items.map((item) => item.child_id) },
+  );
   return (
     <ClinicalWorkspace active="tools">
       <div className="page-heading">
@@ -96,7 +107,11 @@ export default async function FollowUp({
       {mode === "appointments"
         ? (data.items as unknown as AppointmentPage["items"]).map(
             (appointment) => (
-              <AppointmentCard key={appointment.id} appointment={appointment} />
+              <AppointmentCard
+                key={appointment.id}
+                appointment={appointment}
+                attributions={attributions}
+              />
             ),
           )
         : (data.items as Reference[]).map((item) => (
@@ -121,8 +136,12 @@ export default async function FollowUp({
               )}
               {item.documentation && (
                 <p>
-                  Dose documentée par {item.documentation.professional_id} le{" "}
-                  {item.documentation.occurred_on}.
+                  Dose documentée par{" "}
+                  {clinicianName(
+                    attributions,
+                    item.documentation.professional_id,
+                  )}{" "}
+                  le {item.documentation.occurred_on}.
                 </p>
               )}
               <p className="fine">

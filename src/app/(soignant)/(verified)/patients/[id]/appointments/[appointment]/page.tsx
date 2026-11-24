@@ -1,3 +1,5 @@
+import { clinicianName } from "@/lib/clinical/attribution";
+import { readClinicalAttributions } from "@/lib/clinical/read-attribution";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { randomUUID } from "node:crypto";
@@ -40,6 +42,15 @@ export default async function History({
       "Impossible de charger l’historique complet du rendez-vous.",
     );
   const data = history.data as AppointmentHistory;
+  const attributions = await readClinicalAttributions(
+    supabase,
+    [
+      data.appointment.professional_id,
+      data.appointment.documentation?.professional_id,
+      ...data.events.map((event) => event.professional_id),
+    ],
+    { children: [id] },
+  );
   return (
     <ClinicalWorkspace
       active="appointments"
@@ -58,7 +69,11 @@ export default async function History({
         Rendez-vous de l’enfant
       </Link>
       <h2>Rendez-vous actuel</h2>
-      <AppointmentCard appointment={data.appointment} link={false} />
+      <AppointmentCard
+        appointment={data.appointment}
+        link={false}
+        attributions={attributions}
+      />
       {data.appointment.recommended_on && (
         <div className="notice">
           <p>
@@ -87,8 +102,8 @@ export default async function History({
           </p>
           <p>{event.reason}</p>
           <p className="fine">
-            {event.professional_id} · décision enregistrée le{" "}
-            {event.recorded_at}
+            {clinicianName(attributions, event.professional_id)} · décision
+            enregistrée le {event.recorded_at}
           </p>
         </article>
       ))}

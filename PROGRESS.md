@@ -1,5 +1,7 @@
 # Mon Enfant — Implementation progress
 
+> Mon compte soignant · 24 November 2026. Redesigned the clinician account and added editable display names, the existing password recovery action, and professional ID copy. Migration `20261124182847` provides authorized clinical attribution names while preserving audit identifiers. Scoped lint, type checks, 20 focused tests and a four-width isolated browser run passed.
+
 > Scanner un QR partagé · 24 November 2026. Redesigned the scanner content for desktop and mobile. User-initiated camera capture, local image decoding and manual redemption preserve the existing server authorization and registration destinations. Scoped lint, 36 focused tests, and four-width Chromium verification with fictional records passed.
 
 > Croissance · 23 November 2026. Redesigned the clinician page with an inline form using the existing guarded clinical action, three interactive raw-measurement charts, and responsive history and correction links. Visual and workflow checks passed on four viewport widths with isolated fictional records, plus 16 focused clinical tests and scoped lint. No schema changes.

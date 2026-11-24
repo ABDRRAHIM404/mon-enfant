@@ -289,7 +289,7 @@ export function ClinicalForm({
                   {conflict.vaccine_label} ·{" "}
                   {conflict.dose_label || "Dose inconnue"} ·{" "}
                   {conflict.occurred_on || "Date inconnue"} ·{" "}
-                  {conflict.professional_id}
+                  {conflict.authorLabel}
                 </Link>
                 <span className="fine"> — révision {conflict.id}</span>
               </li>

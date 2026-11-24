@@ -1,3 +1,5 @@
+import { clinicianName } from "@/lib/clinical/attribution";
+import { readClinicalAttributions } from "@/lib/clinical/read-attribution";
 import Link from "next/link";
 import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
@@ -43,6 +45,14 @@ export default async function VaccineVersion({
   };
   const selected = v.rules.find((r) => r.dose_code === query.dose);
   const formProps = { versionId: id, revision: v.revision };
+  const attributions =
+    profile?.role !== "admin"
+      ? await readClinicalAttributions(
+          supabase,
+          [v.reviewed_by, ...history.map((change) => change.actor_id)],
+          { catalog: id },
+        )
+      : null;
   return (
     <CatalogWorkspace profile={profile}>
       <div className="page-heading">
@@ -71,8 +81,11 @@ export default async function VaccineVersion({
         </p>
         {v.reviewed_by && (
           <p>
-            Revue : {v.reviewed_by} · {v.reviewed_at} · source contrôlée :{" "}
-            {v.review_reference}
+            Revue :{" "}
+            {attributions
+              ? clinicianName(attributions, v.reviewed_by)
+              : v.reviewed_by}{" "}
+            · {v.reviewed_at} · source contrôlée : {v.review_reference}
           </p>
         )}
         <p className="fine source-json">
@@ -170,7 +183,10 @@ export default async function VaccineVersion({
                 <p>{h.reason}</p>
                 <p>Source contrôlée : {h.evidence_reference}</p>
                 <p className="fine">
-                  Acteur {h.actor_id} · {h.created_at}
+                  {attributions
+                    ? clinicianName(attributions, h.actor_id)
+                    : `Acteur ${h.actor_id}`}{" "}
+                  · {h.created_at}
                 </p>
                 <details>
                   <summary>Règles conservées à cette révision</summary>
