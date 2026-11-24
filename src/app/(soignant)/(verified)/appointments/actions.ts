@@ -195,8 +195,12 @@ export async function confirmRoutineAppointment(
     "/follow-up",
     "/dashboard",
     "/vaccinations",
+    `/patients/${child}`,
     `/patients/${child}/appointments`,
+    `/patients/${child}/summary`,
   ])
     revalidatePath(path);
+  if (field("returnTo") === "child")
+    return redirect(`/patients/${child}/appointments?saved=1`);
   return redirect(`/appointments?date=${date}&view=day&saved=1`);
 }

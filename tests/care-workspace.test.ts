@@ -73,7 +73,7 @@ describe("child workflows and visible capability boundaries", () => {
   });
   it("keeps every child section in the same child scope and hides access management when unavailable", () => {
     const html = renderToStaticMarkup(
-      PatientNavigation({ childId: child.id, active: "growth" }),
+      createElement(PatientNavigation, { childId: child.id, active: "growth" }),
     );
     expect(html).toContain(`/patients/${child.id}/vaccinations`);
     expect(html).toContain(`/patients/${child.id}/appointments`);
@@ -81,7 +81,7 @@ describe("child workflows and visible capability boundaries", () => {
     expect((html.match(/aria-current="page"/g) ?? []).length).toBe(1);
     expect(
       renderToStaticMarkup(
-        PatientNavigation({
+        createElement(PatientNavigation, {
           childId: child.id,
           active: "guardians",
           canManageAccess: true,

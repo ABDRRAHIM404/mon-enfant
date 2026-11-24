@@ -1,4 +1,11 @@
-import Link from "next/link";
+import { ChevronDown } from "lucide-react";
+import {
+  ChildPageHeading,
+  ChildPanel,
+  ChildStatus,
+} from "@/components/clinician/patient-profile";
+import { ConfirmChildAction } from "@/components/clinician/confirm-child-action";
+import { appointmentTime } from "@/lib/appointments/calendar";
 import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
@@ -51,104 +58,202 @@ export default async function Guardians({
   if (error?.code === "42501") notFound();
   if (error) throw new Error("Impossible de charger les responsables.");
   const view = data as Overview;
-  const expiresOn = view.default_expires_on;
+  const now = Date.parse(view.generated_at);
+  const pending = view.claims.filter((claim) => claim.state === "pending");
+  const reviewed = view.claims.filter((claim) => claim.state !== "pending");
+  const relationship: Record<string, string> = {
+    mother: "Mère",
+    father: "Père",
+    legal_guardian: "Représentant légal",
+    other: "Autre responsable",
+  };
   return (
     <ClinicalWorkspace active="children" childId={id} section="guardians">
-      <section className="page-heading">
-        <Link href={`/patients/${id}`}>← Dossier enfant</Link>
-        <h1 id="main-content" tabIndex={-1}>
-          Parents et responsables
-        </h1>
-        <p>
-          Une invitation ne remplace pas la vérification d’identité et
-          d’autorité parentale. Les accès au carnet sont distincts des
-          autorisations des professionnels.
-        </p>
-      </section>
-      <section className="panel">
-        <h2>Inviter un responsable</h2>
-        <GuardianInviteForm childId={id} />
-      </section>
-      <section className="panel">
-        <h2>Demandes à vérifier</h2>
-        {view.claims.filter((c) => c.state === "pending").length === 0 ? (
-          <p>Aucune demande en attente.</p>
+      <ChildPageHeading
+        title="Accès des parents"
+        description="Vérifiez les demandes et gérez les droits des responsables."
+      />
+      <p className="notice">
+        Vérifiez l’identité et l’autorité parentale avant d’accorder le carnet.
+        Un contact déclaré, un numéro de téléphone ou une invitation ne suffit
+        pas.
+      </p>
+      <div className="child-grid child-guardian-grid">
+        <ChildPanel title="Accès des responsables">
+          {view.links.length ? (
+            <ul className="child-list">
+              {view.links.map((g) => {
+                const active = !g.revoked_at && Date.parse(g.expires_at) > now;
+                return (
+                  <li key={g.id}>
+                    <h3>{g.display_name}</h3>
+                    <ChildStatus tone={active ? "green" : "neutral"}>
+                      {g.revoked_at
+                        ? "Révoqué"
+                        : active
+                          ? "Autorisé"
+                          : "Expiré"}
+                    </ChildStatus>
+                    <p>
+                      {relationship[g.relationship] ?? g.relationship} ·
+                      Échéance {appointmentTime(g.expires_at)}
+                    </p>
+                    {active && (
+                      <p>
+                        {g.can_export
+                          ? "Consultation et téléchargement du carnet"
+                          : "Consultation du carnet"}
+                      </p>
+                    )}
+                    {!g.revoked_at && (
+                      <details className="child-expander">
+                        <summary>
+                          Retirer l’accès{" "}
+                          <ChevronDown size={17} aria-hidden="true" />
+                        </summary>
+                        <div className="child-expander-body">
+                          <ConfirmChildAction
+                            title="Retirer l’accès au carnet ?"
+                            description="Le responsable perdra l’accès à ce carnet. Le motif restera dans l’historique."
+                            confirmLabel="Confirmer le retrait"
+                          >
+                            <GuardianRevokeForm
+                              id={g.id}
+                              childId={id}
+                              kind="link"
+                            />
+                          </ConfirmChildAction>
+                        </div>
+                      </details>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <p className="empty-state">Aucun responsable lié à ce carnet.</p>
+          )}
+        </ChildPanel>
+        <ChildPanel title="Inviter un responsable">
+          <GuardianInviteForm childId={id} />
+        </ChildPanel>
+      </div>
+      <ChildPanel
+        title={`Demandes à vérifier (${pending.length})`}
+        className="child-panel-spaced"
+      >
+        {pending.length ? (
+          <div className="child-record-list">
+            {pending.map((c) => (
+              <details className="child-subcard child-expander" key={c.id}>
+                <summary>
+                  <strong>{c.display_name}</strong>
+                  <ChildStatus tone="amber">En attente</ChildStatus>
+                  <ChevronDown size={17} aria-hidden="true" />
+                </summary>
+                <div className="child-expander-body">
+                  <p>
+                    {c.email} · Lien déclaré :{" "}
+                    {relationship[c.declared_relationship] ??
+                      c.declared_relationship}
+                  </p>
+                  <ConfirmChildAction
+                    title="Enregistrer la décision ?"
+                    description="La décision et son motif seront conservés. Une approbation accorde les droits sélectionnés pour ce carnet."
+                    confirmLabel="Confirmer la décision"
+                  >
+                    <GuardianReviewForm
+                      claimId={c.id}
+                      revision={c.revision}
+                      childId={id}
+                      operationId={randomUUID()}
+                      expiresOn={view.default_expires_on}
+                    />
+                  </ConfirmChildAction>
+                </div>
+              </details>
+            ))}
+          </div>
         ) : (
-          view.claims
-            .filter((c) => c.state === "pending")
-            .map((c) => (
-              <article className="record-list" key={c.id}>
-                <h3>{c.display_name}</h3>
-                <p>
-                  {c.email} · lien déclaré : {c.declared_relationship}
-                </p>
-                <GuardianReviewForm
-                  claimId={c.id}
-                  revision={c.revision}
-                  childId={id}
-                  operationId={randomUUID()}
-                  expiresOn={expiresOn}
-                />
-              </article>
-            ))
+          <p className="empty-state">Aucune demande en attente.</p>
         )}
-      </section>
-      <section className="panel">
-        <h2>Accès des responsables</h2>
-        {view.links.length === 0 ? (
-          <p>Aucun responsable lié à ce carnet.</p>
+      </ChildPanel>
+      <ChildPanel title="Invitations et historique">
+        {view.invitations.length ? (
+          <ul className="child-list">
+            {view.invitations.map((i) => {
+              const active =
+                !i.revoked_at &&
+                !i.consumed_at &&
+                Date.parse(i.expires_at) > now;
+              return (
+                <li key={i.id}>
+                  <h3>{i.recipient_email}</h3>
+                  <ChildStatus tone={active ? "amber" : "neutral"}>
+                    {i.revoked_at
+                      ? "Annulée"
+                      : i.consumed_at
+                        ? "Utilisée pour une demande"
+                        : active
+                          ? "En attente"
+                          : "Expirée"}
+                  </ChildStatus>
+                  <p>Échéance {appointmentTime(i.expires_at)}</p>
+                  {!i.revoked_at && !i.consumed_at && (
+                    <details className="child-expander">
+                      <summary>
+                        Annuler l’invitation{" "}
+                        <ChevronDown size={17} aria-hidden="true" />
+                      </summary>
+                      <div className="child-expander-body">
+                        <ConfirmChildAction
+                          title="Annuler cette invitation ?"
+                          description="Le lien personnel ne pourra plus servir à déposer une demande."
+                          confirmLabel="Confirmer l’annulation"
+                        >
+                          <GuardianRevokeForm
+                            id={i.id}
+                            childId={id}
+                            kind="invitation"
+                          />
+                        </ConfirmChildAction>
+                      </div>
+                    </details>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
         ) : (
-          view.links.map((g) => (
-            <article className="record-list" key={g.id}>
-              <h3>{g.display_name}</h3>
-              <p>
-                {g.relationship} · jusqu’au{" "}
-                {new Date(g.expires_at).toLocaleDateString("fr-MA", {
-                  timeZone: "Africa/Casablanca",
-                })}{" "}
-                ·{" "}
-                {g.revoked_at
-                  ? "retiré"
-                  : g.can_export
-                    ? "consultation et export"
-                    : "consultation"}
-              </p>
-              {!g.revoked_at ? (
-                <GuardianRevokeForm id={g.id} childId={id} kind="link" />
-              ) : null}
-            </article>
-          ))
+          <p className="empty-state">Aucune invitation.</p>
         )}
-      </section>
-      <section className="panel">
-        <h2>Invitations et historique</h2>
-        {view.invitations.length === 0 ? (
-          <p>Aucune invitation.</p>
-        ) : (
-          view.invitations.map((i) => (
-            <article className="record-list" key={i.id}>
-              <h3>{i.recipient_email}</h3>
-              <p>
-                {i.revoked_at
-                  ? "Annulée"
-                  : i.consumed_at
-                    ? "Utilisée pour une demande"
-                    : new Date(i.expires_at).getTime() <=
-                        new Date(view.generated_at).getTime()
-                      ? "Expirée"
-                      : "En attente"}{" "}
-                · valable jusqu’au{" "}
-                {new Date(i.expires_at).toLocaleString("fr-MA", {
-                  timeZone: "Africa/Casablanca",
-                })}
-              </p>
-              {!i.revoked_at && !i.consumed_at ? (
-                <GuardianRevokeForm id={i.id} childId={id} kind="invitation" />
-              ) : null}
-            </article>
-          ))
+        {reviewed.length > 0 && (
+          <details className="child-subcard child-expander child-panel-spaced">
+            <summary>
+              Demandes traitées ({reviewed.length}){" "}
+              <ChevronDown size={17} aria-hidden="true" />
+            </summary>
+            <div className="child-expander-body">
+              <ul className="child-list">
+                {reviewed.map((claim) => (
+                  <li key={claim.id}>
+                    <strong>{claim.display_name}</strong>{" "}
+                    <ChildStatus
+                      tone={claim.state === "approved" ? "green" : "neutral"}
+                    >
+                      {claim.state === "approved"
+                        ? "Approuvée"
+                        : claim.state === "rejected"
+                          ? "Refusée"
+                          : "Annulée"}
+                    </ChildStatus>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </details>
         )}
-      </section>
+      </ChildPanel>
     </ClinicalWorkspace>
   );
 }

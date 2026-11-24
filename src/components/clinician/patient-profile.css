@@ -1,0 +1,514 @@
+.child-profile {
+  --child-border: #d4e5eb;
+  --child-green: #00684c;
+  --child-mint: #def6ec;
+  --child-shadow: 0 3px 6px #16455614, 0 8px 22px #24637b12;
+  min-width: 0;
+}
+.child-profile .care-breadcrumb {
+  margin-bottom: 5px;
+}
+.child-profile .care-child-context {
+  background: #fff;
+  padding: 12px 17px;
+  box-shadow: var(--child-shadow);
+  border-color: var(--child-border);
+  border-inline-start: 4px solid #3cb371;
+}
+.child-profile .care-child-context strong {
+  font-size: clamp(1.07rem, 1.7vw, 1.3rem);
+  font-weight: 750;
+}
+.child-profile .care-child-context .care-context-label {
+  display: inline-flex;
+  color: var(--child-green);
+  background: var(--child-mint);
+  padding: 5px 9px;
+  border-radius: 8px;
+}
+.child-profile .care-patient-nav {
+  display: flex;
+  position: relative;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  max-width: 100%;
+  gap: 4px;
+  padding: 6px;
+  box-shadow: var(--child-shadow);
+  margin-bottom: 15px;
+}
+.child-profile .care-patient-nav > a {
+  flex: 1 0 auto;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 9px;
+  min-height: 44px;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: #233944;
+  transition:
+    background-color 200ms,
+    color 200ms,
+    transform 200ms;
+}
+.child-tab-icon {
+  color: var(--child-green);
+  flex: none;
+}
+.child-profile .care-patient-nav > a[aria-current="page"] {
+  color: var(--child-green);
+  background: var(--child-mint);
+  box-shadow: inset 0 -2px var(--child-green);
+  font-weight: 750;
+}
+.child-profile .care-patient-nav > a:hover {
+  background: #edf9f4;
+  color: var(--child-green);
+}
+.child-profile .care-patient-nav > a:active {
+  transform: translateY(1px);
+}
+.child-profile .care-patient-nav a:focus-visible {
+  outline-offset: -3px;
+}
+
+.child-page-heading {
+  display: flex;
+  gap: 12px 20px;
+  align-items: end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin: 18px 0 14px;
+  padding-inline-start: 13px;
+  border-inline-start: 3px solid var(--child-green);
+}
+.child-page-heading h1 {
+  font-size: clamp(1.55rem, 3vw, 2.25rem);
+  line-height: 1.12;
+  color: #111;
+  margin: 0;
+}
+.child-page-heading p {
+  color: #344f5d;
+  margin: 4px 0 0;
+}
+.child-page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.child-profile .child-button {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-weight: 680;
+  transition:
+    transform 200ms,
+    box-shadow 200ms,
+    background-color 200ms;
+}
+.child-profile .child-spotlight {
+  background: #e97872;
+  color: #2d1010;
+  border-color: #dd736b;
+}
+.child-profile .child-spotlight:hover {
+  background: #f5938a;
+}
+.child-profile
+  :is(.child-button, .care-action-card:not(.is-unavailable)):hover {
+  transform: translateY(-3px);
+  box-shadow: var(--child-shadow);
+}
+.child-profile
+  :is(.child-button, .care-action-card:not(.is-unavailable)):active {
+  transform: translateY(1px);
+}
+.child-profile
+  :is(
+    .child-button,
+    .child-expander > summary,
+    .care-action-card
+  ):focus-visible {
+  outline: 2px solid #007658;
+  outline-offset: 2px;
+}
+.child-panel {
+  background: white;
+  border: 1px solid var(--child-border);
+  border-radius: 16px;
+  box-shadow: var(--child-shadow);
+  min-width: 0;
+  padding: clamp(12px, 1.5vw, 20px);
+  margin: 0 0 12px;
+  overflow-wrap: anywhere;
+}
+.child-panel h2 {
+  font-size: clamp(1.07rem, 1.6vw, 1.25rem);
+  color: #111;
+  margin: 0 0 9px;
+}
+.child-panel h3 {
+  color: #111;
+  margin: 0;
+}
+.child-panel p:last-child {
+  margin-bottom: 0;
+}
+.child-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+.child-grid > .child-panel {
+  margin: 0;
+  height: 100%;
+}
+.child-vitals {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 12px;
+}
+.child-vitals span,
+.child-summary-note {
+  color: #3e5764;
+}
+.child-vitals strong {
+  display: block;
+  color: #102620;
+  font-size: 1.05rem;
+}
+.child-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.child-list > li,
+.child-subcard {
+  border-radius: 11px;
+  border: 1px solid var(--child-border);
+  padding: 10px 12px;
+}
+.child-list p,
+.child-subcard p {
+  margin: 4px 0;
+}
+.child-status {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 50px;
+  font-size: 0.77rem;
+  font-weight: 720;
+  color: #374952;
+  background: #eaf0f3;
+}
+.child-status--green {
+  color: #075c3b;
+  background: #dbf6e8;
+}
+.child-status--amber {
+  color: #714000;
+  background: #fff0cc;
+}
+.child-status--red {
+  color: #a21e2b;
+  background: #fde6e8;
+}
+.child-expander {
+  padding: 0;
+  overflow-wrap: anywhere;
+}
+.child-expander > summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 46px;
+  padding: 9px 13px;
+  cursor: pointer;
+  border-radius: inherit;
+  transition: background-color 200ms;
+}
+.child-expander > summary::-webkit-details-marker {
+  display: none;
+}
+.child-expander > summary:hover,
+.child-expander[open] > summary {
+  background: #edf9f4;
+}
+.child-expander > summary:active {
+  background: #d9f4e7;
+}
+.child-expander > summary > svg:last-child {
+  margin-inline-start: auto;
+  flex: none;
+  transition: transform 200ms;
+}
+.child-expander[open] > summary > svg:last-child {
+  transform: rotate(180deg);
+}
+.child-expander .child-expander-body {
+  padding: 12px;
+}
+.child-expander .clinical-entry {
+  margin: 0;
+  box-shadow: none;
+  border: 0;
+  padding: 3px;
+}
+.child-profile .care-actions-panel {
+  padding: 12px;
+}
+.child-profile .care-action-grid {
+  gap: 8px;
+}
+.child-profile .care-action-card {
+  min-height: 84px;
+  padding: 10px 34px 10px 10px;
+  position: relative;
+  transition:
+    transform 200ms,
+    box-shadow 200ms,
+    background-color 200ms;
+}
+.child-profile .care-action-card .care-action-open {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  width: 18px;
+  height: 18px;
+  color: var(--child-green);
+  transform: translateY(-50%);
+}
+.child-profile .care-action-card:hover .care-action-open {
+  transform: translate(2px, -50%);
+}
+.child-identity-qr {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.child-identity-qr svg {
+  width: 115px;
+  height: 115px;
+}
+.child-identity-qr p {
+  flex: 1 1 170px;
+  margin: 0;
+}
+.child-record-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.child-record-filter .button {
+  min-height: 44px;
+}
+.child-record-list {
+  display: grid;
+  gap: 8px;
+  margin-block: 12px;
+}
+.child-record-list .child-panel {
+  margin: 0;
+}
+.child-record-heading {
+  flex: 1;
+  display: grid;
+}
+.child-record-heading small {
+  font-weight: 400;
+  color: #3e5764;
+}
+.child-proposal .routine-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.child-proposal .routine-form {
+  margin: 10px 0 0;
+}
+.child-proposal .routine-form[hidden] {
+  display: none;
+}
+.child-proposal .rdv-action {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--child-border);
+  padding: 8px 12px;
+  border-radius: 9px;
+  cursor: pointer;
+  background: #fff;
+  color: #263f4b;
+}
+.child-proposal .rdv-primary {
+  background: var(--child-green);
+  color: #fff;
+}
+.child-proposal .rdv-coral {
+  background: #fff2f0;
+  color: #872f2a;
+  border-color: #e9a6a0;
+}
+.child-proposal .routine-times {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.child-proposal .routine-form fieldset {
+  display: grid;
+  gap: 8px;
+}
+.child-proposal .routine-form :is(input, select, textarea) {
+  max-width: 100%;
+}
+.child-profile .child-appointment-card {
+  margin: 0;
+}
+.child-sensitive-dialog {
+  width: min(calc(100% - 28px), 420px);
+  color: #111;
+  background: white;
+  border: 1px solid var(--child-border);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: var(--child-shadow);
+}
+.child-sensitive-dialog::backdrop {
+  background: #12293680;
+}
+.child-sensitive-dialog h2 {
+  margin-top: 0;
+}
+.child-print-entry {
+  border-inline-start: 2px solid #c5ebe0;
+  padding-inline-start: 12px;
+  margin-block: 12px;
+}
+@media (max-width: 680px) {
+  .child-grid:not(.child-vitals) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .child-profile .care-child-context {
+    padding: 8px 9px;
+  }
+  .child-profile .care-context-label {
+    display: inline-flex;
+    font-size: 0.7rem;
+    max-width: 105px;
+    gap: 4px;
+  }
+  .child-profile .care-patient-nav > a {
+    min-height: 44px;
+    font-size: 0.78rem;
+  }
+  .child-vitals {
+    gap: 6px;
+  }
+  .child-vitals .child-panel {
+    padding: 8px;
+    font-size: 0.78rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .child-profile :is(a, button, summary, svg) {
+    transition-duration: 0s;
+  }
+  .child-profile :is(.child-button, .care-action-card):hover {
+    transform: none;
+  }
+}
+@page child-medical-summary {
+  size: A4;
+  margin: 14mm;
+}
+@media print {
+  .soignant-main:has(.child-profile.print-summary) > .soignant-development {
+    display: none;
+  }
+  .child-profile.print-summary {
+    page: child-medical-summary;
+    font-size: 10pt;
+    line-height: 1.3;
+  }
+  .child-profile.print-summary .child-panel {
+    box-shadow: none;
+    border: 0;
+    padding: 0;
+    margin: 8pt 0;
+  }
+  .child-profile.print-summary .child-page-heading {
+    border: 0;
+    padding: 0;
+    margin: 0 0 9pt;
+  }
+  .child-profile.print-summary :is(h1, h2, h3) {
+    break-after: avoid;
+  }
+  .child-profile.print-summary :is(.child-print-entry, .clinical-entry, li) {
+    break-inside: avoid;
+  }
+  .child-profile.print-summary .clinical-entry {
+    box-shadow: none;
+    margin: 5pt 0;
+    padding: 4pt 0;
+    border: none;
+  }
+  .child-profile.print-summary :is(h2, h3, p) {
+    margin-block: 3pt;
+  }
+  .child-profile.print-summary .details {
+    margin: 4pt 0;
+  }
+  .child-profile.print-summary .details :is(dt, dd) {
+    margin-block: 1pt;
+    font-size: inherit;
+  }
+  .child-profile.print-summary :is(.details, .clinical-text, li) {
+    overflow-wrap: anywhere;
+  }
+  .child-profile.print-summary a[href] {
+    display: none;
+  }
+}
+.child-panel-spaced {
+  margin-top: 12px;
+}
+.child-profile .child-grid + .care-actions-panel {
+  margin-top: 12px;
+}
+.child-proposal + .child-proposal {
+  margin-top: 8px;
+}
+.child-profile .child-growth-chart .growth-chart-panel {
+  background: #fff;
+  border: 1px solid var(--child-border);
+  border-radius: 16px;
+  box-shadow: var(--child-shadow);
+  padding: clamp(12px, 1.5vw, 20px);
+}
+.child-profile .child-growth-chart .growth-chart-controls {
+  margin-bottom: 12px;
+}
+.child-profile .child-grid .auth-form {
+  max-width: 100%;
+}
+.child-profile .child-print-entry > .panel {
+  box-shadow: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}

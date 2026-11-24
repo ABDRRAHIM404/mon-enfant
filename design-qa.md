@@ -1,3 +1,13 @@
+# Child record pages · 24 November 2026
+
+Final result: passed for the six redesigned child-profile pages and the shared child tab bar.
+
+Reviewed each page at desktop, tablet and phone widths from 1440 to 320 CSS pixels, against the existing clinician workspace. The active child tab stays visible, including on the booklet tab. The shared clinician shell and vaccination booklet content were preserved.
+
+An isolated Chromium run checked care links and scoped filters, chart metric controls, the existing booking form with a revised date and a reload, guardian invitation and decision confirmations, cancellation, revocation and read-only access. JSON attachment wiring was checked with a fixture response. The A4 PDF preserved the summary across two pages, excluded tabs and controls, and had no footer-only page. Isolated PostgreSQL tests separately checked persisted guardian decisions, appointment synchronization and access denials.
+
+---
+
 # Digital vaccination booklet design comparison · 24 November 2026
 
 Final result: passed for the child-record vaccination booklet.

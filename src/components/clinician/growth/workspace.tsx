@@ -106,7 +106,7 @@ function Pagination({
   );
 }
 
-function MeasurementRows({
+export function MeasurementRows({
   child,
   entries,
   canCorrect,

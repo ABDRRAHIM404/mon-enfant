@@ -1,8 +1,13 @@
 "use client";
-export function PrintButton() {
+export function PrintButton({ prominent = false }: { prominent?: boolean }) {
   return (
     <button
-      className="button secondary no-print"
+      type="button"
+      className={
+        prominent
+          ? "button primary child-button child-spotlight no-print"
+          : "button secondary no-print"
+      }
       onClick={() => window.print()}
     >
       Imprimer / enregistrer en PDF

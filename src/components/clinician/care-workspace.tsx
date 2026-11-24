@@ -1,3 +1,4 @@
+import "./patient-profile.css";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -14,12 +15,11 @@ import { ChildAvatar } from "./child-avatar";
 import { ClinicianSectionOverride } from "./navigation-state";
 import type { ClinicianSection } from "./routes";
 import { requireApprovedDoctor } from "@/lib/auth";
-import {
-  patientName,
-  birthLabel,
-  type ChildProfile,
-} from "@/lib/registry/types";
-import { NavigationFeedback } from "@/components/workspace-navigation";
+import { patientName, type ChildProfile } from "@/lib/registry/types";
+import { PatientNavigation } from "./patient-profile-tabs";
+export { PatientNavigation } from "./patient-profile-tabs";
+import { bookletAge, bookletDate } from "@/lib/vaccines/booklet";
+import { todayCasablanca } from "@/lib/appointments/calendar";
 
 export type PatientSection =
   | "overview"
@@ -29,45 +29,6 @@ export type PatientSection =
   | "growth"
   | "guardians"
   | "summary";
-export function PatientNavigation({
-  childId,
-  active,
-  canManageAccess = false,
-}: {
-  childId: string;
-  active: PatientSection;
-  canManageAccess?: boolean;
-}) {
-  const items = [
-    { key: "overview", label: "Vue d’ensemble", suffix: "" },
-    { key: "records", label: "Dossier clinique", suffix: "/records" },
-    { key: "vaccinations", label: "Vaccinations", suffix: "/vaccinations" },
-    { key: "appointments", label: "Rendez-vous", suffix: "/appointments" },
-    { key: "growth", label: "Croissance", suffix: "/growth" },
-    ...(canManageAccess
-      ? [{ key: "guardians", label: "Accès des parents", suffix: "/guardians" }]
-      : []),
-    { key: "summary", label: "Résumé et impression", suffix: "/summary" },
-  ];
-  return (
-    <nav
-      className="care-patient-nav no-print"
-      aria-label="Rubriques du dossier enfant"
-    >
-      {items.map((item) => (
-        <Link
-          key={item.key}
-          href={`/patients/${childId}${item.suffix}`}
-          aria-current={active === item.key ? "page" : undefined}
-        >
-          {item.label}
-          <NavigationFeedback />
-        </Link>
-      ))}
-    </nav>
-  );
-}
-
 export async function ClinicalWorkspace({
   active = "children",
   childId,
@@ -97,10 +58,17 @@ export async function ClinicalWorkspace({
       throw Error("Impossible de confirmer le dossier de l’enfant.");
     context = result.data as ChildProfile;
   }
+  const birth = context?.birth_date;
+  const age =
+    birth && context?.birth_date_precision === "exact"
+      ? bookletAge(birth, todayCasablanca())
+      : null;
   return (
     <>
       {section === "records" && <ClinicianSectionOverride section={active} />}
-      <div className={`care-workflow${print ? " print-summary" : ""}`}>
+      <div
+        className={`care-workflow${childId && context ? " child-profile" : ""}${print ? " print-summary" : ""}`}
+      >
         {childId && context && (
           <>
             <nav className="care-breadcrumb no-print" aria-label="Fil d’Ariane">
@@ -108,12 +76,25 @@ export async function ClinicalWorkspace({
               <ChevronRight size={14} aria-hidden="true" />
               <Link href={`/patients/${childId}`}>Dossier enfant</Link>
             </nav>
-            <div className="care-child-context">
+            <div className="care-child-context no-print">
               <ChildAvatar sex={context.sex} />
               <div>
                 <strong>{patientName(context)}</strong>
                 <span>
-                  {childContextDetails ?? birthLabel(context)}
+                  {childContextDetails ??
+                    (birth ? (
+                      <>
+                        Né(e) le{" "}
+                        <time dateTime={birth}>{bookletDate(birth)}</time>
+                        {age
+                          ? ` · ${age}`
+                          : context.birth_date_precision === "estimated"
+                            ? " · Date estimée"
+                            : ""}
+                      </>
+                    ) : (
+                      "Date de naissance inconnue"
+                    ))}
                   {context.name_status === "provisional"
                     ? " · Identité provisoire"
                     : ""}
@@ -213,7 +194,11 @@ export function ChildCareActions({
               <Icon size={23} aria-hidden="true" />
               <strong>{title}</strong>
               <span>{description}</span>
-              <span className="care-action-open">Ouvrir le formulaire →</span>
+              <ChevronRight
+                className="care-action-open"
+                aria-hidden="true"
+                size={18}
+              />
             </Link>
           ) : (
             <div className="care-action-card is-unavailable" key={kind}>

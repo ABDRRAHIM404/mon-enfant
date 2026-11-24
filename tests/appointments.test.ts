@@ -207,6 +207,7 @@ beforeAll(async () => {
     "20261121183740_routine_appointment_proposals.sql",
     "20261121190310_appointment_workspace_filters.sql",
     "20261124192109_vaccination_booklet_reviews.sql",
+    "20261124195146_patient_routine_appointment_proposals.sql",
   ])
     await db.exec(readFileSync(`supabase/migrations/${file}`, "utf8"));
   editor = await actor("admin");
@@ -367,7 +368,24 @@ describe("automatic routine offers and grouped booking", () => {
         state,
       ]);
     };
+    const scoped = (id = child, who = a, page = 1) =>
+      rpc<Proposals>(who, "patient_routine_appointment_proposals", [id, page]);
+    const otherChild = (await setup(today)).child;
+    await expect(scoped(otherChild)).rejects.toMatchObject({ code: "42501" });
+    await expect(scoped(child, outsider)).rejects.toMatchObject({
+      code: "42501",
+    });
+    await expect(scoped(child, unverified)).rejects.toMatchObject({
+      code: "42501",
+    });
+    await expect(scoped(child, a, 0)).rejects.toMatchObject({ code: "22023" });
     const first = await fetch();
+    expect(await scoped()).toEqual(first);
+    expect(
+      (await scoped(child, a, 2)).items.every(
+        (group) => group.child_id === child,
+      ),
+    ).toBe(true);
     expect(first).toEqual(await fetch());
     expect(first).toMatchObject({ version, preview: false });
     const offer = first.items.find((entry) =>
@@ -457,6 +475,12 @@ describe("automatic routine offers and grouped booking", () => {
         (entry) => entry.recommended_on === offer.recommended_on,
       ),
     ).toBeUndefined();
+    expect(await scoped()).toEqual(await fetch());
+    expect(
+      (await scoped()).items.some(
+        (row) => row.recommended_on === offer.recommended_on,
+      ),
+    ).toBe(false);
     const detail = await rpc<History>(a, "appointment_history", [
       child,
       appointment,

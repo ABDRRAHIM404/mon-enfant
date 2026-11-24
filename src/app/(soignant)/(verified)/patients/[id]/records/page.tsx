@@ -1,3 +1,10 @@
+import { ChevronDown, ClipboardList } from "lucide-react";
+import {
+  ChildPageHeading,
+  ChildPanel,
+  ChildStatus,
+} from "@/components/clinician/patient-profile";
+import { bookletDate } from "@/lib/vaccines/booklet";
 import { readClinicalAttributions } from "@/lib/clinical/read-attribution";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -10,6 +17,7 @@ import { EntryCard } from "@/components/clinical/entry-card";
 import {
   clinicalKinds,
   clinicalLabels,
+  clinicalValueLabels,
   type ClinicalEntry,
   type ClinicalKind,
 } from "@/lib/clinical/types";
@@ -66,19 +74,24 @@ export default async function Records({
       childId={id}
       section="records"
     >
-      <div className="page-heading">
-        <h1 id="main-content" tabIndex={-1}>
-          Dossier clinique
-        </h1>
-        <p className="muted">
-          Dernière révision de chaque saisie, avec accès à l’original et aux
-          corrections.
-        </p>
-      </div>
-      <ChildCareActions childId={id} allowed={allowed} />
-      <section className="panel">
-        <h2>Rechercher dans les soins</h2>
-        <form className="registry-filters" action={`/patients/${id}/records`}>
+      <ChildPageHeading
+        title="Dossier clinique"
+        description="Consultez les soins et ouvrez leur historique de corrections."
+      />
+      <details className="child-panel child-expander no-print">
+        <summary>
+          <ClipboardList size={18} aria-hidden="true" /> Ajouter un soin{" "}
+          <ChevronDown size={18} aria-hidden="true" />
+        </summary>
+        <div className="child-expander-body">
+          <ChildCareActions childId={id} allowed={allowed} />
+        </div>
+      </details>
+      <ChildPanel title="Historique des soins">
+        <form
+          className="child-record-filter"
+          action={`/patients/${id}/records`}
+        >
           <label>
             Type
             <select name="kind" defaultValue={kind}>
@@ -95,11 +108,49 @@ export default async function Records({
         <p className="fine">
           {result.total} saisie(s) · page {page} · 30 par page
         </p>
-      </section>
+      </ChildPanel>
       {result.items.length ? (
-        result.items.map((entry) => (
-          <EntryCard key={entry.id} entry={entry} attributions={attributions} />
-        ))
+        <div className="child-record-list">
+          {result.items.map((entry) => (
+            <details className="child-panel child-expander" key={entry.id}>
+              <summary>
+                <ClipboardList size={17} aria-hidden="true" />
+                <span className="child-record-heading">
+                  <strong>{clinicalLabels[entry.kind]}</strong>
+                  <small>
+                    {entry.occurred_on
+                      ? bookletDate(entry.occurred_on)
+                      : "Date inconnue"}
+                    {entry.occurrence_precision === "estimated" && " · Estimée"}{" "}
+                    · Révision {entry.revision}
+                  </small>
+                </span>
+                {entry.entry_state === "withdrawn" ? (
+                  <ChildStatus>Retirée</ChildStatus>
+                ) : (
+                  entry.kind === "risk" && (
+                    <ChildStatus
+                      tone={
+                        entry.payload.severity === "high"
+                          ? "red"
+                          : entry.payload.severity === "moderate"
+                            ? "amber"
+                            : "neutral"
+                      }
+                    >
+                      {clinicalValueLabels[String(entry.payload.category)] ??
+                        "Risque documenté"}
+                    </ChildStatus>
+                  )
+                )}
+                <ChevronDown size={18} aria-hidden="true" />
+              </summary>
+              <div className="child-expander-body">
+                <EntryCard entry={entry} attributions={attributions} />
+              </div>
+            </details>
+          ))}
+        </div>
       ) : (
         <p className="empty-state">
           Aucun soin documenté dans cette vue. Un historique absent reste

@@ -1,11 +1,29 @@
+import "../../../growth/growth.css";
+import { Plus } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
 import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
-import { GrowthChart } from "@/components/clinical/growth-chart";
+import {
+  ChildPageHeading,
+  ChildPanel,
+} from "@/components/clinician/patient-profile";
+import { MeasurementChart } from "@/components/clinician/growth/measurement-chart";
+import { MeasurementRows } from "@/components/clinician/growth/workspace";
+import { readClinicalAttributions } from "@/lib/clinical/read-attribution";
+import { growthPoints } from "@/lib/clinical/growth";
 import type { ClinicalEntry } from "@/lib/clinical/types";
-import { uuidPattern } from "@/lib/registry/types";
+import { uuidPattern, type ChildProfile } from "@/lib/registry/types";
+import { bookletDate } from "@/lib/vaccines/booklet";
+
 export const dynamic = "force-dynamic";
+type History = { items: ClinicalEntry[]; total: number };
+const metrics = [
+  { field: "weight_kg", label: "Poids", unit: "kg" },
+  { field: "height_cm", label: "Taille", unit: "cm" },
+  { field: "head_cm", label: "Périmètre crânien", unit: "cm" },
+];
+
 export default async function Growth({
   params,
   searchParams,
@@ -13,7 +31,7 @@ export default async function Growth({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ page?: string }>;
 }) {
-  const { supabase } = await requireApprovedDoctor();
+  const { supabase, user } = await requireApprovedDoctor();
   const { id } = await params;
   if (!uuidPattern.test(id)) notFound();
   const query = await searchParams;
@@ -21,138 +39,128 @@ export default async function Growth({
     10000,
     Math.max(1, Math.floor(Number(query.page) || 1)),
   );
-  const [{ data, error }, capabilities] = await Promise.all([
+  const history = (page: number) =>
     supabase.rpc("clinical_timeline", {
       p_child_id: id,
       p_kind: "growth",
       p_page: page,
-    }),
+    });
+  const [first, current, profile, capabilities, standard] = await Promise.all([
+    history(1),
+    page > 1 ? history(page) : null,
+    supabase.rpc("get_child_profile", { p_child_id: id }),
     supabase.rpc("my_clinical_capabilities"),
+    supabase.rpc("has_standard_child_access", { p_child_id: id }),
   ]);
-  if (error?.code === "42501") notFound();
-  if (error || capabilities.error)
+  if (
+    [first, current, profile, standard].some(
+      (result) => result?.error?.code === "42501",
+    ) ||
+    (!profile.error && !profile.data)
+  )
+    notFound();
+  if (
+    first.error ||
+    current?.error ||
+    profile.error ||
+    capabilities.error ||
+    standard.error
+  )
     throw new Error("Impossible de charger les mesures.");
-  const result = data as { items: ClinicalEntry[]; total: number };
+  const child = profile.data as ChildProfile;
+  const recent = first.data as History;
+  const result = current ? (current.data as History) : recent;
+  const allowed = (capabilities.data as string[]).includes("growth");
+  const names = await readClinicalAttributions(
+    supabase,
+    result.items.map((entry) => entry.professional_id),
+    { children: [id] },
+  );
   return (
-    <ClinicalWorkspace active="growth" childId={id} section="growth">
-      <div className="page-heading">
-        <h1 id="main-content" tabIndex={-1}>
-          Croissance
-        </h1>
-        <p className="muted">
-          Mesures actives datées de cette page (30 saisies au maximum). Les
-          corrections remplacent la projection sans effacer l’original.
-        </p>
-      </div>
-      <div className="care-page-actions">
-        {(capabilities.data as string[]).includes("growth") ? (
-          <Link
-            className="button primary"
-            href={`/patients/${id}/records/new?kind=growth`}
-          >
-            Ajouter une mesure
-          </Link>
-        ) : (
-          <p className="notice">
-            Les mesures sont consultables. Une habilitation de croissance est
-            nécessaire pour en ajouter.{" "}
-            <Link className="text-link" href="/account/clinical-permissions">
-              Mes habilitations
-            </Link>
-          </p>
-        )}
-      </div>
-      <GrowthChart
-        entries={result.items}
-        field="weight_kg"
-        label="Poids"
-        unit="kg"
-      />
-      <GrowthChart
-        entries={result.items}
-        field="height_cm"
-        label="Taille"
-        unit="cm"
-      />
-      <GrowthChart
-        entries={result.items}
-        field="head_cm"
-        label="Périmètre crânien"
-        unit="cm"
-      />
-      <section className="panel">
-        <h2>Valeurs et provenance</h2>
-        <p className="fine">
-          {result.total} saisie(s) de mesure · page {page}
-        </p>
-        {result.items.length ? (
-          <div
-            className="table-scroll"
-            role="region"
-            aria-label="Valeurs et provenance des mesures"
-            tabIndex={0}
-          >
-            <table>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Poids (kg)</th>
-                  <th>Taille (cm)</th>
-                  <th>PC (cm)</th>
-                  <th>Source / état</th>
-                  <th>Historique</th>
-                </tr>
-              </thead>
-              <tbody>
-                {result.items.map((e) => (
-                  <tr key={e.id}>
-                    <td>
-                      {e.occurred_on || "Inconnue"}
-                      {e.occurrence_precision === "estimated"
-                        ? " (estimée)"
-                        : ""}
-                    </td>
-                    <td>{e.payload.weight_kg ?? "—"}</td>
-                    <td>{e.payload.height_cm ?? "—"}</td>
-                    <td>{e.payload.head_cm ?? "—"}</td>
-                    <td>
-                      {e.entry_state === "withdrawn"
-                        ? "Retirée"
-                        : e.source_verified
-                          ? "Source contrôlée"
-                          : "Source non confirmée"}
-                    </td>
-                    <td>
-                      <Link
-                        className="text-link"
-                        href={`/patients/${id}/records/${e.root_id}`}
-                      >
-                        Version {e.revision}
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <p className="empty-state">Aucune mesure documentée.</p>
-        )}
-        <nav className="pagination" aria-label="Pagination des mesures">
-          {page > 1 ? (
-            <Link href={`/patients/${id}/growth?page=${page - 1}`}>
-              Page précédente
+    <ClinicalWorkspace
+      active="growth"
+      childId={id}
+      child={child}
+      section="growth"
+    >
+      <ChildPageHeading
+        title="Croissance"
+        description="Mesures enregistrées et évolution brute."
+        actions={
+          allowed ? (
+            <Link
+              className="button primary child-button child-spotlight"
+              href={`/patients/${id}/records/new?kind=growth`}
+            >
+              <Plus size={18} aria-hidden="true" />
+              Ajouter une mesure
             </Link>
           ) : (
-            <span />
-          )}
-          {page * 30 < result.total && page < 10000 && (
-            <Link href={`/patients/${id}/growth?page=${page + 1}`}>
-              Page suivante
+            <Link
+              className="button secondary child-button"
+              href="/account/clinical-permissions"
+            >
+              Mes habilitations
             </Link>
-          )}
-        </nav>
-      </section>
+          )
+        }
+      />
+      <div className="child-grid child-vitals">
+        {metrics.map(({ field, label, unit }) => {
+          const point = growthPoints([...recent.items].reverse(), field).at(-1);
+          return (
+            <ChildPanel title={label} key={field}>
+              <strong>
+                {point ? `${point.value.toLocaleString("fr-MA")} ${unit}` : "—"}
+              </strong>
+              <span>
+                {point
+                  ? bookletDate(point.date)
+                  : "Aucune valeur récente datée"}
+              </span>
+              {point && !point.confirmed && (
+                <p className="fine">Source non confirmée</p>
+              )}
+            </ChildPanel>
+          );
+        })}
+      </div>
+      <div className="growth-workspace child-growth-chart">
+        <MeasurementChart entries={result.items} />
+      </div>
+      <ChildPanel title="Historique des mesures" className="child-panel-spaced">
+        <p className="fine">
+          {result.total} saisie(s) · page {page}. Le graphique affiche les
+          mesures actives à date exacte de cette page.
+        </p>
+        {result.items.length ? (
+          <div className="growth-workspace">
+            <MeasurementRows
+              child={child}
+              entries={result.items}
+              attributions={names}
+              canCorrect={(entry) =>
+                allowed &&
+                (standard.data === true || entry.author_id === user.id)
+              }
+            />
+          </div>
+        ) : (
+          <p className="empty-state">
+            Aucune mesure documentée sur cette page.
+          </p>
+        )}
+        {(page > 1 || page * 30 < result.total) && (
+          <nav className="pagination" aria-label="Pagination des mesures">
+            {page > 1 && (
+              <Link href={`?page=${page - 1}`}>Page précédente</Link>
+            )}
+            {page * 30 < result.total && page < 10000 && (
+              <Link href={`?page=${page + 1}`}>Page suivante</Link>
+            )}
+          </nav>
+        )}
+      </ChildPanel>
     </ClinicalWorkspace>
   );
 }

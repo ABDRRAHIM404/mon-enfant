@@ -1,3 +1,10 @@
+import Link from "next/link";
+import {
+  ChildPageHeading,
+  ChildPanel,
+  ChildStatus,
+} from "@/components/clinician/patient-profile";
+import { bookletDate } from "@/lib/vaccines/booklet";
 import { clinicianName } from "@/lib/clinical/attribution";
 import { readClinicalAttributions } from "@/lib/clinical/read-attribution";
 import { QrCode } from "@/components/qr/code";
@@ -13,8 +20,6 @@ import { EndAccessForm } from "@/components/registry/forms";
 import {
   uuidPattern,
   historyLabels,
-  patientName,
-  birthLabel,
   type ChildProfile,
   type AccessGrant,
 } from "@/lib/registry/types";
@@ -41,6 +46,7 @@ export default async function PatientProfile({
   if (error || visits.error || capabilities.error)
     throw new Error("Impossible de charger ce dossier.");
   const child = data as ChildProfile;
+  const now = new Date().getTime();
   const overview = visits.data as {
     last_documented_care: string | null;
     next_own_appointment: { starts_at: string } | null;
@@ -69,34 +75,39 @@ export default async function PatientProfile({
       section="overview"
       child={child}
     >
-      <div className="page-heading">
-        <span className="eyebrow">Dossier enfant</span>
-        <h1 id="main-content" tabIndex={-1}>
-          {patientName(child)}
-        </h1>
-        <p className="muted">
-          {child.name_status === "provisional" ? "Identité provisoire · " : ""}
-          {birthLabel(child)}
-        </p>
+      <ChildPageHeading
+        title="Vue d’ensemble"
+        description="Suivi, identité et accès au dossier de l’enfant."
+      />
+      <div className="child-grid">
+        <ChildPanel title="Dernier soin documenté">
+          <p>
+            {overview.last_documented_care ? (
+              <time dateTime={overview.last_documented_care}>
+                {bookletDate(overview.last_documented_care)}
+              </time>
+            ) : (
+              "Non documenté"
+            )}
+          </p>
+          <Link className="text-link" href={`/patients/${id}/records`}>
+            Ouvrir le dossier clinique
+          </Link>
+        </ChildPanel>
+        <ChildPanel title="Mon prochain rendez-vous">
+          <p>
+            {overview.next_own_appointment
+              ? appointmentTime(overview.next_own_appointment.starts_at)
+              : "Non planifié"}
+          </p>
+          <Link className="text-link" href={`/patients/${id}/appointments`}>
+            Voir les rendez-vous
+          </Link>
+        </ChildPanel>
       </div>
       <ChildCareActions childId={id} allowed={capabilities.data as string[]} />
-      <section className="panel">
-        <h2>Continuité des soins</h2>
-        <p>
-          Dernier soin documenté :{" "}
-          {overview.last_documented_care || "non documenté"}.
-        </p>
-        <p>
-          Mon prochain rendez-vous :{" "}
-          {overview.next_own_appointment
-            ? appointmentTime(overview.next_own_appointment.starts_at)
-            : "non planifié"}
-          .
-        </p>
-      </section>
-      <div className="two-columns">
-        <section className="panel">
-          <h2>Identité et provenance</h2>
+      <div className="child-grid">
+        <ChildPanel title="Identité et provenance">
           <dl className="details">
             <dt>Identifiant universel</dt>
             <dd>{child.universal_id}</dd>
@@ -116,9 +127,12 @@ export default async function PatientProfile({
             <dd>{historyLabels[child.history_status]}</dd>
             <dt>Source initiale</dt>
             <dd>
-              {child.source_type === "paper_transcription"
-                ? "Transcription papier"
-                : "Nouvelle inscription"}
+              {(
+                {
+                  paper_transcription: "Transcription papier",
+                  new_registration: "Nouvelle inscription",
+                } as Record<string, string>
+              )[child.source_type] ?? "Source non précisée"}
             </dd>
             {child.paper_reference && (
               <>
@@ -142,9 +156,8 @@ export default async function PatientProfile({
             provenance. Un historique absent ne signifie pas une vaccination
             manquée ou un état de santé normal.
           </p>
-        </section>
-        <section className="panel">
-          <h2>Mon registre et contact déclaré</h2>
+        </ChildPanel>
+        <ChildPanel title="Mon registre et contact déclaré">
           {child.registers.map((r, i) => (
             <p key={i}>
               <strong>{r.number}</strong> · {r.year} / {r.book} ·{" "}
@@ -161,45 +174,65 @@ export default async function PatientProfile({
             <dd>{child.guardian_phone || "Non renseigné"}</dd>
           </dl>
           <p className="fine">
-            Le contact déclaré ne prouve pas une tutelle et ne dispose pas d’un
-            accès parent.
+            La qualité de responsable et l’accès parent exigent une vérification
+            distincte du contact déclaré.
           </p>
-        </section>
+        </ChildPanel>
       </div>
-      <section className="panel">
-        <h2>QR d’identification pour un professionnel</h2>
-        <p>
-          Connectez-vous à votre compte professionnel avant de scanner. Ce QR
-          contient uniquement un identifiant de dossier ; il ne remplace aucune
-          autorisation et ne contient aucun soin.
-        </p>
-        <QrCode
-          value={clinicianLookupUrl(
-            process.env.NEXT_PUBLIC_SITE_URL ?? "https://mon-enfant.vercel.app",
-            child.universal_id,
-          )}
-          label="Identification du dossier — accès professionnel vérifié à l’ouverture"
-        />
-      </section>
+      <ChildPanel
+        title="QR d’identification professionnelle"
+        className="child-panel-spaced"
+      >
+        <div className="child-identity-qr">
+          <p>
+            Connectez-vous à votre compte professionnel avant de scanner. Ce QR
+            contient uniquement un identifiant de dossier ; il ne remplace
+            aucune autorisation et ne contient aucun soin.
+          </p>
+          <QrCode
+            value={clinicianLookupUrl(
+              process.env.NEXT_PUBLIC_SITE_URL ??
+                "https://mon-enfant.vercel.app",
+              child.universal_id,
+            )}
+            label="Identification du dossier — accès professionnel vérifié à l’ouverture"
+          />
+        </div>
+      </ChildPanel>
       {child.can_manage_access && (
-        <section className="panel">
-          <h2>Autorisations du dossier</h2>
+        <ChildPanel title="Autorisations des professionnels">
           <p className="fine">
             Vous gérez les accès de cet enfant. Une délégation doit correspondre
             à une autorisation vérifiée.
           </p>
-          <div className="record-list">
+          <ul className="child-list">
             {grants.map((g) => (
-              <article key={g.professional_id}>
+              <li key={g.professional_id}>
                 <strong>
                   {clinicianName(attributions, g.platform_id)}
                   {g.is_self ? " (vous)" : ""}
                 </strong>
                 <p>
+                  <ChildStatus
+                    tone={
+                      !g.revoked_at &&
+                      (!g.expires_at || Date.parse(g.expires_at) > now)
+                        ? "green"
+                        : "neutral"
+                    }
+                  >
+                    {g.revoked_at
+                      ? "Révoqué"
+                      : g.expires_at && Date.parse(g.expires_at) <= now
+                        ? "Expiré"
+                        : "Actif"}
+                  </ChildStatus>
+                </p>
+                <p>
                   {g.revoked_at
                     ? "Accès révoqué"
                     : g.expires_at
-                      ? `Échéance : ${g.expires_at}`
+                      ? `Échéance : ${appointmentTime(g.expires_at)}`
                       : "Sans échéance"}{" "}
                   ·{" "}
                   {g.can_manage_access
@@ -212,10 +245,10 @@ export default async function PatientProfile({
                     professionalId={g.professional_id}
                   />
                 )}
-              </article>
+              </li>
             ))}
-          </div>
-        </section>
+          </ul>
+        </ChildPanel>
       )}
     </ClinicalWorkspace>
   );

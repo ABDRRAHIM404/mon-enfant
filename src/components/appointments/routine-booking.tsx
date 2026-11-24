@@ -13,12 +13,14 @@ export function RoutineBooking({
   facilities,
   operation,
   today,
+  returnToChild = false,
 }: {
   proposal: RoutineAppointmentProposal;
   version: string;
   facilities: Facility[];
   operation: string;
   today: string;
+  returnToChild?: boolean;
 }) {
   const [state, action, pending] = useActionState(
     confirmRoutineAppointment,
@@ -55,6 +57,7 @@ export function RoutineBooking({
         className="auth-form routine-form"
         onReset={(event) => event.preventDefault()}
       >
+        {returnToChild && <input type="hidden" name="returnTo" value="child" />}
         <input type="hidden" name="child" value={proposal.child_id} />
         <input type="hidden" name="version" value={version} />
         <input type="hidden" name="operation" value={operation} />

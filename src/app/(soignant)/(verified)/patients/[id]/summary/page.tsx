@@ -1,3 +1,9 @@
+import {
+  ChildPageHeading,
+  ChildPanel,
+} from "@/components/clinician/patient-profile";
+import { bookletDate } from "@/lib/vaccines/booklet";
+import { clinicalKinds, clinicalLabels } from "@/lib/clinical/types";
 import { clinicianName } from "@/lib/clinical/attribution";
 import { readClinicalAttributions } from "@/lib/clinical/read-attribution";
 import Link from "next/link";
@@ -17,7 +23,6 @@ import type { ClinicalEntry } from "@/lib/clinical/types";
 import {
   uuidPattern,
   patientName,
-  birthLabel,
   type ChildProfile,
 } from "@/lib/registry/types";
 export const dynamic = "force-dynamic";
@@ -85,69 +90,87 @@ export default async function Summary({
     { children: [id] },
   );
   return (
-    <ClinicalWorkspace active="children" childId={id} section="summary" print>
-      <div className="page-heading">
-        <span className="eyebrow">RÉSUMÉ CLINIQUE — DONNÉES FICTIVES</span>
-        <h1 id="main-content" tabIndex={-1}>
-          {patientName(child)}
-        </h1>
+    <ClinicalWorkspace
+      active="children"
+      childId={id}
+      child={child}
+      section="summary"
+      print
+    >
+      <ChildPageHeading
+        title="Résumé et impression"
+        actions={
+          <>
+            <PrintButton prominent />
+            <a
+              className="button secondary child-button"
+              href={`/patients/${id}/export`}
+              download
+            >
+              Télécharger le relevé JSON
+            </a>
+            <Link
+              className="button secondary child-button"
+              href={`/patients/${id}/records`}
+            >
+              Retour au dossier clinique
+            </Link>
+          </>
+        }
+      />
+      <ChildPanel title={patientName(child)}>
         <p>
-          {birthLabel(child)} · {child.universal_id}
+          {child.birth_date ? (
+            <>
+              <time dateTime={child.birth_date}>
+                {bookletDate(child.birth_date)}
+              </time>
+              {child.birth_date_precision === "estimated" && " (estimée)"}
+            </>
+          ) : (
+            "Naissance non renseignée"
+          )}{" "}
+          · {child.universal_id}
+        </p>
+        <p className="child-summary-note">
+          Résumé du carnet · Généré le{" "}
+          {appointmentTime(new Date().toISOString())} · Données fictives ·
+          Document non certifié
         </p>
         <p className="fine">
-          Généré le {new Date().toISOString()} · contient l’original et toutes
-          les corrections des soins enregistrés, y compris les retraits. Les
-          administrations vaccinales, leurs rapprochements et les décisions sur
-          les références sont inclus.
+          Le relevé inclut les saisies originales, les corrections, les retraits
+          et les décisions conservées.
         </p>
-      </div>
-      <div className="tabs no-print">
-        <PrintButton />
-        <a href={`/patients/${id}/export`} download>
-          Télécharger le relevé JSON
-        </a>
-        <Link href={`/patients/${id}/records`}>Retour au dossier</Link>
-      </div>
+      </ChildPanel>
       <p className="notice">
         Une absence de saisie ne prouve pas l’absence de soin. Vérifiez la
         provenance, la date et la dernière révision de chaque événement. Les
         valeurs de croissance n’ont pas d’interprétation automatique.
       </p>
-      <section className="panel">
-        <h2>Références vaccinales et toutes leurs décisions</h2>
-        {(vaccines.data as VaccineItemExport[]).map((item) => (
-          <article key={item.id}>
+      <ChildPanel title="Références vaccinales et leurs décisions">
+        {vaccineItems.map((item) => (
+          <article className="child-print-entry" key={item.id}>
             <h3>
               {item.dose_code} · {item.version_label}
             </h3>
-            <p className="fine">
-              Référence {item.id} · version {item.version_id}
-            </p>
             <ul>
               {item.changes.map((change) => (
                 <li key={change.id}>
                   Révision {change.revision} ·{" "}
                   {change.state === "active" ? "Active" : "Retirée"} ·{" "}
                   {change.reason} ·{" "}
-                  {clinicianName(attributions, change.professional_id)} · lieu{" "}
-                  {change.facility_id} · {change.created_at}
+                  {clinicianName(attributions, change.professional_id)} ·{" "}
+                  {appointmentTime(change.created_at)}
                 </li>
               ))}
             </ul>
           </article>
         ))}
-        {!(vaccines.data as VaccineItemExport[]).length && (
-          <p>Aucune référence assignée.</p>
-        )}
-      </section>
-      <section className="panel">
-        <h2>Rendez-vous et toutes leurs décisions</h2>
-        {(
-          appointments.data as (AppointmentRow & {
-            events: AppointmentEvent[];
-          })[]
-        ).map((appointment) => (
-          <article key={appointment.id}>
+        {!vaccineItems.length && <p>Aucune référence assignée.</p>}
+      </ChildPanel>
+      <ChildPanel title="Rendez-vous et leurs décisions">
+        {appointmentRows.map((appointment) => (
+          <article className="child-print-entry" key={appointment.id}>
             <AppointmentCard
               appointment={appointment}
               link={false}
@@ -170,19 +193,26 @@ export default async function Summary({
             </ul>
           </article>
         ))}
-        {!(appointments.data as unknown[]).length && (
-          <p>Aucun rendez-vous documenté.</p>
-        )}
-      </section>
+        {!appointmentRows.length && <p>Aucun rendez-vous documenté.</p>}
+      </ChildPanel>
       {entries.length ? (
-        entries.map((entry) => (
-          <EntryCard
-            key={entry.id}
-            entry={entry}
-            link={false}
-            attributions={attributions}
-          />
-        ))
+        clinicalKinds.map((kind) => {
+          const records = entries.filter((entry) => entry.kind === kind);
+          return (
+            records.length > 0 && (
+              <ChildPanel key={kind} title={clinicalLabels[kind]}>
+                {records.map((entry) => (
+                  <EntryCard
+                    key={entry.id}
+                    entry={entry}
+                    link={false}
+                    attributions={attributions}
+                  />
+                ))}
+              </ChildPanel>
+            )
+          );
+        })
       ) : (
         <p className="empty-state">Aucun soin documenté dans ce module.</p>
       )}
