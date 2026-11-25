@@ -1,12 +1,20 @@
-import {
-  ProvisionalSection,
-  type SectionQuery,
-} from "@/components/clinician/provisional-section";
-export const dynamic = "force-dynamic";
-export default async function Page({
+import { notFound, redirect } from "next/navigation";
+import { getProfessional } from "@/lib/auth";
+import { legacyClinicalHref } from "@/components/clinician/clinical-destinations";
+import { uuidPattern } from "@/lib/registry/types";
+
+export default async function LegacyClinicalRoute({
   searchParams,
 }: {
-  searchParams: Promise<SectionQuery>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  return <ProvisionalSection section="growth" query={await searchParams} />;
+  const { profile } = await getProfessional();
+  if (!profile) redirect("/account");
+  const query = await searchParams;
+  if (
+    query.child &&
+    (typeof query.child !== "string" || !uuidPattern.test(query.child))
+  )
+    notFound();
+  redirect(legacyClinicalHref("growth", query, true));
 }

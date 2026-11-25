@@ -3,7 +3,6 @@ import Link from "next/link";
 import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
 import {
   ChildPageHeading,
   ChildPanel,
@@ -21,11 +20,7 @@ import {
   clinicianName,
   type ClinicalAttributions,
 } from "@/lib/clinical/attribution";
-import {
-  uuidPattern,
-  type ChildProfile,
-  type Facility,
-} from "@/lib/registry/types";
+import { uuidPattern, type Facility } from "@/lib/registry/types";
 import {
   appointmentStates,
   type AppointmentPage,
@@ -134,8 +129,7 @@ export default async function PatientAppointments({
   if (!uuidPattern.test(id)) notFound();
   const page = pageNumber(q.page),
     proposalsPage = pageNumber(q.proposals);
-  const [profile, appointments, caps, proposals] = await Promise.all([
-    supabase.rpc("get_child_profile", { p_child_id: id }),
+  const [appointments, caps, proposals] = await Promise.all([
     supabase.rpc("patient_appointments", { p_child_id: id, p_page: page }),
     supabase.rpc("my_clinical_capabilities"),
     supabase.rpc("patient_routine_appointment_proposals", {
@@ -144,15 +138,13 @@ export default async function PatientAppointments({
     }),
   ]);
   if (
-    [profile, appointments, proposals].some(
+    [appointments, proposals].some(
       (response) => response.error?.code === "42501",
-    ) ||
-    (!profile.error && !profile.data)
+    )
   )
     notFound();
-  if (profile.error || appointments.error || caps.error || proposals.error)
+  if (appointments.error || caps.error || proposals.error)
     throw new Error("Impossible de charger les rendez-vous.");
-  const child = profile.data as ChildProfile;
   const data = appointments.data as AppointmentPage;
   const routine = proposals.data as RoutineAppointmentProposals;
   const rights = caps.data as string[];
@@ -185,12 +177,7 @@ export default async function PatientAppointments({
   const href = (list: number, pending: number, anchor: string) =>
     `/patients/${id}/appointments?${new URLSearchParams({ page: String(list), proposals: String(pending) })}#${anchor}`;
   return (
-    <ClinicalWorkspace
-      active="appointments"
-      childId={id}
-      child={child}
-      section="appointments"
-    >
+    <>
       <ChildPageHeading
         title="Rendez-vous"
         description="Créneaux de cet enfant, en heure de Casablanca."
@@ -364,6 +351,6 @@ export default async function PatientAppointments({
           </nav>
         )}
       </ChildPanel>
-    </ClinicalWorkspace>
+    </>
   );
 }

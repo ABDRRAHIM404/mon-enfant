@@ -15,7 +15,6 @@ import type {
 } from "@/lib/appointments/types";
 import { notFound } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
 import { EntryCard } from "@/components/clinical/entry-card";
 import { PrintButton } from "@/components/clinical/print-button";
 import type { VaccineItemExport } from "@/lib/vaccines/patient-types";
@@ -53,7 +52,7 @@ export default async function Summary({
     appointments.error?.code === "54000"
   )
     return (
-      <ClinicalWorkspace active="children" childId={id} section="summary" print>
+      <div className="print-summary">
         <section className="panel">
           <h1 id="main-content" tabIndex={-1}>
             Résumé volumineux
@@ -64,7 +63,7 @@ export default async function Summary({
             partiel n’a été généré.
           </p>
         </section>
-      </ClinicalWorkspace>
+      </div>
     );
   if (profile.error || ledger.error || vaccines.error || appointments.error)
     throw new Error("Impossible de générer le résumé.");
@@ -90,13 +89,7 @@ export default async function Summary({
     { children: [id] },
   );
   return (
-    <ClinicalWorkspace
-      active="children"
-      childId={id}
-      child={child}
-      section="summary"
-      print
-    >
+    <div className="print-summary">
       <ChildPageHeading
         title="Résumé et impression"
         actions={
@@ -216,6 +209,6 @@ export default async function Summary({
       ) : (
         <p className="empty-state">Aucun soin documenté dans ce module.</p>
       )}
-    </ClinicalWorkspace>
+    </div>
   );
 }

@@ -7,7 +7,6 @@ import type { VaccineItemExport } from "@/lib/vaccines/patient-types";
 import { notFound } from "next/navigation";
 import { randomUUID } from "node:crypto";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
 import { ClinicalForm } from "@/components/clinical/entry-form";
 import {
   clinicalKinds,
@@ -76,17 +75,7 @@ export default async function NewEntry({
       )
     : undefined;
   return (
-    <ClinicalWorkspace
-      active={
-        kind === "vaccination"
-          ? "vaccinations"
-          : kind === "growth"
-            ? "growth"
-            : "consultations"
-      }
-      childId={id}
-      section="records"
-    >
+    <>
       <div className="page-heading">
         <h1 id="main-content" tabIndex={-1}>
           {kind === "vaccination"
@@ -140,6 +129,6 @@ export default async function NewEntry({
           </p>
         )}
       </section>
-    </ClinicalWorkspace>
+    </>
   );
 }

@@ -1,3 +1,4 @@
+import { readAuthorizedChild } from "@/lib/registry/read-child";
 import "./overview.css";
 import Link from "next/link";
 import {
@@ -16,10 +17,7 @@ import {
 } from "lucide-react";
 import { notFound } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
-import {
-  ChildCareActions,
-  ClinicalWorkspace,
-} from "@/components/clinician/care-workspace";
+import { ChildCareActions } from "@/components/clinician/care-workspace";
 import { ChildStatus } from "@/components/clinician/patient-profile";
 import {
   OverviewDetails,
@@ -39,7 +37,6 @@ import { EndAccessForm } from "@/components/registry/forms";
 import {
   uuidPattern,
   historyLabels,
-  type ChildProfile,
   type AccessGrant,
 } from "@/lib/registry/types";
 
@@ -56,21 +53,14 @@ export default async function PatientProfile({
   const { id } = await params;
   const saved = (await searchParams)?.saved === "1";
   if (!uuidPattern.test(id)) notFound();
-  const [profile, visits, capabilities] = await Promise.all([
-    supabase.rpc("get_child_profile", { p_child_id: id }),
+  const [child, visits, capabilities] = await Promise.all([
+    readAuthorizedChild(id),
     supabase.rpc("patient_visit_overview", { p_child_id: id }),
     supabase.rpc("my_clinical_capabilities"),
   ]);
-  if (
-    profile.error?.code === "42501" ||
-    visits.error?.code === "42501" ||
-    (!profile.data && !profile.error)
-  )
-    notFound();
-  if (profile.error || visits.error || capabilities.error)
-    throw new Error("Impossible de charger ce dossier.");
-
-  const child = profile.data as ChildProfile;
+  if (visits.error?.code === "42501") notFound();
+  if (visits.error || capabilities.error)
+    throw Error("Impossible de charger ce dossier.");
   const overview = visits.data as {
     last_documented_care: string | null;
     next_own_appointment: { starts_at: string } | null;
@@ -166,12 +156,7 @@ export default async function PatientProfile({
   ] as const;
 
   return (
-    <ClinicalWorkspace
-      active="children"
-      childId={id}
-      section="overview"
-      child={child}
-    >
+    <>
       <div id="main-content" tabIndex={-1} className="child-overview">
         <h1 className="sr-only">Vue d’ensemble</h1>
         {saved && (
@@ -234,6 +219,12 @@ export default async function PatientProfile({
                 </li>
               ))}
             </ul>
+            <Link
+              className="overview-vaccine-reference text-link"
+              href={`${base}/vaccinations/follow-up`}
+            >
+              Repères vaccinaux de routine
+            </Link>
           </section>
           <ChildCareActions
             compact
@@ -440,6 +431,6 @@ export default async function PatientProfile({
           )}
         </div>
       </div>
-    </ClinicalWorkspace>
+    </>
   );
 }

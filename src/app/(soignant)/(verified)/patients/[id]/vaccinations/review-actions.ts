@@ -87,7 +87,6 @@ export async function reviewBookletDose(
     `/patients/${child}/records`,
     `/patients/${child}/appointments`,
     `/patients/${child}/summary`,
-    "/vaccinations",
     "/appointments",
     "/follow-up",
     "/dashboard",

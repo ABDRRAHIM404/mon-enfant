@@ -1,12 +1,5 @@
 "use client";
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useLayoutEffect,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { NavigationFeedback } from "@/components/workspace-navigation";
@@ -14,50 +7,17 @@ import { clinicianRoute, type ClinicianSection } from "./routes";
 
 type Selection = ReturnType<typeof clinicianRoute>;
 const SelectionContext = createContext<Selection>({ section: "home" });
-const OverrideContext = createContext<
-  ((section: ClinicianSection | null) => void) | null
->(null);
 export function ClinicianNavigationState({
   children,
 }: {
   children: ReactNode;
 }) {
-  const pathname = usePathname();
-  const [override, setOverride] = useState<{
-    pathname: string;
-    section: ClinicianSection;
-  } | null>(null);
-  const updateOverride = useCallback(
-    (section: ClinicianSection | null) => {
-      setOverride(section === null ? null : { pathname, section });
-    },
-    [pathname],
-  );
-  const route = clinicianRoute(pathname);
-  const active =
-    override?.pathname === pathname
-      ? { ...route, section: override.section }
-      : route;
+  const route = clinicianRoute(usePathname());
   return (
-    <OverrideContext.Provider value={updateOverride}>
-      <SelectionContext.Provider value={active}>
-        {children}
-      </SelectionContext.Provider>
-    </OverrideContext.Provider>
+    <SelectionContext.Provider value={route}>
+      {children}
+    </SelectionContext.Provider>
   );
-}
-export function ClinicianSectionOverride({
-  section,
-}: {
-  section: ClinicianSection;
-}) {
-  const setOverride = useContext(OverrideContext);
-  useLayoutEffect(() => {
-    if (!setOverride) return;
-    setOverride(section);
-    return () => setOverride(null);
-  }, [section, setOverride]);
-  return null;
 }
 export function ClinicianNavLink({
   href,

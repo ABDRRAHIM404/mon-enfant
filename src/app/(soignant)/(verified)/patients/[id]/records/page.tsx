@@ -9,10 +9,7 @@ import { readClinicalAttributions } from "@/lib/clinical/read-attribution";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
-import {
-  ChildCareActions,
-  ClinicalWorkspace,
-} from "@/components/clinician/care-workspace";
+import { ChildCareActions } from "@/components/clinician/care-workspace";
 import { EntryCard } from "@/components/clinical/entry-card";
 import {
   clinicalKinds,
@@ -63,17 +60,7 @@ export default async function Records({
     { children: [id] },
   );
   return (
-    <ClinicalWorkspace
-      active={
-        kind === "vaccination"
-          ? "vaccinations"
-          : kind === "growth"
-            ? "growth"
-            : "consultations"
-      }
-      childId={id}
-      section="records"
-    >
+    <>
       <ChildPageHeading
         title="Dossier clinique"
         description="Consultez les soins et ouvrez leur historique de corrections."
@@ -171,6 +158,6 @@ export default async function Records({
           </Link>
         )}
       </nav>
-    </ClinicalWorkspace>
+    </>
   );
 }

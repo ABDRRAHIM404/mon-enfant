@@ -1,3 +1,8 @@
+import {
+  clinicalChildHref,
+  clinicalDestination,
+  clinicalDestinationLabel,
+} from "@/components/clinician/clinical-destinations";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -62,7 +67,7 @@ const views = [
   { value: "grid", label: "Vue cartes", icon: LayoutGrid },
 ] as const;
 
-function RegistryCard({ patient }: { patient: Patient }) {
+function RegistryCard({ patient, href }: { patient: Patient; href: string }) {
   const {
     birth_date: birth,
     history_status: history,
@@ -77,11 +82,7 @@ function RegistryCard({ patient }: { patient: Patient }) {
   const HistoryIcon = reviewed ? CircleCheck : Clock3;
   return (
     <li>
-      <Link
-        className="registry-directory-card"
-        href={`/patients/${patient.id}`}
-        prefetch={false}
-      >
+      <Link className="registry-directory-card" href={href} prefetch={false}>
         <div className="registry-directory-identity">
           <ChildAvatar sex={patient.sex} size={54} />
           <div>
@@ -176,6 +177,7 @@ export default async function Patients({
     age: ["under1", "1to5", "over5", "unknown"].includes(age) ? age : "all",
     page: Math.min(10000, Math.max(1, Math.floor(Number(get("page")) || 1))),
     sort: get("sort") === "name" ? "name" : "recent",
+    open: clinicalDestination(get("open")),
     view: get("view") === "grid" ? "grid" : "list",
   };
   const { data, error } = await supabase.rpc("list_patients", {
@@ -199,8 +201,10 @@ export default async function Patients({
   );
   function href(changes: Partial<RegistryQuery>) {
     const next = { ...query, ...changes };
-    const { page, ...filters } = next;
-    return `/patients?${new URLSearchParams({ ...filters, page: String(page) })}`;
+    const { page, open, ...filters } = next;
+    const params = new URLSearchParams({ ...filters, page: String(page) });
+    if (open) params.set("open", open);
+    return `/patients?${params}`;
   }
   return (
     <div className="registry-directory">
@@ -210,7 +214,11 @@ export default async function Patients({
           <h1 id="main-content" tabIndex={-1}>
             Enfants
           </h1>
-          <p>Retrouvez les enfants suivis et leurs dossiers autorisés.</p>
+          <p>
+            {query.open
+              ? `Sélectionnez un enfant pour ouvrir la rubrique « ${clinicalDestinationLabel(query.open)} ».`
+              : "Retrouvez les enfants suivis et leurs dossiers autorisés."}
+          </p>
         </div>
         <Image
           src="/dashboard-art/registry-hero.webp"
@@ -287,7 +295,15 @@ export default async function Patients({
             role="list"
           >
             {patients.map((patient) => (
-              <RegistryCard key={patient.id} patient={patient} />
+              <RegistryCard
+                key={patient.id}
+                patient={patient}
+                href={
+                  query.open
+                    ? clinicalChildHref(patient.id, query.open)
+                    : `/patients/${patient.id}`
+                }
+              />
             ))}
           </ul>
         ) : (

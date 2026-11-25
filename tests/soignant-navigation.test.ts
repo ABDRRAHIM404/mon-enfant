@@ -1,6 +1,8 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { clinicianMainNavigation } from "../src/components/clinician/main-navigation";
+import { legacyClinicalHref } from "../src/components/clinician/clinical-destinations";
 import { clinicianRoute } from "../src/components/clinician/routes";
 
 const routes = {
@@ -12,18 +14,24 @@ const routes = {
   "/patients/[id]": "children",
   "/patients/[id]/guardians": "children",
   "/patients/[id]/summary": "children",
-  "/patients/[id]/records": "consultations",
-  "/patients/[id]/records/new": "consultations",
-  "/patients/[id]/records/[root]": "consultations",
-  "/patients/[id]/vaccinations": "vaccinations",
-  "/patients/[id]/vaccinations/[item]": "vaccinations",
-  "/patients/[id]/growth": "growth",
-  "/patients/[id]/appointments": "appointments",
-  "/patients/[id]/appointments/new": "appointments",
-  "/patients/[id]/appointments/[appointment]": "appointments",
-  "/consultations": "consultations",
-  "/vaccinations": "vaccinations",
-  "/growth": "growth",
+  "/patients/[id]/edit": "children",
+  "/patients/[id]/consultations": "children",
+  "/patients/[id]/vaccinations/follow-up": "children",
+  "/provisional/[id]/consultations": "children",
+  "/provisional/[id]/vaccinations": "children",
+  "/provisional/[id]/growth": "children",
+  "/patients/[id]/records": "children",
+  "/patients/[id]/records/new": "children",
+  "/patients/[id]/records/[root]": "children",
+  "/patients/[id]/vaccinations": "children",
+  "/patients/[id]/vaccinations/[item]": "children",
+  "/patients/[id]/growth": "children",
+  "/patients/[id]/appointments": "children",
+  "/patients/[id]/appointments/new": "children",
+  "/patients/[id]/appointments/[appointment]": "children",
+  "/consultations": "children",
+  "/vaccinations": "children",
+  "/growth": "children",
   "/appointments": "appointments",
   "/appointments/new": "appointments",
   "/documents": "documents",
@@ -39,9 +47,9 @@ const routes = {
   "/provisional": "home",
   "/provisional/children": "children",
   "/provisional/[id]": "children",
-  "/provisional/consultations": "consultations",
-  "/provisional/vaccinations": "vaccinations",
-  "/provisional/growth": "growth",
+  "/provisional/consultations": "children",
+  "/provisional/vaccinations": "children",
+  "/provisional/growth": "children",
   "/provisional/appointments": "appointments",
   "/provisional/documents": "documents",
   "/provisional/guide": "guide",
@@ -91,11 +99,54 @@ describe("shared clinician route coverage", () => {
   it.each([
     ["/account", "account"],
     ["/verification", "account"],
-    ["/vaccines", "vaccinations"],
-    ["/vaccines/id", "vaccinations"],
+    ["/vaccines", "tools"],
+    ["/vaccines/id", "tools"],
     ["/share", "sharing"],
   ] as const)("selects the clinician section for %s", (path, active) => {
     expect(clinicianRoute(path).section).toBe(active);
+  });
+
+  it("shares the exact verified rail and drawer entries and preserves provisional isolation", () => {
+    expect(clinicianMainNavigation(false).map(({ href }) => href)).toEqual([
+      "/dashboard",
+      "/patients",
+      "/appointments",
+      "/documents",
+      "/share",
+      "/guide-soignant",
+      "/account",
+    ]);
+    expect(clinicianMainNavigation(true).map(({ href }) => href)).toEqual([
+      "/provisional",
+      "/provisional/children",
+      "/provisional/appointments",
+      "/provisional/documents",
+      "/provisional/guide",
+      "/account",
+    ]);
+  });
+
+  it("carries safe legacy entry URLs to the same child or the correct selector", () => {
+    const id = "41ebbe4b-4c52-489d-94e7-341954a63c33";
+    expect(
+      legacyClinicalHref("consultations", {
+        child: id,
+        sort: "oldest",
+        page: "2",
+      }),
+    ).toBe(`/patients/${id}/consultations?page=2&sort=oldest`);
+    expect(legacyClinicalHref("vaccinations", { child: id, page: "3" })).toBe(
+      `/patients/${id}/vaccinations?historyPage=3`,
+    );
+    expect(
+      legacyClinicalHref("growth", {
+        child: "https://example.invalid",
+        q: "A B",
+      }),
+    ).toBe("/patients?open=growth&q=A+B");
+    expect(legacyClinicalHref("vaccinations", { child: id }, true)).toBe(
+      `/provisional/${id}/vaccinations`,
+    );
   });
 
   it("opens the matching management tool for a detail URL", () => {

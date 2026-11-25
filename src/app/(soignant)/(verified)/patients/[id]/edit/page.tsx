@@ -1,19 +1,14 @@
+import { readAuthorizedChild } from "@/lib/registry/read-child";
 import "@/components/registry/registration.css";
 import "@/components/clinician/registry-filter-select.css";
 import { randomUUID } from "node:crypto";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
 import { ChildInformationForm } from "@/components/registry/child-information-form";
 import { todayCasablanca } from "@/lib/appointments/calendar";
 import { requireApprovedDoctor } from "@/lib/auth";
-import {
-  patientName,
-  uuidPattern,
-  type ChildProfile,
-  type Facility,
-} from "@/lib/registry/types";
+import { patientName, uuidPattern, type Facility } from "@/lib/registry/types";
 
 export const dynamic = "force-dynamic";
 
@@ -29,11 +24,8 @@ export default async function EditChildInformation({
   const { register: registerId } = await searchParams;
   if (!uuidPattern.test(id) || (registerId && !uuidPattern.test(registerId)))
     notFound();
-  const profile = await supabase.rpc("get_child_profile", { p_child_id: id });
-  if (profile.error?.code === "42501") notFound();
-  if (profile.error) throw new Error("Impossible de charger ce dossier.");
-  const child = profile.data as ChildProfile | null;
-  if (!child?.can_manage_access) notFound();
+  const child = await readAuthorizedChild(id);
+  if (!child.can_manage_access) notFound();
   const register = registerId
     ? child.registers.find(({ id }) => id === registerId)
     : child.registers[0];
@@ -43,12 +35,7 @@ export default async function EditChildInformation({
   const facilities = data as Facility[];
   const base = `/patients/${id}`;
   return (
-    <ClinicalWorkspace
-      active="children"
-      childId={id}
-      section="overview"
-      child={child}
-    >
+    <>
       <div className="registration-page">
         <Link className="registration-back" href={base}>
           <ArrowLeft size={17} aria-hidden="true" /> Vue d’ensemble
@@ -101,6 +88,6 @@ export default async function EditChildInformation({
           />
         </section>
       </div>
-    </ClinicalWorkspace>
+    </>
   );
 }

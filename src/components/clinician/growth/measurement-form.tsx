@@ -13,14 +13,10 @@ export function MeasurementForm({
   childId,
   operationId,
   facilities,
-  query,
-  childPage,
 }: {
   childId: string;
   operationId: string;
   facilities: Facility[];
-  query: string;
-  childPage: number;
 }) {
   const [state, action, pending] = useActionState(recordClinical, {});
   const [precision, setPrecision] = useState("exact");
@@ -43,8 +39,6 @@ export function MeasurementForm({
       <input type="hidden" name="childId" value={childId} />
       <input type="hidden" name="operationId" value={operationId} />
       <input type="hidden" name="returnTo" value="growth" />
-      <input type="hidden" name="growthQuery" value={query} />
-      <input type="hidden" name="growthChildPage" value={childPage} />
       <fieldset disabled={pending} className="growth-fields">
         <legend className="sr-only">Mesures et provenance</legend>
         <div className="growth-input-grid">

@@ -4,7 +4,9 @@ import { createPortal } from "react-dom";
 import { DashboardSkeleton, type SkeletonVariant } from "./dashboard/skeleton";
 import { useLinkStatus } from "next/link";
 import { LoaderCircle, Menu } from "lucide-react";
-export function NavigationFeedback() {
+export function NavigationFeedback({
+  inlineOnly = false,
+}: { inlineOnly?: boolean } = {}) {
   const { pending } = useLinkStatus();
   const anchor = useRef<HTMLSpanElement>(null);
   const [overlay, setOverlay] = useState<{
@@ -13,7 +15,7 @@ export function NavigationFeedback() {
     variant: SkeletonVariant;
   } | null>(null);
   useEffect(() => {
-    if (!pending) return;
+    if (!pending || inlineOnly) return;
     const timer = window.setTimeout(() => {
       const link = anchor.current?.closest("a");
       const root = anchor.current?.closest(
@@ -50,7 +52,7 @@ export function NavigationFeedback() {
       window.clearTimeout(timer);
       setOverlay(null);
     };
-  }, [pending]);
+  }, [pending, inlineOnly]);
   useEffect(() => {
     if (!overlay) return;
     const main = anchor.current

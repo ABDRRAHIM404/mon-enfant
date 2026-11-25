@@ -4,7 +4,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { randomUUID } from "node:crypto";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
 import { AppointmentCard } from "@/components/appointments/card";
 import { AppointmentForm } from "@/components/appointments/form";
 import {
@@ -52,11 +51,7 @@ export default async function History({
     { children: [id] },
   );
   return (
-    <ClinicalWorkspace
-      active="appointments"
-      childId={id}
-      section="appointments"
-    >
+    <>
       <div className="page-heading">
         <h1 id="main-content" tabIndex={-1}>
           Historique du rendez-vous
@@ -123,6 +118,6 @@ export default async function History({
           </p>
         )}
       </section>
-    </ClinicalWorkspace>
+    </>
   );
 }

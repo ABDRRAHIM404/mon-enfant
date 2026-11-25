@@ -1,4 +1,9 @@
 import Link from "next/link";
+import {
+  clinicalChildHref,
+  clinicalDestination,
+  clinicalDestinationLabel,
+} from "./clinical-destinations";
 import { appointmentTime } from "@/lib/appointments/calendar";
 import { GrowthChart } from "@/components/clinical/growth-chart";
 import { notFound, redirect } from "next/navigation";
@@ -22,6 +27,7 @@ import {
 import { uuidPattern } from "@/lib/registry/types";
 export type SectionQuery = {
   child?: string;
+  open?: string;
   q?: string;
   page?: string;
   childPage?: string;
@@ -62,13 +68,19 @@ const name = (c: ProvisionalChild) =>
 export async function ProvisionalSection({
   section,
   query,
+  childId,
 }: {
   section: keyof typeof sections;
   query: SectionQuery;
+  childId?: string;
 }) {
   const { profile, supabase } = await getProfessional();
   if (!profile) redirect("/account");
-  if (query.child && !uuidPattern.test(query.child)) notFound();
+  const requestedChild =
+    childId || (section === "appointments" ? query.child : undefined);
+  if (requestedChild && !uuidPattern.test(requestedChild)) notFound();
+  const open =
+    section === "children" ? clinicalDestination(query.open) : undefined;
   const config = sections[section],
     base = `/provisional/${section}`,
     page = Math.min(10000, Math.max(1, Math.floor(Number(query.page) || 1))),
@@ -79,13 +91,13 @@ export async function ProvisionalSection({
     q = (query.q || "").slice(0, 100);
   const result = await supabase.rpc("provisional_section", {
     p_kind: config.kind,
-    p_child_id: query.child || null,
+    p_child_id: requestedChild || null,
     p_page: page,
     p_query: q,
     p_child_page: childPage,
   });
   if (result.error?.code === "42501") {
-    if (query.child) notFound();
+    if (requestedChild) notFound();
     redirect("/account");
   }
   if (result.error)
@@ -100,6 +112,7 @@ export async function ProvisionalSection({
     total: number;
   };
   const selected = data.selected_child;
+  if (childId && selected?.id !== childId) notFound();
   const followup =
     selected && section === "vaccinations"
       ? await supabase.rpc("provisional_vaccination_followup", {
@@ -107,11 +120,25 @@ export async function ProvisionalSection({
         })
       : null;
   if (followup?.error?.code === "42501") notFound();
-  const href = (child: string, n = 1, cp = childPage) =>
-    `${base}?${new URLSearchParams({ child, page: String(n), childPage: String(cp), q })}`;
+  const href = (child: string, n = 1, cp = childPage) => {
+    const params = new URLSearchParams({ page: String(n) });
+    if (childId) return `/provisional/${childId}/${section}?${params}`;
+    if (open) params.set("open", open);
+    if (child) params.set("child", child);
+    params.set("childPage", String(cp));
+    if (q) params.set("q", q);
+    return `${base}?${params}`;
+  };
   return (
     <>
-      <ClinicianHeading title={config.title} description={config.description}>
+      <ClinicianHeading
+        title={config.title}
+        description={
+          open
+            ? `Sélectionnez un dossier privé pour ouvrir « ${clinicalDestinationLabel(open)} ».`
+            : config.description
+        }
+      >
         <Link className="button primary" href="/provisional?new=1#new-child">
           <Plus size={18} aria-hidden="true" />
           Ajouter un enfant
@@ -137,12 +164,17 @@ export async function ProvisionalSection({
       </div>
       {section === "children" && (
         <form action={base} className="registry-filters panel">
+          {open && <input type="hidden" name="open" value={open} />}
           <label>
             Rechercher dans mes dossiers privés
             <input type="search" name="q" maxLength={100} defaultValue={q} />
           </label>
           <button className="button secondary">Rechercher</button>
-          {q && <Link href={base}>Réinitialiser</Link>}
+          {q && (
+            <Link href={open ? `${base}?open=${open}` : base}>
+              Réinitialiser
+            </Link>
+          )}
         </form>
       )}
       {section === "children" ? (
@@ -164,7 +196,11 @@ export async function ProvisionalSection({
                     <td>
                       <Link
                         className="text-link clinician-child-label"
-                        href={`/provisional/${c.id}`}
+                        href={
+                          open
+                            ? clinicalChildHref(c.id, open, true)
+                            : `/provisional/${c.id}`
+                        }
                       >
                         <ChildAvatar sex={c.identity.sex} size={34} />
                         {name(c)}
@@ -186,23 +222,25 @@ export async function ProvisionalSection({
           )}
         </section>
       ) : (
-        <div className="soignant-section-grid">
-          <ClinicianChildPicker
-            base={base}
-            q={q}
-            page={childPage}
-            total={data.children_total}
-            items={data.children.map((c) => ({
-              id: c.id,
-              label: name(c),
-              sex: c.identity.sex,
-              caption: "Dossier privé · non vérifié",
-            }))}
-            current={
-              selected ? { id: selected.id, label: name(selected) } : null
-            }
-            privateRecords
-          />
+        <div className={childId ? undefined : "soignant-section-grid"}>
+          {!childId && (
+            <ClinicianChildPicker
+              base={base}
+              q={q}
+              page={childPage}
+              total={data.children_total}
+              items={data.children.map((c) => ({
+                id: c.id,
+                label: name(c),
+                sex: c.identity.sex,
+                caption: "Dossier privé · non vérifié",
+              }))}
+              current={
+                selected ? { id: selected.id, label: name(selected) } : null
+              }
+              privateRecords
+            />
+          )}
           <div>
             {selected ? (
               <>
@@ -412,7 +450,7 @@ export async function ProvisionalSection({
         <nav className="pagination" aria-label="Liste des enfants provisoires">
           {childPage > 1 && (
             <Link
-              href={`${base}?${new URLSearchParams({ q, childPage: String(childPage - 1) })}`}
+              href={`${base}?${new URLSearchParams({ q, childPage: String(childPage - 1), ...(open ? { open } : {}) })}`}
             >
               Enfants précédents
             </Link>
@@ -422,7 +460,7 @@ export async function ProvisionalSection({
           </span>
           {childPage * 30 < data.children_total && (
             <Link
-              href={`${base}?${new URLSearchParams({ q, childPage: String(childPage + 1) })}`}
+              href={`${base}?${new URLSearchParams({ q, childPage: String(childPage + 1), ...(open ? { open } : {}) })}`}
             >
               Enfants suivants
             </Link>

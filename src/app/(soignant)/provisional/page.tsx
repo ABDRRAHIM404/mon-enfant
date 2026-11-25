@@ -18,13 +18,13 @@ export default async function ProvisionalWorkspace({
   const q = await searchParams;
   const destinations: Record<string, string> = {
     children: "children",
-    consultation: "consultations",
-    vaccination: "vaccinations",
+    consultation: "children?open=consultations",
+    vaccination: "children?open=vaccinations",
     appointment: "appointments",
-    growth: "growth",
+    growth: "children?open=growth",
     documents: "documents",
   };
-  if (q.view && destinations[q.view])
+  if (q.view && Object.hasOwn(destinations, q.view))
     redirect(`/provisional/${destinations[q.view]}`);
   const page = Math.max(1, Math.min(10000, Number(q.page) || 1));
   const kind =

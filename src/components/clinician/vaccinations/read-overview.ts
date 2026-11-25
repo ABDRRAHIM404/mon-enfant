@@ -54,7 +54,6 @@ export async function readScheduleCatalog(supabase: Client) {
 export async function readVaccinationOverview(
   supabase: Client,
   child: Patient,
-  page: number,
 ): Promise<VaccinationOverview> {
   async function historyPage(n: number) {
     const result = await supabase.rpc("clinical_timeline", {
@@ -67,21 +66,16 @@ export async function readVaccinationOverview(
       throw new Error("Impossible de lire l’historique vaccinal.");
     return result.data as VaccinationOverview["history"];
   }
-  const [history, references, catalog] = await Promise.all([
-    historyPage(page),
-    supabase.rpc("patient_vaccine_items", { p_child_id: child.id, p_page: 1 }),
+  const [history, catalog] = await Promise.all([
+    historyPage(1),
     readScheduleCatalog(supabase),
   ]);
-  if (references.error?.code === "42501") notFound();
-  if (references.error)
-    throw new Error("Impossible de lire les références de cet enfant.");
-
   const pages = Math.ceil(history.total / historyPageSize);
   let completeHistory = null;
   if (pages <= maxHistoryPages) {
     const records = await Promise.all(
       Array.from({ length: pages }, (_, i) =>
-        i + 1 === page ? history : historyPage(i + 1),
+        i === 0 ? history : historyPage(i + 1),
       ),
     );
     const entries = records.flatMap((record) => record.items);
@@ -95,7 +89,6 @@ export async function readVaccinationOverview(
 
   return {
     history,
-    references: references.data as VaccinationOverview["references"],
     projection: vaccinationProjection(
       child,
       catalog.approved,

@@ -1,3 +1,5 @@
+import { readAuthorizedChild } from "@/lib/registry/read-child";
+import { ageAtVaccination } from "@/components/clinician/vaccinations/projection";
 import { readClinicalAttributions } from "@/lib/clinical/read-attribution";
 import {
   choicesWithRecordVersions,
@@ -8,7 +10,6 @@ import type { VaccineItemExport } from "@/lib/vaccines/patient-types";
 import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
 import { EntryCard } from "@/components/clinical/entry-card";
 import { ClinicalForm } from "@/components/clinical/entry-form";
 import type { ClinicalEntry } from "@/lib/clinical/types";
@@ -44,6 +45,8 @@ export default async function ClinicalHistory({
   const entries = history.data as ClinicalEntry[];
   if (!entries.length) notFound();
   const latest = entries[entries.length - 1];
+  const vaccinationChild =
+    latest.kind === "vaccination" ? await readAuthorizedChild(id) : null;
   const canCorrect =
     standardAccess.data === true || latest.author_id === user.id;
   const allowed = (capabilities.data as string[]).includes(latest.kind);
@@ -67,17 +70,7 @@ export default async function ClinicalHistory({
     { children: [id] },
   );
   return (
-    <ClinicalWorkspace
-      active={
-        latest.kind === "vaccination"
-          ? "vaccinations"
-          : latest.kind === "growth"
-            ? "growth"
-            : "consultations"
-      }
-      childId={id}
-      section="records"
-    >
+    <>
       <div className="page-heading">
         <h1 id="main-content" tabIndex={-1}>
           Historique de la saisie
@@ -91,14 +84,20 @@ export default async function ClinicalHistory({
         Retour au dossier clinique
       </Link>
       <h2>Versions conservées</h2>
-      {entries.map((entry) => (
-        <EntryCard
-          key={entry.id}
-          entry={entry}
-          link={false}
-          attributions={attributions}
-        />
-      ))}
+      {entries.map((entry) => {
+        const age = vaccinationChild
+          ? ageAtVaccination(vaccinationChild, entry)
+          : null;
+        return (
+          <EntryCard
+            key={entry.id}
+            entry={entry}
+            link={false}
+            attributions={attributions}
+            administrationAgeDays={age ?? undefined}
+          />
+        );
+      })}
       <section
         className="panel"
         id={latest.kind === "growth" ? "growth-correction" : undefined}
@@ -125,6 +124,6 @@ export default async function ClinicalHistory({
           </p>
         )}
       </section>
-    </ClinicalWorkspace>
+    </>
   );
 }

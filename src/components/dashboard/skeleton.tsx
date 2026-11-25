@@ -1,3 +1,4 @@
+import { clinicianMainNavigation } from "@/components/clinician/main-navigation";
 import Link from "next/link";
 import { Brand } from "@/components/brand";
 import {
@@ -7,7 +8,6 @@ import {
   Home,
   Settings,
   ShieldCheck,
-  Stethoscope,
   Syringe,
   UsersRound,
 } from "lucide-react";
@@ -117,29 +117,21 @@ export function DashboardLoading({
   area?: SkeletonArea;
   variant?: SkeletonVariant;
 }) {
-  const parent = area === "parent",
-    base = area === "provisional" ? "/provisional" : "";
-  const items = parent
-    ? ([
-        ["Tableau de bord", "/parent", Home],
-        ["Mes enfants", "/parent?view=children", UsersRound],
-        ["Vaccinations", "/parent?view=vaccinations", Syringe],
-        ["Croissance", "/parent?view=growth", ChartNoAxesCombined],
-        ["Rendez-vous", "/parent?view=appointments", CalendarDays],
-        ["Documents", "/parent?view=documents", FileText],
-        ["Partage & accès", "/parent?view=access", ShieldCheck],
-        ["Paramètres", "/parent/settings", Settings],
-      ] as const)
-    : ([
-        ["Tableau de bord", base || "/dashboard", Home],
-        ["Enfants", base ? base + "/children" : "/patients", UsersRound],
-        ["Consultations", base + "/consultations", Stethoscope],
-        ["Vaccinations", base + "/vaccinations", Syringe],
-        ["Rendez-vous", base + "/appointments", CalendarDays],
-        ["Croissance", base + "/growth", ChartNoAxesCombined],
-        ["Documents", base + "/documents", FileText],
-        ["Mon compte soignant", "/account", Settings],
-      ] as const);
+  const items =
+    area === "parent"
+      ? (
+          [
+            ["Tableau de bord", "/parent", Home],
+            ["Mes enfants", "/parent?view=children", UsersRound],
+            ["Vaccinations", "/parent?view=vaccinations", Syringe],
+            ["Croissance", "/parent?view=growth", ChartNoAxesCombined],
+            ["Rendez-vous", "/parent?view=appointments", CalendarDays],
+            ["Documents", "/parent?view=documents", FileText],
+            ["Partage & accès", "/parent?view=access", ShieldCheck],
+            ["Paramètres", "/parent/settings", Settings],
+          ] as const
+        ).map(([label, href, icon]) => ({ label, href, icon, hint: undefined }))
+      : clinicianMainNavigation(area === "provisional");
   return (
     <div className={`dashboard-loading-frame loading-${area}`}>
       <header className="loading-frame-header">
@@ -149,10 +141,11 @@ export function DashboardLoading({
       {area !== "neutral" && (
         <aside className="loading-frame-sidebar">
           <nav aria-label="Rubriques pendant le chargement">
-            {items.map(([label, href, Icon]) => (
+            {items.map(({ label, href, icon: Icon, hint }) => (
               <Link key={label} href={href}>
                 <Icon size={20} aria-hidden="true" />
                 {label}
+                {hint && <small>{hint}</small>}
               </Link>
             ))}
           </nav>

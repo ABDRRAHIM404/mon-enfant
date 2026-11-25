@@ -46,6 +46,7 @@
   min-height: 44px;
   line-height: 1.2;
   white-space: nowrap;
+  font-weight: 650;
   color: #233944;
   transition:
     background-color 200ms,
@@ -60,7 +61,6 @@
   color: var(--child-green);
   background: var(--child-mint);
   box-shadow: inset 0 -2px var(--child-green);
-  font-weight: 750;
 }
 .child-profile .care-patient-nav > a:hover {
   background: #edf9f4;
@@ -436,51 +436,51 @@
   margin: 14mm;
 }
 @media print {
-  .soignant-main:has(.child-profile.print-summary) > .soignant-development {
+  .soignant-main:has(.child-profile .print-summary) > .soignant-development {
     display: none;
   }
-  .child-profile.print-summary {
+  .child-profile .print-summary {
     page: child-medical-summary;
     font-size: 10pt;
     line-height: 1.3;
   }
-  .child-profile.print-summary .child-panel {
+  .child-profile .print-summary .child-panel {
     box-shadow: none;
     border: 0;
     padding: 0;
     margin: 8pt 0;
   }
-  .child-profile.print-summary .child-page-heading {
+  .child-profile .print-summary .child-page-heading {
     border: 0;
     padding: 0;
     margin: 0 0 9pt;
   }
-  .child-profile.print-summary :is(h1, h2, h3) {
+  .child-profile .print-summary :is(h1, h2, h3) {
     break-after: avoid;
   }
-  .child-profile.print-summary :is(.child-print-entry, .clinical-entry, li) {
+  .child-profile .print-summary :is(.child-print-entry, .clinical-entry, li) {
     break-inside: avoid;
   }
-  .child-profile.print-summary .clinical-entry {
+  .child-profile .print-summary .clinical-entry {
     box-shadow: none;
     margin: 5pt 0;
     padding: 4pt 0;
     border: none;
   }
-  .child-profile.print-summary :is(h2, h3, p) {
+  .child-profile .print-summary :is(h2, h3, p) {
     margin-block: 3pt;
   }
-  .child-profile.print-summary .details {
+  .child-profile .print-summary .details {
     margin: 4pt 0;
   }
-  .child-profile.print-summary .details :is(dt, dd) {
+  .child-profile .print-summary .details :is(dt, dd) {
     margin-block: 1pt;
     font-size: inherit;
   }
-  .child-profile.print-summary :is(.details, .clinical-text, li) {
+  .child-profile .print-summary :is(.details, .clinical-text, li) {
     overflow-wrap: anywhere;
   }
-  .child-profile.print-summary a[href] {
+  .child-profile .print-summary a[href] {
     display: none;
   }
 }

@@ -37,21 +37,21 @@ const shortcuts = [
   {
     label: "Consultation",
     detail: "Ouvrir un dossier patient",
-    href: "/consultations",
+    href: "/patients?open=consultations",
     kind: "consultation",
     Icon: Stethoscope,
   },
   {
     label: "Vaccination",
     detail: "Enregistrer une dose",
-    href: "/vaccinations",
+    href: "/patients?open=vaccinations",
     kind: "vaccination",
     Icon: Syringe,
   },
   {
     label: "Croissance",
     detail: "Suivre les mesures",
-    href: "/growth",
+    href: "/patients?open=growth",
     kind: "growth",
     Icon: ChartNoAxesCombined,
   },
@@ -186,7 +186,7 @@ export default async function Dashboard() {
     {
       count: recent.total,
       label: "Consultations documentées",
-      href: "/consultations",
+      href: "/patients?open=consultations",
       Icon: Stethoscope,
       review: false,
     },
@@ -448,7 +448,7 @@ export default async function Dashboard() {
           <footer>
             <Link
               className="care-action care-action--coral"
-              href="/consultations"
+              href="/patients?open=consultations"
             >
               <FileText aria-hidden="true" />
               Voir l’historique

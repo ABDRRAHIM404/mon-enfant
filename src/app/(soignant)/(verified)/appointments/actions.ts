@@ -194,7 +194,6 @@ export async function confirmRoutineAppointment(
     "/appointments",
     "/follow-up",
     "/dashboard",
-    "/vaccinations",
     `/patients/${child}`,
     `/patients/${child}/appointments`,
     `/patients/${child}/summary`,

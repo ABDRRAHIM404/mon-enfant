@@ -158,8 +158,7 @@ export default async function ProvisionalBooklet({
           {result.child.identity.sex}
         </p>
         <p>
-          Créé le {result.child.created_at} par {result.child.owner_id} (
-          {result.child.author_role}), compte {result.child.account_status}.
+          Créé le {result.child.created_at} depuis votre compte professionnel.
           Dossier toujours non vérifié.
         </p>
         <p>
@@ -180,7 +179,9 @@ export default async function ProvisionalBooklet({
           examine l’historique et décide du suivi manuellement.
         </p>
         <div className="tabs">
-          <Link href={`/provisional/vaccinations?child=${id}#routine-followup`}>
+          <Link href={`/provisional/${id}/consultations`}>Consultations</Link>
+          <Link href={`/provisional/${id}/growth`}>Croissance</Link>
+          <Link href={`/provisional/${id}/vaccinations#routine-followup`}>
             Vaccinations à venir et suivis planifiés
           </Link>
           <Link href="#entry-history">Consulter les entrées enregistrées</Link>

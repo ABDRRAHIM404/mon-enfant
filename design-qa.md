@@ -198,3 +198,11 @@ final result: passed (preview scope)
 Canonical UI/loading/cache publication: PR #4 / 168b0f4, READY dpl_4FvjCGbqsqdnePe5pU3wKVAHrqHS. Production reports pass, including access revocation with an existing session. Test fixture retirement remains pending explicit owner approval after automatic review rejection; it is not falsely marked complete.
 
 final result: passed (scoped canonical UI/loading/cache); cleanup pending owner approval
+
+## 25 November — child clinical workspace and navigation
+
+The supplied Consultations and Croissance layouts guided the persistent identity card, single-row desktop tabs, two-column consultation history and raw-measurement workspace. The retained rail uses the existing logo, artwork and navigation styling. The clinical actions use the requested coral highlight. Browser comparison used fictional records and the existing product typography. The growth history was narrowed after the first desktop review so attribution and correction controls fit alongside the chart, and the chart appears above long history on smaller screens.
+
+All eight tabs passed in Chromium at 1710, 850 and 390 px. The identity card and tab bar kept the same DOM nodes and card position while sections changed. The narrow tab bar revealed the active selection, the drawer reflected the centralized rail, and the booklet retained its nine columns and sticky horizontal navigation. See the [route inventory](docs/design-qa/soignant-shared-navigation.md) and [verification log](PROGRESS.md).
+
+final result: passed for the reference-guided layout and browser fixture checks.

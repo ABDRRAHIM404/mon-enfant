@@ -2,12 +2,14 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
-  ClinicalWorkspace,
+  ChildProfileWorkspace,
   ChildCareActions,
   PatientNavigation,
 } from "../src/components/clinician/care-workspace";
+import ChildLayout from "../src/app/(soignant)/(verified)/patients/[id]/layout";
 import { ParentWorkflow } from "../src/components/parents/workflow";
 import type { ChildProfile } from "../src/lib/registry/types";
+vi.mock("server-only", () => ({}));
 const { rpc, guard } = vi.hoisted(() => ({ rpc: vi.fn(), guard: vi.fn() }));
 vi.mock("@/lib/auth", () => ({ requireApprovedDoctor: guard }));
 vi.mock("@/app/auth/actions", () => ({ signOut: async () => ({}) }));
@@ -74,8 +76,9 @@ describe("child workflows and visible capability boundaries", () => {
   });
   it("keeps every child section in the same child scope and hides access management when unavailable", () => {
     const html = renderToStaticMarkup(
-      createElement(PatientNavigation, { childId: child.id, active: "growth" }),
+      createElement(PatientNavigation, { childId: child.id }),
     );
+    expect(html).toContain(`/patients/${child.id}/consultations`);
     expect(html).toContain(`/patients/${child.id}/vaccinations`);
     expect(html).toContain(`/patients/${child.id}/appointments`);
     expect(html).not.toContain("/guardians");
@@ -84,7 +87,6 @@ describe("child workflows and visible capability boundaries", () => {
       renderToStaticMarkup(
         createElement(PatientNavigation, {
           childId: child.id,
-          active: "guardians",
           canManageAccess: true,
         }),
       ),
@@ -92,9 +94,8 @@ describe("child workflows and visible capability boundaries", () => {
   });
   it("shows the authorized child's identity before the entry form", async () => {
     const html = renderToStaticMarkup(
-      await ClinicalWorkspace({
-        childId: child.id,
-        section: "records",
+      await ChildLayout({
+        params: Promise.resolve({ id: child.id }),
         children: createElement("h1", null, "Ajouter une consultation"),
       }),
     );
@@ -108,8 +109,7 @@ describe("child workflows and visible capability boundaries", () => {
   });
   it("does not re-read a child that the guarded page has already loaded", async () => {
     renderToStaticMarkup(
-      await ClinicalWorkspace({
-        childId: child.id,
+      ChildProfileWorkspace({
         child,
         children: "Contenu",
       }),
@@ -119,7 +119,10 @@ describe("child workflows and visible capability boundaries", () => {
   it("does not render a child context after current-session access denial", async () => {
     rpc.mockResolvedValue({ data: null, error: { code: "42501" } });
     await expect(
-      ClinicalWorkspace({ childId: child.id, children: "Contenu" }),
+      ChildLayout({
+        params: Promise.resolve({ id: child.id }),
+        children: "Contenu",
+      }),
     ).rejects.toThrow("NOT_FOUND");
   });
   it("keeps parent requests, notifications and invitation reachable inside the same workspace", () => {

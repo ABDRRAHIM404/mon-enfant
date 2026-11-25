@@ -1,12 +1,7 @@
 import Link from "next/link";
 import { DashboardHeading } from "@/components/dashboard/heading";
 import {
-  Home,
   UsersRound,
-  Stethoscope,
-  Syringe,
-  CalendarDays,
-  ChartNoAxesCombined,
   FileText,
   UserRound,
   Search,
@@ -15,7 +10,6 @@ import {
   Building2,
   ClipboardList,
   MessageSquare,
-  QrCode,
   KeyRound,
   Wrench,
   BookOpen,
@@ -36,7 +30,7 @@ import type { Professional } from "@/lib/authorization";
 import { statusLabels } from "@/lib/authorization";
 import { signOut } from "@/app/auth/actions";
 import { redirect } from "next/navigation";
-import type { ClinicianSection } from "./routes";
+import { clinicianMainNavigation } from "./main-navigation";
 
 export function ClinicianShell({
   provisional = false,
@@ -50,89 +44,17 @@ export function ClinicianShell({
   if (!profile || !["doctor", "nurse"].includes(profile.role))
     redirect("/account");
   const base = provisional ? "/provisional" : "";
-  const items = [
-    {
-      key: "home",
-      label: "Tableau de bord",
-      href: provisional ? base : "/dashboard",
-      icon: Home,
-    },
-    {
-      key: "children",
-      label: "Enfants",
-      href: provisional ? base + "/children" : "/patients",
-      icon: UsersRound,
-    },
-    {
-      key: "consultations",
-      label: "Consultations",
-      href: base + "/consultations",
-      icon: Stethoscope,
-    },
-    {
-      key: "vaccinations",
-      label: "Vaccinations",
-      href: base + "/vaccinations",
-      icon: Syringe,
-    },
-    {
-      key: "appointments",
-      label: "Rendez-vous",
-      href: base + "/appointments",
-      icon: CalendarDays,
-    },
-    {
-      key: "growth",
-      label: "Croissance",
-      href: base + "/growth",
-      icon: ChartNoAxesCombined,
-    },
-    {
-      key: "documents",
-      label: "Documents",
-      href: base + "/documents",
-      icon: FileText,
-    },
-    ...(!provisional
-      ? [
-          {
-            key: "sharing",
-            label: "Scanner un QR partagé",
-            href: "/share",
-            icon: QrCode,
-          },
-        ]
-      : []),
-    {
-      key: "guide",
-      label: "Guide et aide",
-      href: provisional ? "/provisional/guide" : "/guide-soignant",
-      icon: BookOpen,
-    },
-    {
-      key: "account",
-      label: "Mon compte soignant",
-      href: "/account",
-      icon: UserRound,
-    },
-  ];
-  const links = (featuresOnly = false) =>
-    items
-      .filter(({ key }) => !featuresOnly || key !== "account")
-      .map(({ key, label, href, icon: Icon }) => (
-        <ClinicianNavLink
-          key={key}
-          href={href}
-          section={key as ClinicianSection}
-          title={label}
-        >
-          <Icon size={21} aria-hidden="true" />
-          <span className="rail-label">
-            {label}
-            {key === "documents" && <small>Bientôt disponible</small>}
-          </span>
-        </ClinicianNavLink>
-      ));
+  const links = clinicianMainNavigation(provisional).map(
+    ({ key, label, href, icon: Icon, hint }) => (
+      <ClinicianNavLink key={key} href={href} section={key} title={label}>
+        <Icon size={21} aria-hidden="true" />
+        <span className="rail-label">
+          {label}
+          {hint && <small>{hint}</small>}
+        </span>
+      </ClinicianNavLink>
+    ),
+  );
   const tools = [
     {
       key: "followup",
@@ -220,7 +142,7 @@ export function ClinicianShell({
       <div className="soignant-workspace soignant-workspace--shared">
         <aside id="clinician-navigation-rail" className="soignant-sidebar">
           <Brand clinician />
-          <nav aria-label="Espace soignant">{links()}</nav>
+          <nav aria-label="Espace soignant">{links}</nav>
           {toolsMenu(true)}
           <div className="soignant-sidebar-footer">
             <form action={signOut}>
@@ -293,7 +215,7 @@ export function ClinicianShell({
           </div>
         </header>
         <DashboardMobileNavigation provisional={provisional}>
-          <nav aria-label="Toutes les rubriques soignant">{links(true)}</nav>
+          <nav aria-label="Toutes les rubriques soignant">{links}</nav>
           {toolsMenu()}
         </DashboardMobileNavigation>
         <main className="soignant-main">

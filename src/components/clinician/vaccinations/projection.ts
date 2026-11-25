@@ -7,7 +7,6 @@ import {
   routineReference,
 } from "@/lib/vaccines/calendar";
 import type { CatalogSnapshot } from "@/lib/vaccines/types";
-import type { PatientVaccineItem } from "@/lib/vaccines/patient-types";
 
 const hasDocumentedDate = (
   entry: ClinicalEntry,
@@ -157,7 +156,6 @@ export function ageAtVaccination(child: Patient, entry: ClinicalEntry) {
 
 export type VaccinationOverview = {
   history: { items: ClinicalEntry[]; total: number };
-  references: { items: PatientVaccineItem[]; total: number };
   projection: ReturnType<typeof vaccinationProjection>;
   historyComplete: boolean;
   catalogSearchComplete: boolean;

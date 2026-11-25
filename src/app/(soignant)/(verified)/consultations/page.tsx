@@ -1,12 +1,19 @@
-import { PatientSection } from "@/components/clinician/patient-section";
-import type { SectionQuery } from "@/components/clinician/provisional-section";
-import "./consultations.css";
+import { notFound, redirect } from "next/navigation";
+import { requireApprovedDoctor } from "@/lib/auth";
+import { legacyClinicalHref } from "@/components/clinician/clinical-destinations";
+import { uuidPattern } from "@/lib/registry/types";
 
-export const dynamic = "force-dynamic";
-export default async function Page({
+export default async function LegacyClinicalRoute({
   searchParams,
 }: {
-  searchParams: Promise<SectionQuery & { sort?: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  return <PatientSection section="consultations" query={await searchParams} />;
+  await requireApprovedDoctor();
+  const query = await searchParams;
+  if (
+    query.child &&
+    (typeof query.child !== "string" || !uuidPattern.test(query.child))
+  )
+    notFound();
+  redirect(legacyClinicalHref("consultations", query));
 }

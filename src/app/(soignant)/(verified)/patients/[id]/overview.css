@@ -493,3 +493,9 @@
     transform: none;
   }
 }
+
+.overview-followup a.overview-vaccine-reference {
+  display: inline-flex;
+  min-height: 44px;
+  padding-inline: 6px;
+}

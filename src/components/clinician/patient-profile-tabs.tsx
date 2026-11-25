@@ -8,14 +8,22 @@ import {
   House,
   ShieldCheck,
   Syringe,
+  Stethoscope,
 } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { NavigationFeedback } from "@/components/workspace-navigation";
 import type { PatientSection } from "./care-workspace";
 
 const tabs = [
   { key: "overview", label: "Vue d’ensemble", suffix: "", Icon: House },
+  {
+    key: "consultations",
+    label: "Consultations",
+    suffix: "/consultations",
+    Icon: Stethoscope,
+  },
   {
     key: "records",
     label: "Dossier clinique",
@@ -56,13 +64,15 @@ const tabs = [
 
 export function PatientNavigation({
   childId,
-  active,
   canManageAccess = false,
 }: {
   childId: string;
-  active: PatientSection;
   canManageAccess?: boolean;
 }) {
+  const pathname = usePathname();
+  const segment = pathname?.split("/")[3];
+  const active: PatientSection =
+    tabs.find(({ key }) => key === segment)?.key ?? "overview";
   const bar = useRef<HTMLElement>(null);
   useEffect(() => {
     const nav = bar.current;
@@ -70,10 +80,13 @@ export function PatientNavigation({
     function align() {
       const selected = nav?.querySelector<HTMLElement>('[aria-current="page"]');
       if (!nav || !selected || nav.scrollWidth <= nav.clientWidth) return;
-      nav.scrollLeft +=
-        selected.getBoundingClientRect().left -
-        nav.getBoundingClientRect().left -
-        (nav.clientWidth - selected.offsetWidth) / 2;
+      const { left, right } = selected.getBoundingClientRect();
+      const bounds = nav.getBoundingClientRect();
+      const inset = 6;
+      if (left < bounds.left + inset)
+        nav.scrollLeft += left - bounds.left - inset;
+      if (right > bounds.right - inset)
+        nav.scrollLeft += right - bounds.right + inset;
     }
     align();
     const observer = new ResizeObserver(align);
@@ -96,11 +109,12 @@ export function PatientNavigation({
           <Link
             key={key}
             href={`/patients/${childId}${suffix}`}
+            scroll={false}
             aria-current={active === key ? "page" : undefined}
           >
             <Icon size={16} aria-hidden="true" className="child-tab-icon" />
             {label}
-            <NavigationFeedback />
+            <NavigationFeedback inlineOnly />
           </Link>
         ))}
     </nav>

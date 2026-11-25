@@ -240,28 +240,12 @@ export async function recordClinical(
   revalidatePath(`/patients/${child}/vaccinations`);
   revalidatePath(`/patients/${child}/summary`);
   if (root) revalidatePath(`/patients/${child}/records/${root}`);
-  if (kind === "growth") {
-    revalidatePath("/growth");
-    if (inlineGrowth) {
-      const params = new URLSearchParams({
-        child,
-        saved: "1",
-        q: text("growthQuery").slice(0, 100),
-        childPage: String(
-          Math.min(
-            10000,
-            Math.max(1, Math.floor(Number(text("growthChildPage")) || 1)),
-          ),
-        ),
-      });
-      return redirect(`/growth?${params}`);
-    }
-  }
-  if (kind === "vaccination") {
-    revalidatePath("/vaccinations");
-    if (!root && text("returnTo") === "booklet")
-      return redirect(`/patients/${child}/vaccinations?saved=1`);
-  }
+  revalidatePath(`/patients/${child}/consultations`);
+  revalidatePath(`/patients/${child}/vaccinations/follow-up`);
+  if (inlineGrowth)
+    return redirect(`/patients/${child}/growth?saved=1#history`);
+  if (kind === "vaccination" && !root && text("returnTo") === "booklet")
+    return redirect(`/patients/${child}/vaccinations?saved=1`);
   return redirect(`/patients/${child}/records/${root || data}`);
 }
 export async function changeClinicalPermission(

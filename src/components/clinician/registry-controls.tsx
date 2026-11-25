@@ -3,6 +3,7 @@
 import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTransition, type FormEvent } from "react";
+import type { ClinicalDestination } from "./clinical-destinations";
 import { historyLabels } from "@/lib/registry/types";
 import { RegistryFilterSelect } from "./registry-filter-select";
 import "./registry-filter-select.css";
@@ -20,6 +21,7 @@ const ageOptions = [
 ];
 
 export type RegistryQuery = {
+  open?: ClinicalDestination;
   q: string;
   history: string;
   age: string;
@@ -58,6 +60,7 @@ export function RegistryFilters({ query }: { query: RegistryQuery }) {
     >
       <input type="hidden" name="sort" value={query.sort} />
       <input type="hidden" name="view" value={query.view} />
+      {query.open && <input type="hidden" name="open" value={query.open} />}
       <label>
         Nom, identifiant, contact ou numéro local
         <span className="registry-directory-search">
@@ -112,6 +115,7 @@ export function RegistrySort({ query }: { query: RegistryQuery }) {
       <input type="hidden" name="age" value={query.age} />
       <input type="hidden" name="page" value={query.page} />
       <input type="hidden" name="view" value={query.view} />
+      {query.open && <input type="hidden" name="open" value={query.open} />}
       <label>
         <span id="registry-sort-label">Trier par</span>
         <select

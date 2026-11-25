@@ -1,18 +1,15 @@
 import type { ClinicalAttributions } from "@/lib/clinical/attribution";
-import Image from "next/image";
 import Link from "next/link";
 import {
   CalendarCheck,
   ChevronDown,
-  CircleCheck,
+  ChevronRight,
   ClipboardList,
   Folder,
   Pill,
   Plus,
   ShieldCheck,
-  Stethoscope,
   TriangleAlert,
-  UserRound,
 } from "lucide-react";
 import { EntryCard } from "@/components/clinical/entry-card";
 import { NavigationFeedback } from "@/components/workspace-navigation";
@@ -21,17 +18,13 @@ import {
   sourceLabels,
   type ClinicalEntry,
 } from "@/lib/clinical/types";
-import { birthLabel, patientName, type Patient } from "@/lib/registry/types";
-import { ChildAvatar } from "../child-avatar";
-import { ConsultationSearch, ConsultationSort } from "./controls";
+import { bookletDate } from "@/lib/vaccines/booklet";
+import { ChildPageHeading } from "../patient-profile";
+import { ConsultationSort } from "./controls";
 
 type Sort = "recent" | "oldest";
 const pageSize = 30;
 const maxPage = 10000;
-
-function pageHref(params: Record<string, string>) {
-  return `/consultations?${new URLSearchParams(params)}`;
-}
 
 function ConsultationPagination({
   label,
@@ -78,14 +71,16 @@ function ConsultationEntry({
   const withdrawn = entry.entry_state === "withdrawn";
   const source = sourceLabels[entry.source_type] ?? entry.source_type;
   return (
-    <li>
+    <li data-selected={initiallyOpen}>
       <details className="consultation-entry" open={initiallyOpen}>
         <summary>
           <CalendarCheck size={20} aria-hidden="true" />
           <span className="consultation-entry-heading">
             <strong>
               {entry.occurred_on ? (
-                <time dateTime={entry.occurred_on}>{entry.occurred_on}</time>
+                <time dateTime={entry.occurred_on}>
+                  {bookletDate(entry.occurred_on)}
+                </time>
               ) : (
                 "Date inconnue"
               )}
@@ -120,32 +115,24 @@ function ConsultationEntry({
 }
 
 export function ConsultationsWorkspace({
-  query,
-  child,
-  matches,
-  childrenPage,
-  childrenTotal,
+  childId,
   history,
   historyPage,
+  selectedRoot,
   canWrite,
   sort,
   attributions,
 }: {
-  query: string;
-  child: Patient | null;
-  matches: Patient[];
-  childrenPage: number;
-  childrenTotal: number;
+  childId: string;
   history: { items: ClinicalEntry[]; total: number };
   historyPage: number;
+  selectedRoot?: string;
   canWrite: boolean;
   sort: Sort;
   attributions: ClinicalAttributions;
 }) {
-  const base = { q: query, sort, childPage: String(childrenPage) };
-  const childPath = child ? `/patients/${child.id}` : "";
-  const newHref =
-    child && canWrite ? `${childPath}/records/new?kind=consultation` : null;
+  const base = `/patients/${childId}`;
+  const href = `${base}/consultations`;
   const timeline =
     sort === "recent"
       ? history.items
@@ -154,248 +141,131 @@ export function ConsultationsWorkspace({
           if (!b.occurred_on) return -1;
           return a.occurred_on.localeCompare(b.occurred_on);
         });
-  const newAction = newHref && (
-    <Link className="consultation-new" href={newHref} prefetch={false}>
-      <Plus size={21} aria-hidden="true" />
-      Nouvelle consultation
-      <NavigationFeedback />
-    </Link>
-  );
+
+  const selected =
+    timeline.find(({ root_id }) => root_id === selectedRoot) ?? timeline[0];
 
   return (
-    <div className="consultations-workspace">
-      <header className="consultation-heading">
-        <div className="consultation-heading-copy">
-          <span>Espace soignant</span>
-          <h1 id="main-content" tabIndex={-1}>
-            Consultations
-          </h1>
-          <p>
-            Créer, consulter et suivre les consultations de vos enfants
-            autorisés.
-          </p>
-        </div>
-        <Image
-          src="/dashboard-art/consultations-hero.webp"
-          width={1080}
-          height={349}
-          alt=""
-          unoptimized
-        />
-        {newAction && (
-          <div className="consultation-phone-action">{newAction}</div>
-        )}
-      </header>
-      <div className="consultation-grid">
-        <aside
-          className="consultation-panel consultation-picker"
-          aria-labelledby="consultation-picker-title"
-        >
+    <div className="consultations-workspace child-consultations-workspace">
+      <ChildPageHeading
+        title="Consultations"
+        description="Suivi des consultations de cet enfant."
+        actions={
+          canWrite ? (
+            <Link
+              className="button primary child-button child-spotlight"
+              href={`${base}/records/new?kind=consultation`}
+            >
+              <Plus size={19} aria-hidden="true" /> Nouvelle consultation
+              <NavigationFeedback />
+            </Link>
+          ) : (
+            <Link
+              className="button secondary child-button"
+              href="/account/clinical-permissions"
+            >
+              <ShieldCheck size={18} aria-hidden="true" /> Mes habilitations
+            </Link>
+          )
+        }
+      />
+      <section
+        className="consultation-panel consultation-history"
+        id="section-history"
+        aria-labelledby="consultation-history-title"
+      >
+        <header>
           <div className="consultation-panel-title">
             <span className="consultation-icon">
-              <UserRound size={22} aria-hidden="true" />
+              <CalendarCheck size={22} aria-hidden="true" />
             </span>
-            <h2 id="consultation-picker-title">Sélectionner un enfant</h2>
+            <h2 id="consultation-history-title">
+              Historique des consultations
+            </h2>
           </div>
-          <ConsultationSearch key={query} query={query} sort={sort} />
-          <ul className="consultation-patients" role="list">
-            {matches.map((patient) => (
-              <li key={patient.id}>
+          {timeline.length > 1 && (
+            <ConsultationSort
+              key={`${childId}/${sort}`}
+              href={href}
+              params={{ page: String(historyPage) }}
+              sort={sort}
+            />
+          )}
+        </header>
+        <nav
+          className="consultation-extra-actions"
+          aria-label="Autres actions du dossier enfant"
+        >
+          <Link href={`${base}/records?kind=consultation`}>
+            <Folder size={17} aria-hidden="true" /> Historique et corrections
+          </Link>
+          <Link href={`${base}/records?kind=prescription`}>
+            <Pill size={17} aria-hidden="true" /> Traitements / prescriptions
+          </Link>
+          <Link href={`${base}/records?kind=risk`}>
+            <TriangleAlert size={17} aria-hidden="true" /> Risques et allergies
+          </Link>
+        </nav>
+        {timeline.length ? (
+          <div className="child-consultation-columns">
+            <nav
+              className="child-consultation-index"
+              aria-label="Choisir une consultation"
+            >
+              {timeline.map((entry) => (
                 <Link
-                  href={pageHref({ ...base, child: patient.id })}
-                  aria-current={child?.id === patient.id ? "true" : undefined}
-                  prefetch={false}
+                  key={entry.id}
+                  href={`${href}?${new URLSearchParams({ sort, page: String(historyPage), entry: entry.root_id })}`}
+                  scroll={false}
+                  aria-current={entry === selected ? "true" : undefined}
                 >
-                  <ChildAvatar sex={patient.sex} size={42} />
+                  <CalendarCheck size={19} aria-hidden="true" />
                   <span>
-                    <strong>{patientName(patient)}</strong>
-                    <small>{birthLabel(patient)}</small>
+                    <strong>
+                      {entry.occurred_on
+                        ? bookletDate(entry.occurred_on)
+                        : "Date inconnue"}
+                    </strong>
+                    {entry.entry_state === "withdrawn" ? (
+                      <small>Consultation retirée</small>
+                    ) : (
+                      <small>{entry.payload.reason || "Consultation"}</small>
+                    )}
                   </span>
-                  {child?.id === patient.id && (
-                    <CircleCheck size={22} aria-hidden="true" />
-                  )}
-                  <NavigationFeedback />
+                  <ChevronRight size={17} aria-hidden="true" />
                 </Link>
-              </li>
-            ))}
-          </ul>
-          {matches.length === 0 && (
-            <p className="consultation-muted">
-              Aucun dossier autorisé ne correspond à cette recherche.
-            </p>
-          )}
-          <ConsultationPagination
-            label="Pages des enfants"
-            page={childrenPage}
-            total={childrenTotal}
-            href={(page) => pageHref({ ...base, childPage: String(page) })}
-          />
-        </aside>
-        <div className="consultation-main">
-          {child ? (
-            <>
-              <section
-                className="consultation-panel consultation-profile"
-                aria-labelledby="consultation-child-name"
-              >
-                <div className="consultation-child">
-                  <ChildAvatar sex={child.sex} size={65} />
-                  <div>
-                    <h2 id="consultation-child-name">{patientName(child)}</h2>
-                    <ul className="consultation-child-meta" role="list">
-                      <li>
-                        {child.sex === "male"
-                          ? "Garçon"
-                          : child.sex === "female"
-                            ? "Fille"
-                            : "Sexe non renseigné"}
-                      </li>
-                      <li>
-                        {child.birth_date
-                          ? `Naissance : ${birthLabel(child)}`
-                          : "Date de naissance inconnue"}
-                      </li>
-                      {child.registers?.map((r) => (
-                        <li
-                          key={`${r.facility_id}/${r.year}/${r.book}/${r.number}`}
-                        >
-                          Registre local : {r.number} / {r.year} / {r.book} ·{" "}
-                          {r.facility_name}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-                <nav
-                  className="consultation-actions"
-                  aria-label="Actions du dossier enfant"
-                >
-                  <a
-                    href="#section-history"
-                    className="consultation-active"
-                    aria-current="location"
-                  >
-                    <Stethoscope size={20} aria-hidden="true" />
-                    Consultations
-                  </a>
-                  {newAction && (
-                    <div className="consultation-desktop-action">
-                      {newAction}
-                    </div>
-                  )}
-                  <Link
-                    href={`${childPath}/records?kind=consultation`}
-                    prefetch={false}
-                  >
-                    <Folder size={19} aria-hidden="true" />
-                    Historique et corrections
-                    <NavigationFeedback />
-                  </Link>
-                </nav>
-                <nav
-                  className="consultation-extra-actions"
-                  aria-label="Autres rubriques du dossier enfant"
-                >
-                  <Link href={childPath} prefetch={false}>
-                    <UserRound size={17} aria-hidden="true" />
-                    Profil de l’enfant
-                  </Link>
-                  <Link
-                    href={`${childPath}/records?kind=prescription`}
-                    prefetch={false}
-                  >
-                    <Pill size={17} aria-hidden="true" />
-                    Traitements / prescriptions
-                  </Link>
-                  <Link
-                    href={`${childPath}/records?kind=risk`}
-                    prefetch={false}
-                  >
-                    <TriangleAlert size={17} aria-hidden="true" />
-                    Risques et allergies
-                  </Link>
-                </nav>
-                {!canWrite && (
-                  <p className="consultation-permission">
-                    <ShieldCheck size={17} aria-hidden="true" />
-                    Consultation du dossier autorisée. Une habilitation clinique
-                    est nécessaire pour ajouter un soin.
-                  </p>
-                )}
-              </section>
-              <section
-                className="consultation-panel consultation-history"
-                id="section-history"
-                aria-labelledby="consultation-history-title"
-              >
-                <header>
-                  <div className="consultation-panel-title">
-                    <span className="consultation-icon">
-                      <CalendarCheck size={22} aria-hidden="true" />
-                    </span>
-                    <h2 id="consultation-history-title">
-                      Historique des consultations
-                    </h2>
-                  </div>
-                  {timeline.length > 1 && (
-                    <ConsultationSort
-                      key={`${child.id}/${sort}`}
-                      params={{
-                        q: query,
-                        childPage: String(childrenPage),
-                        child: child.id,
-                        page: String(historyPage),
-                      }}
-                      sort={sort}
-                    />
-                  )}
-                </header>
-                {timeline.length ? (
-                  <ul className="consultation-timeline" role="list">
-                    {timeline.map((entry, index) => (
-                      <ConsultationEntry
-                        key={entry.id}
-                        entry={entry}
-                        initiallyOpen={index === 0}
-                        attributions={attributions}
-                      />
-                    ))}
-                  </ul>
-                ) : (
-                  <div className="consultation-empty">
-                    <ClipboardList size={27} aria-hidden="true" />
-                    <p>
-                      {history.total > 0
-                        ? "Aucune consultation sur cette page."
-                        : "Aucune consultation documentée pour cet enfant."}
-                    </p>
-                    {history.total === 0 && newAction}
-                  </div>
-                )}
-                <ConsultationPagination
-                  label="Pages de l’historique des consultations"
-                  page={historyPage}
-                  total={history.total}
-                  href={(page) =>
-                    pageHref({ ...base, child: child.id, page: String(page) })
-                  }
+              ))}
+            </nav>
+            <ul className="consultation-timeline" role="list">
+              {timeline.map((entry) => (
+                <ConsultationEntry
+                  key={entry.id}
+                  entry={entry}
+                  initiallyOpen={entry === selected}
+                  attributions={attributions}
                 />
-              </section>
-            </>
-          ) : (
-            <section className="consultation-panel consultation-empty">
-              <ClipboardList size={29} aria-hidden="true" />
-              <h2>Aucun enfant sélectionné</h2>
-              <p>
-                Choisissez un dossier autorisé pour afficher ses consultations.
-              </p>
-              <Link className="text-link" href="/patients/new" prefetch={false}>
-                Inscrire un enfant
-              </Link>
-            </section>
-          )}
-        </div>
-      </div>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <div className="consultation-empty">
+            <ClipboardList size={27} aria-hidden="true" />
+            <p>
+              {history.total > 0
+                ? "Aucune consultation sur cette page."
+                : "Aucune consultation documentée pour cet enfant."}
+            </p>
+          </div>
+        )}
+        <ConsultationPagination
+          label="Pages de l’historique des consultations"
+          page={historyPage}
+          total={history.total}
+          href={(page) =>
+            `${href}?${new URLSearchParams({ sort, page: String(page) })}`
+          }
+        />
+      </section>
     </div>
   );
 }

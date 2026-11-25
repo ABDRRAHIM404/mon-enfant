@@ -15,11 +15,13 @@ export function EntryCard({
   link = true,
   attributions,
   heading = true,
+  administrationAgeDays,
 }: {
   entry: ClinicalEntry;
   link?: boolean;
   attributions?: ClinicalAttributions;
   heading?: boolean;
+  administrationAgeDays?: number;
 }) {
   return (
     <article className="panel clinical-entry">
@@ -39,6 +41,12 @@ export function EntryCard({
               : "Source non confirmée"}
           </p>
         </>
+      )}
+      {administrationAgeDays !== undefined && (
+        <p className="fine">
+          Âge à l’administration · {administrationAgeDays} jour
+          {administrationAgeDays !== 1 ? "s" : ""}
+        </p>
       )}
       <dl className="details">
         {Object.entries(entry.payload)

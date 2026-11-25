@@ -9,7 +9,6 @@ import { appointmentTime } from "@/lib/appointments/calendar";
 import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
-import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
 import {
   GuardianInviteForm,
   GuardianReviewForm,
@@ -68,7 +67,7 @@ export default async function Guardians({
     other: "Autre responsable",
   };
   return (
-    <ClinicalWorkspace active="children" childId={id} section="guardians">
+    <>
       <ChildPageHeading
         title="Accès des parents"
         description="Vérifiez les demandes et gérez les droits des responsables."
@@ -254,6 +253,6 @@ export default async function Guardians({
           </details>
         )}
       </ChildPanel>
-    </ClinicalWorkspace>
+    </>
   );
 }
