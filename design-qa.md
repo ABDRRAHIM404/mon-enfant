@@ -1,3 +1,13 @@
+# Child overview redesign · 25 November 2026
+
+Final result: passed for the child overview and shared identity header.
+
+Compared the supplied desktop and mobile references with Chromium captures at 1440, 820, 390 and 320 CSS pixels. Desktop pairs the shortcuts and follow-up. Mobile presents follow-up first and collapses identity, register, QR and professional access. The final capture uses vertically stacked icons and readable labels in narrow clinical shortcuts.
+
+Isolated browser verification covered the six shortcut destinations, current tabs, refreshed data and vaccination status, expandable panels, clipboard feedback, decoding the displayed QR to the existing identification URL, and no-write and denied states. Production uses the existing authorized queries, and the change adds no database migration.
+
+---
+
 # Vaccination history verification · 25 November 2026
 
 Compared the booklet at 1440, 820, 390 and 320 CSS pixels. The three choices use a centered modal on desktop and a bottom sheet on mobile. Opening the review preserves the table row height, and the nine columns and sticky headers remain usable.

@@ -22,11 +22,7 @@ import {
   type CatalogSnapshot,
 } from "@/lib/vaccines/types";
 import { todayCasablanca } from "@/lib/appointments/calendar";
-import {
-  bookletAge,
-  vaccinationBooklet,
-  type DoseReview,
-} from "@/lib/vaccines/booklet";
+import { vaccinationBooklet, type DoseReview } from "@/lib/vaccines/booklet";
 import {
   BookletDate,
   VaccinationBooklet,
@@ -152,10 +148,6 @@ export default async function Vaccinations({
     (detail.data as { version: CatalogSnapshot } | null)?.version ?? null;
   const historyHref = (n: number) =>
     `?${new URLSearchParams({ historyPage: String(n), catalogPage: String(catalogPage), ...(query.version ? { version: query.version } : {}) })}#vaccination-history`;
-  const age =
-    child.birth_date && child.birth_date_precision === "exact"
-      ? bookletAge(child.birth_date, today)
-      : null;
   return (
     <section className="vaccination-booklet">
       <ClinicalWorkspace
@@ -163,27 +155,6 @@ export default async function Vaccinations({
         childId={id}
         section="vaccinations"
         child={child}
-        childContextDetails={
-          <>
-            {child.birth_date ? (
-              <>
-                Né(e) le <BookletDate date={child.birth_date} />
-                {age
-                  ? ` · ${age}`
-                  : child.birth_date_precision === "estimated"
-                    ? " · Date estimée"
-                    : ""}
-              </>
-            ) : (
-              "Date de naissance inconnue"
-            )}
-            {child.sex === "male" || child.sex === "female" ? (
-              <span className="booklet-child-sex">
-                {child.sex === "male" ? "Garçon" : "Fille"}
-              </span>
-            ) : null}
-          </>
-        }
       >
         {query.saved === "1" && (
           <p className="booklet-save-notice" role="status">
