@@ -1,5 +1,6 @@
 export type Facility = { id: string; name: string; city: string };
 export type Register = {
+  id?: string;
   facility_id: string;
   facility_name: string;
   year: number;
@@ -23,6 +24,7 @@ export type Patient = {
   registers: Register[];
 };
 export type ChildProfile = Patient & {
+  profile_revision: number;
   can_manage_access: boolean;
   created_by_professional_id: string;
   paper_reference: string | null;

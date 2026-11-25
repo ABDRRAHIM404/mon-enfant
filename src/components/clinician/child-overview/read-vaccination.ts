@@ -51,6 +51,7 @@ export async function readChildVaccineFollowup(
     new Set(entries.map(({ root_id }) => root_id)).size !== first.total
   )
     return null;
+  const today = todayCasablanca();
   const booklet = vaccinationBooklet(
     child,
     catalog.approved,
@@ -58,18 +59,25 @@ export async function readChildVaccineFollowup(
     true,
     items.data as VaccineItemExport[],
     reviews.data as DoseReview[],
-    todayCasablanca(),
+    today,
   );
   const overdue = booklet.rows
     .filter((row) => row.status === "overdue")
-    .sort((a, b) => (a.ref.endOn ?? "").localeCompare(b.ref.endOn ?? ""))[0];
-  const next = overdue ?? booklet.upcoming[0];
-  if (!next?.ref.startOn) return null;
+    .sort((a, b) => (a.ref.endOn ?? "").localeCompare(b.ref.endOn ?? ""))
+    .map((row) => row.rule.dose_code);
+  const next = booklet.upcoming.find(
+    (row) => row.ref.startOn && row.ref.startOn >= today,
+  );
   return {
-    code: next.rule.dose_code,
-    stage: next.stage.label,
-    start: next.ref.startOn,
-    end: next.ref.isWindow ? next.ref.endOn : null,
-    overdue: next.status === "overdue",
+    next: next?.ref.startOn
+      ? {
+          code: next.rule.dose_code,
+          name: next.label,
+          stage: next.stage.label,
+          start: next.ref.startOn,
+          end: next.ref.isWindow ? next.ref.endOn : null,
+        }
+      : null,
+    overdue,
   };
 }

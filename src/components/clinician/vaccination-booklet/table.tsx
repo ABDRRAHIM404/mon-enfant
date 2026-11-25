@@ -360,7 +360,7 @@ export function VaccinationBooklet({
                           ? entryForm
                           : `/vaccines/${rule.version_id}`;
                     return (
-                      <tr key={rule.dose_code}>
+                      <tr key={rule.dose_code} id={`dose-${rule.dose_code}`}>
                         {index === 0 && (
                           <th
                             rowSpan={rows.length}

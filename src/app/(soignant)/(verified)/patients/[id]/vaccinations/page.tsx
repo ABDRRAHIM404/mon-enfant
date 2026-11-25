@@ -45,6 +45,7 @@ export default async function Vaccinations({
     catalogPage?: string;
     historyPage?: string;
     saved?: string;
+    registered?: string;
   }>;
 }) {
   const { supabase } = await requireApprovedDoctor();
@@ -156,6 +157,15 @@ export default async function Vaccinations({
         section="vaccinations"
         child={child}
       >
+        {query.registered === "1" && (
+          <p className="booklet-save-notice" role="status">
+            Dossier créé.{" "}
+            <Link className="text-link" href={`/patients/${id}`}>
+              Ouvrir la vue d’ensemble
+            </Link>{" "}
+            pour documenter un soin ou compléter les informations plus tard.
+          </p>
+        )}
         {query.saved === "1" && (
           <p className="booklet-save-notice" role="status">
             Vaccination enregistrée.

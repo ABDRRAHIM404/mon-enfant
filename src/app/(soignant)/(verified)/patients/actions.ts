@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireApprovedDoctor } from "@/lib/auth";
 import { reportOperationalEvent } from "@/lib/operational-events";
+import { parseAppointmentDate } from "@/lib/appointments/calendar";
 import { uuidPattern } from "@/lib/registry/types";
 export type RegistryState = {
   error?: string;
@@ -53,11 +54,26 @@ export async function registryAction(
       "duplicate_override_reason",
       "smi_reference",
     ];
+    const quick = text("quickRegistration") === "on";
     const payload: Record<string, unknown> = Object.fromEntries(
-      fields.map((key) => [key, text(key)]),
+      (quick ? ["given_name", "family_name", "sex"] : fields).map((key) => [
+        key,
+        text(key),
+      ]),
     );
-    payload.register_year = Number(text("register_year"));
-    if (text("parentDraft") === "on") {
+    if (quick) {
+      try {
+        payload.birth_date = parseAppointmentDate(text("birth_date"));
+      } catch {
+        return {
+          error: "Indiquez une date de naissance valide au format JJ/MM/AAAA.",
+        };
+      }
+      payload.quick_registration = true;
+    } else {
+      payload.register_year = Number(text("register_year"));
+    }
+    if (!quick && text("parentDraft") === "on") {
       if (text("draftIdentityChecked") !== "on")
         return {
           error: "Confirmez l’identité et la date de naissance de l’enfant.",
@@ -195,8 +211,10 @@ export async function registryAction(
   ) {
     if (kind === "register" && text("parentDraft") === "on") {
       revalidatePath("/parent/add-child");
-      redirect(`/patients/${data}/guardians`);
+      return redirect(`/patients/${data}/guardians`);
     }
+    if (kind === "register" && text("quickRegistration") === "on")
+      return redirect(`/patients/${data}/vaccinations?registered=1`);
     redirect(`/patients/${data}`);
   }
   return { success: true };
@@ -290,7 +308,120 @@ export async function resumeRegistration(
   revalidatePath("/registration-reviews");
   if (item.payload.parent_draft_identity_checked === true) {
     revalidatePath("/parent/add-child");
-    redirect(`/patients/${result.data}/guardians`);
+    return redirect(`/patients/${result.data}/guardians`);
   }
+  if (item.payload.quick_registration === true)
+    return redirect(`/patients/${result.data}/vaccinations?registered=1`);
   redirect(`/patients/${result.data}`);
+}
+
+export async function updateChildInformation(
+  _: RegistryState,
+  form: FormData,
+): Promise<RegistryState> {
+  const { supabase } = await requireApprovedDoctor();
+  const text = (key: string) => String(form.get(key) ?? "").trim();
+  const child = text("childId");
+  const operation = text("operationId");
+  const revision = text("revision");
+  if (
+    !uuidPattern.test(child) ||
+    !uuidPattern.test(operation) ||
+    !/^\d+$/.test(revision)
+  )
+    return { error: "Rechargez le dossier avant de poursuivre." };
+
+  const details = Object.fromEntries(
+    [
+      "given_name",
+      "family_name",
+      "name_status",
+      "birth_date",
+      "birth_date_precision",
+      "sex",
+      "history_status",
+      "paper_reference",
+      "provenance_note",
+      "guardian_name",
+      "guardian_phone",
+    ].map((key) => [key, text(key)]),
+  );
+  if (details.birth_date) {
+    try {
+      details.birth_date = parseAppointmentDate(details.birth_date);
+    } catch {
+      return {
+        error: "Indiquez une date de naissance valide au format JJ/MM/AAAA.",
+      };
+    }
+  }
+  const register = {
+    id: text("registerId"),
+    facility_id: text("facility_id"),
+    year: text("register_year"),
+    book: text("register_book"),
+    number: text("local_number"),
+    smi_reference: text("smi_reference"),
+  };
+  const hasRegister = Object.values(register).some(Boolean);
+  if (
+    hasRegister &&
+    (!uuidPattern.test(register.facility_id) ||
+      !register.year ||
+      !register.book ||
+      !register.number)
+  )
+    return {
+      error:
+        "Pour enregistrer le registre, renseignez le lieu, l’année, la série et le numéro local.",
+    };
+
+  const { error } = await supabase.rpc("update_child_information", {
+    p_operation_id: operation,
+    p_child_id: child,
+    p_expected_revision: revision,
+    p_details: details,
+    p_register: hasRegister ? register : null,
+  });
+  if (error) {
+    switch (error.code) {
+      case "PT409":
+        return {
+          error:
+            "Le dossier a été modifié. Rechargez-le avant de reprendre la saisie.",
+        };
+      case "PT422":
+        return {
+          error:
+            "La date de naissance est postérieure à un soin documenté. Vérifiez la date saisie.",
+        };
+      case "42501":
+        return {
+          error:
+            "Vérifiez votre autorisation de gestion et le lieu d’exercice sélectionné.",
+        };
+      case "23505":
+        return {
+          error:
+            "Cette référence existe déjà dans ce registre. Vérifiez la série et le numéro.",
+        };
+      case "22023":
+      case "22007":
+      case "22008":
+      case "22P02":
+      case "23514":
+        return {
+          error:
+            "Vérifiez les noms, les degrés de certitude, la date et les coordonnées saisies.",
+        };
+      default:
+        return {
+          error: `Enregistrement indisponible. Référence : ${reportOperationalEvent("registry_action_failed")}`,
+        };
+    }
+  }
+  revalidatePath("/dashboard");
+  revalidatePath("/patients");
+  revalidatePath(`/patients/${child}`, "layout");
+  return redirect(`/patients/${child}?saved=1`);
 }

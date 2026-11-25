@@ -97,7 +97,7 @@ async function setup(dob: string | null = "2025-01-01", sex = "female") {
     register_year: 2026,
     register_book: "A",
     local_number: "125",
-    given_name: "Enfant fictif",
+    given_name: `Enfant fictif ${randomUUID()}`,
     family_name: randomUUID(),
     birth_date: dob,
     birth_date_precision: dob ? "exact" : "unknown",
@@ -206,12 +206,14 @@ beforeAll(async () => {
   for (const file of [
     "20261119150616_doctor_care_qr.sql",
     "20261119152628_parent_care_visit_qr.sql",
+    "20261119164356_parent_child_drafts.sql",
     "20261121174928_pni_hepatitis_b_birth_draft.sql",
     "20261121183740_routine_appointment_proposals.sql",
     "20261121190310_appointment_workspace_filters.sql",
     "20261124192109_vaccination_booklet_reviews.sql",
     "20261124195146_patient_routine_appointment_proposals.sql",
     "20261125174814_booklet_history_verification.sql",
+    "20261125190338_quick_child_registration.sql",
   ])
     await db.exec(readFileSync(`supabase/migrations/${file}`, "utf8"));
   editor = await actor("admin");
@@ -475,6 +477,192 @@ it("transcribes one paper dose using the authorized ledger and preserves audited
   expect(
     after.items.some((row) => row.doses.some((dose) => dose.code === next)),
   ).toBe(false);
+});
+
+describe("quick registration and deferred dossier completion", () => {
+  it("keeps complete and paper registration on the original register path", async () => {
+    const { a, facility, child } = await setup();
+    const op = randomUUID();
+    const paper = {
+      facility_id: facility,
+      register_year: 2026,
+      register_book: "P",
+      local_number: "004",
+      name_status: "unknown",
+      birth_date_precision: "unknown",
+      sex: "unknown",
+      source_type: "paper_transcription",
+      paper_reference: "Carnet de test fictif",
+      history_status: "partial",
+    };
+    expect(
+      await rpc(a, "prepare_child_registration", [op, paper]),
+    ).toMatchObject({ state: "ready" });
+    const id = await rpc<string>(a, "register_child", [op, paper]);
+    expect(id).not.toBe(child);
+    expect(await rpc(a, "get_child_profile", [id])).toMatchObject({
+      birth_date: null,
+      given_name: null,
+      source_type: paper.source_type,
+      paper_reference: paper.paper_reference,
+      registers: [{ facility_id: facility, number: "004" }],
+    });
+    expect(await rpc(a, "get_child_profile", [child])).toMatchObject({
+      source_type: "new_registration",
+      registers: [{ number: "125" }],
+    });
+  });
+
+  it("opens a readable booklet and eligible proposals before local registration, then preserves care and identity on completion", async () => {
+    const a = await actor("nurse");
+    const operation = randomUUID();
+    const body = {
+      quick_registration: true,
+      given_name: "Enfant fictif",
+      family_name: randomUUID(),
+      birth_date: todayCasablanca(),
+      sex: "unknown",
+    };
+    const prepare = (who: Actor, op: string, details = body) =>
+      rpc<{ state: string }>(who, "prepare_child_registration", [
+        op,
+        details,
+        null,
+        null,
+        false,
+      ]);
+    expect(await prepare(a, operation)).toMatchObject({ state: "ready" });
+    const id = await rpc<string>(a, "register_child", [operation, body]);
+    expect(await rpc(a, "register_child", [operation, body])).toBe(id);
+    const profile = () =>
+      rpc<{ id: string; universal_id: string }>(a, "get_child_profile", [id]);
+    const minimal = await profile();
+    expect(minimal).toMatchObject({
+      id,
+      sex: "unknown",
+      history_status: "unknown",
+      can_manage_access: true,
+      registers: [],
+    });
+    expect(
+      await rpc(a, "list_patients", [body.family_name, "all", "all", 1]),
+    ).toMatchObject({ total: 1, items: [{ id }] });
+
+    const other = await actor();
+    const blockedOp = randomUUID();
+    const known = { ...body, sex: "female" };
+    const duplicate = await prepare(other, blockedOp, known);
+    expect(duplicate).toEqual({
+      state: "needs_details",
+      operation_id: blockedOp,
+      checked: true,
+    });
+    await expect(
+      rpc(other, "register_child", [blockedOp, known]),
+    ).rejects.toMatchObject({ code: "PT409" });
+    await expect(rpc(other, "get_child_profile", [id])).rejects.toMatchObject({
+      code: "42501",
+    });
+    const pending = await actor("doctor", "unverified");
+    await expect(prepare(pending, randomUUID())).rejects.toMatchObject({
+      code: "42501",
+    });
+
+    const scoped = await rpc<RoutineAppointmentProposals>(
+      a,
+      "patient_routine_appointment_proposals",
+      [id, 1],
+    );
+    expect(scoped).toMatchObject({ version, preview: false });
+    expect(
+      scoped.items.some(
+        (group) =>
+          group.child_id === id &&
+          group.doses.some(({ code }) => code === "VPO1"),
+      ),
+    ).toBe(true);
+    expect(
+      scoped.items.every((group) =>
+        group.doses.every(({ code }) => !code.startsWith("HPV")),
+      ),
+    ).toBe(true);
+    expect(await rpc(a, "routine_appointment_proposals", [1])).toEqual(scoped);
+    expect(
+      await rpc(a, "clinical_timeline", [id, 1, "vaccination"]),
+    ).toMatchObject({ total: 0 });
+    const facility = await rpc<string>(a, "create_facility", [
+      randomUUID(),
+      "Centre fictif",
+      "Belfaa",
+    ]);
+    await cap(a, "vaccination");
+    const recordedDose = dose(id, facility);
+    recordedDose[4] = body.birth_date;
+    const care = await rpc<string>(a, "write_clinical_entry", recordedDose);
+
+    const revision = 0;
+    const details = {
+      given_name: "Enfant fictif corrigé",
+      family_name: body.family_name,
+      birth_date: body.birth_date,
+      birth_date_precision: "exact",
+      sex: "unknown",
+      name_status: "confirmed",
+      history_status: "partial",
+    };
+    const register = {
+      facility_id: facility,
+      year: "2026",
+      book: "A",
+      number: "0005",
+    };
+    const update = [randomUUID(), id, revision, details, register];
+    await expect(
+      rpc(other, "update_child_information", update),
+    ).rejects.toMatchObject({ code: "42501" });
+    await db.query(
+      "insert into public.access_grants(child_id,professional_id,granted_by) values($1,$2,$3)",
+      [id, other.id, a.id],
+    );
+    await expect(
+      rpc(other, "update_child_information", update),
+    ).rejects.toMatchObject({ code: "42501" });
+    expect(await rpc(a, "update_child_information", update)).toBe(id);
+    expect(await rpc(a, "update_child_information", update)).toBe(id);
+    await expect(
+      rpc(a, "update_child_information", [randomUUID(), ...update.slice(1)]),
+    ).rejects.toMatchObject({ code: "PT409" });
+    expect(await profile()).toMatchObject({
+      id,
+      universal_id: minimal.universal_id,
+      profile_revision: 1,
+      given_name: details.given_name,
+      registers: [{ number: "0005", facility_id: facility }],
+    });
+    expect(
+      await rpc(a, "clinical_timeline", [id, 1, "vaccination"]),
+    ).toMatchObject({ total: 1, items: [{ id: care }] });
+    expect(
+      await rpc(a, "list_patients", ["0005", "all", "all", 1]),
+    ).toMatchObject({ total: 1, items: [{ id }] });
+
+    const registerId = (
+      await rpc<{ registers: { id: string }[] }>(a, "get_child_profile", [id])
+    ).registers[0].id;
+    await rpc(a, "update_child_information", [
+      randomUUID(),
+      id,
+      1,
+      details,
+      { ...register, id: registerId, number: "0006" },
+    ]);
+    expect(await profile()).toMatchObject({
+      registers: [{ id: registerId, number: "0006" }],
+    });
+    expect(
+      await rpc(a, "list_patients", ["0005", "all", "all", 1]),
+    ).toMatchObject({ total: 0 });
+  });
 });
 
 describe("automatic routine offers and grouped booking", () => {

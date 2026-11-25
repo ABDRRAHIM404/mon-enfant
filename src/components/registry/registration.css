@@ -1,0 +1,307 @@
+.registration-page {
+  max-width: 900px;
+  color: #111;
+}
+
+.registration-page .registration-heading {
+  margin-bottom: 20px;
+}
+
+.registration-heading h1 {
+  margin-bottom: 6px;
+}
+
+.registration-heading p {
+  margin: 0;
+  color: #415e69;
+}
+
+.registration-heading p.notice {
+  margin-top: 12px;
+}
+
+.registration-modes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.registration-modes a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #cddfe5;
+  border-radius: 15px;
+  background: #fff;
+  color: #111;
+  box-shadow:
+    0 3px 0 #d8e7eb,
+    0 6px 13px #274d5b12;
+}
+
+.registration-modes a[aria-current="page"] {
+  background: #e6f8ef;
+  border-color: #3cb371;
+  box-shadow:
+    0 3px 0 #3cb37154,
+    0 6px 13px #274d5b12;
+}
+
+.registration-modes svg {
+  flex: none;
+  color: #126440;
+}
+
+.registration-modes small {
+  display: block;
+  margin-top: 3px;
+  color: #415e69;
+}
+
+.registration-panel {
+  padding: clamp(15px, 3vw, 27px);
+  border: 1px solid #d3e4ea;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow:
+    0 4px 0 #d8e7eb,
+    0 8px 19px #274d5b16;
+}
+
+.registration-panel h2 {
+  margin: 0;
+  font-size: 1.22rem;
+}
+
+.registration-page .registration-form {
+  max-width: none;
+  margin-top: 14px;
+  gap: 14px;
+}
+
+.registration-form .registration-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+}
+
+.registration-form :is(label, .registration-date-picker) {
+  min-width: 0;
+}
+
+.registration-fields :is(input, select) {
+  width: 100%;
+  min-width: 0;
+}
+
+.registration-form fieldset.registration-group,
+.registration-form .registration-duplicate {
+  padding: 12px 15px 15px;
+  border: 1px solid #d5e5ea;
+  border-radius: 14px;
+  background: #f6fafb;
+}
+
+.registration-form :is(.registration-group, .registration-sex) legend {
+  padding: 0 5px;
+  font-weight: 700;
+  color: #17333a;
+}
+
+.registration-form .registration-group p {
+  margin: 0;
+}
+
+.registration-duplicate summary {
+  cursor: pointer;
+  font-weight: 650;
+}
+
+.registration-duplicate[open] summary,
+.registration-duplicate label {
+  margin-bottom: 10px;
+}
+
+.registration-date {
+  max-width: 300px;
+}
+
+.registration-date-picker > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px;
+  margin-top: 5px;
+}
+
+.registration-form label.registration-calendar {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 46px;
+  border-radius: 10px;
+  border: 1px solid #cddfe5;
+  background: #eaf4f8;
+  color: #126440;
+}
+
+.registration-calendar input,
+.registration-sex input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.registration-calendar input::-webkit-calendar-picker-indicator {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  cursor: pointer;
+}
+
+.registration-form .registration-sex {
+  gap: 6px;
+}
+
+.registration-sex > div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  max-width: 480px;
+}
+
+.registration-sex label {
+  position: relative;
+  cursor: pointer;
+}
+
+.registration-sex label span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  min-height: 47px;
+  border: 1px solid #cddfe5;
+  border-radius: 11px;
+  background: #fff;
+}
+
+.registration-sex input:checked + span {
+  border-color: #3cb371;
+  background: #e6f8ef;
+  color: #105c39;
+}
+
+.registration-note {
+  margin: 0;
+  color: #415e69;
+  font-size: 0.875rem;
+}
+
+.registration-form .button {
+  justify-self: start;
+  align-self: start;
+}
+
+.registration-form .registration-submit {
+  background: #e97872;
+  border: 1px solid #df716b;
+  color: #321611;
+  font-weight: 750;
+  min-height: 48px;
+  box-shadow:
+    0 3px 0 #b6534c,
+    0 7px 15px #92473d24;
+}
+
+.registration-form .registration-submit:hover {
+  background: #f08e88;
+}
+
+.registration-form .registration-submit:disabled {
+  cursor: wait;
+  opacity: 0.75;
+}
+
+.registration-back {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  gap: 6px;
+  color: #126440;
+  font-weight: 650;
+}
+
+.registration-form .registration-submit,
+.registration-modes a,
+.registration-sex label span,
+.registration-calendar {
+  transition:
+    background-color 200ms ease,
+    box-shadow 200ms ease,
+    transform 200ms ease;
+}
+
+@media (hover: hover) {
+  .registration-modes a:hover,
+  .registration-submit:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 4px 0 #86aa9d69,
+      0 9px 17px #274d5b22;
+  }
+
+  .registration-sex label:hover span,
+  .registration-calendar:hover {
+    background: #eaf4f8;
+  }
+}
+
+.registration-modes a:active,
+.registration-submit:not(:disabled):active {
+  transform: translateY(2px);
+}
+
+.registration-sex input:active + span {
+  transform: translateY(1px);
+}
+
+.registration-calendar:focus-within,
+.registration-sex input:focus-visible + span,
+.registration-page
+  :is(a, button, input, select, textarea, summary):focus-visible {
+  outline: 2px solid #126440;
+  outline-offset: 2px;
+}
+
+@media (max-width: 700px) {
+  .registration-modes,
+  .registration-form .registration-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .registration-modes a {
+    padding: 9px 11px;
+  }
+
+  .registration-date {
+    max-width: none;
+  }
+
+  .registration-form .button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .registration-page
+    :is(a, button, .registration-calendar, .registration-sex span) {
+    transition: none;
+    transform: none;
+  }
+}

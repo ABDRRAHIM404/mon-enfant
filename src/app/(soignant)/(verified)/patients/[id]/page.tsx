@@ -3,6 +3,8 @@ import Link from "next/link";
 import {
   Activity,
   CalendarDays,
+  AlertTriangle,
+  ClipboardPen,
   ChartNoAxesCombined,
   ChevronRight,
   FileText,
@@ -45,11 +47,14 @@ export const dynamic = "force-dynamic";
 
 export default async function PatientProfile({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams?: Promise<{ saved?: string }>;
 }) {
   const { supabase } = await requireApprovedDoctor();
   const { id } = await params;
+  const saved = (await searchParams)?.saved === "1";
   if (!uuidPattern.test(id)) notFound();
   const [profile, visits, capabilities] = await Promise.all([
     supabase.rpc("get_child_profile", { p_child_id: id }),
@@ -89,6 +94,9 @@ export default async function PatientProfile({
   const base = `/patients/${id}`;
   const appointment = overview.next_own_appointment?.starts_at;
   const lastCare = overview.last_documented_care;
+  const nextDose = vaccination?.next;
+  const overdue = vaccination?.overdue ?? [];
+  const missingRegister = !child.registers.length;
   const followup = [
     {
       title: "Prochain rendez-vous",
@@ -105,29 +113,44 @@ export default async function PatientProfile({
     },
     {
       title: "Prochaine vaccination",
-      href: `${base}/vaccinations`,
+      href: nextDose
+        ? `${base}/vaccinations#dose-${encodeURIComponent(nextDose.code)}`
+        : `${base}/vaccinations`,
       Icon: Syringe,
-      tone: vaccination ? (vaccination.overdue ? "red" : "amber") : "neutral",
-      label: vaccination ? (
+      tone: nextDose ? "amber" : "neutral",
+      label: nextDose ? (
         <>
-          {vaccination.overdue ? "En retard · " : ""}
-          <span title={vaccination.stage}>{vaccination.code}</span> ·{" "}
-          <time dateTime={vaccination.start}>
-            {bookletDate(vaccination.start)}
-          </time>
-          {vaccination.end && (
+          {nextDose.code}
+          {nextDose.name !== nextDose.code && ` · ${nextDose.name}`}
+          <br />
+          {nextDose.stage} ·{" "}
+          <time dateTime={nextDose.start}>{bookletDate(nextDose.start)}</time>
+          {nextDose.end && (
             <>
               {" "}
               au{" "}
-              <time dateTime={vaccination.end}>
-                {bookletDate(vaccination.end)}
-              </time>
+              <time dateTime={nextDose.end}>{bookletDate(nextDose.end)}</time>
             </>
           )}
         </>
+      ) : vaccination ? (
+        "Aucune date à venir"
       ) : (
-        "Aucune date confirmée"
+        "À vérifier"
       ),
+    },
+    {
+      title: "Vaccinations en retard",
+      href: overdue.length
+        ? `${base}/vaccinations#dose-${encodeURIComponent(overdue[0])}`
+        : `${base}/vaccinations`,
+      Icon: Syringe,
+      tone: overdue.length ? "red" : "neutral",
+      label: overdue.length
+        ? overdue.join(", ")
+        : vaccination
+          ? "Aucun retard confirmé"
+          : "À vérifier",
     },
     {
       title: "Dernier soin documenté",
@@ -151,6 +174,34 @@ export default async function PatientProfile({
     >
       <div id="main-content" tabIndex={-1} className="child-overview">
         <h1 className="sr-only">Vue d’ensemble</h1>
+        {saved && (
+          <p className="notice" role="status">
+            Informations du dossier enregistrées.
+          </p>
+        )}
+        {child.can_manage_access && (
+          <div className="overview-completion">
+            {missingRegister && (
+              <ChildStatus tone="amber">
+                <AlertTriangle size={15} aria-hidden="true" /> Dossier à
+                compléter
+              </ChildStatus>
+            )}
+            <Link
+              className={
+                missingRegister
+                  ? "overview-edit overview-edit-highlight"
+                  : "overview-edit"
+              }
+              href={`${base}/edit`}
+            >
+              <ClipboardPen size={17} aria-hidden="true" />
+              {missingRegister
+                ? "Compléter le dossier"
+                : "Modifier les informations"}
+            </Link>
+          </div>
+        )}
         <div className="overview-top">
           <section
             className="overview-card overview-followup"
@@ -162,7 +213,7 @@ export default async function PatientProfile({
             </h2>
             <ul>
               {followup.map(({ title, href, Icon, tone, label }) => (
-                <li key={href}>
+                <li key={title}>
                   <Link
                     href={href}
                     title={

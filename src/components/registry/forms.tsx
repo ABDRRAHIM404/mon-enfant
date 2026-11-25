@@ -1,5 +1,7 @@
 "use client";
 import { useActionState, type ReactNode } from "react";
+import { CircleHelp, Mars, Venus } from "lucide-react";
+import { FrenchDateInput } from "@/components/appointments/french-date-input";
 import {
   registryAction,
   reviewRegistration,
@@ -11,17 +13,19 @@ function ActionForm({
   operationId,
   children,
   label,
+  registration,
 }: {
   kind: string;
   operationId?: string;
   children: ReactNode;
   label: string;
+  registration?: "quick" | "full";
 }) {
   const [state, action, pending] = useActionState(registryAction, {});
   return (
     <form
       action={action}
-      className="auth-form"
+      className={registration ? "auth-form registration-form" : "auth-form"}
       onReset={
         kind === "register" ? (event) => event.preventDefault() : undefined
       }
@@ -33,37 +37,41 @@ function ActionForm({
       )}
       <fieldset disabled={pending || state.success}>
         {children}
-        {kind === "register" && (
-          <details open={state.duplicate || undefined}>
-            <summary>
-              Informations de naissance pour le contrôle de doublons
-            </summary>
-            <label>
-              Nom complet de la mère
-              <input
-                name="mother_name"
-                maxLength={200}
-                minLength={2}
-                autoComplete="off"
-              />
-            </label>
-            <label>
-              Lieu de naissance (maternité ou hôpital)
-              <input
-                name="birthplace"
-                maxLength={200}
-                minLength={2}
-                autoComplete="off"
-              />
-            </label>
-            <p className="fine">
-              Facultatif sans alerte. Si une correspondance est possible,
-              fournissez ces deux informations pour l’examiner, ou demandez une
-              revue si elles ne sont pas disponibles. Aucun numéro de CIN des
-              parents n’est demandé.
-            </p>
-          </details>
-        )}
+        {kind === "register" &&
+          (registration !== "quick" || state.duplicate) && (
+            <details
+              className="registration-duplicate"
+              open={state.duplicate || undefined}
+            >
+              <summary>
+                Informations de naissance pour le contrôle de doublons
+              </summary>
+              <label>
+                Nom complet de la mère
+                <input
+                  name="mother_name"
+                  maxLength={200}
+                  minLength={2}
+                  autoComplete="off"
+                />
+              </label>
+              <label>
+                Lieu de naissance (maternité ou hôpital)
+                <input
+                  name="birthplace"
+                  maxLength={200}
+                  minLength={2}
+                  autoComplete="off"
+                />
+              </label>
+              <p className="fine">
+                Facultatif sans alerte. Si une correspondance est possible,
+                fournissez ces deux informations pour l’examiner, ou demandez
+                une revue si elles ne sont pas disponibles. Aucun numéro de CIN
+                des parents n’est demandé.
+              </p>
+            </details>
+          )}
       </fieldset>
       {state.error && (
         <p role="alert" className="form-error">
@@ -73,8 +81,8 @@ function ActionForm({
       {state.duplicate && (
         <div className="notice stacked-notice">
           <p role="alert">
-            A child with similar details may already be registered. Please
-            provide additional information to verify the match.
+            Un dossier présente des informations similaires. Ajoutez les
+            informations de naissance pour poursuivre le contrôle confidentiel.
           </p>
           {state.registrationState === "need_qr" && (
             <p>
@@ -97,7 +105,14 @@ function ActionForm({
           Opération enregistrée.
         </p>
       )}
-      <button className="button primary" disabled={pending || state.success}>
+      <button
+        className={
+          registration === "quick"
+            ? "button registration-submit"
+            : "button primary"
+        }
+        disabled={pending || state.success}
+      >
         {pending
           ? "Enregistrement…"
           : state.duplicate
@@ -202,6 +217,61 @@ export function FacilityForm({ operationId }: { operationId: string }) {
     </ActionForm>
   );
 }
+export function QuickRegistrationForm({
+  operationId,
+  today,
+}: {
+  operationId: string;
+  today: string;
+}) {
+  return (
+    <ActionForm
+      kind="register"
+      registration="quick"
+      operationId={operationId}
+      label="Créer le dossier et consulter les vaccinations"
+    >
+      <input type="hidden" name="quickRegistration" value="on" />
+      <input type="hidden" name="syntheticOnly" value="on" />
+      <div className="registration-fields">
+        <Field name="given_name" label="Prénom" required />
+        <Field name="family_name" label="Nom" required />
+      </div>
+      <div className="registration-date">
+        <FrenchDateInput
+          name="birth_date"
+          label="Date de naissance"
+          min="1900-01-01"
+          max={today}
+        />
+      </div>
+      <fieldset className="registration-sex">
+        <legend>Sexe</legend>
+        <div>
+          {[
+            { value: "male", label: "Garçon", Icon: Mars },
+            { value: "female", label: "Fille", Icon: Venus },
+            { value: "unknown", label: "Inconnu", Icon: CircleHelp },
+          ].map(({ value, label, Icon }) => (
+            <label key={value}>
+              <input type="radio" name="sex" value={value} required />
+              <span>
+                <Icon size={18} aria-hidden="true" />
+                {label}
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+      <p className="registration-note">
+        Le lieu d’exercice et les informations du registre peuvent être ajoutés
+        plus tard. En créant ce dossier, vous confirmez utiliser des données
+        fictives.
+      </p>
+    </ActionForm>
+  );
+}
+
 export function RegistrationForm({
   operationId,
   facilities,
@@ -216,6 +286,7 @@ export function RegistrationForm({
   return (
     <ActionForm
       kind="register"
+      registration="full"
       operationId={operationId}
       label="Créer le dossier et le numéro local"
     >
@@ -225,101 +296,121 @@ export function RegistrationForm({
         name="source_type"
         value={paper ? "paper_transcription" : "new_registration"}
       />
-      <RegisterFields facilities={facilities} />
-      <Field
-        name="smi_reference"
-        label="Référence SMI locale (facultative, non unique)"
-      />
-      <label>
-        Certitude de l’identité
-        <select
-          name="name_status"
-          defaultValue={paper && !intake ? "unknown" : "confirmed"}
-        >
-          <option value="confirmed">Noms confirmés</option>
-          <option value="provisional">Noms provisoires</option>
-          <option value="unknown">
-            Noms inconnus — laisser les deux champs vides
-          </option>
-        </select>
-      </label>
-      <Field
-        name="given_name"
-        label="Prénom (si connu)"
-        defaultValue={intake?.given_name}
-        required={!!intake}
-      />
-      <Field
-        name="family_name"
-        label="Nom (si connu)"
-        defaultValue={intake?.family_name}
-        required={!!intake}
-      />
-      <label>
-        Certitude de la naissance
-        <select
-          name="birth_date_precision"
-          defaultValue={paper && !intake ? "unknown" : "exact"}
-        >
-          <option value="exact">Date exacte</option>
-          <option value="estimated">Date estimée</option>
-          <option value="unknown">Date inconnue — laisser le champ vide</option>
-        </select>
-      </label>
-      <Field
-        name="birth_date"
-        label="Date de naissance (si connue)"
-        type="date"
-        defaultValue={intake?.birth_date}
-        required={!!intake}
-      />
-      <label>
-        Sexe
-        <select name="sex" defaultValue="unknown">
-          <option value="unknown">Inconnu</option>
-          <option value="female">Féminin</option>
-          <option value="male">Masculin</option>
-        </select>
-      </label>
-      <label>
-        État de l’historique disponible
-        <select name="history_status" defaultValue="unknown">
-          <option value="unknown">Inconnu</option>
-          <option value="partial">Partiel</option>
-          <option value="reviewed">Déclaré revu par le professionnel</option>
-        </select>
-      </label>
-      <p className="fine">
-        Un historique revu ne signifie pas que les vaccinations ou soins sont
-        complets.
-      </p>
-      {paper && (
-        <Field
-          name="paper_reference"
-          label="Référence du document / registre papier"
-          maxLength={200}
-          required
-        />
-      )}
-      <label>
-        Provenance et limites connues
-        <textarea name="provenance_note" rows={3} maxLength={2000} />
-      </label>
-      <Field
-        name="guardian_name"
-        label="Contact de soins déclaré (facultatif)"
-        maxLength={150}
-      />
-      <Field
-        name="guardian_phone"
-        label="Téléphone de contact (facultatif)"
-        type="tel"
-        maxLength={25}
-      />
-      <p className="fine">
-        Ces coordonnées ne vérifient pas la tutelle et n’ouvrent aucun accès
-        parent.
-      </p>
+      <fieldset className="registration-group">
+        <legend>Identité de l’enfant</legend>
+        <div className="registration-fields">
+          <label>
+            Certitude de l’identité
+            <select
+              name="name_status"
+              defaultValue={paper && !intake ? "unknown" : "confirmed"}
+            >
+              <option value="confirmed">Noms confirmés</option>
+              <option value="provisional">Noms provisoires</option>
+              <option value="unknown">
+                Noms inconnus — laisser les deux champs vides
+              </option>
+            </select>
+          </label>
+          <Field
+            name="given_name"
+            label="Prénom (si connu)"
+            defaultValue={intake?.given_name}
+            required={!!intake}
+          />
+          <Field
+            name="family_name"
+            label="Nom (si connu)"
+            defaultValue={intake?.family_name}
+            required={!!intake}
+          />
+          <label>
+            Certitude de la naissance
+            <select
+              name="birth_date_precision"
+              defaultValue={paper && !intake ? "unknown" : "exact"}
+            >
+              <option value="exact">Date exacte</option>
+              <option value="estimated">Date estimée</option>
+              <option value="unknown">
+                Date inconnue — laisser le champ vide
+              </option>
+            </select>
+          </label>
+          <Field
+            name="birth_date"
+            label="Date de naissance (si connue)"
+            type="date"
+            defaultValue={intake?.birth_date}
+            required={!!intake}
+          />
+          <label>
+            Sexe
+            <select name="sex" defaultValue="unknown">
+              <option value="unknown">Inconnu</option>
+              <option value="female">Féminin</option>
+              <option value="male">Masculin</option>
+            </select>
+          </label>
+        </div>
+      </fieldset>
+      <fieldset className="registration-group">
+        <legend>Registre et lieu d’exercice</legend>
+        <div className="registration-fields">
+          <RegisterFields facilities={facilities} />
+          <Field
+            name="smi_reference"
+            label="Référence SMI locale (facultative, non unique)"
+          />
+        </div>
+      </fieldset>
+      <fieldset className="registration-group">
+        <legend>Historique et provenance</legend>
+        <label>
+          État de l’historique disponible
+          <select name="history_status" defaultValue="unknown">
+            <option value="unknown">Inconnu</option>
+            <option value="partial">Partiel</option>
+            <option value="reviewed">Déclaré revu par le professionnel</option>
+          </select>
+        </label>
+        <p className="fine">
+          Un historique revu ne signifie pas que les vaccinations ou soins sont
+          complets.
+        </p>
+        {paper && (
+          <Field
+            name="paper_reference"
+            label="Référence du document / registre papier"
+            maxLength={200}
+            required
+          />
+        )}
+        <label>
+          Provenance et limites connues
+          <textarea name="provenance_note" rows={3} maxLength={2000} />
+        </label>
+      </fieldset>
+      <fieldset className="registration-group">
+        <legend>Contact déclaré</legend>
+        <div className="registration-fields">
+          <Field
+            name="guardian_name"
+            label="Contact de soins déclaré (facultatif)"
+            maxLength={150}
+          />
+          <Field
+            name="guardian_phone"
+            label="Téléphone de contact (facultatif)"
+            type="tel"
+            maxLength={25}
+          />
+        </div>
+        <p className="fine">
+          Ces coordonnées ne vérifient pas la tutelle et n’ouvrent aucun accès
+          parent.
+        </p>
+      </fieldset>
       <label>
         Motif de création d’un dossier distinct en cas d’homonymie
         <textarea

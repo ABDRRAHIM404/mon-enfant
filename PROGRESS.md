@@ -1109,3 +1109,11 @@ Desktop and mobile captures were compared with the references. Chromium checked 
 ### 21 November 2026 — revised PNI hepatitis B draft
 
 Prepared a separate 26-rule draft from the existing transcription and slides 67 and 73 of the supplied presentation. It preserves the original catalogue and adds HBn as the standalone birth dose, with HB1 shown as the manual fallback when omission is confirmed. A documented HBn suppresses the routine HB1 review notice. Uncertain or conflicting entries are flagged for review. The existing independent approval and appointment boundaries remain in force. The targeted catalogue, calendar and projection tests passed.
+
+### 25 November 2026 — quick clinician registration and dossier completion
+
+Inscription rapide is the default at Enfants → Inscrire un enfant. Name, exact birth date and sex are collected first. Unknown sex is supported, and the guarded duplicate workflow opens additional fields only when needed. Successful registration opens the approved vaccination booklet. Complete registration, paper transcription and parent QR intake retain their existing paths.
+
+The overview links authorized dossier managers to a dedicated editor for identity, local register, provenance and contact details. The child identifiers and clinical entries are preserved. Administrative completion is indicated by the presence of a local register entry for the clinician. Upcoming routine and confirmed overdue vaccinations are presented in separate rows using the booklet projection.
+
+Supabase migration `20261125190338_quick_child_registration` is applied. Forty-four focused tests passed, covering guarded registration, retained clinical records, register changes, unknown eligibility, and child and workspace appointment proposals. Changed-file lint and TypeScript passed. Isolated Chromium checks at 1440, 830, 390 and 320 px covered mode selection, French date input, duplicate follow-up, the booklet redirect, profile editing, refresh, read-only denial and separate HPV and VPO0 statuses with fictional fixtures.

@@ -1,8 +1,14 @@
+import "@/components/registry/registration.css";
+import { ClipboardList, FileText, Zap } from "lucide-react";
+import { todayCasablanca } from "@/lib/appointments/calendar";
 import Link from "next/link";
 import { randomUUID } from "node:crypto";
 import { requireApprovedDoctor } from "@/lib/auth";
 import { ClinicalWorkspace } from "@/components/clinician/care-workspace";
-import { RegistrationForm } from "@/components/registry/forms";
+import {
+  QuickRegistrationForm,
+  RegistrationForm,
+} from "@/components/registry/forms";
 import { notFound } from "next/navigation";
 import {
   uuidPattern,
@@ -18,14 +24,15 @@ export default async function NewPatient({
   const { supabase } = await requireApprovedDoctor();
   const { source, draft } = await searchParams;
   const paper = source === "paper";
+  const quick = !draft && !paper && source !== "full";
   if (draft && !uuidPattern.test(draft)) notFound();
   const [facilitiesResult, draftResult] = await Promise.all([
-    supabase.rpc("my_facilities"),
+    quick ? null : supabase.rpc("my_facilities"),
     draft
       ? supabase.rpc("get_parent_child_intake", { p_draft_id: draft })
       : null,
   ]);
-  const { data, error } = facilitiesResult;
+  const { data, error } = facilitiesResult ?? {};
   if (error) throw new Error("Impossible de charger les lieux d’exercice.");
   if (draftResult?.error?.code === "42501") notFound();
   if (draftResult?.error)
@@ -46,63 +53,111 @@ export default async function NewPatient({
         </section>
       </ClinicalWorkspace>
     );
-  const facilities = data as Facility[];
-  const draftQuery = draft ? `draft=${encodeURIComponent(draft)}` : "";
+  const facilities = (data ?? []) as Facility[];
+  const modes = [
+    ...(!draft
+      ? [
+          {
+            value: "quick",
+            title: "Inscription rapide",
+            detail: "Ouvrir le carnet en quatre champs",
+            Icon: Zap,
+          },
+        ]
+      : []),
+    {
+      value: "full",
+      title: "Inscription complète",
+      detail: "Renseigner le registre et les coordonnées",
+      Icon: ClipboardList,
+    },
+    {
+      value: "paper",
+      title: "Dossier papier",
+      detail: "Transcrire un carnet existant",
+      Icon: FileText,
+    },
+  ];
   return (
     <ClinicalWorkspace active="children">
-      <div className="page-heading">
-        <h1 id="main-content" tabIndex={-1}>
-          {draft
-            ? "Compléter la fiche du parent"
-            : paper
-              ? "Transcrire un dossier papier"
-              : "Inscrire un enfant"}
-        </h1>
-        <p className="muted">
-          Conservez les inconnues et les limites de la source. Aucun
-          rapprochement automatique des dossiers.
-        </p>
-        {draft && (
-          <p className="notice">
-            Vérifiez les informations indiquées par le parent et complétez
-            l’inscription. Vous pourrez ensuite vérifier sa demande d’accès au
-            carnet.
+      <div className="registration-page">
+        <div className="page-heading registration-heading">
+          <h1 id="main-content" tabIndex={-1}>
+            {draft
+              ? "Compléter la fiche du parent"
+              : paper
+                ? "Transcrire un dossier papier"
+                : "Inscrire un enfant"}
+          </h1>
+          <p className="muted">
+            Choisissez un mode selon les informations dont vous disposez.
           </p>
-        )}
-      </div>
-      <div className="tabs">
-        <Link
-          href={draftQuery ? `/patients/new?${draftQuery}` : "/patients/new"}
-          aria-current={!paper ? "page" : undefined}
+          {draft && (
+            <p className="notice">
+              Vérifiez les informations indiquées par le parent et complétez
+              l’inscription. Vous pourrez ensuite vérifier sa demande d’accès au
+              carnet.
+            </p>
+          )}
+        </div>
+        <nav className="registration-modes" aria-label="Mode d’inscription">
+          {modes.map(({ value, title, detail, Icon }) => {
+            const query = new URLSearchParams();
+            if (value !== "quick") query.set("source", value);
+            if (draft) query.set("draft", draft);
+            const current =
+              value === (quick ? "quick" : paper ? "paper" : "full");
+            return (
+              <Link
+                key={value}
+                href={query.size ? `/patients/new?${query}` : "/patients/new"}
+                aria-current={current ? "page" : undefined}
+              >
+                <Icon size={22} aria-hidden="true" />
+                <span>
+                  <strong>{title}</strong>
+                  <small>{detail}</small>
+                </span>
+              </Link>
+            );
+          })}
+        </nav>
+        <section
+          className="registration-panel"
+          aria-labelledby="registration-form-title"
         >
-          Nouvelle inscription
-        </Link>
-        <Link
-          href={`/patients/new?source=paper${draftQuery ? `&${draftQuery}` : ""}`}
-          aria-current={paper ? "page" : undefined}
-        >
-          Dossier papier
-        </Link>
+          <h2 id="registration-form-title">
+            {quick
+              ? "Identité de l’enfant"
+              : paper
+                ? "Transcription du carnet"
+                : "Informations du dossier"}
+          </h2>
+          {quick ? (
+            <QuickRegistrationForm
+              key="quick"
+              operationId={randomUUID()}
+              today={todayCasablanca()}
+            />
+          ) : facilities.length ? (
+            <RegistrationForm
+              key={`${paper ? "paper" : "new"}:${draft ?? ""}`}
+              operationId={draft ?? randomUUID()}
+              facilities={facilities}
+              paper={paper}
+              intake={intake ?? undefined}
+            />
+          ) : (
+            <p>
+              Déclarez d’abord un{" "}
+              <Link className="text-link" href="/practices">
+                lieu d’exercice
+              </Link>
+              .
+            </p>
+          )}
+        </section>
       </div>
-      <section className="panel">
-        {facilities.length ? (
-          <RegistrationForm
-            key={`${paper ? "paper" : "new"}:${draft ?? ""}`}
-            operationId={draft ?? randomUUID()}
-            facilities={facilities}
-            paper={paper}
-            intake={intake ?? undefined}
-          />
-        ) : (
-          <p>
-            Déclarez d’abord un{" "}
-            <Link className="text-link" href="/practices">
-              lieu d’exercice
-            </Link>
-            .
-          </p>
-        )}
-      </section>
     </ClinicalWorkspace>
   );
 }
