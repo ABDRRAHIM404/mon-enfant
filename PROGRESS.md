@@ -1,5 +1,7 @@
 # Mon Enfant — Implementation progress
 
+> Vérification des vaccinations · 25 November 2026. Added the three-way review, isolated from the table layout, and scoped historical paper transcription through the existing clinical ledger. Migration `20261125174814` supports audited absence and uncertainty decisions without inferring missed doses. Clinicians can reopen history for corrections or transcribe with an unknown or estimated date in the full form. Scoped lint, type checks, 49 focused tests and four-width browser verification passed.
+
 > Dossier enfant · 24 November 2026. Redesigned six clinician child-profile tabs and the shared child header. Migration `20261124195146` exposes child-scoped proposals through the current routine appointment calculation and booking flow. Shared tabs, responsive layout, cautious guardian confirmations and A4 print were verified with isolated browser fixtures. Scoped lint, types and 53 focused tests passed.
 
 > Calendrier vaccinal de l’enfant · 24 November 2026. Added the complete responsive booklet with versioned PNI rows, administration age and attribution, existing optional-batch and correction workflows, and explicit audited overdue findings. Applied migration `20261124192109`. Scoped lint, 41 focused tests and a four-width browser workflow with fictional fixtures passed. Vaccine-specific catch-up remains manual pending structured approved criteria.

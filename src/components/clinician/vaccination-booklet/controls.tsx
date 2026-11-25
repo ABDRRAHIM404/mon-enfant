@@ -8,7 +8,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { FrenchDateInput } from "@/components/appointments/french-date-input";
 import { reviewBookletDose } from "@/app/(soignant)/(verified)/patients/[id]/vaccinations/review-actions";
 
 export function BookletScroll({ children }: { children: ReactNode }) {
@@ -99,66 +100,170 @@ export function BookletReviewForm({
   dose,
   operation,
   previous,
-  outstanding,
+  existingRecord,
+  entryForm,
+  hasRoutineDate,
+  today,
 }: {
   child: string;
   version: string;
   dose: string;
   operation: string;
   previous?: string;
-  outstanding: boolean;
+  existingRecord?: string;
+  entryForm: string;
+  hasRoutineDate: boolean;
+  today: string;
 }) {
   const [state, action, pending] = useActionState(reviewBookletDose, {});
+  const [decision, setDecision] = useState("");
+  const dialog = useRef<HTMLDialogElement>(null);
+  const id = useId();
+  const administered = decision === "administered";
+  const hasReason = administered || decision === "not_administered";
+  const needsCorrection = !!existingRecord && hasReason;
+  const lacksReference = decision === "not_administered" && !hasRoutineDate;
   return (
-    <details className="booklet-dose-review">
-      <summary>
-        {outstanding
-          ? "Retirer la confirmation"
-          : "Confirmer la dose manquante"}
-      </summary>
-      <form
-        action={action}
-        aria-busy={pending}
-        onReset={(event) => event.preventDefault()}
+    <>
+      <button
+        type="button"
+        className="booklet-review-trigger"
+        onClick={() => dialog.current?.showModal()}
       >
-        {Object.entries({
-          child,
-          version,
-          dose,
-          operation,
-          previous: previous ?? "",
-          decision: outstanding ? "retract" : "confirm",
-        }).map(([name, value]) => (
-          <input type="hidden" name={name} value={value} key={name} />
-        ))}
-        <label>
-          Motif et source contrôlée
-          <textarea
-            name="reason"
-            rows={3}
-            required
-            minLength={10}
-            maxLength={1000}
-            disabled={pending || state.saved}
-          />
-        </label>
-        <label className="booklet-review-check">
-          <input
-            name="reviewed"
-            type="checkbox"
-            required
-            disabled={pending || state.saved}
-          />
-          {outstanding
-            ? "J’ai vérifié le motif du retrait."
-            : "J’ai vérifié que cette dose n’a pas été administrée."}
-        </label>
-        {state.error && <p role="alert">{state.error}</p>}
-        {state.saved && <p role="status">Décision enregistrée.</p>}
-        <button className="button secondary" disabled={pending || state.saved}>
-          {pending ? "Enregistrement…" : "Enregistrer la décision"}
-        </button>
-      </form>
-    </details>
+        Vérifier la vaccination
+      </button>
+      <dialog
+        className="booklet-review-dialog"
+        aria-labelledby={id}
+        ref={dialog}
+        onCancel={(event) => {
+          if (pending) event.preventDefault();
+        }}
+        onClick={(event) => {
+          if (event.target === event.currentTarget && !pending)
+            dialog.current?.close();
+        }}
+      >
+        <div className="booklet-review-sheet">
+          <div className="booklet-review-heading">
+            <div>
+              <h2 id={id}>Vérifier la vaccination</h2>
+              <p>{dose}</p>
+            </div>
+            <button
+              type="button"
+              aria-label="Fermer la vérification"
+              disabled={pending}
+              onClick={() => dialog.current?.close()}
+            >
+              <X size={20} aria-hidden="true" />
+            </button>
+          </div>
+          <form
+            action={action}
+            aria-busy={pending}
+            onReset={(event) => event.preventDefault()}
+          >
+            {Object.entries({
+              child,
+              version,
+              dose,
+              operation,
+              previous: previous ?? "",
+            }).map(([name, value]) => (
+              <input type="hidden" name={name} value={value} key={name} />
+            ))}
+            <fieldset disabled={pending || state.saved}>
+              <legend>Résultat de la vérification</legend>
+              <div className="booklet-review-choices">
+                {[
+                  ["administered", "Dose administrée"],
+                  ["not_administered", "Dose non administrée"],
+                  ["uncertain", "Information non confirmée"],
+                ].map(([value, label]) => (
+                  <label key={value}>
+                    <input
+                      type="radio"
+                      name="decision"
+                      value={value}
+                      required
+                      checked={decision === value}
+                      onChange={() => setDecision(value)}
+                    />
+                    {label}
+                  </label>
+                ))}
+              </div>
+              {needsCorrection ? (
+                <p className="booklet-review-help">
+                  Une saisie existe déjà pour cette dose.{" "}
+                  <a href={existingRecord}>
+                    Ouvrir l’historique et corriger la saisie
+                  </a>
+                  .
+                </p>
+              ) : lacksReference ? (
+                <p className="booklet-review-help">
+                  Aucune date PNI calculable pour cette dose. Consultez la
+                  référence avant de déterminer son état.
+                </p>
+              ) : (
+                <>
+                  {administered && (
+                    <label className="booklet-review-field">
+                      Date d’administration
+                      <FrenchDateInput name="administeredOn" max={today} />
+                    </label>
+                  )}
+                  {hasReason && (
+                    <label className="booklet-review-field">
+                      Motif et source de l’information
+                      <textarea
+                        name="reason"
+                        rows={3}
+                        required
+                        minLength={10}
+                        maxLength={1000}
+                      />
+                    </label>
+                  )}
+                  {administered && (
+                    <p className="booklet-review-help">
+                      <a href={entryForm}>
+                        Date inconnue ou estimée · Ouvrir la saisie complète
+                      </a>
+                    </p>
+                  )}
+                </>
+              )}
+            </fieldset>
+            {state.error && (
+              <p role="alert" className="form-error">
+                {state.error}
+              </p>
+            )}
+            {state.saved && <p role="status">Décision enregistrée.</p>}
+            {state.saved ? (
+              <button
+                type="button"
+                className="booklet-button"
+                onClick={() => dialog.current?.close()}
+              >
+                Fermer
+              </button>
+            ) : (
+              <button
+                className="booklet-button is-primary"
+                disabled={
+                  pending || !decision || needsCorrection || lacksReference
+                }
+              >
+                {pending ? "Enregistrement…" : "Enregistrer la décision"}
+              </button>
+            )}
+          </form>
+        </div>
+      </dialog>
+    </>
   );
 }

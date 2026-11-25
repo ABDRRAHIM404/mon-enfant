@@ -1,3 +1,11 @@
+# Vaccination history verification · 25 November 2026
+
+Compared the booklet at 1440, 820, 390 and 320 CSS pixels. The three choices use a centered modal on desktop and a bottom sheet on mobile. Opening the review preserves the table row height, and the nine columns and sticky headers remain usable.
+
+Isolated browser verification covered all three outcomes, the French date entry, a return through the full form for an unknown date, reloading and read-only access. Isolated PostgreSQL verification covered paper provenance, permission denial, duplicate prevention and preservation of the confirmed appointment events when a recorded dose reconciles. The live PNI lacks structured approved catch-up criteria.
+
+---
+
 # Child record pages · 24 November 2026
 
 Final result: passed for the six redesigned child-profile pages and the shared child tab bar.

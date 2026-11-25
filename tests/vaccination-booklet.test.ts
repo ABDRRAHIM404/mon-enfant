@@ -157,3 +157,29 @@ it("computes age at administration across birth, weeks and month boundaries", ()
   expect(bookletAge("2026-10-16", "2027-12-16")).toBe("1 an et 2 mois");
   expect(bookletAge("2026-10-16", "2026-10-15")).toBeNull();
 });
+
+it("treats upcoming non-administrations and explicit uncertainty distinctly", () => {
+  const find = (today: string, review: { uncertain?: boolean }) =>
+    vaccinationBooklet(
+      child,
+      catalog,
+      [],
+      true,
+      [],
+      [
+        {
+          id: "review",
+          dose_code: "VPO1",
+          outstanding: !review.uncertain,
+          recommended_end: "2026-12-11",
+          ...review,
+        },
+      ],
+      today,
+    ).rows.find((r) => r.rule.dose_code === "VPO1");
+  expect(find("2026-12-10", {})?.status).toBe("upcoming");
+  expect(find("2026-12-12", {})?.status).toBe("overdue");
+  expect(find("2026-12-10", { uncertain: true })?.status).toBe("review");
+  expect(find("2026-12-10", {})?.stage.label).toBe("≈ 2 mois");
+  expect(find("2026-12-10", {})?.ref.startOn).toBe("2026-12-11");
+});

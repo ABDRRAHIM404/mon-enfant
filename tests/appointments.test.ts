@@ -8,8 +8,11 @@ import {
   appointmentWorkspaceRange,
   todayCasablanca,
 } from "../src/lib/appointments/calendar";
-import { routineReference } from "../src/lib/vaccines/calendar";
-import type { AppointmentWorkspace } from "../src/lib/appointments/types";
+import { addCivilDays, routineReference } from "../src/lib/vaccines/calendar";
+import type {
+  AppointmentWorkspace,
+  RoutineAppointmentProposals,
+} from "../src/lib/appointments/types";
 import type { CatalogSnapshot } from "../src/lib/vaccines/types";
 let db: PGlite, version: string, seed: string, editor: Actor, reviewer: Actor;
 type Actor = { id: string; session: string };
@@ -208,6 +211,7 @@ beforeAll(async () => {
     "20261121190310_appointment_workspace_filters.sql",
     "20261124192109_vaccination_booklet_reviews.sql",
     "20261124195146_patient_routine_appointment_proposals.sql",
+    "20261125174814_booklet_history_verification.sql",
   ])
     await db.exec(readFileSync(`supabase/migrations/${file}`, "utf8"));
   editor = await actor("admin");
@@ -332,6 +336,145 @@ it("audits and retracts explicit overdue findings without assuming missing histo
     { outstanding: false },
     { outstanding: true },
   ]);
+});
+
+it("transcribes one paper dose using the authorized ledger and preserves audited verification decisions", async () => {
+  const today = todayCasablanca();
+  const date = addCivilDays(today, -1);
+  const { a, child, facility } = await setup(addCivilDays(today, -90));
+  const other = await actor();
+  const verify = (
+    decision: string,
+    dose: string,
+    date: string | null = null,
+    previous: string | null = null,
+    operation = randomUUID(),
+    actor = a,
+  ) =>
+    rpc<string>(actor, "verify_booklet_dose", [
+      operation,
+      child,
+      version,
+      dose,
+      previous,
+      decision,
+      date,
+      decision === "uncertain" ? null : reason,
+    ]);
+  const review = async () =>
+    rpc<
+      {
+        id: string;
+        dose_code: string;
+        outstanding: boolean;
+        uncertain?: boolean;
+      }[]
+    >(a, "vaccination_booklet_reviews", [child, version]);
+  await expect(verify("uncertain", "VPO1")).rejects.toMatchObject({
+    code: "42501",
+  });
+  await cap(a, "vaccination");
+  await expect(
+    verify("uncertain", "VPO1", null, null, randomUUID(), other),
+  ).rejects.toMatchObject({ code: "42501" });
+  const overdue = await verify("not_administered", "VPO1");
+  const future = await verify("not_administered", "RR1");
+  expect(await review()).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({
+        id: overdue,
+        dose_code: "VPO1",
+        outstanding: true,
+      }),
+      expect.objectContaining({
+        id: future,
+        dose_code: "RR1",
+        outstanding: true,
+      }),
+    ]),
+  );
+  const uncertain = await verify("uncertain", "VPO1", null, overdue);
+  expect(await review()).toContainEqual(
+    expect.objectContaining({
+      id: uncertain,
+      outstanding: false,
+      uncertain: true,
+    }),
+  );
+  await expect(
+    verify("administered", "VPO1", null, uncertain),
+  ).rejects.toMatchObject({ code: "22023" });
+  const proposalsBefore = await rpc<RoutineAppointmentProposals>(
+    a,
+    "patient_routine_appointment_proposals",
+    [child],
+  );
+  const group = proposalsBefore.items.find(({ doses }) => doses.length === 1)!;
+  const next = group.doses[0].code;
+  const appointment = await rpc<string>(a, "confirm_routine_appointment", [
+    randomUUID(),
+    child,
+    version,
+    group.recommended_on,
+    [next],
+    facility,
+    resolveAppointmentTime(`${group.recommended_on}T10:00`),
+    resolveAppointmentTime(`${group.recommended_on}T10:30`),
+    reason,
+    true,
+  ]);
+  const prior = await rpc<History>(a, "appointment_history", [
+    child,
+    appointment,
+  ]);
+  const operation = randomUUID();
+  const result = await verify("administered", next, date, null, operation);
+  expect(await verify("administered", next, date, null, operation)).toBe(
+    result,
+  );
+  await expect(verify("administered", next, date)).rejects.toMatchObject({
+    code: "PT409",
+  });
+  const projection = await rpc<{
+    items: {
+      id: string;
+      occurred_on: string;
+      source_type: string;
+      source_verified: boolean;
+      payload: Record<string, string>;
+      vaccine_mapping: { dose_code: string };
+    }[];
+  }>(a, "clinical_timeline", [child, 1, "vaccination"]);
+  expect(projection.items).toHaveLength(1);
+  expect(projection.items[0]).toMatchObject({
+    id: result,
+    occurred_on: date,
+    source_type: "paper_transcription",
+    source_verified: true,
+    payload: {
+      lot_status: "unknown",
+      provider_status: "unknown",
+      administration_facility_status: "unknown",
+    },
+    vaccine_mapping: { dose_code: next },
+  });
+  const reconciled = await rpc<History>(a, "appointment_history", [
+    child,
+    appointment,
+  ]);
+  expect(reconciled.events).toEqual(prior.events);
+  expect(reconciled.appointment).toMatchObject({
+    state: "scheduled",
+    effective_state: "dose_documented",
+  });
+  const after = await rpc<{ items: { doses: { code: string }[] }[] }>(
+    a,
+    "patient_routine_appointment_proposals",
+    [child],
+  );
+  expect(
+    after.items.some((row) => row.doses.some((dose) => dose.code === next)),
+  ).toBe(false);
 });
 
 describe("automatic routine offers and grouped booking", () => {

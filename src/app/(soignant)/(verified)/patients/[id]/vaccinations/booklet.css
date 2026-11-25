@@ -222,7 +222,7 @@
   text-decoration: underline;
 }
 .booklet-scroll {
-  --booklet-age-width: 110px;
+  --booklet-age-width: 104px;
   position: relative;
   isolation: isolate;
   min-width: 0;
@@ -236,7 +236,7 @@
 }
 .booklet-table {
   width: 100%;
-  min-width: 1080px;
+  min-width: 930px;
   table-layout: fixed;
   line-height: 1.34;
   border-collapse: separate;
@@ -261,27 +261,28 @@
   background: #d7f5e6;
   color: #111;
   font-weight: 750;
+  hyphens: auto;
 }
 .booklet-table thead th:nth-child(2) {
-  width: 142px;
+  width: 126px;
 }
 .booklet-table thead th:nth-child(3) {
-  width: 122px;
+  width: 111px;
 }
 .booklet-table thead th:nth-child(4) {
-  width: 100px;
+  width: 86px;
 }
 .booklet-table thead th:nth-child(5) {
-  width: 64px;
+  width: 58px;
 }
 .booklet-table thead th:nth-child(6) {
-  width: 80px;
+  width: 69px;
 }
 .booklet-table thead th:nth-child(7) {
-  width: 152px;
+  width: 130px;
 }
 .booklet-table thead th:nth-child(9) {
-  width: 151px;
+  width: 128px;
 }
 .booklet-table .booklet-sticky-age {
   position: sticky;
@@ -302,7 +303,10 @@
 .booklet-table tbody .booklet-sticky-dose {
   z-index: 2;
 }
-.booklet-table thead :is(.booklet-sticky-age, .booklet-sticky-dose) {
+.vaccination-booklet
+  .booklet-table
+  thead
+  :is(.booklet-sticky-age, .booklet-sticky-dose) {
   z-index: 4;
 }
 .booklet-table
@@ -368,37 +372,185 @@
   white-space: nowrap;
 }
 .booklet-row-action,
-.booklet-dose-review summary {
+.booklet-review-trigger {
   display: block;
-  margin-top: 5px;
-  font-size: 0.75rem;
+  margin-top: 4px;
+  font-size: 0.78rem;
 }
-.booklet-dose-review summary,
+.booklet-review-trigger {
+  border: 0;
+  padding: 4px 0;
+  background: transparent;
+  color: #006744;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  text-align: start;
+  min-height: 32px;
+  line-height: 1.25;
+}
+.booklet-review-trigger:hover {
+  color: #0a5a46;
+}
+.booklet-review-trigger:active {
+  transform: translateY(1px);
+}
 .booklet-secondary > summary {
   cursor: pointer;
 }
-.booklet-dose-review form {
-  display: grid;
-  gap: 7px;
-  margin-top: 6px;
+
+.booklet-review-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  padding: 0;
+  width: min(510px, calc(100% - 28px));
+  max-width: none;
+  max-height: calc(100dvh - 28px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid #d8e7ee;
+  border-radius: 20px;
+  background: #fff;
+  color: #142533;
+  box-shadow: 0 14px 48px #183d4b41;
 }
-.booklet-dose-review label {
+.booklet-review-dialog[open] {
+  animation: booklet-review-enter 200ms ease-out both;
+}
+body:has(.booklet-review-dialog[open]) {
+  overflow: hidden;
+}
+.booklet-review-dialog::backdrop {
+  background: #102f437b;
+}
+.booklet-review-sheet {
+  padding: 18px 20px;
+}
+.booklet-review-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.booklet-review-heading h2 {
+  font-size: 1.25rem;
+  margin: 0;
+  color: #111;
+}
+.booklet-review-heading p {
+  margin: 3px 0 0;
+  color: #3e5866;
+  font-size: 0.86rem;
+}
+.booklet-review-heading button {
+  min-width: 44px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #d8e7ee;
+  border-radius: 10px;
+  background: #eaf4f8;
+  cursor: pointer;
+}
+.booklet-review-dialog form,
+.booklet-review-dialog fieldset {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+.booklet-review-dialog fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.booklet-review-dialog legend {
+  font-weight: 650;
+  margin-bottom: 7px;
+}
+.booklet-review-choices {
+  display: grid;
+  gap: 6px;
+}
+.booklet-review-choices label {
+  min-height: 43px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 9px;
+  border: 1px solid #d8e7ee;
+  cursor: pointer;
+}
+.booklet-review-choices label:has(:checked) {
+  background: #e0f6eb;
+  border-color: #429970;
+}
+.booklet-review-choices input {
+  accent-color: #006744;
+}
+.booklet-review-field {
   display: grid;
   gap: 4px;
+  font-size: 0.9rem;
+  font-weight: 640;
 }
-.booklet-dose-review .booklet-review-check {
-  display: flex;
-  align-items: start;
-}
-.booklet-dose-review textarea {
+.booklet-review-field :is(input, textarea) {
+  width: 100%;
   min-width: 0;
-  padding: 5px;
-}
-.booklet-dose-review button {
   min-height: 44px;
-  line-height: 1.15;
-  padding: 5px;
-  white-space: normal;
+  border: 1px solid #b9ced8;
+  border-radius: 9px;
+  background: #fafdff;
+  padding: 7px 10px;
+}
+.booklet-review-help {
+  margin: 0;
+  font-size: 0.84rem;
+}
+.booklet-review-help a {
+  color: #006744;
+  text-decoration: underline;
+}
+.booklet-review-dialog .booklet-button:disabled {
+  opacity: 0.55;
+  cursor: default;
+  transform: none;
+}
+@keyframes booklet-review-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes booklet-review-sheet-enter {
+  from {
+    transform: translateY(100%);
+  }
+}
+@media (max-width: 620px) {
+  .booklet-review-trigger {
+    min-height: 44px;
+  }
+  .booklet-review-dialog {
+    inset: auto 0 0;
+    margin: 0;
+    width: 100%;
+    max-height: min(85dvh, 610px);
+    border-radius: 19px 19px 0 0;
+  }
+  .booklet-review-dialog[open] {
+    animation-name: booklet-review-sheet-enter;
+  }
+  .booklet-review-sheet {
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .booklet-review-dialog[open] {
+    animation: none;
+  }
 }
 
 .booklet-foot {

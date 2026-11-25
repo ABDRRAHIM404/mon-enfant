@@ -17,6 +17,7 @@ export function ClinicalForm({
   vaccineChoices = [],
   vaccineInitialChoice,
   returnToBooklet = false,
+  paperHistory = false,
 }: {
   childId: string;
   operationId: string;
@@ -27,6 +28,7 @@ export function ClinicalForm({
   vaccineChoices?: VaccineChoice[];
   vaccineInitialChoice?: VaccineChoice;
   returnToBooklet?: boolean;
+  paperHistory?: boolean;
 }) {
   const [state, action, pending] = useActionState(recordClinical, {});
   const data = previous?.payload;
@@ -100,7 +102,10 @@ export function ClinicalForm({
           Certitude de la date de soin
           <select
             name="occurrence_precision"
-            defaultValue={previous?.occurrence_precision ?? "exact"}
+            defaultValue={
+              previous?.occurrence_precision ??
+              (paperHistory ? "unknown" : "exact")
+            }
           >
             <option value="exact">Exacte</option>
             <option value="estimated">Estimée</option>
@@ -119,7 +124,10 @@ export function ClinicalForm({
           Provenance
           <select
             name="source_type"
-            defaultValue={previous?.source_type ?? "observed"}
+            defaultValue={
+              previous?.source_type ??
+              (paperHistory ? "paper_transcription" : "observed")
+            }
           >
             <option value="observed">Observé par le professionnel</option>
             <option value="paper_transcription">Transcription papier</option>

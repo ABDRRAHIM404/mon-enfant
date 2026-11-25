@@ -9,20 +9,24 @@ export function FrenchDateInput({
   date,
   readOnly,
   min,
+  max,
+  name = "date",
 }: {
-  date: string;
+  date?: string;
   readOnly?: boolean;
   min?: string;
+  max?: string;
+  name?: string;
 }) {
   return (
     <input
       type="text"
-      name="date"
+      name={name}
       inputMode="numeric"
       pattern="[0-9]{2}/[0-9]{2}/[0-9]{4}"
       placeholder="JJ/MM/AAAA"
       title="Format JJ/MM/AAAA"
-      defaultValue={frenchAppointmentDate(date)}
+      defaultValue={date ? frenchAppointmentDate(date) : ""}
       readOnly={readOnly}
       required
       onChange={(event) => {
@@ -34,8 +38,13 @@ export function FrenchDateInput({
         input.setCustomValidity("");
         if (digits.length !== 8) return;
         try {
-          if (parseAppointmentDate(input.value) < (min ?? ""))
+          const iso = parseAppointmentDate(input.value);
+          if (min && iso < min)
             input.setCustomValidity("Choisissez une date à venir.");
+          if (max && iso > max)
+            input.setCustomValidity(
+              "Choisissez une date qui n’est pas dans le futur.",
+            );
         } catch {
           input.setCustomValidity(
             "Indiquez une date valide au format JJ/MM/AAAA.",

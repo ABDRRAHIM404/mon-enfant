@@ -1,3 +1,4 @@
+import { todayCasablanca } from "@/lib/appointments/calendar";
 import { randomUUID } from "node:crypto";
 import {
   ArrowLeft,
@@ -152,6 +153,8 @@ function AdministrationCells({
               <small>Date estimée</small>
             )}
           </>
+        ) : entry ? (
+          "Date inconnue"
         ) : (
           "—"
         )}
@@ -211,6 +214,7 @@ export function VaccinationBooklet({
   const base = `/patients/${child.id}`;
   const form = `${base}/records/new?kind=vaccination&from=booklet`;
   const documents = booklet.approved;
+  const today = todayCasablanca();
   const groups = Map.groupBy(booklet.rows, (row) => row.stage.label);
   return (
     <div className="vaccination-booklet-content">
@@ -393,6 +397,14 @@ export function VaccinationBooklet({
                         />
                         <td className="booklet-state-cell">
                           <Status status={status} />
+                          {entry && (
+                            <Link
+                              className="booklet-row-action"
+                              href={`${base}/records/${entry.root_id}`}
+                            >
+                              Historique et correction
+                            </Link>
+                          )}
                           {!entry &&
                             item &&
                             allowed &&
@@ -405,17 +417,27 @@ export function VaccinationBooklet({
                                 Saisir la dose
                               </Link>
                             )}
-                          {allowed && row.canReview && (
-                            <BookletReviewForm
-                              key={`${row.review?.id ?? "new"}-${status}`}
-                              child={child.id}
-                              version={rule.version_id}
-                              dose={rule.dose_code}
-                              operation={randomUUID()}
-                              previous={row.review?.id}
-                              outstanding={status === "overdue"}
-                            />
-                          )}
+                          {allowed &&
+                            row.canReview &&
+                            status !== "completed" &&
+                            status !== "not_applicable" && (
+                              <BookletReviewForm
+                                key={`${row.review?.id ?? "new"}-${status}`}
+                                child={child.id}
+                                version={rule.version_id}
+                                dose={rule.dose_code}
+                                operation={randomUUID()}
+                                previous={row.review?.id}
+                                existingRecord={
+                                  entry
+                                    ? `${base}/records/${entry.root_id}`
+                                    : undefined
+                                }
+                                entryForm={`${entryForm}&historique=1`}
+                                hasRoutineDate={!!row.ref.endOn}
+                                today={today}
+                              />
+                            )}
                         </td>
                       </tr>
                     );

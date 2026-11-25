@@ -26,6 +26,7 @@ export default async function NewEntry({
     version?: string;
     dose?: string;
     from?: string;
+    historique?: string;
   }>;
 }) {
   const { supabase } = await requireApprovedDoctor();
@@ -127,6 +128,7 @@ export default async function NewEntry({
             vaccineChoices={choices}
             vaccineInitialChoice={requestedDose}
             returnToBooklet={fromBooklet}
+            paperHistory={fromBooklet && query.historique === "1"}
           />
         ) : (
           <p>

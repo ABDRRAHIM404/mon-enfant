@@ -13,7 +13,8 @@ export type DoseReview = {
   id: string;
   dose_code: string;
   outstanding: boolean;
-  recommended_end: string;
+  recommended_end: string | null;
+  uncertain?: boolean;
 };
 export type BookletStatus =
   | "completed"
@@ -65,7 +66,13 @@ function stage(rule: CatalogRule) {
     case "first_4_weeks":
       return { label: "4 premières semaines", order: 1 };
     case "weeks":
-      return { label: `${age.value} semaines`, order: age.value * 7 };
+      return {
+        label:
+          age.value <= 4
+            ? `${age.value} semaines`
+            : `≈ ${(age.value / 4).toLocaleString("fr-MA")} mois`,
+        order: age.value * 7,
+      };
     case "months":
       return { label: `${age.value} mois`, order: age.value * 30.44 };
     case "years":
@@ -170,7 +177,10 @@ export function vaccinationBooklet(
       );
       const past = !!ref.endOn && ref.endOn < today;
       const withdrawn = item?.changes.at(-1)?.state === "withdrawn";
-      const canReview = complete && !entry && past && !withdrawn;
+      const canReview =
+        complete &&
+        !withdrawn &&
+        (rule.eligibility !== "female" || child.sex === "female");
       const manual = ref.state === "disabled_reference_only";
       const status: BookletStatus =
         entry &&
@@ -182,9 +192,10 @@ export function vaccinationBooklet(
             ? "not_applicable"
             : withdrawn && !entry
               ? "withdrawn"
-              : entry || !complete
+              : entry || !complete || review?.uncertain
                 ? "review"
                 : canReview &&
+                    past &&
                     review?.outstanding &&
                     review.recommended_end === ref.endOn
                   ? "overdue"
