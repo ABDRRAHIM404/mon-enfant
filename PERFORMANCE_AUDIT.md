@@ -1,5 +1,7 @@
 # Mon Enfant — Phase 1 performance audit
 
+The [authenticated production baseline](#step-0--authenticated-production-baseline) and refined priorities appear below the original signed-out audit.
+
 **27 November 2026 · Africa/Casablanca**
 
 **Production:** [mon-enfant.vercel.app](https://mon-enfant.vercel.app/) · Vercel deployment `dpl_8BiaGEdHpJv14j6tXZkEgC48N8Wh` · source `6f58072905f3b8730681f1cde19a0c564ab25398`
@@ -7,10 +9,10 @@
 ## Executive findings
 
 - **Enfants is the strongest confirmed backend bottleneck.** The production `list_patients` SQL fingerprint averaged **210 ms over 387 calls**, peaked at **1,597 ms**, and accumulated about **81 seconds of SQL execution**. One server RPC runs a visit-summary calculation for every child returned, even when the caller only needs a child selector.
-- **Dossier enfant has an existing persistent layout.** Same-child tab links use Next.js navigation and retain the shared identity by design. The earlier mock-backed checks verified identity DOM persistence on desktop, tablet and mobile. Current source shows substantive differences in what each tab must fetch. The overview and vaccination booklet have the deepest read chains. Current authenticated tab latency, React commit cost and production DOM stability remain unmeasured.
+- **Dossier enfant has an existing persistent layout.** Same-child tab links use Next.js navigation and retain the shared identity by design. The earlier mock-backed checks verified identity DOM persistence on desktop, tablet and mobile. Current source shows substantive differences in what each tab must fetch. The overview and vaccination booklet have the deepest read chains. Current authenticated tab latency, React commit cost and production DOM stability were unmeasured at the initial checkpoint.
 - **The app and database are separated by the Atlantic.** The Vercel function region is Virginia (`iad1`) and Supabase is in Paris (`eu-west-3`). Sequential auth, reference and clinical reads can multiply the effect. Their direct round-trip latency, middleware duration and Vercel cold-start contribution remain unmeasured.
 - **Public pages transfer substantial assets on a first visit.** On constrained mobile, median cold transfers were about **718 KiB** for home, **334 KiB** for login and **378 KiB** for the public QR page. A separate Lighthouse homepage run measured **2.57 s LCP**. The homepage GIFs and the shared sans font are the largest attributable public asset costs.
-- **The signed-in baseline is the outstanding measurement.** Production probes exercised the sign-in guard on every clinician route. This session had no usable authorized synthetic login. Current credential submission, opening a real synthetic chart, clinical tab changes and the verified QR camera workflow could therefore not be measured. The SQL telemetry identifies server work independently of that limitation.
+- **At the initial checkpoint, the signed-in baseline was outstanding.** Production probes exercised the sign-in guard on every clinician route. This session had no usable authorized synthetic login. Current credential submission, opening a real synthetic chart, clinical tab changes and the verified QR camera workflow could therefore not be measured. The SQL telemetry identifies server work independently of that limitation.
 
 ## Measurement method
 
@@ -188,3 +190,105 @@ Expected improvements below are hypotheses, measurable deltas in work, or propos
 Use **LCP ≤2.5 s, INP ≤200 ms and CLS ≤0.1** as field p75 objectives when adequate representative traffic is available. Keep lab and field results distinct. For authenticated testing, compare identical seeded data, permissions, and access changes across candidate builds. Avoid logging identifiers or medical data. Require direct access and expired/revoked session checks before shipping anything that changes routing, authorization, or caching.
 
 The deliverable is this audit. Production application code, clinical logic, data, schema, infrastructure configuration and subscriptions received no changes.
+
+
+## Step 0 — Authenticated production baseline
+
+**27 November 2026 · Africa/Casablanca.** The production alias resolved to Vercel deployment `dpl_257CE2TDj3iamdhJttUvENzXktqs`, Git SHA `0e8c16d36ccd4028ffcd9447c38c2d45ecd8fe90`. That commit adds the initial audit document. The app source is the same as the original audit baseline. The original audit above is retained as a dated signed-out comparison.
+
+An authorized, temporary clinician signed in through the regular clinician form. Scope was one verified synthetic account, two fictional child records created through Inscription rapide, and one fictional practice. Both child identities and clinical writes belonged to that account. No clinical record belonging to another account was opened. The isolated harness used the established cloud Chromium and synthetic fixture workflow. Credential material stayed in a restricted temporary workspace. After testing, the account was signed out and disabled. Independent database readback found zero sessions, child grants, enabled capabilities or active practices. The two fictional children and three synthetic consultations remain in the audit history. The report contains no patient identifiers, credentials, request bodies or session tokens.
+
+Desktop used 1440 × 900, mobile used 390 × 844 at DPR 2, and constrained mobile used the same viewport with 4× CPU slowdown, 150 ms added latency, 1.6 Mbps down and 0.75 Mbps up. Each document route has one browser-cache-disabled observation and the median of two warm observations per profile. This is a browser cache experiment. It does not establish function cold starts. Each tab has one first visit and one revisit per profile in the same session. Login, save and child-switch durations are observed lab samples. The fixture represents a small account with two children. It is useful for causality and regression comparisons and does not represent a large clinician registry.
+
+“Ready” is elapsed time to the target heading or success content using the browser automation wait. This includes detection/polling overhead and should be treated as an upper-bound estimate of actual content visibility, especially for the ~830 ms clusters. TTFB and LCP are document timing metrics. Next.js client transitions have no new document TTFB or LCP. Their foreground request timings are reported separately. Request counts include observed prefetch and cache activity. Bytes count completed wire transfers within the bounded sampling windows and are lower bounds when prefetch or streaming responses are still in flight. A displayed zero KiB can be a rounded sub-KiB observation. Test sizes are too small for field percentiles.
+### Document and sign-in/action measurements
+
+Each cell shows **ready / document TTFB / document LCP / requests / observed KiB**. Timings are in milliseconds. A dash indicates no new document metric or no verified sample.
+
+| Flow | Cache | Desktop | Mobile | Constrained mobile |
+|---|---|---:|---:|---:|
+| Tableau de bord | Uncached | 1332 / 540 / 1420 / 39 / 348 | 1109 / 280 / 1140 / 34 / 380 | 1648 / 270 / 2156 / 31 / 378 |
+| Tableau de bord | Warm | 971 / 314 / 980 / 36 / 25 | 1010 / 258 / 984 / 36 / 43 | 1104 / 288 / 1094 / 41 / 43 |
+| Enfants | Uncached | 1376 / 290 / 1524 / 41 / 398 | 1257 / 448 / 1344 / 37 / 417 | 1709 / 277 / 2416 / 34 / 303 |
+| Enfants | Warm | 1338 / 338 / 1320 / 40 / 43 | 1020 / 248 / 1012 / 29 / 43 | 1184 / 304 / 1136 / 30 / 36 |
+| Inscription rapide | Uncached | 953 / 443 / 1028 / 32 / 357 | 769 / 289 / 764 / 29 / 351 | 1647 / 256 / 1636 / 29 / 351 |
+| Inscription rapide | Warm | 979 / 378 / 816 / 36 / 26 | 644 / 266 / 638 / 31 / 38 | 775 / 266 / 738 / 34 / 36 |
+| Ouvrir le dossier | Uncached | 1806 / 316 / 964 / 47 / 372 | 1750 / 258 / 1724 / 46 / 379 | 1959 / 469 / 1936 / 31 / 372 |
+| Ouvrir le dossier | Warm | 2086 / 268 / 742 / 52 / 39 | 1342 / 252 / 1324 / 47 / 49 | 1620 / 250 / 1568 / 52 / 47 |
+| Carnet vaccinal | Uncached | 2433 / 306 / 1152 / 48 / 358 | 1651 / 242 / 792 / 48 / 371 | 2140 / 266 / 1700 / 38 / 366 |
+| Carnet vaccinal | Warm | 2171 / 308 / 760 / 46 / 36 | 1432 / 272 / 930 / 50 / 59 | 1678 / 264 / 966 / 54 / 53 |
+| Rendez-vous global | Uncached | 1278 / 263 / 1332 / 39 / 393 | 1014 / 249 / 980 / 43 / 417 | 1668 / 285 / 1664 / 25 / 332 |
+| Rendez-vous global | Warm | 1237 / 356 / 1324 / 38 / 75 | 977 / 277 / 930 / 42 / 91 | 1117 / 300 / 1090 / 44 / 143 |
+| Rendez-vous enfant | Uncached | 1243 / 439 / 968 / 37 / 344 | 1192 / 261 / 1192 / 39 / 357 | 1790 / 425 / 1780 / 36 / 355 |
+| Rendez-vous enfant | Warm | 1428 / 405 / 814 / 44 / 28 | 1018 / 267 / 988 / 39 / 43 | 1064 / 252 / 1026 / 42 / 37 |
+| Connexion, formulaire | Action | 818 / 364 / 754 / 24 / 327 | 762 / 319 / 656 / 24 / 332 | 1476 / 382 / 1336 / 13 / 200 |
+| Connexion, envoi → tableau de bord | Action | 2602 / — / — / 28 / 57 | 2734 / — / — / 28 / 101 | 2035 / — / — / 35 / 88 |
+| Enfant A → Enfants → enfant B | Action | 2832 / — / — / 20 / 68 | 2905 / — / — / 17 / 61 | 3632 / — / — / 17 / 70 |
+| Enregistrer une consultation | Action | 1906 / — / — / 38 / 30 | 2042 / — / — / 18 / 31 | 1929 / — / — / 13 / 20 |
+| Recharger le soin enregistré | Action | 1139 / 450 / 828 / 39 / 27 | 932 / 259 / 920 / 38 / 47 | 1039 / 306 / 1024 / 36 / 30 |
+
+### Eight child tabs
+
+Each cell shows **ready ms / RSC headers ms / requests / observed KiB** for one visit. The heading or section-specific content was visible at the end of each measured switch.
+
+| Tab | Desktop first | Desktop return | Mobile first | Mobile return | Constrained first | Constrained return |
+|---|---:|---:|---:|---:|---:|---:|
+| Vue d’ensemble | 1841 / 468 / 7 / 5 | 1327 / 289 / 2 / <1 | 1829 / 254 / 9 / 4 | 1835 / 238 / 2 / 6 | 1442 / 273 / 9 / 2 | 1454 / 292 / 2 / <1 |
+| Consultations | 1187 / 299 / 23 / 14 | 851 / 280 / 3 / 1 | 1347 / 294 / 15 / 14 | 833 / 248 / 2 / 4 | 1517 / 270 / 14 / 19 | 911 / 288 / 2 / <1 |
+| Dossier clinique | 1363 / 436 / 11 / 25 | 851 / 275 / 2 / <1 | 1865 / 957 / 4 / 2 | 834 / 263 / 2 / 4 | 1002 / 278 / 4 / 2 | 918 / 325 / 2 / <1 |
+| Vaccinations | 2348 / 450 / 13 / 20 | 1886 / 323 / 2 / <1 | 1847 / 274 / 13 / 33 | 1343 / 270 / 2 / 7 | 1985 / 282 / 13 / 14 | 1408 / 285 / 2 / 1 |
+| Rendez-vous | 1358 / 418 / 6 / 4 | 837 / 282 / 2 / <1 | 1338 / 262 / 7 / 3 | 852 / 280 / 2 / <1 | 968 / 277 / 7 / 3 | 1018 / 270 / 2 / <1 |
+| Croissance | 1331 / 453 / 6 / 11 | 837 / 309 / 2 / 1 | 831 / 241 / 7 / 11 | 856 / 247 / 2 / <1 | 946 / 267 / 7 / 11 | 915 / 264 / 2 / <1 |
+| Accès des parents | 1346 / 424 / 3 / 4 | 849 / 268 / 2 / <1 | 831 / 254 / 5 / 5 | 825 / 274 / 2 / <1 | 916 / 245 / 5 / 6 | 962 / 248 / 2 / <1 |
+| Résumé et impression | 1346 / 431 / 3 / 1 | 841 / 289 / 2 / <1 | 1344 / 270 / 3 / 1 | 839 / 272 / 2 / <1 | 1402 / 475 / 3 / 1 | 1443 / 252 / 2 / <1 |
+
+### What the browser verified
+
+- **All eight tabs stayed in one workspace.** Across 48 switches, the browser stayed in the same document and retained the child identity, tab bar and shell DOM nodes. Each click issued a foreground RSC request, including all 24 revisits. The first-visit ready estimates ranged from **831 to 2,348 ms**, median **1,347 ms**. Revisits ranged from **825 to 1,886 ms**, median **884 ms**. DOM node retention does not measure React rerender cost. No overlay or inert transition was observed on those 48 tab clicks.
+- **The child switch replaced the intended identity.** From A, the clinician returned to Enfants and opened B. The shell and browser document survived, the child identity and tab bar were replaced, and B’s identity was visible. The two foreground RSC requests were serial. The second began **1,335 / 1,311 / 1,905 ms** after the first on desktop/mobile/constrained mobile. End-to-end ready times were **2.83 / 2.91 / 3.63 s**, including automation between clicks. First RSC headers came back in **272 / 264 / 337 ms**, then the selected child request took **266 / 276 / 307 ms** to headers.
+- **Clinical writes and refresh worked on all three profiles.** One distinct synthetic consultation per profile reached the saved clinical record and remained visible after a hard refresh. The save POST reached response headers in **1,170 / 830 / 1,090 ms**. The save used a Next server action in the existing document. The following reload was an intentional full document request. The two desktop fixture registrations through Inscription rapide took **2,593 ms** and **2,398 ms** from submit to the new booklet; their POSTs reached headers in **1,776 ms** and **1,279 ms**. No duplicate fixture write was retried after success.
+- **Broad overlays occur on selected links.** A desktop Dashboard → Ajouter un enfant click and a Consultations → Nouvelle consultation click each inserted the route overlay and toggled main from interactive to inert and back. Their ready times were **1,382 ms** and **832 ms**. The in-dossier form click retained both identity and navigation in the DOM. The overlay covered/intercepted main content during the transition. This is the UI mechanism behind some perceived full-page loading, alongside ordinary content skeletons.
+- **Dashboard refresh reissues the route.** With the signed-in dashboard visible and idle, a foreground dashboard RSC fetch started **60,000 ms** after the first request captured in the refresh observation. It returned headers after **335 ms**, in the same document and without an overlay. The wider observation also included initial and post-response prefetch activity. It would be misleading to assign all 45 observed requests to the interval. From the page source, the refresh re-executes dashboard data loading. An isolated per-refresh Supabase call count was unavailable.
+- **Early paint can substantially precede clinical readiness.** For example, the uncached desktop booklet painted its largest observed element at **1,152 ms**, but waited **2,433 ms** for the booklet heading. A page-wide LCP target alone would miss delays after the workspace shell first appears.
+
+### Server request waterfalls and SQL duration
+
+Four separate authenticated HTML GETs used the same synthetic clinician without a browser JavaScript prefetcher. The four request windows were sequential with one-second separation. Supabase gateway records were restricted to that fixture actor and matched by the isolated request times. The observed operation order is shown below. Arrows indicate successive groups in the measured window and concurrent calls are in parentheses. Network/client timings differ from Postgres execution. Upstream service is the provider gateway's reported upstream duration. It can include API, database and connection handling. It is not statement-only duration.
+
+| Requested page | Full HTML elapsed | Observed upstream sequence |
+|---|---:|---|
+| Enfants | 1,317 ms | Auth user twice → professional profile → `list_patients`. The directory RPC reported **322 ms upstream**, **469 ms gateway origin time**. |
+| Dossier overview | 2,084 ms | Auth user twice → profile → (visit overview, capabilities, child identity) → (access grants, catalogue list) → catalogue detail → (clinical timeline, vaccine items, historical reviews) → clinician labels. Two catalogue calls reported **6 / 19 ms upstream** and **274 / 204 ms origin time**. Their gateway event times were 300 ms apart. |
+| Vaccination booklet | 2,244 ms | Auth user twice → profile → child identity → (timeline, items, capabilities, catalogue list) → catalogue detail → historical reviews → (another catalogue call, facilities). The three catalogue calls reported **14 / 26 / 7 ms upstream** and **112 / 360 / 109 ms origin time**. Catalogue calls began again about 0.13 s after the first gateway event and about 0.50 s after the second. The fixture had a small ledger and did not exercise extra history pages. |
+| Global Rendez-vous | 844 ms | Auth user twice → profile → (facilities, workspace, capabilities). The workspace RPC reported **51 ms upstream**, **154 ms origin time**. |
+
+Each of these four requests showed two fresh Auth user lookups and one professional profile read. This supports separating duplicate identity work on one server request from profile reads that are expected when a new route is requested. The supabase gateway footprint of 35 events was all `IAD`. The median difference between the gateway's origin and upstream durations was **103 ms**, range **93–375 ms**. This measures combined gateway/origin overhead in this sample. It does not isolate Virginia–Paris network RTT, function cold starts or providers' queue times. Routing evidence for all four Vercel responses was `cle1::iad1`, with Supabase PostgreSQL in Paris. The measured serial rounds and this combined overhead are stronger evidence for reducing dependent cross-service reads than an estimate based on geography alone.
+
+Updated production-wide top-level SQL aggregate through this audit session, using the same reset timestamp as the original table. These are query durations across all callers and cannot be attributed to the test clinician's individual requests.
+
+| SQL fingerprint | Calls | Mean execution | Maximum |
+|---|---:|---:|---:|
+| `list_patients` | 403 | 201.82 ms | 1,597.43 ms |
+| `professional_profiles` match | 10,886 | 2.59 ms | 747.40 ms |
+| `my_clinical_capabilities` | 2,274 | 6.10 ms | 557.65 ms |
+| `get_child_profile` | 1,075 | 6.25 ms | 467.59 ms |
+| `vaccine_catalog` | 1,347 | 12.67 ms | 590.95 ms |
+| `clinical_timeline` | 463 | 7.07 ms | 223.83 ms |
+| `vaccination_booklet_reviews` | 60 | 8.17 ms | 124.36 ms |
+| `appointment_workspace` | 54 | 53.24 ms | 210.41 ms |
+
+### European function placement
+
+The project handoff identifies `bounga` as **Hobby**, and a current Vercel eligibility readback reports a plan below Pro/Enterprise for rolling releases. Vercel's function configuration docs allow a single selected region on Hobby. The official list includes **Paris `cdg1`**, the same underlying AWS region (`eu-west-3`) as the Supabase project. One Paris function region is therefore available within the documented Hobby limit. Two simultaneous function regions on the current plan would exceed it. No function region, project setting or billing plan was changed during testing. A controlled same-code Paris comparison remains a future experiment. [Function regions and plan limits](https://vercel.com/docs/functions/configuring-functions/region) · [Vercel region list](https://vercel.com/docs/regions)
+
+### Refined order after the authenticated baseline
+
+| Order | Approved roadmap item | Measured acceptance to carry forward |
+|---|---|---|
+| 1 | Batch registry SQL and use the lightweight authorized selector. | Compare statement p50/p95, same child and audit results, and end-to-end Enfants and A→B journeys. Include a larger fixture with representative record counts. |
+| 2 | Shorten overview and booklet dependency chains and deduplicate catalogue/reference reads within the authorization boundary. | Start with the measured **2.08 s overview / 2.24 s booklet** HTML samples, two overview and three booklet catalogue calls. Compare click-to-content with an in-browser readiness event, and require equivalent review, validity, PNI and clinical outputs. |
+| 3 | Benchmark a same-code Paris function placement and investigate repeated verified identity reads. | Hold the synthetic fixture, source and browser conditions constant. Compare gateway overhead, repeated Auth counts, and browser navigation. Preserve session revocation, role checks and RLS. Measure before choosing production placement. |
+| 4 | Target repeat tab fetches, route-level auto-refresh and broad overlays. | Keep identity, shell and tab continuity. Reduce unnecessary foreground RSC requests and whole-route polling while keeping clinical freshness. Scope loading feedback to the changing panel or invoking link. Retest the **<300 ms** warm tab goal with in-browser timestamps so automation polling does not dominate. |
+| 5 | Reduce initial bytes once slow clinical stages are addressed. | Compare both document LCP and target-section visibility. Review route prefetch budget, GIF/font work and measured JS coverage. |
+
+Remaining measurement limits are per-action SQL traces and direct interregion RTT, Vercel cold-start timings, private field INP and React commit profiles, large registries, longer vaccination histories, and physical Moroccan device/network coverage. The lab baseline covers the requested current flows. It gives concrete browser times, observed upstream call order and separate aggregate SQL timing without enabling new production instrumentation.
